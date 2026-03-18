@@ -1,0 +1,13 @@
+.negotiation-form-container {
+  padding: 16px;
+}
+.full-width {
+  width: 100%;
+}
+.mb-15 {
+  margin-bottom: 15px;
+  display: block;
+}
+.cancel-btn {
+  margin-right: 8px;
+}

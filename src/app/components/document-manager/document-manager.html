@@ -1,0 +1,78 @@
+<div class="doc-manager-container">
+  <div class="manager-header">
+    <div class="header-info">
+      <h3>Documents & Files</h3>
+      <p>Secure version tracking and digital signatures</p>
+    </div>
+    <button mat-stroked-button color="primary" class="upload-btn" (click)="openUploadForm()">
+      <mat-icon>cloud_upload</mat-icon>
+      Upload
+    </button>
+  </div>
+
+  @if (loading) {
+    <div class="loading-state">
+      <mat-icon class="spin">refresh</mat-icon>
+      <span>Loading documents...</span>
+    </div>
+  } @else if (documents.length === 0) {
+    <div class="empty-state">
+      <mat-icon>folder_open</mat-icon>
+      <p>No documents uploaded yet</p>
+    </div>
+  } @else {
+    <div class="doc-list">
+      @for (doc of documents; track doc.id) {
+        <mat-card class="doc-card">
+          <div class="doc-icon-area" [attr.data-type]="doc.type">
+            <mat-icon>{{ getIconForType(doc.type) }}</mat-icon>
+          </div>
+          
+          <div class="doc-info">
+            <div class="doc-main">
+              <span class="doc-title">{{ doc.title }}</span>
+              <span class="doc-meta">
+                v{{ doc.currentVersion }} • {{ doc.type }} • 
+                {{ (doc.versions[0]?.fileSize / 1024).toFixed(1) }} KB
+              </span>
+            </div>
+            <div class="doc-status-row">
+              <span class="status-badge" [attr.data-status]="doc.status">
+                {{ doc.status }}
+              </span>
+              @if (doc.status === 'Signed') {
+                <span class="sign-meta">Signed {{ doc.signedAt | date:'shortDate' }}</span>
+              }
+            </div>
+          </div>
+
+          <div class="doc-actions">
+            <button mat-icon-button [matMenuTriggerFor]="docMenu">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #docMenu="matMenu">
+              <button mat-menu-item (click)="downloadDocument(doc)">
+                <mat-icon>download</mat-icon>
+                <span>Download Latest</span>
+              </button>
+              <button mat-menu-item (click)="openUploadForm(true, doc.id)">
+                <mat-icon>history</mat-icon>
+                <span>Upload New Version</span>
+              </button>
+              @if (doc.isDigitalSignatureEnabled && doc.status !== 'Signed') {
+                <button mat-menu-item (click)="signDocument(doc)">
+                  <mat-icon color="primary">draw</mat-icon>
+                  <span>Sign Digitally</span>
+                </button>
+              }
+              <button mat-menu-item (click)="deleteDocument(doc)" class="text-warn">
+                <mat-icon color="warn">delete_outline</mat-icon>
+                <span>Delete</span>
+              </button>
+            </mat-menu>
+          </div>
+        </mat-card>
+      }
+    </div>
+  }
+</div>

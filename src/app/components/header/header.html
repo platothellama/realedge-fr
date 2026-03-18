@@ -1,0 +1,28 @@
+<mat-toolbar class="header-toolbar">
+  <span class="spacer"></span>
+  
+  <app-notifications></app-notifications>
+
+  <button mat-button [matMenuTriggerFor]="profileMenu" class="profile-btn">
+    <img [src]="user()?.photo || 'https://ui-avatars.com/api/?name=' + user()?.name + '&background=6366f1&color=fff'" 
+         style="width: 32px; height: 32px; border-radius: 8px; margin-right: 8px;" alt="Avatar">
+    <span class="username">{{ user()?.name }}</span>
+    <mat-icon iconPositionEnd>keyboard_arrow_down</mat-icon>
+  </button>
+
+  <mat-menu #profileMenu="matMenu" xPosition="before">
+    <button mat-menu-item>
+      <mat-icon>person</mat-icon>
+      <span>My Profile</span>
+    </button>
+    <button mat-menu-item>
+      <mat-icon>settings</mat-icon>
+      <span>Account Settings</span>
+    </button>
+    <mat-divider></mat-divider>
+    <button mat-menu-item color="warn" (click)="logout()">
+      <mat-icon color="warn">logout</mat-icon>
+      <span style="color: var(--warn)">Logout</span>
+    </button>
+  </mat-menu>
+</mat-toolbar>

@@ -1,0 +1,151 @@
+<div class="tasks-container">
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">Office Tasks</h1>
+      <p class="page-subtitle">Manage team tasks and track progress</p>
+    </div>
+    <button mat-raised-button color="primary" (click)="showAddDialog = true">
+      <mat-icon>add</mat-icon>
+      Add Task
+    </button>
+  </div>
+
+  @if (loading) {
+    <div class="loading-container">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+  } @else {
+    <div class="kanban-board">
+      @for (column of columns; track column.id) {
+        <div class="kanban-column">
+          <div class="column-header" [style.border-left-color]="column.color">
+            <span class="column-title">{{ column.label }}</span>
+            <span class="column-count">{{ getTaskArray(column.id).length }}</span>
+          </div>
+          <div 
+            class="column-content"
+            cdkDropList
+            [id]="column.id"
+            [cdkDropListData]="getTaskArray(column.id)"
+            [cdkDropListConnectedTo]="['todo', 'in_progress', 'review', 'done']"
+            (cdkDropListDropped)="drop($event)">
+            @for (task of getTaskArray(column.id); track task.id) {
+              <div class="task-card" [class]="getPriorityClass(task.priority)" cdkDrag>
+                <div class="task-header">
+                  <span class="task-priority" [style.background-color]="priorityColors[task.priority]">
+                    {{ task.priority }}
+                  </span>
+                  <button mat-icon-button [matMenuTriggerFor]="taskMenu" class="task-menu-btn">
+                    <mat-icon>more_vert</mat-icon>
+                  </button>
+                  <mat-menu #taskMenu="matMenu">
+                    <button mat-menu-item [matMenuTriggerFor]="assignMenu">
+                      <mat-icon>person_add</mat-icon>
+                      Assign To
+                    </button>
+                    <mat-menu #assignMenu="matMenu">
+                      @for (user of users; track user.id) {
+                        <button mat-menu-item (click)="assignTask(task, user.id)">
+                          <mat-icon>person</mat-icon>
+                          {{ user.name }}
+                        </button>
+                      }
+                    </mat-menu>
+                    @for (col of columns; track col.id) {
+                      @if (col.id !== task.status) {
+                        <button mat-menu-item (click)="updateTaskStatus(task, col.id)">
+                          <mat-icon>drive_file_move</mat-icon>
+                          Move to {{ col.label }}
+                        </button>
+                      }
+                    }
+                    <button mat-menu-item (click)="deleteTask(task.id)" class="delete-option">
+                      <mat-icon>delete</mat-icon>
+                      Delete
+                    </button>
+                  </mat-menu>
+                </div>
+                <h3 class="task-title">{{ task.title }}</h3>
+                @if (task.description) {
+                  <p class="task-description">{{ task.description }}</p>
+                }
+                <div class="task-footer">
+                  @if (task.assignedTo) {
+                    <div class="task-assignee" (click)="openAssignDialog(task)">
+                      <mat-icon>person</mat-icon>
+                      <span>{{ task.assignedTo.name }}</span>
+                    </div>
+                  } @else {
+                    <div class="task-assignee unassigned" (click)="openAssignDialog(task)">
+                      <mat-icon>person_add</mat-icon>
+                      <span>Assign</span>
+                    </div>
+                  }
+                  @if (task.dueDate) {
+                    <div class="task-due" [class.overdue]="isOverdue(task.dueDate)">
+                      <mat-icon>schedule</mat-icon>
+                      <span>{{ task.dueDate | date:'MMM d' }}</span>
+                    </div>
+                  }
+                </div>
+              </div>
+            } @empty {
+              <div class="empty-column">
+                <mat-icon>inbox</mat-icon>
+                <p>No tasks</p>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
+
+@if (showAddDialog) {
+  <div class="dialog-overlay" (click)="closeDialog()">
+    <div class="dialog-content" (click)="$event.stopPropagation()">
+      <div class="dialog-header">
+        <h2>Create New Task</h2>
+        <button mat-icon-button (click)="closeDialog()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+      <div class="dialog-body">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Task Title</mat-label>
+          <input matInput [(ngModel)]="newTask.title" placeholder="Enter task title">
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Description</mat-label>
+          <textarea matInput [(ngModel)]="newTask.description" placeholder="Enter description" rows="3"></textarea>
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Priority</mat-label>
+          <mat-select [(ngModel)]="newTask.priority">
+            @for (priority of priorities; track priority) {
+              <mat-option [value]="priority">{{ priority | titlecase }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Assign To</mat-label>
+          <mat-select [(ngModel)]="newTask.assignedToUserId">
+            <mat-option value="">Unassigned</mat-option>
+            @for (user of users; track user.id) {
+              <mat-option [value]="user.id">{{ user.name }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Due Date</mat-label>
+          <input matInput type="date" [(ngModel)]="newTask.dueDate">
+        </mat-form-field>
+      </div>
+      <div class="dialog-actions">
+        <button mat-button (click)="closeDialog()">Cancel</button>
+        <button mat-raised-button color="primary" (click)="createTask()">Create Task</button>
+      </div>
+    </div>
+  </div>
+}

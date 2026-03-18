@@ -1,0 +1,166 @@
+<div class="page-container">
+  <div class="page-header">
+    <div class="header-left">
+      <button mat-icon-button (click)="goBack()" class="back-button">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div class="header-content">
+        <h1>AI Property Matcher</h1>
+        @if (preference) {
+          <p class="subtitle">Matching properties for: <strong>{{ preference.clientName }}</strong></p>
+        }
+      </div>
+    </div>
+    <div class="header-actions">
+      <button mat-stroked-button (click)="openNlSearch()">
+        <mat-icon>search</mat-icon>
+        Natural Language Search
+      </button>
+      @if (preferenceId) {
+        <button mat-raised-button color="primary" (click)="matchProperties()">
+          <mat-icon>refresh</mat-icon>
+          Rematch
+        </button>
+      }
+    </div>
+  </div>
+
+  @if (showNlSearch) {
+    <div class="nl-search-section">
+      <mat-card>
+        <mat-card-content>
+          <h3>Natural Language Property Search</h3>
+          <p class="nl-hint">Try searching like: "modern apartment near downtown with balcony under $300k"</p>
+          <div class="search-input-row">
+            <mat-form-field appearance="outline" class="search-field">
+              <mat-label>Search properties</mat-label>
+              <input matInput [(ngModel)]="nlQuery" (keyup.enter)="naturalLanguageSearch()" 
+                placeholder="e.g., cheap studio near university with parking">
+              <mat-icon matSuffix>search</mat-icon>
+            </mat-form-field>
+            <button mat-raised-button color="primary" (click)="naturalLanguageSearch()" [disabled]="searchLoading">
+              @if (searchLoading) {
+                <mat-spinner diameter="20"></mat-spinner>
+              } @else {
+                Search
+              }
+            </button>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  }
+
+  @if (loading || searchLoading) {
+    <div class="loading-container">
+      <mat-spinner diameter="50"></mat-spinner>
+      <p>Analyzing properties with AI...</p>
+    </div>
+  } @else {
+    @if (aiExplanation) {
+      <div class="ai-explanation-card">
+        <div class="ai-header">
+          <mat-icon>smart_toy</mat-icon>
+          <span>AI Analysis</span>
+        </div>
+        <p>{{ aiExplanation }}</p>
+      </div>
+    }
+
+    <div class="results-summary">
+      <span class="result-count">{{ totalFound }} properties found</span>
+      <span class="match-count">{{ matches.length }} matches shown</span>
+    </div>
+
+    @if (matches.length === 0) {
+      <div class="empty-state">
+        <mat-icon>search_off</mat-icon>
+        <h3>No matching properties found</h3>
+        <p>Try adjusting the buyer requirements or add more properties to the database</p>
+      </div>
+    } @else {
+      <div class="matches-grid">
+        @for (match of matches; track match.property.id) {
+          <div class="property-card">
+            <div class="property-image">
+              @if (getMainImage(match.property)) {
+                <img [src]="getMainImage(match.property)" [alt]="match.property.title">
+              } @else {
+                <div class="no-image">
+                  <mat-icon>home</mat-icon>
+                </div>
+              }
+              <div class="match-score" [class]="getScoreClass(match.scores.total)">
+                {{ getScorePercentage(match.scores.total) }}%
+              </div>
+            </div>
+            
+            <div class="property-content">
+              <div class="property-header">
+                <h3>{{ match.property.title }}</h3>
+                <span class="price">${{ match.property.price | number }}</span>
+              </div>
+              
+              <div class="property-location">
+                <mat-icon>location_on</mat-icon>
+                {{ match.property.city }}, {{ match.property.address }}
+              </div>
+              
+              <div class="property-details">
+                <span><mat-icon>bed</mat-icon> {{ match.property.bedrooms }} bed</span>
+                <span><mat-icon>bathtub</mat-icon> {{ match.property.bathrooms }} bath</span>
+                <span><mat-icon>square_foot</mat-icon> {{ match.property.area }} sqm</span>
+              </div>
+
+              @if (match.matchReasons && match.matchReasons.length > 0) {
+                <div class="match-reasons">
+                  @for (reason of match.matchReasons.slice(0, 4); track reason) {
+                    <mat-chip>{{ reason }}</mat-chip>
+                  }
+                </div>
+              }
+
+              <div class="score-details">
+                <div class="score-item" matTooltip="AI Description Match">
+                  <span class="label">AI</span>
+                  <div class="score-bar">
+                    <div class="score-fill" [style.width.%]="match.scores.ai ? match.scores.ai * 100 : 0"></div>
+                  </div>
+                  <span class="value">{{ match.scores.ai ? (match.scores.ai * 100 | number:'1.0-0') : 'N/A' }}%</span>
+                </div>
+                <div class="score-item" matTooltip="Price Match">
+                  <span class="label">Price</span>
+                  <div class="score-bar">
+                    <div class="score-fill" [style.width.%]="match.scores.price * 100"></div>
+                  </div>
+                  <span class="value">{{ match.scores.price * 100 | number:'1.0-0' }}%</span>
+                </div>
+                <div class="score-item" matTooltip="Location Match">
+                  <span class="label">Location</span>
+                  <div class="score-bar">
+                    <div class="score-fill" [style.width.%]="match.scores.location * 100"></div>
+                  </div>
+                  <span class="value">{{ match.scores.location * 100 | number:'1.0-0' }}%</span>
+                </div>
+                <div class="score-item" matTooltip="Features Match">
+                  <span class="label">Features</span>
+                  <div class="score-bar">
+                    <div class="score-fill" [style.width.%]="match.scores.features * 100"></div>
+                  </div>
+                  <span class="value">{{ match.scores.features * 100 | number:'1.0-0' }}%</span>
+                </div>
+              </div>
+
+              <div class="property-actions">
+                <button mat-stroked-button (click)="viewPropertyDetails(match.property.id)">
+                  <mat-icon>visibility</mat-icon>
+                  View Details
+                </button>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  }
+</div>

@@ -1,0 +1,48 @@
+<div class="negotiation-form-container">
+  <h2 mat-dialog-title>Add Negotiation/Price Log</h2>
+  
+  <mat-dialog-content [formGroup]="negotiationForm" style="padding-top: 10px;">
+    
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Proposed Price / Current Value ($)</mat-label>
+        <input matInput type="number" formControlName="price">
+        <mat-icon matPrefix>payments</mat-icon>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <mat-checkbox formControlName="updatePropertyPrice" color="primary" class="mb-15">
+        Also update the listing's asking price to this amount
+      </mat-checkbox>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Associated Lead / Client (Optional)</mat-label>
+        <mat-select formControlName="leadId">
+          <mat-option [value]="null">-- No Associated Lead --</mat-option>
+          @for (lead of leads; track lead.id) {
+            <mat-option [value]="lead.id">{{lead.name}} ({{lead.email}})</mat-option>
+          }
+        </mat-select>
+        <mat-icon matPrefix>person</mat-icon>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Event Note / Discussion</mat-label>
+        <textarea matInput formControlName="note" rows="3" placeholder="Ex: Client offered a cash payment..."></textarea>
+      </mat-form-field>
+    </div>
+
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="onCancel()" class="cancel-btn">Cancel</button>
+    <button mat-raised-button color="primary" class="submit-btn" (click)="onSubmit()" [disabled]="!negotiationForm.valid">
+      Add Event
+    </button>
+  </mat-dialog-actions>
+</div>

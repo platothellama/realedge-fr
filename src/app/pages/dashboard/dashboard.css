@@ -1,0 +1,240 @@
+.dashboard-container {
+  padding: 60px 40px;
+  max-width: 1500px;
+  margin: 0 auto;
+}
+
+.welcome-section {
+  margin-bottom: 40px;
+}
+
+.welcome-section h1 {
+  font-size: 3.5rem;
+  font-weight: 900;
+  letter-spacing: -0.06em;
+  margin: 0;
+  background: linear-gradient(135deg, #fff 0%, #a1a1aa 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.welcome-section p {
+  font-size: 1.25rem;
+  color: var(--text-secondary);
+  margin-top: 12px;
+  max-width: 800px;
+}
+
+.section-header {
+  margin: 40px 0 24px;
+}
+
+.section-header h2 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+  margin-bottom: 40px;
+}
+
+.stats-grid.small {
+  grid-template-columns: repeat(4, 1fr);
+  margin-bottom: 40px;
+}
+
+.stat-card {
+  padding: 40px !important;
+  border-radius: var(--radius-xl) !important;
+  background: var(--bg-surface) !important;
+}
+
+.stat-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary-soft);
+  color: var(--primary);
+  margin-bottom: 32px;
+}
+
+.stat-icon mat-icon { font-size: 36px; width: 36px; height: 36px; }
+
+.stat-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-label {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+}
+
+.stat-value {
+  font-size: 3rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-top: 8px;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1.8fr 1fr;
+  gap: 40px;
+}
+
+.section-card {
+  border-radius: var(--radius-xl) !important;
+}
+
+.card-header {
+  padding: 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+}
+
+.card-header h2 {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 800;
+}
+
+.activity-list {
+  padding: 24px;
+}
+
+.activity-item {
+  display: flex;
+  gap: 24px;
+  padding: 24px;
+  border-radius: var(--radius-lg);
+  transition: all 0.2s ease;
+}
+
+.activity-item:hover {
+  background: var(--bg-elevated);
+  transform: translateX(8px);
+}
+
+.activity-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: var(--bg-elevated);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+}
+
+.activity-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.activity-title {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: var(--text-primary);
+}
+
+.activity-time {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+}
+
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  padding: 40px;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  color: var(--text-muted);
+}
+
+.empty-state mat-icon {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 12px;
+}
+
+.empty-state span {
+  font-size: 0.95rem;
+}
+
+/* Chart Sections */
+.chart-section {
+  padding: 24px;
+}
+
+.progress-item {
+  margin-bottom: 20px;
+}
+
+.progress-item:last-child {
+  margin-bottom: 0;
+}
+
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.progress-label, .source-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.source-label mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  color: var(--primary);
+}
+
+.progress-value {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.progress-bar {
+  height: 8px;
+  background: var(--bg-elevated);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 10px;
+  transition: width 0.5s ease;
+}

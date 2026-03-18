@@ -1,0 +1,562 @@
+.market-container {
+  padding: 24px;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.header-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.page-title {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.page-subtitle {
+  font-size: 15px;
+  color: var(--text-secondary);
+  margin: 6px 0 0 0;
+  font-weight: 400;
+}
+
+.header-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.period-select {
+  width: 160px;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+@media (max-width: 1400px) {
+  .metrics-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.metric-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  transition: all 0.2s ease;
+}
+
+.metric-card:hover {
+  border-color: var(--border-strong);
+  transform: translateY(-2px);
+}
+
+.metric-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.metric-header mat-icon {
+  color: var(--primary);
+  font-size: 22px;
+  width: 22px;
+  height: 22px;
+}
+
+.metric-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.metric-value {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 10px;
+  letter-spacing: -0.02em;
+}
+
+.metric-change {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.metric-change mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+.metric-change.positive {
+  color: var(--success);
+}
+
+.metric-change.negative {
+  color: var(--error);
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 24px;
+}
+
+@media (max-width: 1200px) {
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.main-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.sidebar-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.data-table-card,
+.performers-card,
+.insights-card {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-lg) !important;
+}
+
+:host ::ng-deep .mat-mdc-card-header {
+  padding: 24px 24px 0;
+}
+
+:host ::ng-deep .mat-mdc-card-title {
+  color: var(--text-primary);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+:host ::ng-deep .mat-mdc-card-content {
+  padding: 20px 24px 24px;
+}
+
+.market-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.market-table th,
+.market-table td {
+  padding: 16px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.market-table th {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.1em;
+}
+
+.market-table td {
+  font-size: 14px;
+  color: var(--text-primary);
+}
+
+.location-cell {
+  font-weight: 600;
+}
+
+.market-table .positive {
+  color: var(--success);
+}
+
+.market-table .negative {
+  color: var(--error);
+}
+
+.demand-badge {
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.demand-badge.demand-high {
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--success);
+}
+
+.demand-badge.demand-medium {
+  background: rgba(245, 158, 11, 0.12);
+  color: var(--warning);
+}
+
+.demand-badge.demand-low {
+  background: rgba(100, 116, 139, 0.12);
+  color: var(--text-muted);
+}
+
+.performers-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.performer-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: var(--bg-elevated);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  transition: all 0.2s ease;
+}
+
+.performer-item:hover {
+  border-color: var(--border-strong);
+}
+
+.performer-rank {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--primary);
+  color: white;
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.performer-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.performer-name {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 15px;
+}
+
+.performer-stats {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.performer-volume,
+.performer-price {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+}
+
+.volume-value,
+.price-value {
+  font-weight: 700;
+  color: var(--text-primary);
+  font-size: 15px;
+}
+
+.volume-label,
+.price-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.insights-card mat-card-header {
+  display: flex;
+}
+
+.insights-card mat-card-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.insights-card mat-card-title mat-icon {
+  color: var(--warning);
+}
+
+.insights-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.insight-item {
+  display: flex;
+  gap: 14px;
+  padding: 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
+
+.insight-item.insight-opportunity {
+  background: rgba(16, 185, 129, 0.06);
+  border-color: rgba(16, 185, 129, 0.2);
+}
+
+.insight-item.insight-warning {
+  background: rgba(239, 68, 68, 0.06);
+  border-color: rgba(239, 68, 68, 0.2);
+}
+
+.insight-item.insight-trend {
+  background: rgba(99, 102, 241, 0.06);
+  border-color: rgba(99, 102, 241, 0.2);
+}
+
+.insight-item.insight-info {
+  background: rgba(99, 102, 241, 0.06);
+  border-color: rgba(99, 102, 241, 0.2);
+}
+
+.insight-item.insight-success {
+  background: rgba(16, 185, 129, 0.06);
+  border-color: rgba(16, 185, 129, 0.2);
+}
+
+.insight-icon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+}
+
+.insight-opportunity .insight-icon {
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--success);
+}
+
+.insight-warning .insight-icon {
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--error);
+}
+
+.insight-trend .insight-icon,
+.insight-info .insight-icon {
+  background: rgba(99, 102, 241, 0.15);
+  color: var(--primary);
+}
+
+.insight-success .insight-icon {
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--success);
+}
+
+.insight-icon mat-icon {
+  font-size: 22px;
+  width: 22px;
+  height: 22px;
+}
+
+.insight-content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.insight-title {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 14px;
+}
+
+.insight-description {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
+:host ::ng-deep .mat-mdc-form-field {
+  --mdc-outlined-text-field-outline-color: var(--border-strong);
+  --mdc-outlined-text-field-focus-outline-color: var(--primary);
+  --mdc-outlined-text-field-label-text-color: var(--text-muted);
+  --mdc-outlined-text-field-input-text-color: var(--text-primary);
+}
+
+.methodology-card {
+  margin-top: 32px;
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-lg) !important;
+}
+
+.methodology-card :host ::ng-deep .mat-mdc-card-header {
+  padding: 24px 24px 0;
+}
+
+.methodology-card :host ::ng-deep .mat-mdc-card-title {
+  color: var(--text-primary);
+  font-size: 20px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.methodology-card :host ::ng-deep .mat-mdc-card-title mat-icon {
+  color: var(--primary);
+}
+
+.methodology-card :host ::ng-deep .mat-mdc-card-content {
+  padding: 20px 24px 24px;
+}
+
+.methodology-card :host ::ng-deep .mat-expansion-panel {
+  background: var(--bg-elevated) !important;
+  border: 1px solid var(--border);
+  margin-bottom: 10px;
+  border-radius: var(--radius-md) !important;
+  box-shadow: none !important;
+  --mat-expansion-container-background-color: var(--bg-elevated) !important;
+  --mat-expansion-container-text-color: var(--text-primary) !important;
+}
+
+.methodology-card mat-expansion-panel {
+  background: var(--bg-elevated) !important;
+}
+
+.mat-expansion-panel.mat-expansion-panel.mat-expansion-panel-animations-enabled {
+  background: var(--bg-surface) !important;
+  background-color: var(--bg-surface) !important;
+}
+
+.methodology-card :host ::ng-deep .mat-expansion-panel:hover {
+  border-color: var(--border-strong);
+}
+
+.methodology-card :host ::ng-deep .mat-expansion-panel-header {
+  height: 56px;
+  padding: 0 20px;
+  font-family: 'Urbanist', sans-serif !important;
+}
+
+.methodology-card :host ::ng-deep .mat-expansion-panel-header:hover {
+  background: rgba(255, 255, 255, 0.03) !important;
+}
+
+.methodology-card .mat-expansion-panel-header-title,
+.methodology-card .mat-expansion-panel-header-title span,
+.methodology-card :host ::ng-deep .mat-expansion-panel-header-title,
+.methodology-card :host ::ng-deep .mat-expansion-panel-header-title span,
+.methodology-card .mdc-typography--body-md,
+.methodology-card :host .mat-expansion-panel-header-title {
+  color: var(--text-primary) !important;
+  font-weight: 600 !important;
+  font-size: 15px !important;
+  font-family: 'Urbanist', sans-serif !important;
+}
+
+.methodology-card .mat-expansion-panel-header-description,
+.methodology-card :host ::ng-deep .mat-expansion-panel-header-description,
+.methodology-card :host .mat-expansion-panel-header-description {
+  color: var(--text-muted) !important;
+  font-size: 13px !important;
+  font-family: 'Urbanist', sans-serif !important;
+}
+
+.methodology-card :host ::ng-deep .mat-expansion-indicator::after {
+  border-color: var(--text-muted) !important;
+}
+
+.methodology-card :host ::ng-deep .mat-expansion-panel-header.mat-expanded {
+  height: 56px;
+}
+
+.methodology-card :host ::ng-deep .mat-expansion-panel-body {
+  padding: 0 20px 20px;
+}
+
+.methodology-details {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.methodology-section h4 {
+  color: var(--primary) !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  margin: 0 0 10px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-family: 'Urbanist', sans-serif !important;
+}
+
+.methodology-section code {
+  display: block;
+  background: var(--bg-main) !important;
+  color: var(--text-primary) !important;
+  padding: 14px 16px;
+  border-radius: var(--radius-sm);
+  font-family: 'Urbanist', 'Monaco', 'Consolas', monospace !important;
+  font-size: 13px !important;
+  line-height: 1.6;
+  border: 1px solid var(--border);
+}
+
+.methodology-section p {
+  color: var(--text-secondary) !important;
+  margin: 0;
+  font-size: 14px !important;
+  line-height: 1.6;
+  font-family: 'Urbanist', sans-serif !important;
+}

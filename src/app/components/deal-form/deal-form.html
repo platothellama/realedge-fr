@@ -1,0 +1,113 @@
+<div class="deal-form-container">
+  <div class="modal-header">
+    <h2 mat-dialog-title>{{ isEdit ? 'Edit Deal & Contract' : 'Register New Deal' }}</h2>
+    <p class="modal-subtitle">Track the transaction progress and commissions</p>
+  </div>
+
+  <mat-dialog-content [formGroup]="dealForm" class="custom-scrollbar">
+    <div class="section-label">General Information</div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Deal Title</mat-label>
+        <input matInput formControlName="title" placeholder="e.g. Sale of Downtown Penthouse">
+        <mat-icon matSuffix>label</mat-icon>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Property</mat-label>
+        <mat-select formControlName="propertyId">
+          @for (prop of properties; track prop.id) {
+            <mat-option [value]="prop.id">{{ prop.title }} - ${{ prop.price | number }}</mat-option>
+          }
+        </mat-select>
+        <mat-icon matSuffix>home</mat-icon>
+      </mat-form-field>
+    </div>
+
+    <div class="section-label">Parties & Broker</div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Buyer Name</mat-label>
+        <input matInput formControlName="buyerName">
+        <mat-icon matSuffix>person</mat-icon>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Link to Lead (Optional)</mat-label>
+        <mat-select formControlName="buyerLeadId">
+          <mat-option [value]="null">-- None --</mat-option>
+          @for (lead of leads; track lead.id) {
+            <mat-option [value]="lead.id">{{ lead.name }} ({{ lead.email }})</mat-option>
+          }
+        </mat-select>
+        <mat-icon matSuffix>link</mat-icon>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Seller Name</mat-label>
+        <input matInput formControlName="sellerName">
+        <mat-icon matSuffix>person_outline</mat-icon>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Assigned Broker</mat-label>
+        <mat-select formControlName="brokerId">
+          @for (user of brokers; track user.id) {
+            <mat-option [value]="user.id">{{ user.name }} ({{ user.role }})</mat-option>
+          }
+        </mat-select>
+        <mat-icon matSuffix>badge</mat-icon>
+      </mat-form-field>
+    </div>
+
+    <div class="section-label">Deal Progress</div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Deal Stage</mat-label>
+        <mat-select formControlName="dealStage">
+          @for (stage of stages; track stage) {
+            <mat-option [value]="stage">{{ stage }}</mat-option>
+          }
+        </mat-select>
+        <mat-icon matSuffix>stacked_line_chart</mat-icon>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="full-width budget-field">
+        <mat-label>Commission Earned ($)</mat-label>
+        <input matInput type="number" formControlName="commission">
+        <span matPrefix class="currency-prefix">$</span>
+        @if (!isAdmin) {
+          <mat-hint>Commission can only be edited by an Admin</mat-hint>
+        }
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Internal Notes</mat-label>
+        <textarea matInput formControlName="notes" rows="3"></textarea>
+      </mat-form-field>
+    </div>
+
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="onCancel()" class="cancel-btn">Discard</button>
+    <button mat-raised-button color="primary" class="submit-btn" (click)="onSubmit()" [disabled]="!dealForm.valid">
+      {{ isEdit ? 'Update Deal' : 'Start Deal' }}
+    </button>
+  </mat-dialog-actions>
+</div>

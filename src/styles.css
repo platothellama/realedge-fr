@@ -1,0 +1,334 @@
+/* Lux Dark Design System - RealEdge Enterprise */
+@import url('https://fonts.googleapis.com/css2?family=Urbanist:wght@300;400;500;600;700;800;900&display=swap');
+
+:root {
+  /* Colors - Deepest Saturated Charcoal */
+  --bg-main: #050505;
+  /* True black for depth */
+  --bg-surface: #17171a;
+  /* Secondary containers */
+  --bg-elevated: #111114;
+  /* Tertiary cards */
+
+  /* Text Layers */
+  --text-primary: #ffffff;
+  /* Pure white for headings */
+  --text-secondary: #94A3B8;
+  /* Slate 400 for subtext */
+  --text-muted: #64748B;
+  /* Slate 500 for captions */
+
+  /* Brand */
+  --primary: #6366f1;
+  /* Indigo 500 */
+  --primary-bright: #818cf8;
+  /* Indigo 400 */
+  --primary-soft: rgba(99, 102, 241, 0.1);
+  --primary-glow: rgba(99, 102, 241, 0.4);
+
+  --success: #10b981;
+  --error: #ef4444;
+  --warning: #f59e0b;
+
+  /* Borders */
+  --border: rgba(255, 255, 255, 0.05);
+  --border-strong: rgba(255, 255, 255, 0.1);
+
+  /* Shadows */
+  --shadow-lg: 0 10px 30px -10px rgba(0, 0, 0, 0.7);
+  --shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+
+  /* Radii */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 32px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  transition: all 0.2s ease-in-out;
+}
+
+html,
+body {
+  height: 100%;
+  font-family: 'Urbanist', sans-serif !important;
+  background-color: var(--bg-main);
+  color: var(--text-primary);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Ensure all Material elements follow Urbanist */
+.mat-mdc-button,
+.mat-mdc-raised-button,
+.mat-mdc-card,
+.mat-mdc-tab,
+.mat-mdc-tab-label,
+.mat-mdc-dialog-title,
+.mat-mdc-dialog-content,
+.mat-mdc-form-field,
+.mat-mdc-select,
+.mat-mdc-option,
+.mat-mdc-menu-item,
+.mat-mdc-list-item,
+.mat-mdc-snack-bar-label,
+.mat-mdc-form-field-hint,
+.mat-mdc-form-field-label,
+input,
+textarea,
+button,
+select {
+  font-family: 'Urbanist', sans-serif !important;
+}
+
+/* Typography Enhancements */
+h1 {
+  font-size: 3.5rem;
+  font-weight: 900;
+  letter-spacing: -0.05em;
+  line-height: 1.1;
+  margin-bottom: 1rem;
+}
+
+h2 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  margin-bottom: 0.75rem;
+}
+
+h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+p {
+  font-size: 1.125rem;
+  color: var(--text-secondary);
+}
+
+/* Layout Utilities */
+.spacer {
+  flex: 1 1 auto;
+}
+
+/* Material Component Premium Overrides */
+.mat-mdc-card {
+  background-color: var(--bg-surface) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-lg) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+
+/* Material Component Premium Overrides */
+.mat-mdc-button,
+.mat-mdc-raised-button,
+.mat-mdc-unelevated-button,
+.mat-mdc-outlined-button,
+.mat-mdc-icon-button,
+.mat-mdc-fab,
+.mat-mdc-mini-fab {
+  font-family: 'Urbanist', sans-serif !important;
+  border-radius: var(--radius-md) !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.02em !important;
+  text-transform: none !important;
+}
+
+.mat-mdc-button,
+.mat-mdc-raised-button,
+.mat-mdc-unelevated-button,
+.mat-mdc-outlined-button {
+  padding: 12px 28px !important;
+  height: auto !important;
+}
+
+.mat-mdc-raised-button.mat-primary,
+.mat-mdc-unelevated-button.mat-primary {
+  background-color: var(--primary) !important;
+  color: #ffffff !important;
+  box-shadow: 0 10px 20px var(--primary-glow) !important;
+}
+
+.mat-mdc-raised-button.mat-warn,
+.mat-mdc-unelevated-button.mat-warn {
+  background-color: var(--error) !important;
+  color: #ffffff !important;
+  box-shadow: 0 10px 20px rgba(239, 68, 68, 0.3) !important;
+}
+
+.mat-mdc-outlined-button {
+  border-color: var(--border-strong) !important;
+  color: var(--text-primary) !important;
+}
+
+.mat-mdc-button {
+  color: var(--text-secondary) !important;
+}
+
+.mat-mdc-button:hover {
+  color: var(--text-primary) !important;
+  background: rgba(255, 255, 255, 0.03) !important;
+}
+
+/* Table Design */
+.mat-mdc-table {
+  background: transparent !important;
+}
+
+.mat-mdc-header-cell {
+  background: rgba(255, 255, 255, 0.02) !important;
+  color: var(--text-muted) !important;
+  font-weight: 800 !important;
+  text-transform: uppercase !important;
+  font-size: 0.7rem !important;
+  letter-spacing: 0.15em !important;
+}
+
+.mat-mdc-cell {
+  color: var(--text-primary) !important;
+  border-bottom: 1px solid var(--border) !important;
+  padding: 20px 16px !important;
+  font-size: 0.95rem !important;
+}
+
+.mat-mdc-row:hover {
+  background: rgba(255, 255, 255, 0.02) !important;
+}
+
+/* Global Material Text & Internal MDC Overrides */
+.mdc-list-item__primary-text,
+.mdc-list-item__secondary-text,
+.mat-mdc-list-item-title,
+.mat-mdc-list-item-line {
+  font-family: 'Urbanist', sans-serif !important;
+  color: inherit !important;
+}
+
+/* Material Typography Overrides */
+.mat-typography h1,
+.mat-typography h2,
+.mat-typography h3,
+.mat-typography h4,
+.mat-typography h5,
+.mat-typography h6 {
+  font-family: 'Urbanist', sans-serif !important;
+}
+
+.mat-typography,
+.mat-mdc-card-title,
+.mat-mdc-card-subtitle,
+.mat-mdc-card-content,
+.mat-mdc-header-cell,
+.mat-mdc-cell {
+  font-family: 'Urbanist', sans-serif !important;
+}
+
+.mat-mdc-select-value {
+  color: #ffffff !important;
+}
+
+/* Fix Dialogs and Popups */
+.cdk-overlay-pane,
+.mat-mdc-dialog-container,
+.mat-mdc-dialog-surface,
+.mat-mdc-dialog-panel {
+  font-family: 'Urbanist', sans-serif !important;
+  background-color: var(--bg-surface) !important;
+  color: var(--text-primary) !important;
+  border-radius: var(--radius-lg) !important;
+}
+
+.mat-mdc-dialog-title {
+  color: var(--text-primary) !important;
+  font-family: 'Urbanist', sans-serif !important;
+}
+
+.mat-mdc-dialog-content {
+  color: var(--text-secondary) !important;
+  font-family: 'Urbanist', sans-serif !important;
+}
+
+/* Input Fields inside dialogs */
+.mdc-text-field--outlined .mdc-notched-outline {
+  border-color: var(--border) !important;
+}
+
+.mdc-text-field--outlined:not(.mdc-text-field--disabled) .mdc-text-field__input {
+  color: var(--text-primary) !important;
+  font-family: 'Urbanist', sans-serif !important;
+}
+
+.mdc-floating-label {
+  color: var(--text-muted) !important;
+  font-family: 'Urbanist', sans-serif !important;
+}
+
+.mat-mdc-option {
+  background-color: var(--bg-elevated) !important;
+  color: var(--text-secondary) !important;
+  font-family: 'Urbanist', sans-serif !important;
+}
+.mat-mdc-option:hover,
+.mat-mdc-option.mdc-list-item--selected {
+  background-color: var(--bg-surface) !important;
+  color: var(--text-primary) !important;
+}
+
+.mat-mdc-select-panel {
+  background-color: var(--bg-elevated) !important;
+  border: 1px solid var(--border) !important;
+}
+
+/* Universal Font Application */
+.mat-typography * {
+  font-family: 'Urbanist', sans-serif !important;
+}
+
+/* Fix Tab Font Colors */
+.mat-mdc-tab .mdc-tab__text-label {
+  color: var(--text-secondary) !important;
+  font-family: 'Urbanist', sans-serif !important;
+}
+
+.mat-mdc-tab.mdc-tab--active .mdc-tab__text-label {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+}
+
+/* Fix Tab Pagination Arrows */
+.mat-mdc-tab-header-pagination-chevron {
+  border-color: #ffffff !important;
+}
+
+.mat-mdc-tab-header-pagination-controls-enabled .mat-mdc-tab-header-pagination-arrow {
+  color: #ffffff !important;
+}
+
+.mat-mdc-tab-header-pagination {
+  background-color: var(--bg-surface) !important;
+  min-width: 44px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-shadow: none !important;
+}
+
+.mat-mdc-tab-header-pagination-before,
+.mat-mdc-tab-header-pagination-after {
+  background: none !important;
+}
+
+.mat-mdc-tab-header-pagination-arrow:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.mat-mdc-tab-header-pagination-disabled .mat-mdc-tab-header-pagination-chevron {
+  border-color: var(--text-muted) !important;
+  opacity: 0.5;
+}

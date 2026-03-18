@@ -1,0 +1,64 @@
+<div class="upload-form-container">
+  <div class="modal-header">
+    <h2 mat-dialog-title>{{ data.isNewVersion ? 'Add New Version' : 'Upload Document' }}</h2>
+    <p class="modal-subtitle">Securely store and manage property documents</p>
+  </div>
+
+  <mat-dialog-content [formGroup]="uploadForm" class="custom-scrollbar">
+    <div class="file-drop-area" (click)="fileInput.click()">
+      <mat-icon>cloud_upload</mat-icon>
+      <div class="drop-text">
+        @if (selectedFile) {
+          <span class="file-name">{{ selectedFile.name }}</span>
+          <span class="file-size">({{ (selectedFile.size / 1024).toFixed(1) }} KB)</span>
+        } @else {
+          <span>Click to browse or drag and drop a file</span>
+          <span class="file-types">PDF, DOCX, PNG, JPG (Max 10MB)</span>
+        }
+      </div>
+      <input #fileInput type="file" style="display: none" (change)="onFileSelected($event)">
+    </div>
+
+    <div class="section-label">Document Info</div>
+    
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Document Title</mat-label>
+        <input matInput formControlName="title" placeholder="e.g. Sales Contract - unit 402">
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Document Type</mat-label>
+        <mat-select formControlName="type">
+          @for (t of types; track t) {
+            <mat-option [value]="t">{{ t }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    @if (!data.isNewVersion) {
+      <div class="form-row checkbox-row">
+        <mat-checkbox formControlName="isDigitalSignatureEnabled" color="primary">
+          Enable Digital Signature tracking
+        </mat-checkbox>
+      </div>
+    }
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Notes / Version Details</mat-label>
+        <textarea matInput formControlName="notes" rows="3" placeholder="Add any comments about this version..."></textarea>
+      </mat-form-field>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="onCancel()" class="cancel-btn">Discard</button>
+    <button mat-raised-button color="primary" class="submit-btn" (click)="onSubmit()" [disabled]="!uploadForm.valid || (!selectedFile && !data.isNewVersion)">
+      {{ data.isNewVersion ? 'Upload New Version' : 'Upload Document' }}
+    </button>
+  </mat-dialog-actions>
+</div>

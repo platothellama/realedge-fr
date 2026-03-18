@@ -1,0 +1,181 @@
+<div class="marketing-container">
+  <div class="page-header">
+    <h1><mat-icon>trending_up</mat-icon> Marketing Tools</h1>
+    <p>Generate professional marketing content for your listings using AI</p>
+  </div>
+
+  <div class="content-wrapper">
+    <!-- Property Selection -->
+    <mat-card class="property-selector">
+      <mat-card-header>
+        <mat-card-title>Select Property</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="property-list">
+          @for (property of properties; track property.id) {
+            <div 
+              class="property-item" 
+              [class.selected]="selectedProperty?.id === property.id"
+              (click)="selectProperty(property)">
+              <mat-icon>home</mat-icon>
+              <div class="property-info">
+                <span class="property-title">{{ property.title }}</span>
+                <span class="property-details">{{ property.type }} • {{ property.bedrooms }} bed • ${{ property.price | number }}</span>
+              </div>
+            </div>
+          }
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Marketing Tools -->
+    <div class="marketing-tools" [class.disabled]="!selectedProperty">
+      @if (!selectedProperty) {
+        <div class="placeholder-message">
+          <mat-icon>touch_app</mat-icon>
+          <p>Select a property to generate marketing content</p>
+        </div>
+      }
+
+      @if (selectedProperty) {
+        <div class="selected-property-banner">
+          <mat-icon>check_circle</mat-icon>
+          <span>Generating content for: <strong>{{ selectedProperty.title }}</strong></span>
+        </div>
+
+        <mat-tab-group animationDuration="200ms">
+          <!-- Listing Description -->
+          <mat-tab label="Listing Description">
+            <div class="tool-content">
+              <div class="tool-header">
+                <h3>Auto-Generated Listing Description</h3>
+                <button 
+                  mat-raised-button 
+                  color="primary" 
+                  (click)="generate('description')"
+                  [disabled]="loading.description">
+                  @if (loading.description) {
+                    <mat-spinner diameter="20"></mat-spinner>
+                  } @else {
+                    <ng-container><mat-icon>auto_awesome</mat-icon> Generate</ng-container>
+                  }
+                </button>
+              </div>
+              @if (content.description) {
+                <div class="generated-content">
+                  <p>{{ content.description }}</p>
+                  <div class="content-actions">
+                    <button mat-button (click)="copyToClipboard(content.description)">
+                      <mat-icon>content_copy</mat-icon> Copy
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          </mat-tab>
+
+          <!-- Social Media Posts -->
+          <mat-tab label="Social Media Posts">
+            <div class="tool-content">
+              <div class="tool-header">
+                <h3>Social Media Posts</h3>
+                <button 
+                  mat-raised-button 
+                  color="primary" 
+                  (click)="generate('social_post')"
+                  [disabled]="loading.social_post">
+                  @if (loading.social_post) {
+                    <mat-spinner diameter="20"></mat-spinner>
+                  } @else {
+                    <ng-container><mat-icon>auto_awesome</mat-icon> Generate</ng-container>
+                  }
+                </button>
+              </div>
+              @if (content.social_post) {
+                <div class="generated-content">
+                  <p>{{ content.social_post }}</p>
+                  <div class="content-actions">
+                    <button mat-button (click)="copyToClipboard(content.social_post)">
+                      <mat-icon>content_copy</mat-icon> Copy
+                    </button>
+                    @for (platform of socialPlatforms; track platform) {
+                      <button mat-button (click)="exportToSocial(platform, content.social_post)">
+                        <mat-icon>share</mat-icon> {{ platform }}
+                      </button>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          </mat-tab>
+
+          <!-- Ads Copy -->
+          <mat-tab label="Ads Copy">
+            <div class="tool-content">
+              <div class="tool-header">
+                <h3>Advertising Copy</h3>
+                <button 
+                  mat-raised-button 
+                  color="primary" 
+                  (click)="generate('ads_copy')"
+                  [disabled]="loading.ads_copy">
+                  @if (loading.ads_copy) {
+                    <mat-spinner diameter="20"></mat-spinner>
+                  } @else {
+                    <ng-container><mat-icon>auto_awesome</mat-icon> Generate</ng-container>
+                  }
+                </button>
+              </div>
+              @if (content.ads_copy) {
+                <div class="generated-content ads-content">
+                  <pre>{{ content.ads_copy }}</pre>
+                  <div class="content-actions">
+                    <button mat-button (click)="copyToClipboard(content.ads_copy)">
+                      <mat-icon>content_copy</mat-icon> Copy
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          </mat-tab>
+
+          <!-- Captions & Hashtags -->
+          <mat-tab label="Captions & Hashtags">
+            <div class="tool-content">
+              <div class="tool-header">
+                <h3>Social Media Captions & Hashtags</h3>
+                <button 
+                  mat-raised-button 
+                  color="primary" 
+                  (click)="generate('captions_hashtags')"
+                  [disabled]="loading.captions_hashtags">
+                  @if (loading.captions_hashtags) {
+                    <mat-spinner diameter="20"></mat-spinner>
+                  } @else {
+                    <ng-container><mat-icon>auto_awesome</mat-icon> Generate</ng-container>
+                  }
+                </button>
+              </div>
+              @if (content.captions_hashtags) {
+                <div class="generated-content">
+                  <p>{{ content.captions_hashtags }}</p>
+                  <div class="content-actions">
+                    <button mat-button (click)="copyToClipboard(content.captions_hashtags)">
+                      <mat-icon>content_copy</mat-icon> Copy
+                    </button>
+                    <button mat-button (click)="exportToSocial('Instagram', content.captions_hashtags)">
+                      <mat-icon>photo_camera</mat-icon> Instagram
+                    </button>
+                    <button mat-button (click)="exportToSocial('Facebook', content.captions_hashtags)">
+                      <mat-icon>facebook</mat-icon> Facebook
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          </mat-tab>
+        </mat-tab-group>
+      }
+    </div>
+  </div>
+</div>

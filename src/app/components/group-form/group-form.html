@@ -1,0 +1,46 @@
+<div class="group-form-container">
+  <h2 mat-dialog-title>{{ isEdit ? 'Edit Group' : 'Create New Group' }}</h2>
+
+  <mat-dialog-content [formGroup]="groupForm">
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Group Name</mat-label>
+        <input matInput formControlName="name" placeholder="Ex: Lead Generators">
+        <mat-icon matSuffix color="primary">group_work</mat-icon>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Description</mat-label>
+        <textarea matInput formControlName="description" rows="3" placeholder="Describe the purpose of this group"></textarea>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Assign Members</mat-label>
+        <mat-select formControlName="userIds" multiple>
+          @for (user of users; track user.id) {
+            <mat-option [value]="user.id">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <img [src]="user.photo || 'https://ui-avatars.com/api/?name=' + user.name" style="width: 24px; height: 24px; border-radius: 50%;">
+                <span>{{ user.name }}</span>
+                <span style="font-size: 0.75rem; color: var(--text-muted);">({{ user.role }})</span>
+              </div>
+            </mat-option>
+          }
+        </mat-select>
+        <mat-icon matSuffix color="primary">people</mat-icon>
+        <mat-hint>Select users to add to this group</mat-hint>
+      </mat-form-field>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close class="cancel-btn">Cancel</button>
+    <button mat-raised-button color="primary" class="submit-btn" (click)="onSubmit()" [disabled]="!groupForm.valid">
+      {{ isEdit ? 'Save Changes' : 'Create Group' }}
+    </button>
+  </mat-dialog-actions>
+</div>

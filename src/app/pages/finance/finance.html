@@ -1,0 +1,77 @@
+<div class="finance-container">
+  <div class="page-header">
+    <h1><mat-icon>account_balance</mat-icon> Finance</h1>
+    <p>Track income, expenses, and financial performance</p>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="summary-grid">
+    <mat-card class="summary-card income">
+      <mat-icon>trending_up</mat-icon>
+      <div class="summary-info">
+        <span class="label">Total Income</span>
+        <span class="value">{{ formatCurrency(summary.totalIncome) }}</span>
+      </div>
+    </mat-card>
+    <mat-card class="summary-card expense">
+      <mat-icon>trending_down</mat-icon>
+      <div class="summary-info">
+        <span class="label">Total Expenses</span>
+        <span class="value">{{ formatCurrency(summary.totalExpenses) }}</span>
+      </div>
+    </mat-card>
+    <mat-card class="summary-card profit">
+      <mat-icon>savings</mat-icon>
+      <div class="summary-info">
+        <span class="label">Net Profit</span>
+        <span class="value">{{ formatCurrency(summary.netProfit) }}</span>
+      </div>
+    </mat-card>
+  </div>
+
+  <!-- Transactions -->
+  <mat-card class="transactions-card">
+    <div class="card-header">
+      <h2>Transactions</h2>
+      <mat-form-field appearance="outline" class="filter-field">
+        <mat-label>Filter</mat-label>
+        <mat-select [(ngModel)]="filterType">
+          <mat-option value="all">All</mat-option>
+          <mat-option value="income">Income</mat-option>
+          <mat-option value="expense">Expense</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    @if (loading) {
+      <div class="loading">
+        <mat-spinner diameter="40"></mat-spinner>
+      </div>
+    }
+
+    @if (!loading) {
+      <div class="transactions-list">
+        @for (tx of filteredTransactions; track tx.id) {
+          <div class="transaction-item" [class]="tx.type">
+            <div class="tx-icon">
+              <mat-icon>{{ getCategoryIcon(tx.category) }}</mat-icon>
+            </div>
+            <div class="tx-info">
+              <span class="tx-desc">{{ tx.description }}</span>
+              <span class="tx-meta">{{ tx.category | titlecase }} • {{ tx.date | date:'mediumDate' }}</span>
+            </div>
+            <div class="tx-amount" [class]="tx.type">
+              {{ tx.type === 'expense' ? '-' : '+' }}{{ formatCurrency(tx.amount) }}
+            </div>
+          </div>
+        }
+        @if (filteredTransactions.length === 0) {
+          <div class="empty-state">
+            <mat-icon>receipt_long</mat-icon>
+            <span>No transactions found</span>
+          </div>
+        }
+      </div>
+    }
+  </mat-card>
+</div>

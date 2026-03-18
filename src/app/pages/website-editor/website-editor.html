@@ -1,0 +1,112 @@
+<div class="editor-container">
+  @if (loading) {
+    <div class="loading-container"><mat-spinner diameter="40"></mat-spinner></div>
+  } @else {
+    <div class="editor-header">
+      <div class="header-left">
+        <button mat-icon-button routerLink="/website-builder">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+        <h2>{{ website.name }}</h2>
+        <span class="slug">/{{ website.slug }}</span>
+      </div>
+      <div class="header-actions">
+        <button mat-stroked-button (click)="showComponentPanel = !showComponentPanel">
+          <mat-icon>add</mat-icon> Add Section
+        </button>
+        <button mat-raised-button color="primary" (click)="saveWebsite()">
+          <mat-icon>save</mat-icon> Save
+        </button>
+      </div>
+    </div>
+
+    <div class="editor-tabs">
+      <mat-tab-group [(selectedIndex)]="selectedPageIndex">
+        @for (page of website.pages || []; track page.id; let i = $index) {
+          <mat-tab [label]="page.name">
+            <div class="page-content">
+              @if ((page.sections || []).length === 0) {
+                <div class="empty-sections">
+                  <mat-icon>dashboard</mat-icon>
+                  <h3>No sections yet</h3>
+                  <p>Add sections to build your page</p>
+                  <button mat-raised-button color="primary" (click)="showComponentPanel = true">
+                    <mat-icon>add</mat-icon> Add Section
+                  </button>
+                </div>
+              } @else {
+                <div class="sections-list">
+                  @for (section of page.sections || []; track section.id; let j = $index) {
+                    <div class="section-item" [class.hidden]="!section.isVisible">
+                      <div class="section-preview" [style.border-color]="website.primaryColor">
+                        <mat-icon>{{ getComponentIcon(section.componentType) }}</mat-icon>
+                        <span>{{ section.name || section.componentType }}</span>
+                        <span class="variant-badge">{{ section.designVariant }}</span>
+                      </div>
+                      <div class="section-actions">
+                        <button mat-icon-button>
+                          <mat-icon>drag_handle</mat-icon>
+                        </button>
+                        <button mat-icon-button (click)="editSection(section)">
+                          <mat-icon>edit</mat-icon>
+                        </button>
+                        <button mat-icon-button (click)="deleteSection(section)">
+                          <mat-icon>delete</mat-icon>
+                        </button>
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          </mat-tab>
+        }
+      </mat-tab-group>
+    </div>
+
+    @if (showComponentPanel) {
+      <div class="component-panel">
+        <div class="panel-header">
+          <h3>Add Component</h3>
+          <button mat-icon-button (click)="showComponentPanel = false">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+        <div class="category-tabs">
+          @for (cat of categories; track cat) {
+            <button 
+              mat-button 
+              [class.active]="selectedCategory === cat"
+              (click)="selectedCategory = cat; loadComponentTemplates()">
+              {{ cat }}
+            </button>
+          }
+        </div>
+        <div class="components-grid">
+          @for (template of componentTemplates; track template.id) {
+            <div class="component-card" (click)="addSection(template)">
+              <mat-icon>{{ template.icon }}</mat-icon>
+              <span>{{ template.name }}</span>
+              <div class="variants">
+                @for (variant of template.variants; track variant) {
+                  <span class="variant-chip">{{ variant }}</span>
+                }
+              </div>
+            </div>
+          }
+          @if (componentTemplates.length === 0) {
+            <p class="no-components">No components in this category</p>
+          }
+        </div>
+      </div>
+    }
+
+    @if (showSectionEditor && selectedSection) {
+      <app-section-editor
+        [section]="selectedSection"
+        (close)="closeSectionEditor()"
+        (save)="onSectionSaved($event)">
+      </app-section-editor>
+    }
+  }
+</div>

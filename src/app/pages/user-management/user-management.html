@@ -1,0 +1,153 @@
+<div class="user-mgmt-container">
+  <div class="header-section">
+    <div class="title-area">
+      <h1>Organization</h1>
+      <p>Manage your team, roles and groups</p>
+    </div>
+    <div style="display: flex; gap: 12px;">
+      <button mat-stroked-button color="primary" class="create-btn" (click)="openGroupForm()">
+        <mat-icon style="margin-right: 8px;">group_add</mat-icon>
+        Create Group
+      </button>
+      <button mat-raised-button color="primary" class="create-btn" (click)="openUserForm()">
+        <mat-icon style="margin-right: 8px;">person_add</mat-icon>
+        Add New Member
+      </button>
+    </div>
+  </div>
+
+  <mat-tab-group class="mgmt-tabs">
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="tab-icon">people</mat-icon>
+        Team Members
+      </ng-template>
+
+      <mat-card class="table-card">
+        <table mat-table [dataSource]="users">
+          <!-- Name & Profile Column -->
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef> Team Member </th>
+            <td mat-cell *matCellDef="let user">
+              <div class="user-cell">
+                <img [src]="user.photo || 'https://ui-avatars.com/api/?name=' + user.name + '&background=3b82f6&color=fff&bold=true&rounded=true'" class="table-avatar">
+                <div class="user-name-info">
+                  <span class="user-name">{{user.name}}</span>
+                  <span class="user-email-text">{{user.email}}</span>
+                </div>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Email Column -->
+          <ng-container matColumnDef="email">
+            <th mat-header-cell *matHeaderCellDef> Email Address </th>
+            <td mat-cell *matCellDef="let user"> {{user.email}} </td>
+          </ng-container>
+
+          <!-- Role Column -->
+          <ng-container matColumnDef="role">
+            <th mat-header-cell *matHeaderCellDef> Role & Groups </th>
+            <td mat-cell *matCellDef="let user">
+              <div style="display: flex; flex-direction: column; gap: 4px;">
+                <span class="role-badge" [attr.data-role]="user.role">{{user.role}}</span>
+                @if (user.groups && user.groups.length > 0) {
+                  <div style="font-size: 0.75rem; color: #64748b; font-weight: 500;">
+                    @for (g of user.groups; track g.id) {
+                      <span style="display: inline-block; background: rgba(0,0,0,0.05); padding: 2px 6px; border-radius: 4px; margin-right: 4px; margin-top: 2px;">{{g.name}}</span>
+                    }
+                  </div>
+                }
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Status Column -->
+          <ng-container matColumnDef="status">
+            <th mat-header-cell *matHeaderCellDef> Status </th>
+            <td mat-cell *matCellDef="let user">
+              <div class="status-area">
+                <div class="status-dot" [class.active]="user.active" [class.blocked]="!user.active"></div>
+                <span class="status-text">{{user.active ? 'Active' : 'Blocked'}}</span>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Actions Column -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef align="right"> Actions </th>
+            <td mat-cell *matCellDef="let user" align="right">
+              <div class="action-group">
+                <button mat-icon-button class="action-btn" (click)="openUserForm(user)" matTooltip="Edit Profile">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button class="action-btn" (click)="toggleStatus(user)" [matTooltip]="user.active ? 'Block Access' : 'Restore Access'">
+                  <mat-icon>{{user.active ? 'block' : 'undo'}}</mat-icon>
+                </button>
+                <button mat-icon-button class="action-btn delete" (click)="deleteUser(user)" matTooltip="Remove Member">
+                  <mat-icon>delete_outline</mat-icon>
+                </button>
+              </div>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+      </mat-card>
+    </mat-tab>
+
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="tab-icon">group_work</mat-icon>
+        Groups
+      </ng-template>
+
+      <mat-card class="table-card">
+        <table mat-table [dataSource]="groupsDataSource">
+          <!-- Name Column -->
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef> Group Name </th>
+            <td mat-cell *matCellDef="let group">
+              <div style="font-weight: 700; color: var(--text-primary);">{{group.name}}</div>
+            </td>
+          </ng-container>
+
+          <!-- Description Column -->
+          <ng-container matColumnDef="description">
+            <th mat-header-cell *matHeaderCellDef> Description </th>
+            <td mat-cell *matCellDef="let group">
+              <div style="color: var(--text-muted); font-size: 0.9rem;">{{group.description || 'No description'}}</div>
+            </td>
+          </ng-container>
+
+          <!-- Members Count Column -->
+          <ng-container matColumnDef="members">
+            <th mat-header-cell *matHeaderCellDef> Members </th>
+            <td mat-cell *matCellDef="let group">
+              <span class="role-badge">{{ (group.members?.length || 0) }} Members</span>
+            </td>
+          </ng-container>
+
+          <!-- Actions Column -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef align="right"> Actions </th>
+            <td mat-cell *matCellDef="let group" align="right">
+              <div class="action-group">
+                <button mat-icon-button class="action-btn" (click)="openGroupForm(group)" matTooltip="Edit Group">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button mat-icon-button class="action-btn delete" (click)="deleteGroup(group)" matTooltip="Delete Group">
+                  <mat-icon>delete_outline</mat-icon>
+                </button>
+              </div>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="groupColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: groupColumns;"></tr>
+        </table>
+      </mat-card>
+    </mat-tab>
+  </mat-tab-group>
+</div>

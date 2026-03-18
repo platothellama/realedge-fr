@@ -1,0 +1,22 @@
+<div class="visits-container">
+  <div class="header-section">
+    <div class="title-area">
+      <h1>Visit Calendar</h1>
+      <p>Manage property viewings and client meetings</p>
+    </div>
+    <div class="action-area">
+      <button mat-stroked-button color="primary" class="google-sync-btn">
+        <mat-icon>sync</mat-icon>
+        Sync Google Calendar
+      </button>
+      <button mat-raised-button color="primary" class="schedule-btn" (click)="openVisitForm()">
+        <mat-icon>add_task</mat-icon>
+        Schedule Visit
+      </button>
+    </div>
+  </div>
+
+  <mat-card class="calendar-card">
+    <full-calendar [options]="calendarOptions()"></full-calendar>
+  </mat-card>
+</div>

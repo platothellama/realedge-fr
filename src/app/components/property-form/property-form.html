@@ -1,0 +1,240 @@
+<div class="property-form-container">
+  <div class="modal-header">
+    <h2 mat-dialog-title>{{ isEdit ? 'Edit Property Listing' : 'List New Property' }}</h2>
+    <p class="modal-subtitle">Complete the details below to {{ isEdit ? 'update' : 'publish' }} your listing</p>
+  </div>
+
+  <mat-dialog-content [formGroup]="propertyForm" class="custom-scrollbar">
+    <mat-tab-group color="primary" class="premium-tabs">
+
+      <!-- Basic Info -->
+      <mat-tab label="Basic Info">
+        <div class="tab-content">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Property Title</mat-label>
+            <input matInput formControlName="title" placeholder="Ex: Modern Penthouse in Downtown">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Description</mat-label>
+            <textarea matInput formControlName="description" rows="4" placeholder="Describe the property..."></textarea>
+          </mat-form-field>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="budget-field">
+              <mat-label>Asking Price</mat-label>
+              <input matInput type="number" formControlName="price" placeholder="0.00">
+              <span matPrefix class="currency-prefix">$</span>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Property Status</mat-label>
+              <mat-select formControlName="status">
+                @for (s of statuses; track s) {
+                  <mat-option [value]="s">{{s}}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Property Type</mat-label>
+            <mat-select formControlName="type">
+              @for (t of propertyTypes; track t) {
+                <mat-option [value]="t">{{t}}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </mat-tab>
+
+      <!-- Details -->
+      <mat-tab label="Details">
+        <div class="tab-content">
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Bedrooms</mat-label>
+              <input matInput type="number" formControlName="bedrooms">
+              <mat-icon matPrefix>bed</mat-icon>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Bathrooms</mat-label>
+              <input matInput type="number" formControlName="bathrooms">
+              <mat-icon matPrefix>bathtub</mat-icon>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Indoor Area (sqft/sqm)</mat-label>
+              <input matInput type="number" formControlName="area">
+              <mat-icon matPrefix>square_foot</mat-icon>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Lot Size</mat-label>
+              <input matInput type="number" formControlName="lotSize">
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Year Built</mat-label>
+              <input matInput type="number" formControlName="yearBuilt">
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Parking Spaces</mat-label>
+              <input matInput type="number" formControlName="parkingSpaces">
+              <mat-icon matPrefix>directions_car</mat-icon>
+            </mat-form-field>
+          </div>
+        </div>
+      </mat-tab>
+
+      <!-- Location -->
+      <mat-tab label="Location">
+        <div class="tab-content map-wrapper">
+          <div class="form-row address-row">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Street Address</mat-label>
+              <input matInput formControlName="address">
+              <mat-icon matSuffix>location_on</mat-icon>
+            </mat-form-field>
+          </div>
+
+          <div class="map-container">
+            <google-map
+              height="250px"
+              width="100%"
+              [center]="mapCenter"
+              [zoom]="mapZoom"
+              [options]="mapOptions"
+              (mapClick)="onMapClick($event)">
+              @if (markerPosition) {
+                <map-marker [position]="markerPosition"></map-marker>
+              }
+            </google-map>
+            <p class="map-hint">Click on the map to drop a pin and auto-fill coordinates and address.</p>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>City</mat-label>
+              <input matInput formControlName="city">
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Country</mat-label>
+              <input matInput formControlName="country">
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Latitude</mat-label>
+              <input matInput type="number" formControlName="lat">
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Longitude</mat-label>
+              <input matInput type="number" formControlName="lng">
+            </mat-form-field>
+          </div>
+        </div>
+      </mat-tab>
+
+      <!-- Media -->
+      <mat-tab label="Media & Tours">
+        <div class="tab-content">
+          <div class="upload-section">
+            <label class="upload-label">Property Photos</label>
+            <div class="photo-grid">
+              @for (photo of uploadedPhotos; track photo; let i = $index) {
+                <div class="photo-item">
+                  <img [src]="photo" alt="Property photo">
+                  <button mat-icon-button color="warn" class="remove-btn" (click)="removePhoto(i)">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+              }
+              <div class="upload-btn-container" *ngIf="!isUploading">
+                <input type="file" #fileInput (change)="onFileSelected($event)" accept="image/*" style="display: none">
+                <button mat-stroked-button color="primary" class="upload-trigger" (click)="fileInput.click()">
+                  <mat-icon>add_a_photo</mat-icon>
+                  <span>Upload Image</span>
+                </button>
+              </div>
+              <div class="upload-loading" *ngIf="isUploading">
+                <mat-icon class="spin">refresh</mat-icon>
+                <span>Uploading...</span>
+              </div>
+            </div>
+          </div>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Additional Photo URLs (comma separated)</mat-label>
+            <textarea matInput formControlName="photos" rows="2"></textarea>
+            <mat-icon matSuffix>link</mat-icon>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Video URLs</mat-label>
+            <input matInput formControlName="videos">
+            <mat-icon matSuffix>videocam</mat-icon>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>360 Tour Links</mat-label>
+            <input matInput formControlName="tours360">
+            <mat-icon matSuffix>360</mat-icon>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Document Links</mat-label>
+            <input matInput formControlName="documents">
+            <mat-icon matSuffix>description</mat-icon>
+          </mat-form-field>
+        </div>
+      </mat-tab>
+      <!-- Assignments -->
+      <mat-tab label="Assignments">
+        <div class="tab-content">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Assign to User</mat-label>
+            <mat-select formControlName="assignedToUserId">
+              <mat-option [value]="null">-- Unassigned --</mat-option>
+              @for (u of users; track u.id) {
+                <mat-option [value]="u.id">{{ u.name }} ({{ u.role }})</mat-option>
+              }
+            </mat-select>
+            <mat-icon matPrefix>person</mat-icon>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Assign to Group</mat-label>
+            <mat-select formControlName="assignedToGroupId">
+              <mat-option [value]="null">-- Unassigned --</mat-option>
+              @for (g of groups; track g.id) {
+                <mat-option [value]="g.id">{{ g.name }}</mat-option>
+              }
+            </mat-select>
+            <mat-icon matPrefix>groups</mat-icon>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width budget-field">
+            <mat-label>Commission Percentage (%)</mat-label>
+            <input matInput type="number" formControlName="commissionPercentage">
+            <span matSuffix class="percentage-suffix">%</span>
+            @if (!isAdmin) {
+              <mat-hint>Only Admin/Super Admin can set the commission percentage</mat-hint>
+            }
+          </mat-form-field>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="onCancel()" class="cancel-btn">Discard</button>
+    <button mat-raised-button color="primary" class="submit-btn" (click)="onSubmit()" [disabled]="!propertyForm.valid">
+      {{ isEdit ? 'Update Listing' : 'Publish Listing' }}
+    </button>
+  </mat-dialog-actions>
+</div>

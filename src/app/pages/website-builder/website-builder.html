@@ -1,0 +1,191 @@
+<div class="builder-container">
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">Website Builder</h1>
+      <p class="page-subtitle">Create AI-powered property websites with automatic page generation</p>
+    </div>
+    <button mat-raised-button color="primary" (click)="showAddDialog = true">
+      <mat-icon>add</mat-icon>
+      New Website
+    </button>
+  </div>
+
+  @if (loading) {
+    <div class="loading-container"><mat-spinner diameter="40"></mat-spinner></div>
+  } @else {
+    <div class="websites-grid">
+      @for (website of websites; track website.id) {
+        <mat-card class="website-card">
+          <div class="website-preview" [style.background]="website.primaryColor + '20'">
+            <mat-icon>language</mat-icon>
+          </div>
+          <mat-card-content>
+            <div class="website-info">
+              <h3>{{ website.name }}</h3>
+              <p class="website-slug">/{{ website.slug }}</p>
+              <p class="website-desc">{{ website.description || 'No description' }}</p>
+            </div>
+            <div class="website-meta">
+              <span class="status-badge" [class]="getStatusClass(website.status)">{{ website.status }}</span>
+              <span class="page-count">{{ website.pages?.length || 0 }} pages</span>
+            </div>
+          </mat-card-content>
+          <mat-card-actions>
+            <button mat-button color="primary" (click)="openGenerateDialog(website.id)">
+              <mat-icon>auto_awesome</mat-icon> AI Generate
+            </button>
+            <button mat-button [routerLink]="['/website-editor', website.id]">
+              <mat-icon>edit</mat-icon> Edit
+            </button>
+            <button mat-icon-button [matMenuTriggerFor]="menu">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #menu="matMenu">
+              @if (website.status !== 'published') {
+                <button mat-menu-item (click)="publishWebsite(website)">
+                  <mat-icon>publish</mat-icon> Publish
+                </button>
+              }
+              <button mat-menu-item [routerLink]="['/website', website.slug]" target="_blank">
+                <mat-icon>open_in_new</mat-icon> Preview
+              </button>
+              <button mat-menu-item (click)="deleteWebsite(website)" class="delete-option">
+                <mat-icon>delete</mat-icon> Delete
+              </button>
+            </mat-menu>
+          </mat-card-actions>
+        </mat-card>
+      }
+      @if (websites.length === 0) {
+        <div class="empty-state">
+          <mat-icon>web</mat-icon>
+          <h3>No websites yet</h3>
+          <p>Create your first website to get started</p>
+          <button mat-raised-button color="primary" (click)="showAddDialog = true">Create Website</button>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Create Website Dialog -->
+  @if (showAddDialog) {
+    <div class="dialog-overlay" (click)="showAddDialog = false">
+      <div class="dialog-content" (click)="$event.stopPropagation()">
+        <div class="dialog-header">
+          <h2>Create New Website</h2>
+          <button mat-icon-button (click)="showAddDialog = false"><mat-icon>close</mat-icon></button>
+        </div>
+        <div class="dialog-body">
+          <mat-form-field appearance="outline">
+            <mat-label>Website Name</mat-label>
+            <input matInput [(ngModel)]="newWebsite.name" placeholder="My Real Estate Website" (input)="generateSlug(newWebsite.name || '')">
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>URL Slug</mat-label>
+            <input matInput [(ngModel)]="newWebsite.slug" placeholder="my-website">
+            <mat-hint>This will be: /{{ newWebsite.slug }}</mat-hint>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Description</mat-label>
+            <textarea matInput [(ngModel)]="newWebsite.description" rows="2" placeholder="Brief description..."></textarea>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Primary Color</mat-label>
+            <input matInput type="color" [(ngModel)]="newWebsite.primaryColor">
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Homepage Template</mat-label>
+            <mat-select [(ngModel)]="selectedTemplate">
+              @for (template of templates; track template.id) {
+                <mat-option [value]="template.id">{{ template.name }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <div class="dialog-footer">
+          <button mat-button (click)="showAddDialog = false">Cancel</button>
+          <button mat-raised-button color="primary" (click)="createWebsite()">Create Website</button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- AI Generate Dialog -->
+  @if (showGenerateDialog) {
+    <div class="dialog-overlay" (click)="showGenerateDialog = false">
+      <div class="dialog-content dialog-large" (click)="$event.stopPropagation()">
+        <div class="dialog-header">
+          <h2><mat-icon>auto_awesome</mat-icon> AI Website Generator</h2>
+          <button mat-icon-button (click)="showGenerateDialog = false"><mat-icon>close</mat-icon></button>
+        </div>
+        <div class="dialog-body">
+          <div class="generate-options">
+            <div class="option-section">
+              <h4>Select Properties</h4>
+              <p class="hint">Choose properties to generate pages for (or leave empty to use all available)</p>
+              
+              <div class="select-actions">
+                <button mat-button (click)="selectAllProperties()">
+                  {{ selectedProperties.length === properties.length ? 'Deselect All' : 'Select All' }}
+                </button>
+                <span class="selected-count">{{ selectedProperties.length }} selected</span>
+              </div>
+
+              <div class="properties-list">
+                @for (property of properties; track property.id) {
+                  <div class="property-item" [class.selected]="selectedProperties.includes(property.id)" (click)="toggleProperty(property.id)">
+                    <mat-checkbox [checked]="selectedProperties.includes(property.id)" (click)="$event.stopPropagation()"></mat-checkbox>
+                    <div class="property-thumb">
+                      @if (property.photos && property.photos.length > 0) {
+                        <img [src]="property.photos[0]" alt="">
+                      } @else {
+                        <mat-icon>home</mat-icon>
+                      }
+                    </div>
+                    <div class="property-details">
+                      <span class="property-title">{{ property.title }}</span>
+                      <span class="property-info">{{ property.type }} • {{ property.city }} • {{ property.bedrooms }} bed</span>
+                      <span class="property-price">{{ formatPrice(property.price) }}</span>
+                    </div>
+                  </div>
+                }
+                @if (properties.length === 0) {
+                  <div class="no-properties">
+                    <mat-icon>inventory_2</mat-icon>
+                    <p>No properties available. Add properties first.</p>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <div class="option-section">
+              <h4>Templates</h4>
+              <mat-form-field appearance="outline">
+                <mat-label>Property Page Template</mat-label>
+                <mat-select [(ngModel)]="propertyTemplate">
+                  @for (template of propertyTemplates; track template.id) {
+                    <mat-option [value]="template.id">{{ template.name }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+
+              <mat-checkbox [(ngModel)]="useAIContent">
+                Generate AI content & SEO descriptions
+              </mat-checkbox>
+            </div>
+          </div>
+        </div>
+        <div class="dialog-footer">
+          <button mat-button (click)="showGenerateDialog = false">Cancel</button>
+          <button mat-raised-button color="primary" (click)="generateWebsite()" [disabled]="generating">
+            @if (generating) {
+              <mat-spinner diameter="20"></mat-spinner> Generating...
+            } @else {
+              <mat-icon>auto_awesome</mat-icon> Generate Website
+            }
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

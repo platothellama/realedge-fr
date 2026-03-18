@@ -1,0 +1,137 @@
+.doc-manager-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.manager-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.header-info h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #fff;
+}
+
+.header-info p {
+  margin: 4px 0 0;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.upload-btn {
+  border-radius: 12px !important;
+  font-weight: 700 !important;
+  height: 40px !important;
+}
+
+.doc-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.doc-card {
+  background: rgba(255, 255, 255, 0.02) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 16px !important;
+  padding: 16px !important;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: all 0.3s ease !important;
+}
+
+.doc-card:hover {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  transform: translateX(4px);
+}
+
+.doc-icon-area {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.doc-icon-area mat-icon {
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+}
+
+.doc-icon-area[data-type="Contract"] { color: #6366f1; background: rgba(99, 102, 241, 0.1); }
+.doc-icon-area[data-type="Property Paper"] { color: #10b981; background: rgba(16, 185, 129, 0.1); }
+.doc-icon-area[data-type="Client ID"] { color: #f59e0b; background: rgba(245, 158, 11, 0.1); }
+
+.doc-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.doc-title {
+  font-weight: 700;
+  color: #fff;
+  font-size: 0.95rem;
+}
+
+.doc-meta {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.doc-status-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.status-badge {
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary);
+}
+
+.status-badge[data-status="Signed"] { color: #34d399; background: rgba(52, 211, 153, 0.1); }
+.status-badge[data-status="Pending Signature"] { color: #f59e0b; background: rgba(245, 158, 11, 0.1); }
+
+.sign-meta {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.empty-state, .loading-state {
+  padding: 48px;
+  text-align: center;
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.01);
+  border-radius: 20px;
+  border: 1px dashed var(--border);
+}
+
+.empty-state mat-icon, .loading-state mat-icon {
+  font-size: 32px;
+  width: 32px;
+  height: 32px;
+  margin-bottom: 12px;
+}
+
+.spin { animation: rotation 2s infinite linear; }
+@keyframes rotation { from { transform: rotate(0deg); } to { transform: rotate(359deg); } }
+
+.text-warn { color: #ef4444 !important; }

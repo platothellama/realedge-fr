@@ -1,0 +1,133 @@
+<div class="announcements-container">
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">Announcements</h1>
+      <p class="page-subtitle">Company-wide announcements and updates</p>
+    </div>
+    <div class="header-actions">
+      <mat-form-field appearance="outline" class="filter-select">
+        <mat-label>Filter by Category</mat-label>
+        <mat-select [(ngModel)]="filterCategory">
+          <mat-option value="all">All Categories</mat-option>
+          @for (category of categories; track category) {
+            <mat-option [value]="category">{{ category | titlecase }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <button mat-raised-button color="primary" (click)="showAddDialog = true">
+        <mat-icon>add</mat-icon>
+        New Announcement
+      </button>
+    </div>
+  </div>
+
+  @if (loading) {
+    <div class="loading-container">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+  } @else {
+    <div class="announcements-list">
+      @for (announcement of filteredAnnouncements; track announcement.id) {
+        <div class="announcement-card" [class.inactive]="!announcement.isActive" [class.expired]="isExpired(announcement.expiresAt)">
+          <div class="announcement-header">
+            <div class="announcement-meta">
+              <mat-icon [class]="announcement.category">{{ categoryIcons[announcement.category] }}</mat-icon>
+              <span class="category-badge">{{ announcement.category }}</span>
+              <span class="priority-badge" [style.background-color]="priorityColors[announcement.priority]">
+                {{ announcement.priority }}
+              </span>
+            </div>
+            <div class="announcement-actions">
+              <button mat-icon-button (click)="toggleActive(announcement)" [matTooltip]="announcement.isActive ? 'Deactivate' : 'Activate'">
+                <mat-icon>{{ announcement.isActive ? 'visibility' : 'visibility_off' }}</mat-icon>
+              </button>
+              <button mat-icon-button (click)="deleteAnnouncement(announcement.id)" matTooltip="Delete">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </div>
+          
+          <h2 class="announcement-title">{{ announcement.title }}</h2>
+          <p class="announcement-content">{{ announcement.content }}</p>
+          
+          <div class="announcement-footer">
+            <div class="footer-left">
+              <span class="author">
+                <mat-icon>person</mat-icon>
+                {{ announcement.createdBy }}
+              </span>
+              <span class="date">
+                <mat-icon>schedule</mat-icon>
+                {{ formatDate(announcement.createdAt) }}
+              </span>
+              @if (announcement.expiresAt) {
+                <span class="expires" [class.expired]="isExpired(announcement.expiresAt)">
+                  <mat-icon>event</mat-icon>
+                  Expires: {{ formatDate(announcement.expiresAt) }}
+                </span>
+              }
+            </div>
+            @if (!announcement.isActive) {
+              <span class="status-badge inactive">Inactive</span>
+            }
+          </div>
+        </div>
+      } @empty {
+        <div class="empty-state">
+          <mat-icon>campaign_off</mat-icon>
+          <h3>No Announcements</h3>
+          <p>There are no announcements to display.</p>
+        </div>
+      }
+    </div>
+  }
+</div>
+
+@if (showAddDialog) {
+  <div class="dialog-overlay" (click)="closeDialog()">
+    <div class="dialog-content" (click)="$event.stopPropagation()">
+      <div class="dialog-header">
+        <h2>Create Announcement</h2>
+        <button mat-icon-button (click)="closeDialog()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+      <div class="dialog-body">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Title</mat-label>
+          <input matInput [(ngModel)]="newAnnouncement.title" placeholder="Enter announcement title">
+        </mat-form-field>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Content</mat-label>
+          <textarea matInput [(ngModel)]="newAnnouncement.content" placeholder="Enter announcement content" rows="4"></textarea>
+        </mat-form-field>
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Category</mat-label>
+            <mat-select [(ngModel)]="newAnnouncement.category">
+              @for (category of categories; track category) {
+                <mat-option [value]="category">{{ category | titlecase }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Priority</mat-label>
+            <mat-select [(ngModel)]="newAnnouncement.priority">
+              @for (priority of priorities; track priority) {
+                <mat-option [value]="priority">{{ priority | titlecase }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </div>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Expires At (optional)</mat-label>
+          <input matInput type="date" [(ngModel)]="newAnnouncement.expiresAt">
+        </mat-form-field>
+      </div>
+      <div class="dialog-actions">
+        <button mat-button (click)="closeDialog()">Cancel</button>
+        <button mat-raised-button color="primary" (click)="createAnnouncement()">Publish</button>
+      </div>
+    </div>
+  </div>
+}

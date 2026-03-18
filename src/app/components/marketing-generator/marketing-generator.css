@@ -1,0 +1,10 @@
+.marketing-generator .actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.marketing-generator button mat-spinner {
+  display: inline-block;
+  margin-right: 4px;
+}

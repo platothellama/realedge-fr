@@ -1,0 +1,19 @@
+<div class="app-container" [class.no-sidebar]="!auth.currentUser()">
+  
+  <!-- Sidebar -->
+  <app-sidebar *ngIf="auth.currentUser()"></app-sidebar>
+
+  <!-- Main View Area -->
+  <div class="main-content">
+    
+    <!-- Header -->
+    <app-header *ngIf="auth.currentUser()"></app-header>
+
+    <!-- Content -->
+    <main class="content-body">
+      <router-outlet></router-outlet>
+    </main>
+
+  </div>
+
+</div>

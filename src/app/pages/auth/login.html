@@ -1,0 +1,45 @@
+<div class="login-container">
+  <mat-card class="login-card">
+    <div class="login-header">
+      <mat-icon class="logo-icon">domain</mat-icon>
+      <h1>Welcome Back</h1>
+      <p>Sign in to your RealEdge Enterprise account</p>
+    </div>
+
+    <div class="error-message" *ngIf="error()">
+      {{ error() }}
+    </div>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <div class="form-field">
+        <mat-form-field appearance="outline">
+          <mat-label>Email Address</mat-label>
+          <input matInput formControlName="email" type="email" placeholder="name@company.com">
+          <mat-icon matSuffix>email</mat-icon>
+        </mat-form-field>
+      </div>
+
+      <div class="form-field">
+        <mat-form-field appearance="outline">
+          <mat-label>Password</mat-label>
+          <input matInput formControlName="password" [type]="hidePassword ? 'password' : 'text'">
+          <button type="button" mat-icon-button matSuffix (click)="hidePassword = !hidePassword">
+            <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+          </button>
+        </mat-form-field>
+      </div>
+
+      <button mat-raised-button color="primary" class="login-btn" type="submit" [disabled]="loading() || !loginForm.valid">
+        <span *ngIf="!loading()">Sign In</span>
+        <mat-spinner diameter="24" *ngIf="loading()"></mat-spinner>
+      </button>
+    </form>
+
+    <div class="divider">or continue with</div>
+
+    <button mat-button class="google-btn" (click)="loginWithGoogle()">
+      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="google-icon" alt="Google">
+      Sign in with Google
+    </button>
+  </mat-card>
+</div>

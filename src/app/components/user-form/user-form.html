@@ -1,0 +1,71 @@
+<div class="user-form-container">
+  <h2 mat-dialog-title>{{ isEdit ? 'Update Team Member' : 'Add New Member' }}</h2>
+  
+  <mat-dialog-content [formGroup]="userForm">
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Full Name</mat-label>
+        <input matInput formControlName="name" placeholder="Ex: John Smith">
+        <mat-icon matSuffix color="primary">person</mat-icon>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Work Email</mat-label>
+        <input matInput formControlName="email" type="email" placeholder="name@company.com">
+        <mat-icon matSuffix color="primary">email</mat-icon>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row" *ngIf="!isEdit">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Initial Password</mat-label>
+        <input matInput formControlName="password" [type]="hidePassword ? 'password' : 'text'">
+        <button type="button" mat-icon-button matSuffix (click)="hidePassword = !hidePassword">
+          <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+        </button>
+        <mat-hint>Minimum 6 characters</mat-hint>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Access Level / Role</mat-label>
+        <mat-select formControlName="role">
+          @for (role of roles; track role.name) {
+            <mat-option [value]="role.name">
+              <div class="role-option">
+                <mat-icon>{{role.icon}}</mat-icon>
+                <div class="role-text">
+                  <span class="role-name">{{role.name}}</span>
+                  <span class="role-desc">{{role.desc}}</span>
+                </div>
+              </div>
+            </mat-option>
+          }
+        </mat-select>
+        <mat-icon matSuffix color="primary">admin_panel_settings</mat-icon>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Assign Groups</mat-label>
+        <mat-select formControlName="groupIds" multiple>
+          @for (group of groups; track group.id) {
+            <mat-option [value]="group.id">{{group.name}}</mat-option>
+          }
+        </mat-select>
+        <mat-icon matSuffix color="primary">groups</mat-icon>
+      </mat-form-field>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close class="cancel-btn">Discard</button>
+    <button mat-raised-button color="primary" class="submit-btn" (click)="onSubmit()" [disabled]="!userForm.valid">
+      {{ isEdit ? 'Save Changes' : 'Confirm & Add' }}
+    </button>
+  </mat-dialog-actions>
+</div>

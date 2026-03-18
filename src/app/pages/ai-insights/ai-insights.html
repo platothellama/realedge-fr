@@ -1,0 +1,193 @@
+<div class="ai-insights-container">
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">AI Insights</h1>
+      <p class="page-subtitle">AI-powered analytics and predictive intelligence</p>
+    </div>
+    <button mat-raised-button color="primary" (click)="refreshInsights()">
+      <mat-icon>refresh</mat-icon>
+      Refresh Insights
+    </button>
+  </div>
+
+  @if (loading) {
+    <div class="loading-container">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p>Analyzing data with AI...</p>
+    </div>
+  } @else {
+    <div class="summary-bar">
+      <div class="summary-item">
+        <mat-icon>people</mat-icon>
+        <div class="summary-content">
+          <span class="summary-value">{{ summary.totalLeads || 0 }}</span>
+          <span class="summary-label">Total Leads</span>
+        </div>
+      </div>
+      <div class="summary-item hot">
+        <mat-icon>whatshot</mat-icon>
+        <div class="summary-content">
+          <span class="summary-value">{{ summary.hotLeads || 0 }}</span>
+          <span class="summary-label">Hot Leads</span>
+        </div>
+      </div>
+      <div class="summary-item warm">
+        <mat-icon>thermostat</mat-icon>
+        <div class="summary-content">
+          <span class="summary-value">{{ summary.warmLeads || 0 }}</span>
+          <span class="summary-label">Warm Leads</span>
+        </div>
+      </div>
+      <div class="summary-item">
+        <mat-icon>home</mat-icon>
+        <div class="summary-content">
+          <span class="summary-value">{{ summary.availableProperties || 0 }}</span>
+          <span class="summary-label">Available</span>
+        </div>
+      </div>
+      <div class="summary-item">
+        <mat-icon>attach_money</mat-icon>
+        <div class="summary-content">
+          <span class="summary-value">{{ summary.totalRevenue ? formatCurrency(summary.totalRevenue) : '$0' }}</span>
+          <span class="summary-label">Revenue</span>
+        </div>
+      </div>
+      <div class="summary-item">
+        <mat-icon>swap_horiz</mat-icon>
+        <div class="summary-content">
+          <span class="summary-value">{{ summary.closedDeals || 0 }}</span>
+          <span class="summary-label">Closed Deals</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="insights-grid">
+      <div class="main-section">
+        <mat-card class="predictions-card">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>psychology</mat-icon>
+              Predictive Analytics
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="predictions-grid">
+              @for (prediction of predictions; track prediction.title) {
+                <div class="prediction-item">
+                  <div class="prediction-header">
+                    <span class="prediction-title">{{ prediction.title }}</span>
+                    <div class="confidence-badge" [style.background-color]="getConfidenceColor(prediction.confidence)">
+                      {{ prediction.confidence }}% confidence
+                    </div>
+                  </div>
+                  <div class="prediction-value">
+                    <span class="value">{{ prediction.value }}</span>
+                    <mat-icon [class.up]="prediction.trend === 'up'" [class.down]="prediction.trend === 'down'">
+                      {{ prediction.trend === 'up' ? 'trending_up' : prediction.trend === 'down' ? 'trending_down' : 'trending_flat' }}
+                    </mat-icon>
+                  </div>
+                  <p class="prediction-description">{{ prediction.description }}</p>
+                </div>
+              }
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="valuations-card">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>home</mat-icon>
+              Property Valuations
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="valuations-list">
+              @for (val of propertyValuations; track val.propertyId) {
+                <div class="valuation-item">
+                  <div class="valuation-info">
+                    <span class="valuation-title">{{ val.propertyTitle }}</span>
+                    <span class="valuation-price">Current: {{ formatCurrency(val.currentPrice) }}</span>
+                  </div>
+                  <div class="valuation-estimate">
+                    <span class="estimate-label">AI Estimate</span>
+                    <span class="estimate-value" [class.positive]="val.estimatedValue > val.currentPrice" [class.negative]="val.estimatedValue < val.currentPrice">
+                      {{ formatCurrency(val.estimatedValue) }}
+                    </span>
+                    <div class="trend-badge" [class]="val.marketTrend.toLowerCase()">
+                      {{ val.marketTrend }}
+                    </div>
+                  </div>
+                  <div class="valuation-metrics">
+                    <span class="metric">
+                      <mat-icon>square_foot</mat-icon>
+                      {{ formatCurrency(val.pricePerSqm) }}/sqm
+                    </span>
+                    <span class="confidence">
+                      <mat-icon>verified</mat-icon>
+                      {{ val.confidence }}%
+                    </span>
+                  </div>
+                </div>
+              }
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <div class="sidebar-section">
+        <mat-card class="lead-scores-card">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>people</mat-icon>
+              Lead Scoring
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="lead-scores-list">
+              @for (lead of leadScores; track lead.id) {
+                <div class="lead-item">
+                  <div class="lead-score-ring" [style.--score-color]="getScoreColor(lead.score)">
+                    <span class="score-value">{{ lead.score }}</span>
+                  </div>
+                  <div class="lead-info">
+                    <span class="lead-name">{{ lead.name }}</span>
+                    <div class="lead-factors">
+                      @for (factor of lead.factors.slice(0, 2); track factor) {
+                        <span class="factor-chip">{{ factor }}</span>
+                      }
+                    </div>
+                  </div>
+                  <div class="lead-recommendation">
+                    <span class="recommendation">{{ lead.recommendation }}</span>
+                  </div>
+                </div>
+              }
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="quick-actions-card">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>bolt</mat-icon>
+              Quick AI Actions
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="actions-list">
+              @for (action of insights; track action.type) {
+                <button mat-stroked-button class="action-btn">
+                  <mat-icon>{{ action.icon }}</mat-icon>
+                  <div class="action-text">
+                    <span class="action-title">{{ action.title }}</span>
+                    <span class="action-desc">{{ action.description }}</span>
+                  </div>
+                </button>
+              }
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+  }
+</div>

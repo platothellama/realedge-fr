@@ -1,0 +1,124 @@
+.login-container {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--bg-main);
+  background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.login-container::before {
+  content: '';
+  position: absolute;
+  width: 1000px;
+  height: 1000px;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
+  top: -400px;
+  right: -400px;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 440px;
+  padding: 48px !important;
+  border-radius: 24px !important;
+  background: rgba(30, 41, 59, 0.7) !important;
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
+  z-index: 10;
+}
+
+.login-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.logo-icon {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  color: var(--primary);
+  margin-bottom: 16px;
+}
+
+.login-header h1 {
+  font-size: 32px;
+  font-weight: 800;
+  margin: 0;
+  letter-spacing: -1px;
+}
+
+.login-header p {
+  color: var(--text-secondary);
+  margin-top: 8px;
+}
+
+.form-field {
+  margin-bottom: 24px;
+}
+
+.mat-mdc-form-field {
+  width: 100%;
+}
+
+.login-btn {
+  width: 100%;
+  padding: 24px !important;
+  border-radius: 12px !important;
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.5px;
+  margin-top: 8px !important;
+  background: var(--primary) !important;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 32px 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.divider::before, .divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid var(--border);
+}
+
+.divider:not(:empty)::before { margin-right: .5em; }
+.divider:not(:empty)::after { margin-left: .5em; }
+
+.google-btn {
+  width: 100%;
+  padding: 24px !important;
+  border-radius: 12px !important;
+  background: white !important;
+  color: #1e293b !important;
+  font-weight: 600 !important;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  border: none !important;
+}
+
+.google-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.error-message {
+  padding: 12px;
+  background: rgba(244, 63, 94, 0.1);
+  color: #fb7185;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  font-size: 14px;
+  text-align: center;
+  border: 1px solid rgba(244, 63, 94, 0.2);
+}

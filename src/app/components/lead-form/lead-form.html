@@ -1,0 +1,116 @@
+<div class="lead-form-container">
+  <div class="modal-header">
+    <h2 mat-dialog-title>{{ isEdit ? 'Edit Lead Profile' : 'Capture New Lead' }}</h2>
+    <p class="modal-subtitle">Fill in the prospect details for your CRM pipeline</p>
+  </div>
+
+  <mat-dialog-content [formGroup]="leadForm" class="custom-scrollbar">
+    <div class="section-label">Contact Information</div>
+    <div class="form-row">
+      <mat-form-field appearance="outline">
+        <mat-label>Lead Name</mat-label>
+        <input matInput formControlName="name" placeholder="Full Name">
+        <mat-icon matSuffix>person</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Email Address</mat-label>
+        <input matInput type="email" formControlName="email" placeholder="email@example.com">
+        <mat-icon matSuffix>email</mat-icon>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline">
+        <mat-label>Phone Number</mat-label>
+        <input matInput formControlName="phone" placeholder="+1 234 567 890">
+        <mat-icon matSuffix>phone</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Nationality</mat-label>
+        <input matInput formControlName="nationality" placeholder="e.g. British, Emirati">
+        <mat-icon matSuffix>public</mat-icon>
+      </mat-form-field>
+    </div>
+
+    <div class="section-label">Pipeline & Preferences</div>
+    <div class="form-row">
+      <mat-form-field appearance="outline">
+        <mat-label>Lead Source</mat-label>
+        <mat-select formControlName="source">
+          <mat-option value="Website">Website</mat-option>
+          <mat-option value="Facebook">Facebook</mat-option>
+          <mat-option value="Google Ads">Google Ads</mat-option>
+          <mat-option value="Referral">Referral</mat-option>
+          <mat-option value="Walk-in">Walk-in</mat-option>
+        </mat-select>
+        <mat-icon matSuffix>campaign</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Pipeline Stage</mat-label>
+        <mat-select formControlName="status">
+          <mat-option value="New Lead">New Lead</mat-option>
+          <mat-option value="Contacted">Contacted</mat-option>
+          <mat-option value="Visit Scheduled">Visit Scheduled</mat-option>
+          <mat-option value="Negotiation">Negotiation</mat-option>
+          <mat-option value="Closed Deal">Closed Deal</mat-option>
+          <mat-option value="Lost Lead">Lost Lead</mat-option>
+        </mat-select>
+        <mat-icon matSuffix>account_tree</mat-icon>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="budget-field">
+        <mat-label>Maximum Budget</mat-label>
+        <input matInput type="number" formControlName="budget" placeholder="0.00">
+        <span matPrefix class="currency-prefix">$</span>
+        <mat-hint>Enter the maximum amount the client is willing to spend</mat-hint>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Preferred Areas</mat-label>
+        <input matInput formControlName="preferredAreas" placeholder="e.g. Downtown, Marina">
+        <mat-icon matSuffix>map</mat-icon>
+      </mat-form-field>
+    </div>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Property Preferences</mat-label>
+      <input matInput formControlName="propertyPreferences" placeholder="e.g. 3 Bed Villa, Sea View">
+      <mat-icon matSuffix>home</mat-icon>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Internal Notes</mat-label>
+      <textarea matInput formControlName="notes" rows="3" placeholder="Additional details about the lead..."></textarea>
+    </mat-form-field>
+
+    <div class="section-label">Assignment</div>
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Assign to Agent</mat-label>
+      <mat-select formControlName="assignedToUserId">
+        <mat-option [value]="null">-- Self Assigned --</mat-option>
+        @for (user of users; track user.id) {
+          <mat-option [value]="user.id">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <img [src]="user.photo || 'https://ui-avatars.com/api/?name=' + user.name" style="width: 24px; height: 24px; border-radius: 50%;">
+              <span>{{ user.name }}</span>
+              <span style="font-size: 0.75rem; color: var(--text-muted);">({{ user.role }})</span>
+            </div>
+          </mat-option>
+        }
+      </mat-select>
+      <mat-icon matSuffix>assignment_ind</mat-icon>
+    </mat-form-field>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="onCancel()" class="cancel-btn">Discard</button>
+    <button mat-raised-button color="primary" class="submit-btn" (click)="onSubmit()" [disabled]="!leadForm.valid">
+      {{ isEdit ? 'Update Profile' : 'Capture Lead' }}
+    </button>
+  </mat-dialog-actions>
+</div>

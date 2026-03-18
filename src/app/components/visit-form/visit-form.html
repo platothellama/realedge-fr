@@ -1,0 +1,113 @@
+<div class="visit-form-container">
+  <div class="modal-header">
+    <h2 mat-dialog-title>{{ isEdit ? 'Update Visit' : 'Schedule Property Visit' }}</h2>
+    <p class="modal-subtitle">Organize property viewings and notify clients</p>
+  </div>
+
+  <mat-dialog-content [formGroup]="visitForm" class="custom-scrollbar">
+    <div class="section-label">General Info</div>
+    
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Meeting Title</mat-label>
+        <input matInput formControlName="title" placeholder="e.g. Viewing for Downtown Penthouse">
+        <mat-icon matSuffix>event</mat-icon>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Property</mat-label>
+        <mat-select formControlName="propertyId">
+          @for (prop of properties; track prop.id) {
+            <mat-option [value]="prop.id">{{ prop.title }}</mat-option>
+          }
+        </mat-select>
+        <mat-icon matSuffix>home</mat-icon>
+      </mat-form-field>
+    </div>
+
+    <div class="section-label">Schedule</div>
+
+    <div class="form-row-group">
+      <mat-form-field appearance="outline">
+        <mat-label>Visit Date</mat-label>
+        <input matInput [matDatepicker]="picker" formControlName="visitDate">
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Time</mat-label>
+        <input matInput type="time" formControlName="visitTime">
+        <mat-icon matSuffix>schedule</mat-icon>
+      </mat-form-field>
+    </div>
+
+    <div class="section-label">Client Details</div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Client Name</mat-label>
+        <input matInput formControlName="clientName">
+        <mat-icon matSuffix>person</mat-icon>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Client Email</mat-label>
+        <input matInput formControlName="clientEmail" type="email">
+        <mat-icon matSuffix>email</mat-icon>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Client Phone</mat-label>
+        <input matInput formControlName="clientPhone">
+        <mat-icon matSuffix>phone</mat-icon>
+      </mat-form-field>
+    </div>
+
+    <div class="section-label">Assignment & Status</div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Assigned Broker</mat-label>
+        <mat-select formControlName="brokerId">
+          @for (user of brokers; track user.id) {
+            <mat-option [value]="user.id">{{ user.name }} ({{ user.role }})</mat-option>
+          }
+        </mat-select>
+        <mat-icon matSuffix>badge</mat-icon>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Status</mat-label>
+        <mat-select formControlName="status">
+          @for (s of statuses; track s) {
+            <mat-option [value]="s">{{ s }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Internal Notes</mat-label>
+        <textarea matInput formControlName="notes" rows="3"></textarea>
+      </mat-form-field>
+    </div>
+
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="onCancel()" class="cancel-btn">Discard</button>
+    <button mat-raised-button color="primary" class="submit-btn" (click)="onSubmit()" [disabled]="!visitForm.valid">
+      {{ isEdit ? 'Update Schedule' : 'Schedule Visit' }}
+    </button>
+  </mat-dialog-actions>
+</div>

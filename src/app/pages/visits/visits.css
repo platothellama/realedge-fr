@@ -1,0 +1,104 @@
+.visits-container {
+  padding: 40px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.title-area h1 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin: 0;
+  color: #fff;
+}
+
+.title-area p {
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  margin-top: 8px;
+  font-weight: 500;
+}
+
+.action-area {
+  display: flex;
+  gap: 16px;
+}
+
+.schedule-btn, .google-sync-btn {
+  height: 52px !important;
+  border-radius: 14px !important;
+  font-weight: 800 !important;
+  padding: 0 24px !important;
+}
+
+.schedule-btn {
+  box-shadow: 0 8px 20px -4px var(--primary-glow) !important;
+}
+
+.calendar-card {
+  flex: 1;
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 24px !important;
+  padding: 32px !important;
+  overflow: hidden;
+}
+
+/* FullCalendar Custom Styling for Dark Theme */
+::ng-deep .fc {
+  --fc-border-color: var(--border);
+  --fc-page-bg-color: transparent;
+  --fc-button-bg-color: var(--bg-elevated);
+  --fc-button-border-color: var(--border);
+  --fc-button-hover-bg-color: var(--primary);
+  --fc-button-hover-border-color: var(--primary);
+  --fc-button-active-bg-color: var(--primary);
+  --fc-button-active-border-color: var(--primary);
+  --fc-event-bg-color: var(--primary);
+  --fc-event-border-color: transparent;
+  --fc-today-bg-color: rgba(99, 102, 241, 0.05);
+  
+  font-family: 'Urbanist', sans-serif !important;
+}
+
+::ng-deep .fc .fc-toolbar-title {
+  font-weight: 800 !important;
+  color: #fff !important;
+  font-size: 1.5rem !important;
+}
+
+::ng-deep .fc .fc-col-header-cell-cushion {
+  padding: 12px 0 !important;
+  font-weight: 700 !important;
+  color: var(--text-muted) !important;
+  text-transform: uppercase;
+  font-size: 0.75rem !important;
+  letter-spacing: 0.05em !important;
+}
+
+::ng-deep .fc .fc-timegrid-slot-label-cushion {
+  font-weight: 600 !important;
+  color: var(--text-secondary) !important;
+  font-size: 0.8rem !important;
+}
+
+::ng-deep .fc .fc-event {
+  border-radius: 8px !important;
+  padding: 4px 8px !important;
+  font-weight: 600 !important;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+::ng-deep .fc .fc-event:hover {
+  transform: scale(1.02);
+  filter: brightness(1.1);
+}

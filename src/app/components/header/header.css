@@ -1,0 +1,56 @@
+.header-toolbar {
+  background: var(--bg-header) !important;
+  backdrop-filter: blur(24px) saturate(180%);
+  border-bottom: 1px solid var(--border);
+  height: 88px !important;
+  padding: 0 48px !important;
+  display: flex;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.notification-btn {
+  margin-right: 24px;
+  color: var(--text-secondary) !important;
+  width: 48px !important;
+  height: 48px !important;
+}
+
+.profile-btn {
+  display: flex !important;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 16px !important;
+  height: 56px !important;
+  border-radius: 14px !important;
+  background: rgba(255, 255, 255, 0.03) !important;
+  border: 1px solid var(--border) !important;
+  transition: all 0.2s ease !important;
+}
+
+.profile-btn:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: var(--border-strong) !important;
+}
+
+.username {
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--text-primary);
+}
+
+.mat-mdc-menu-panel {
+  background-color: var(--bg-elevated) !important;
+  border: 1px solid var(--border-strong) !important;
+  border-radius: var(--radius-lg) !important;
+  margin-top: 16px !important;
+  box-shadow: var(--shadow-xl) !important;
+}
+
+.mat-mdc-menu-item {
+  color: var(--text-primary) !important;
+  height: 56px !important;
+  font-weight: 500 !important;
+}

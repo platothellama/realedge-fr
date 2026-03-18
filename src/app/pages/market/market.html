@@ -1,0 +1,181 @@
+<div class="market-container">
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">Market Intelligence</h1>
+      <p class="page-subtitle">Real-time market analytics, insights & methodology</p>
+    </div>
+    <div class="header-actions">
+      <mat-form-field appearance="outline" class="period-select">
+        <mat-select [(ngModel)]="selectedPeriod" (selectionChange)="loadMarketData()">
+          @for (period of periods; track period.value) {
+            <mat-option [value]="period.value">{{ period.label }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+      <button mat-raised-button color="primary" (click)="refreshData()">
+        <mat-icon>sync</mat-icon>
+        Refresh
+      </button>
+    </div>
+  </div>
+
+  @if (loading) {
+    <div class="loading-container">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+  } @else {
+    <div class="metrics-grid">
+      @for (metric of metrics; track metric.label) {
+        <div class="metric-card">
+          <div class="metric-header">
+            <mat-icon>{{ metric.icon }}</mat-icon>
+            <span class="metric-label">{{ metric.label }}</span>
+          </div>
+          <div class="metric-value">{{ metric.value }}</div>
+          <div class="metric-change" [class.positive]="metric.trend === 'up'" [class.negative]="metric.trend === 'down'">
+            <mat-icon>{{ getTrendIcon(metric.trend) }}</mat-icon>
+            <span>{{ metric.change > 0 ? '+' : '' }}{{ metric.change }}%</span>
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="content-grid">
+      <div class="main-content">
+        <mat-card class="data-table-card">
+          <mat-card-header>
+            <mat-card-title>Market Overview by Location</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <table class="market-table">
+              <thead>
+                <tr>
+                  <th>Location</th>
+                  <th>Avg. Price</th>
+                  <th>Price Change</th>
+                  <th>Avg. Days</th>
+                  <th>Inventory</th>
+                  <th>Demand</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (data of marketData; track data.location) {
+                  <tr>
+                    <td class="location-cell">{{ data.location }}</td>
+                    <td>{{ formatCurrency(data.avgPrice) }}</td>
+                    <td [class.positive]="data.priceChange > 0" [class.negative]="data.priceChange < 0">
+                      {{ data.priceChange > 0 ? '+' : '' }}{{ data.priceChange }}%
+                    </td>
+                    <td>{{ data.avgDaysOnMarket }}</td>
+                    <td>{{ data.inventory }}</td>
+                    <td>
+                      <span class="demand-badge" [class]="getDemandClass(data.demand)">
+                        {{ data.demand }}
+                      </span>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </mat-card-content>
+        </mat-card>
+
+        <mat-card class="performers-card">
+          <mat-card-header>
+            <mat-card-title>Top Performing Property Types</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="performers-list">
+              @for (performer of topPerformers; track performer.name; let i = $index) {
+                <div class="performer-item">
+                  <div class="performer-rank">{{ i + 1 }}</div>
+                  <div class="performer-info">
+                    <span class="performer-name">{{ performer.name }}</span>
+                    <span class="performer-stats">{{ performer.transactions }} transactions</span>
+                  </div>
+                  <div class="performer-volume">
+                    <span class="volume-value">{{ formatCurrency(performer.volume) }}</span>
+                    <span class="volume-label">Total Volume</span>
+                  </div>
+                  <div class="performer-price">
+                    <span class="price-value">{{ formatCurrency(performer.avgPrice) }}</span>
+                    <span class="price-label">Avg. Price</span>
+                  </div>
+                </div>
+              }
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <div class="sidebar-content">
+        <mat-card class="insights-card">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>lightbulb</mat-icon>
+              AI Insights
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="insights-list">
+              @for (insight of aiInsights; track insight.title) {
+                <div class="insight-item" [class]="'insight-' + insight.type">
+                  <div class="insight-icon">
+                    @switch (insight.type) {
+                      @case ('opportunity') { <mat-icon>trending_up</mat-icon> }
+                      @case ('warning') { <mat-icon>warning</mat-icon> }
+                      @case ('trend') { <mat-icon>show_chart</mat-icon> }
+                    }
+                  </div>
+                  <div class="insight-content">
+                    <span class="insight-title">{{ insight.title }}</span>
+                    <span class="insight-description">{{ insight.description }}</span>
+                  </div>
+                </div>
+              }
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+
+    <mat-card class="methodology-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>info</mat-icon>
+          How Metrics Are Calculated
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <mat-accordion>
+          @for (key of methodologyKeys; track key) {
+            <mat-expansion-panel>
+              <mat-expansion-panel-header>
+                <mat-panel-title>
+                  {{ methodology[key].title }}
+                </mat-panel-title>
+                <mat-panel-description>
+                  Click to see calculation details
+                </mat-panel-description>
+              </mat-expansion-panel-header>
+              <div class="methodology-details">
+                <div class="methodology-section">
+                  <h4>Calculation Formula</h4>
+                  <code>{{ methodology[key].calculation }}</code>
+                </div>
+                <div class="methodology-section">
+                  <h4>Data Source</h4>
+                  <p>{{ methodology[key].source }}</p>
+                </div>
+                <div class="methodology-section">
+                  <h4>Details</h4>
+                  <p>{{ methodology[key].details }}</p>
+                </div>
+              </div>
+            </mat-expansion-panel>
+          }
+        </mat-accordion>
+      </mat-card-content>
+    </mat-card>
+  }
+</div>

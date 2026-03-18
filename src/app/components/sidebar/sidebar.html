@@ -1,0 +1,28 @@
+<div class="sidebar-header">
+  <mat-icon class="logo-icon">domain</mat-icon>
+  <span class="logo-text">RealEdge ERP</span>
+</div>
+
+<div class="user-profile" *ngIf="user()">
+  <img [src]="user()?.photo || 'https://ui-avatars.com/api/?name=' + user()?.name" class="avatar" alt="User">
+  <div class="user-info">
+    <span class="name">{{ user()?.name }}</span>
+    <span class="role-badge">{{ user()?.role }}</span>
+  </div>
+</div>
+
+<mat-nav-list>
+  @for (item of menuItems(); track item.label) {
+    <a mat-list-item [routerLink]="item.link" routerLinkActive="active-link">
+      <mat-icon matListItemIcon>{{ item.icon }}</mat-icon>
+      <span matListItemTitle>{{ item.label }}</span>
+    </a>
+  }
+</mat-nav-list>
+
+<div class="sidebar-footer">
+  <button mat-button class="logout-btn" (click)="logout()">
+    <mat-icon>logout</mat-icon>
+    Sign Out
+  </button>
+</div>

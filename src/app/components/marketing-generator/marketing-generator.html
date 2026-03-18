@@ -1,0 +1,32 @@
+<div class="marketing-generator">
+  <div class="actions">
+    <button mat-raised-button color="primary" (click)="generate('description')" [disabled]="loading.description">
+      @if (loading.description) {
+        <mat-spinner diameter="20"></mat-spinner>
+      } @else {
+        <ng-container><mat-icon>description</mat-icon> Description</ng-container>
+      }
+    </button>
+    <button mat-raised-button color="primary" (click)="generate('social_post')" [disabled]="loading.social_post">
+      @if (loading.social_post) {
+        <mat-spinner diameter="20"></mat-spinner>
+      } @else {
+        <ng-container><mat-icon>share</mat-icon> Social Post</ng-container>
+      }
+    </button>
+    <button mat-raised-button color="primary" (click)="generate('ads_copy')" [disabled]="loading.ads_copy">
+      @if (loading.ads_copy) {
+        <mat-spinner diameter="20"></mat-spinner>
+      } @else {
+        <ng-container><mat-icon>ads_click</mat-icon> Ads Copy</ng-container>
+      }
+    </button>
+    <button mat-raised-button color="primary" (click)="generate('captions_hashtags')" [disabled]="loading.captions_hashtags">
+      @if (loading.captions_hashtags) {
+        <mat-spinner diameter="20"></mat-spinner>
+      } @else {
+        <ng-container><mat-icon>tag</mat-icon> Captions</ng-container>
+      }
+    </button>
+  </div>
+</div>

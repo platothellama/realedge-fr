@@ -1,0 +1,314 @@
+<div class="details-container" *ngIf="!loading && property">
+  <!-- Top Navigation & Actions -->
+  <div class="top-bar">
+    <button mat-button class="back-btn" (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon>
+      Back to Listings
+    </button>
+    <div class="spacer"></div>
+    <button mat-stroked-button color="primary" class="deal-trigger-btn" (click)="startDeal()">
+      <mat-icon>handshake</mat-icon>
+      Start Deal
+    </button>
+    <button mat-stroked-button color="primary" class="visit-trigger-btn" (click)="scheduleVisit()">
+      <mat-icon>calendar_today</mat-icon>
+      Schedule Visit
+    </button>
+    <button mat-raised-button color="primary" class="edit-btn" (click)="openEditForm()">
+      <mat-icon>edit</mat-icon>
+      Edit Details
+    </button>
+  </div>
+
+  <!-- Property Analytics Dashboard -->
+  <div class="analytics-section">
+    <h2 class="section-title">
+      <mat-icon>analytics</mat-icon> Property Performance
+      <span class="status-badge" [style.background-color]="getStatusColor(analytics.status) + '20'" [style.color]="getStatusColor(analytics.status)">
+        {{ analytics.status }}
+      </span>
+    </h2>
+    
+    <div class="analytics-grid">
+      <!-- Price Analysis -->
+      <mat-card class="analytics-card">
+        <div class="card-header">
+          <mat-icon>price_change</mat-icon>
+          <h3>Price Analysis</h3>
+        </div>
+        <div class="stat-row">
+          <div class="stat-item">
+            <span class="label">Asking Price</span>
+            <span class="value">${{ property.price | number }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="label">Market Value</span>
+            <span class="value">${{ analytics.marketValue | number }}</span>
+          </div>
+        </div>
+        <div class="stat-row">
+          <div class="stat-item">
+            <span class="label">Price/m²</span>
+            <span class="value">${{ analytics.pricePerSqm | number:'1.0-0' }}</span>
+          </div>
+          <div class="stat-item">
+            <span class="label">vs Market</span>
+            <span class="value" [class]="analytics.valuationClass">
+              {{ analytics.priceVsMarket > 0 ? '+' : '' }}{{ analytics.priceVsMarket | number:'1.1-1' }}%
+            </span>
+          </div>
+        </div>
+        <div class="valuation-bar">
+          <div class="bar-label">Valuation</div>
+          <div class="bar-track">
+            <div class="bar-fill" [style.width.%]="analytics.valuationClass === 'undervalued' ? 30 : analytics.valuationClass === 'overvalued' ? 90 : 60" [class]="analytics.valuationClass"></div>
+            <div class="bar-marker" [style.left.%]="analytics.priceVsMarket + 50"></div>
+          </div>
+          <div class="bar-labels">
+            <span>Undervalued</span>
+            <span>Fair</span>
+            <span>Overvalued</span>
+          </div>
+        </div>
+      </mat-card>
+
+      <!-- Traction Metrics -->
+      <mat-card class="analytics-card">
+        <div class="card-header">
+          <mat-icon>trending_up</mat-icon>
+          <h3>Traction Metrics</h3>
+        </div>
+        <div class="metric-grid">
+          <div class="metric-item">
+            <mat-icon>visibility</mat-icon>
+            <div class="metric-info">
+              <span class="value">{{ analytics.views }}</span>
+              <span class="label">Total Views</span>
+            </div>
+          </div>
+          <div class="metric-item">
+            <mat-icon>question_answer</mat-icon>
+            <div class="metric-info">
+              <span class="value">{{ analytics.inquiries }}</span>
+              <span class="label">Inquiries</span>
+            </div>
+          </div>
+          <div class="metric-item">
+            <mat-icon>calendar_month</mat-icon>
+            <div class="metric-info">
+              <span class="value">{{ analytics.daysOnMarket }}</span>
+              <span class="label">Days on Market</span>
+            </div>
+          </div>
+          <div class="metric-item">
+            <mat-icon>swap_horiz</mat-icon>
+            <div class="metric-info">
+              <span class="value">{{ analytics.visitsPerView }}%</span>
+              <span class="label">Inquiry Rate</span>
+            </div>
+          </div>
+        </div>
+        <div class="traction-bar">
+          <div class="bar-label">Listing Health</div>
+          <div class="bar-track">
+            <div class="bar-fill" [style.width.%]="analytics.daysClass === 'fresh' ? 90 : analytics.daysClass === 'aging' ? 50 : 20" [class]="analytics.daysClass"></div>
+          </div>
+          <div class="bar-labels">
+            <span>Stale</span>
+            <span>Aging</span>
+            <span>Fresh</span>
+          </div>
+        </div>
+      </mat-card>
+
+      <!-- Quick Stats -->
+      <mat-card class="analytics-card mini">
+        <div class="quick-stat" [class]="analytics.valuationClass">
+          <mat-icon>{{ analytics.valuationClass === 'undervalued' ? 'trending_down' : analytics.valuationClass === 'overvalued' ? 'trending_up' : 'remove' }}</mat-icon>
+          <span class="qs-value">{{ analytics.valuationClass === 'unknown' ? 'N/A' : (analytics.valuationClass | titlecase) }}</span>
+          <span class="qs-label">Valuation</span>
+        </div>
+      </mat-card>
+
+      <mat-card class="analytics-card mini">
+        <div class="quick-stat" [class]="analytics.daysClass">
+          <mat-icon>{{ analytics.daysClass === 'fresh' ? 'check_circle' : analytics.daysClass === 'aging' ? 'warning' : 'error' }}</mat-icon>
+          <span class="qs-value">{{ analytics.daysOnMarket }} days</span>
+          <span class="qs-label">Time on Market</span>
+        </div>
+      </mat-card>
+    </div>
+  </div>
+
+  <div class="main-layout">
+    <!-- Left Column: Visuals & Main Info -->
+    <div class="left-col">
+      <div class="gallery-hero" [style.backgroundImage]="'url(' + (property.photos?.length ? property.photos[0] : 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=1200&q=80') + ')'">
+        <span class="status-chip" [class]="property.status.toLowerCase()">{{ property.status }}</span>
+      </div>
+
+      <div class="gallery-thumbs" *ngIf="property.photos?.length > 1">
+        @for (photo of property.photos.slice(1, 5); track photo) {
+          <div class="thumb" [style.backgroundImage]="'url(' + photo + ')'"></div>
+        }
+      </div>
+
+      <div class="info-card">
+        <div class="header">
+          <div class="title-section">
+            <span class="type-tag">{{ property.type }}</span>
+            <h1>{{ property.title }}</h1>
+            <p class="location-text">
+              <mat-icon>location_on</mat-icon>
+              {{ property.address }}, {{ property.city }}, {{ property.country }}
+            </p>
+          </div>
+          <div class="price-section">
+            <span class="price-label">Asking Price</span>
+            <span class="price-value">${{ property.price | number }}</span>
+          </div>
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <div class="quick-stats">
+          <div class="stat">
+            <mat-icon>bed</mat-icon>
+            <div class="stat-info">
+              <span class="val">{{ property.bedrooms }}</span>
+              <span class="lab">Bedrooms</span>
+            </div>
+          </div>
+          <div class="stat">
+            <mat-icon>bathtub</mat-icon>
+            <div class="stat-info">
+              <span class="val">{{ property.bathrooms }}</span>
+              <span class="lab">Bathrooms</span>
+            </div>
+          </div>
+          <div class="stat">
+            <mat-icon>square_foot</mat-icon>
+            <div class="stat-info">
+              <span class="val">{{ property.area }}</span>
+              <span class="lab">SQM Area</span>
+            </div>
+          </div>
+          <div class="stat">
+            <mat-icon>directions_car</mat-icon>
+            <div class="stat-info">
+              <span class="val">{{ property.parkingSpaces }}</span>
+              <span class="lab">Parking</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="description-section">
+          <h3>Description</h3>
+          <p>{{ property.description || 'No description provided for this luxury property.' }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Negotiation & Details -->
+    <div class="right-col">
+      <mat-card class="side-card history-card">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <h3>Negotiation & Price History</h3>
+            <p class="subtitle">Track price changes and offers</p>
+          </div>
+          <button mat-icon-button color="primary" (click)="openNegotiationForm()" matTooltip="Add Log">
+            <mat-icon>add_circle</mat-icon>
+          </button>
+        </div>
+
+        <div class="timeline">
+          @for (entry of property.priceHistoryEntries; track entry.id) {
+            <div class="timeline-item">
+              <div class="marker"></div>
+              <div class="timeline-content">
+                <div class="time-header">
+                  <span class="date">{{ entry.changeDate | date:'mediumDate' }}</span>
+                  <span class="price">${{ entry.price | number }}</span>
+                </div>
+                <p class="note">
+                  {{ entry.note }}
+                </p>
+                @if (entry.lead) {
+                  <div class="lead-badge">
+                    <mat-icon>person</mat-icon>
+                    {{ entry.lead.name }}
+                  </div>
+                }
+              </div>
+            </div>
+          }
+          @if (!property.priceHistoryEntries?.length) {
+            <div class="empty-state">No negotiation data yet.</div>
+          }
+        </div>
+      </mat-card>
+
+      <mat-card class="side-card spec-card">
+        <h3>Technical Specs</h3>
+        <div class="spec-list">
+          <div class="spec-item">
+            <span class="lab">Year Built</span>
+            <span class="val">{{ property.yearBuilt }}</span>
+          </div>
+          <div class="spec-item">
+            <span class="lab">Lot Size</span>
+            <span class="val">{{ property.lotSize }} sqm</span>
+          </div>
+          <div class="spec-item">
+            <span class="lab">Property ID</span>
+            <span class="val">{{ property.id.split('-')[0].toUpperCase() }}</span>
+          </div>
+          <div class="spec-item">
+            <span class="lab">Listed Date</span>
+            <span class="val">{{ property.createdAt | date:'mediumDate' }}</span>
+          </div>
+        </div>
+      </mat-card>
+
+      <mat-card class="side-card assign-card">
+        <h3>Assignment</h3>
+        <div class="assign-content">
+          @if (property.assignedUser) {
+            <div class="assign-item">
+              <mat-icon>person</mat-icon>
+              <div class="assign-info">
+                <span class="label">Primary Agent</span>
+                <span class="value">{{ property.assignedUser.name }}</span>
+              </div>
+            </div>
+          } @else if (property.assignedGroup) {
+            <div class="assign-item">
+              <mat-icon>groups</mat-icon>
+              <div class="assign-info">
+                <span class="label">Assigned Team</span>
+                <span class="value">{{ property.assignedGroup.name }}</span>
+              </div>
+            </div>
+          } @else {
+            <div class="unassigned-state">
+              <mat-icon>person_off</mat-icon>
+              <span>Currently Unassigned</span>
+            </div>
+          }
+        </div>
+      </mat-card>
+
+      <mat-card class="side-card media-card">
+        <h3>Associated Files</h3>
+        <div class="docs-tab-content">
+          <app-document-manager [propertyId]="property.id"></app-document-manager>
+        </div>
+      </mat-card>
+    </div>
+  </div>
+</div>
+
+<div class="loading-overlay" *ngIf="loading">
+  <mat-spinner diameter="40"></mat-spinner>
+</div>

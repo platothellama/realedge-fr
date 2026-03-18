@@ -1,0 +1,201 @@
+<div class="invoices-container">
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">Invoices</h1>
+      <p class="page-subtitle">Manage and track all invoices</p>
+    </div>
+    <button mat-raised-button color="primary" (click)="showAddDialog = true">
+      <mat-icon>add</mat-icon>
+      New Invoice
+    </button>
+  </div>
+
+  @if (loading) {
+    <div class="loading-container">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+  } @else {
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon paid">
+          <mat-icon>check_circle</mat-icon>
+        </div>
+        <div class="stat-content">
+          <span class="stat-value">{{ formatCurrency(stats.totalPaid || 0) }}</span>
+          <span class="stat-label">Total Paid</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon outstanding">
+          <mat-icon>pending</mat-icon>
+        </div>
+        <div class="stat-content">
+          <span class="stat-value">{{ formatCurrency(stats.totalOutstanding || 0) }}</span>
+          <span class="stat-label">Outstanding</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon overdue">
+          <mat-icon>warning</mat-icon>
+        </div>
+        <div class="stat-content">
+          <span class="stat-value">{{ stats.overdueInvoiceCount || 0 }}</span>
+          <span class="stat-label">Overdue</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon total">
+          <mat-icon>receipt_long</mat-icon>
+        </div>
+        <div class="stat-content">
+          <span class="stat-value">{{ formatCurrency(stats.totalInvoiced || 0) }}</span>
+          <span class="stat-label">Total Invoiced</span>
+        </div>
+      </div>
+    </div>
+
+    <mat-card class="table-card">
+      <div class="table-header">
+        <h3>All Invoices</h3>
+        <div class="filters">
+          <mat-form-field appearance="outline">
+            <mat-select [(ngModel)]="statusFilter" (selectionChange)="loadInvoices()" placeholder="Status">
+              <mat-option value="">All</mat-option>
+              @for (status of statusOptions; track status) {
+                <mat-option [value]="status">{{ status }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-select [(ngModel)]="typeFilter" (selectionChange)="loadInvoices()" placeholder="Type">
+              <mat-option value="">All</mat-option>
+              @for (type of typeOptions; track type) {
+                <mat-option [value]="type">{{ type }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </div>
+      
+      <div class="table-container">
+        <table class="invoices-table">
+          <thead>
+            <tr>
+              <th>Invoice #</th>
+              <th>Client</th>
+              <th>Type</th>
+              <th>Issue Date</th>
+              <th>Due Date</th>
+              <th>Amount</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (invoice of invoices; track invoice.id) {
+              <tr>
+                <td class="invoice-number">{{ invoice.invoiceNumber }}</td>
+                <td>{{ invoice.clientName }}</td>
+                <td>{{ invoice.type }}</td>
+                <td>{{ formatDate(invoice.issueDate) }}</td>
+                <td>{{ formatDate(invoice.dueDate) }}</td>
+                <td class="amount">{{ formatCurrency(invoice.total) }}</td>
+                <td>
+                  <span class="status-badge" [class]="getStatusClass(invoice.status)">
+                    {{ invoice.status }}
+                  </span>
+                </td>
+                <td>
+                  <button mat-icon-button [matMenuTriggerFor]="menu">
+                    <mat-icon>more_vert</mat-icon>
+                  </button>
+                  <mat-menu #menu="matMenu">
+                    @if (invoice.status !== 'Paid') {
+                      <button mat-menu-item (click)="markAsPaid(invoice)">
+                        <mat-icon>check</mat-icon>
+                        Mark as Paid
+                      </button>
+                    }
+                    <button mat-menu-item (click)="deleteInvoice(invoice)" class="delete-option">
+                      <mat-icon>delete</mat-icon>
+                      Delete
+                    </button>
+                  </mat-menu>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+        @if (invoices.length === 0) {
+          <div class="empty-state">
+            <mat-icon>receipt_long</mat-icon>
+            <p>No invoices found</p>
+          </div>
+        }
+      </div>
+    </mat-card>
+  }
+
+  @if (showAddDialog) {
+    <div class="dialog-overlay" (click)="closeDialog()">
+      <div class="dialog-content" (click)="$event.stopPropagation()">
+        <div class="dialog-header">
+          <h2>New Invoice</h2>
+          <button mat-icon-button (click)="closeDialog()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+        <div class="dialog-body">
+          <mat-form-field appearance="outline">
+            <mat-label>Client Name</mat-label>
+            <input matInput [(ngModel)]="newInvoice.clientName" placeholder="Enter client name">
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Client Email</mat-label>
+            <input matInput [(ngModel)]="newInvoice.clientEmail" placeholder="client@email.com">
+          </mat-form-field>
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Type</mat-label>
+              <mat-select [(ngModel)]="newInvoice.type">
+                @for (type of typeOptions; track type) {
+                  <mat-option [value]="type">{{ type }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Status</mat-label>
+              <mat-select [(ngModel)]="newInvoice.status">
+                @for (status of statusOptions; track status) {
+                  <mat-option [value]="status">{{ status }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <mat-form-field appearance="outline">
+            <mat-label>Subtotal</mat-label>
+            <input matInput type="number" [(ngModel)]="newInvoice.subtotal" placeholder="0">
+          </mat-form-field>
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Tax Rate (%)</mat-label>
+              <input matInput type="number" [(ngModel)]="newInvoice.taxRate" placeholder="0">
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Discount</mat-label>
+              <input matInput type="number" [(ngModel)]="newInvoice.discount" placeholder="0">
+            </mat-form-field>
+          </div>
+          <mat-form-field appearance="outline">
+            <mat-label>Notes</mat-label>
+            <textarea matInput [(ngModel)]="newInvoice.notes" rows="3" placeholder="Optional notes"></textarea>
+          </mat-form-field>
+        </div>
+        <div class="dialog-footer">
+          <button mat-button (click)="closeDialog()">Cancel</button>
+          <button mat-raised-button color="primary" (click)="createInvoice()">Create Invoice</button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

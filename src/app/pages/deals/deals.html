@@ -1,0 +1,183 @@
+<div class="deals-container">
+  <div class="header-section">
+    <div class="title-area">
+      <h1>Deals & Contracts</h1>
+      <p>Manage sales pipeline and track commission progress</p>
+    </div>
+
+    <div class="filter-controls">
+      <div class="search-box">
+        <mat-icon>search</mat-icon>
+        <input type="text" placeholder="Search deals, buyers, sellers..." [(ngModel)]="searchQuery" (ngModelChange)="applyFilters()">
+      </div>
+
+      <mat-form-field appearance="outline" class="stage-filter no-subscript">
+        <mat-label>Stage</mat-label>
+        <mat-select [(ngModel)]="selectedStage" (selectionChange)="applyFilters()">
+          <mat-option value="All">All Stages</mat-option>
+          <mat-option value="Offer Made">Offer Made</mat-option>
+          <mat-option value="Negotiation">Negotiation</mat-option>
+          <mat-option value="Contract Signed">Contract Signed</mat-option>
+          <mat-option value="Payment">Payment</mat-option>
+          <mat-option value="Closed">Closed</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="action-area">
+      <button mat-stroked-button color="primary" [matMenuTriggerFor]="dataMenu" class="data-btn">
+        <mat-icon>import_export</mat-icon>
+        Data
+      </button>
+      <mat-menu #dataMenu="matMenu">
+        <button mat-menu-item (click)="exportDealsToCSV()">
+          <mat-icon>download</mat-icon>
+          <span>Export CSV</span>
+        </button>
+      </mat-menu>
+
+      <button mat-raised-button color="primary" class="create-btn" (click)="openDealForm()">
+        <mat-icon>handshake</mat-icon>
+        New Deal
+      </button>
+    </div>
+  </div>
+
+  <div class="pipeline-board">
+    <mat-tab-group class="view-tabs" color="primary">
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon>view_kanban</mat-icon> Pipeline View
+        </ng-template>
+
+        <div class="kanban-wrapper" cdkDropListGroup>
+          @for (stage of pipeline; track stage.name) {
+            <div class="pipeline-stage">
+              <div class="stage-header">
+                <div class="stage-info">
+                  <h3>{{ stage.name }}</h3>
+                  <span class="count-badge">{{ stage.deals.length }}</span>
+                </div>
+              </div>
+
+              <div
+                class="stage-content custom-scrollbar"
+                cdkDropList
+                [id]="stage.status"
+                [cdkDropListData]="stage.deals"
+                (cdkDropListDropped)="drop($event)">
+
+                @for (deal of stage.deals; track deal.id) {
+                  <mat-card class="deal-card" cdkDrag (click)="openDealForm(deal)">
+                    <div class="deal-card-header">
+                      <div class="deal-main-info">
+                        <span class="deal-title">{{ deal.title }}</span>
+                        <span class="property-tag">{{ deal.property?.title }}</span>
+                      </div>
+                      <button mat-icon-button class="edit-btn" (click)="$event.stopPropagation(); openDealForm(deal)">
+                        <mat-icon>edit</mat-icon>
+                      </button>
+                    </div>
+
+                    <div class="deal-details">
+                      <div class="party-info">
+                        <div class="party">
+                          <span class="label">Buyer</span>
+                          <span class="value">{{ deal.buyerName }}</span>
+                        </div>
+                        <div class="party">
+                          <span class="label">Seller</span>
+                          <span class="value">{{ deal.sellerName }}</span>
+                        </div>
+                      </div>
+
+                      <div class="deal-stats">
+                        <div class="stat-item">
+                          <mat-icon>payments</mat-icon>
+                          <span class="commission-value">{{ deal.commission | currency:'USD':'symbol':'1.0-0' }}</span>
+                        </div>
+                        <div class="stat-item broker-info">
+                          <img [src]="deal.broker?.photo || 'https://ui-avatars.com/api/?name=' + deal.broker?.name" alt="Broker">
+                          <span>{{ deal.broker?.name }}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div *cdkDragPlaceholder class="deal-placeholder"></div>
+                  </mat-card>
+                }
+
+                @if (stage.leads?.length === 0) {
+                  <div class="empty-stage">
+                    <mat-icon>assignment</mat-icon>
+                    <p>No active deals</p>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </mat-tab>
+
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon>table_rows</mat-icon> List View
+        </ng-template>
+
+        <div class="list-view-wrapper">
+          <mat-card class="table-card">
+            <table class="standard-table">
+              <tr class="header-row">
+                <th>Deal Title</th>
+                <th>Buyer</th>
+                <th>Seller</th>
+                <th>Property</th>
+                <th>Broker</th>
+                <th>Stage</th>
+                <th>Commission</th>
+                <th align="right">Actions</th>
+              </tr>
+              @for (deal of allDeals; track deal.id) {
+                <tr class="data-row">
+                  <td>
+                    <div class="deal-cell">
+                      <span class="primary-text">{{ deal.title }}</span>
+                      <span class="secondary-text">{{ deal.createdAt | date }}</span>
+                    </div>
+                  </td>
+                  <td>{{ deal.buyerName }}</td>
+                  <td>{{ deal.sellerName }}</td>
+                  <td>{{ deal.property?.title }}</td>
+                  <td>
+                    <div class="broker-cell">
+                      <img [src]="deal.broker?.photo || 'https://ui-avatars.com/api/?name=' + deal.broker?.name">
+                      <span>{{ deal.broker?.name }}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="stage-badge" [attr.data-stage]="deal.dealStage">{{ deal.dealStage }}</span>
+                  </td>
+                  <td><span class="commission-text">{{ deal.commission | currency }}</span></td>
+                  <td align="right">
+                    <button mat-icon-button (click)="openDealForm(deal)">
+                      <mat-icon>edit</mat-icon>
+                    </button>
+                    <button mat-icon-button color="warn" (click)="deleteDeal(deal.id)">
+                      <mat-icon>delete_outline</mat-icon>
+                    </button>
+                  </td>
+                </tr>
+              }
+            </table>
+            @if (allDeals.length === 0) {
+              <div class="empty-state">
+                <mat-icon>history_edu</mat-icon>
+                <p>No deals found in history</p>
+              </div>
+            }
+          </mat-card>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+</div>

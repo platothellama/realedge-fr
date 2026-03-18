@@ -1,0 +1,132 @@
+<div class="automation-container">
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">Marketing Automation</h1>
+      <p class="page-subtitle">Email campaigns, drip sequences & automated follow-ups</p>
+    </div>
+    <button mat-raised-button color="primary" (click)="showAddDialog = true">
+      <mat-icon>add</mat-icon>
+      New Campaign
+    </button>
+  </div>
+
+  @if (loading) {
+    <div class="loading-container"><mat-spinner diameter="40"></mat-spinner></div>
+  } @else {
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon campaigns"><mat-icon>campaign</mat-icon></div>
+        <div class="stat-content">
+          <span class="stat-value">{{ stats.totalCampaigns || 0 }}</span>
+          <span class="stat-label">Total Campaigns</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon active"><mat-icon>play_circle</mat-icon></div>
+        <div class="stat-content">
+          <span class="stat-value">{{ stats.activeCampaigns || 0 }}</span>
+          <span class="stat-label">Active</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon emails"><mat-icon>email</mat-icon></div>
+        <div class="stat-content">
+          <span class="stat-value">{{ stats.totalEmails || 0 }}</span>
+          <span class="stat-label">Emails Sent</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon rate"><mat-icon>trending_up</mat-icon></div>
+        <div class="stat-content">
+          <span class="stat-value">{{ stats.openRate || 0 }}%</span>
+          <span class="stat-label">Open Rate</span>
+        </div>
+      </div>
+    </div>
+
+    <mat-card class="table-card">
+      <div class="table-header"><h3>All Campaigns</h3></div>
+      <div class="table-container">
+        <table class="campaigns-table">
+          <thead>
+            <tr><th>Name</th><th>Type</th><th>Subject</th><th>Status</th><th>Sent</th><th>Opened</th><th>Created</th><th>Actions</th></tr>
+          </thead>
+          <tbody>
+            @for (campaign of campaigns; track campaign.id) {
+              <tr>
+                <td class="name-cell">{{ campaign.name }}</td>
+                <td><span class="type-badge">{{ campaign.type }}</span></td>
+                <td>{{ campaign.subject || '-' }}</td>
+                <td><span class="status-badge" [class]="getStatusClass(campaign.status)">{{ campaign.status }}</span></td>
+                <td>{{ campaign.stats?.sent || 0 }}</td>
+                <td>{{ campaign.stats?.opened || 0 }}</td>
+                <td>{{ formatDate(campaign.createdAt) }}</td>
+                <td>
+                  <button mat-icon-button [matMenuTriggerFor]="menu">
+                    <mat-icon>more_vert</mat-icon>
+                  </button>
+                  <mat-menu #menu="matMenu">
+                    @if (campaign.status === 'draft') {
+                      <button mat-menu-item (click)="sendCampaign(campaign)"><mat-icon>send</mat-icon> Send</button>
+                    }
+                    <button mat-menu-item (click)="deleteCampaign(campaign)" class="delete-option"><mat-icon>delete</mat-icon> Delete</button>
+                  </mat-menu>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+        @if (campaigns.length === 0) {
+          <div class="empty-state"><mat-icon>campaign</mat-icon><p>No campaigns yet</p></div>
+        }
+      </div>
+    </mat-card>
+  }
+
+  @if (showAddDialog) {
+    <div class="dialog-overlay" (click)="showAddDialog = false">
+      <div class="dialog-content" (click)="$event.stopPropagation()">
+        <div class="dialog-header">
+          <h2>New Campaign</h2>
+          <button mat-icon-button (click)="showAddDialog = false"><mat-icon>close</mat-icon></button>
+        </div>
+        <div class="dialog-body">
+          <mat-form-field appearance="outline">
+            <mat-label>Campaign Name</mat-label>
+            <input matInput [(ngModel)]="newCampaign.name" placeholder="Enter campaign name">
+          </mat-form-field>
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Type</mat-label>
+              <mat-select [(ngModel)]="newCampaign.type">
+                @for (type of typeOptions; track type) {
+                  <mat-option [value]="type">{{ type | titlecase }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Status</mat-label>
+              <mat-select [(ngModel)]="newCampaign.status">
+                @for (status of statusOptions; track status) {
+                  <mat-option [value]="status">{{ status | titlecase }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <mat-form-field appearance="outline">
+            <mat-label>Subject Line</mat-label>
+            <input matInput [(ngModel)]="newCampaign.subject" placeholder="Email subject">
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Content</mat-label>
+            <textarea matInput [(ngModel)]="newCampaign.content" rows="5" placeholder="Email body content"></textarea>
+          </mat-form-field>
+        </div>
+        <div class="dialog-footer">
+          <button mat-button (click)="showAddDialog = false">Cancel</button>
+          <button mat-raised-button color="primary" (click)="createCampaign()">Create Campaign</button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

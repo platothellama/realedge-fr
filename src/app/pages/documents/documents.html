@@ -1,0 +1,92 @@
+<div class="documents-container">
+  <div class="page-header">
+    <div class="title-section">
+      <h1><mat-icon>description</mat-icon> Documents</h1>
+      <p>Manage contracts, property papers, and legal documents</p>
+    </div>
+
+    <div class="header-actions">
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-icon matPrefix>search</mat-icon>
+        <input matInput placeholder="Search documents..." [(ngModel)]="searchQuery">
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="type-filter no-subscript">
+        <mat-label>Type</mat-label>
+        <mat-select [(ngModel)]="filterType">
+          @for (type of documentTypes; track type) {
+            <mat-option [value]="type">{{ type }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <button mat-raised-button color="primary" class="upload-btn" (click)="openUploadForm()">
+        <mat-icon class="btn-icon">upload_file</mat-icon> Upload
+      </button>
+    </div>
+  </div>
+
+  @if (loading) {
+    <div class="loading-state">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+  }
+
+  @if (!loading && filteredDocuments.length === 0) {
+    <div class="empty-state">
+      <mat-icon>folder_open</mat-icon>
+      <h3>No documents found</h3>
+      <p>Upload your first document to get started</p>
+      <button mat-raised-button color="primary" class="upload-btn" (click)="openUploadForm()">
+        <mat-icon class="btn-icon">upload_file</mat-icon> Upload Document
+      </button>
+    </div>
+  }
+
+  @if (!loading && filteredDocuments.length > 0) {
+    <div class="documents-grid custom-scrollbar">
+      @for (doc of filteredDocuments; track doc.id) {
+        <mat-card class="document-card">
+          <div class="doc-icon">
+            <mat-icon>{{ getIconForType(doc.documentType) }}</mat-icon>
+          </div>
+          
+          <div class="doc-info">
+            <h3 class="doc-title">{{ doc.title }}</h3>
+            <span class="doc-type">{{ doc.type }}</span>
+            @if (doc.property) {
+              <span class="doc-property">{{ doc.property.title }}</span>
+            }
+            <span class="doc-date">Uploaded: {{ doc.createdAt | date:'mediumDate' }}</span>
+          </div>
+
+          <div class="doc-status">
+            @if (doc.status === 'Signed') {
+              <span class="status-badge signed">
+                <mat-icon>verified</mat-icon> Signed
+              </span>
+            } @else {
+              <span class="status-badge pending">
+                <mat-icon>pending</mat-icon> {{ doc.status }}
+              </span>
+            }
+          </div>
+
+          <div class="doc-actions">
+            <button mat-icon-button matTooltip="Download" (click)="downloadDocument(doc); $event.stopPropagation()">
+              <mat-icon>download</mat-icon>
+            </button>
+            @if (doc.status !== 'Signed') {
+              <button mat-icon-button matTooltip="Sign" color="primary" (click)="signDocument(doc); $event.stopPropagation()">
+                <mat-icon>draw</mat-icon>
+              </button>
+            }
+            <button mat-icon-button matTooltip="Delete" color="warn" (click)="deleteDocument(doc); $event.stopPropagation()">
+              <mat-icon>delete_outline</mat-icon>
+            </button>
+          </div>
+        </mat-card>
+      }
+    </div>
+  }
+</div>
