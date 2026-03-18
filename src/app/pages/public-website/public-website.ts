@@ -569,7 +569,7 @@ export class PublicWebsiteComponent implements OnInit {
   agents: any[] = [];
   currentYear = new Date().getFullYear();
   
-  private apiUrl = 'http://localhost:8000/api';
+  private apiUrl = 'https://realedge-frontend-production.up.railway.app/api';
 
   ngOnInit() {
     this.route.paramMap.subscribe(params => {

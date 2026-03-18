@@ -107,7 +107,7 @@ export class DocumentsPageComponent implements OnInit {
   downloadDocument(doc: any) {
     const version = doc.versions?.[0];
     if (version?.fileUrl) {
-      window.open(`http://localhost:8000/uploads/${version.fileUrl}`, '_blank');
+      window.open(`https://realedge-frontend-production.up.railway.app/uploads/${version.fileUrl}`, '_blank');
     }
   }
 

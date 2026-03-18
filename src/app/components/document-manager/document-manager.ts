@@ -95,7 +95,7 @@ export class DocumentManagerComponent implements OnInit {
   downloadDocument(doc: any) {
     const version = doc.versions[0]; // Latest version
     if (version) {
-      window.open(`http://localhost:8000/uploads/${version.fileUrl}`, '_blank');
+      window.open(`https://realedge-frontend-production.up.railway.app/tend-production.up.railway.app//uploads/${version.fileUrl}`, '_blank');
     }
   }
 

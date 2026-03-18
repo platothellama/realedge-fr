@@ -15,7 +15,7 @@ export interface User {
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:8000/api/auth';
+  private apiUrl = 'https://realedge-frontend-production.up.railway.app/api/auth';
   
   // Real-time user state using Angular Signals
   currentUser = signal<User | null>(null);

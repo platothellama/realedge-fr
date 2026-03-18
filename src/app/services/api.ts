@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class ApiService {
-  private apiUrl = 'http://localhost:8000/api';
+  private apiUrl = 'https://realedge-frontend-production.up.railway.app/api';
 
   constructor(private http: HttpClient) {}
 
@@ -90,23 +90,23 @@ export class ApiService {
 
   // Users
   getUsers(): Observable<any> {
-    return this.http.get<any>(`http://localhost:8000/api/users`);
+    return this.http.get<any>(`https://realedge-frontend-production.up.railway.app/api/users`);
   }
 
   createUser(data: any): Observable<any> {
-    return this.http.post<any>(`http://localhost:8000/api/users`, data);
+    return this.http.post<any>(`https://realedge-frontend-production.up.railway.app/api/users`, data);
   }
 
   updateUser(id: string, data: any): Observable<any> {
-    return this.http.put<any>(`http://localhost:8000/api/users/${id}`, data);
+    return this.http.put<any>(`https://realedge-frontend-production.up.railway.app/api/users/${id}`, data);
   }
 
   deleteUser(id: string): Observable<any> {
-    return this.http.delete<any>(`http://localhost:8000/api/users/${id}`);
+    return this.http.delete<any>(`https://realedge-frontend-production.up.railway.app/api/users/${id}`);
   }
 
   toggleUserStatus(id: string): Observable<any> {
-    return this.http.patch<any>(`http://localhost:8000/api/users/${id}/toggle-status`, {});
+    return this.http.patch<any>(`https://realedge-frontend-production.up.railway.app/api/users/${id}/toggle-status`, {});
   }
 
   // AI
