@@ -72,13 +72,13 @@
           <ng-container matColumnDef="actions">
             <th mat-header-cell *matHeaderCellDef>Actions</th>
             <td mat-cell *matCellDef="let pref">
-              <button mat-icon-button color="primary" (click)="matchProperties(pref.id)" matTooltip="Find matching properties">
+              <button mat-icon-button color="primary" (click)="matchProperties(pref.id)">
                 <mat-icon>search</mat-icon>
               </button>
-              <button mat-icon-button (click)="openForm(pref)" matTooltip="Edit">
+              <button mat-icon-button (click)="openForm(pref)">
                 <mat-icon>edit</mat-icon>
               </button>
-              <button mat-icon-button color="warn" (click)="deletePreference(pref.id)" matTooltip="Delete">
+              <button mat-icon-button color="warn" (click)="deletePreference(pref.id)">
                 <mat-icon>delete</mat-icon>
               </button>
             </td>
@@ -107,7 +107,35 @@
           <mat-tab label="Basic Info">
             <div class="tab-content">
               <div class="lead-selection-section">
-                <h4>Select Lead</h4>
+                <h4>Client Information</h4>
+                <div class="form-row">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Client Name</mat-label>
+                    <input matInput [(ngModel)]="formData.clientName" required>
+                  </mat-form-field>
+                  <mat-form-field appearance="outline">
+                    <mat-label>Email</mat-label>
+                    <input matInput type="email" [(ngModel)]="formData.clientEmail">
+                  </mat-form-field>
+                </div>
+                <div class="form-row">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Phone</mat-label>
+                    <input matInput [(ngModel)]="formData.clientPhone">
+                  </mat-form-field>
+                  <mat-form-field appearance="outline">
+                    <mat-label>Purchase Type</mat-label>
+                    <mat-select [(ngModel)]="formData.purchaseType">
+                      @for (type of purchaseTypes; track type.value) {
+                        <mat-option [value]="type.value">{{ type.label }}</mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+              </div>
+
+              <div class="lead-selection-section" style="margin-top: 20px;">
+                <h4>Link to CRM Lead (Optional)</h4>
                 <div class="lead-options">
                   <mat-radio-group [(ngModel)]="formData.createNewLead" (change)="toggleNewLead($event.value)">
                     <mat-radio-button [value]="false">Select Existing Lead</mat-radio-button>
@@ -131,11 +159,11 @@
                   <div class="new-lead-form">
                     <div class="form-row">
                       <mat-form-field appearance="outline">
-                        <mat-label>Client Name</mat-label>
-                        <input matInput [(ngModel)]="formData.newLeadData.name" required>
+                        <mat-label>Lead Name</mat-label>
+                        <input matInput [(ngModel)]="formData.newLeadData.name">
                       </mat-form-field>
                       <mat-form-field appearance="outline">
-                        <mat-label>Email</mat-label>
+                        <mat-label>Lead Email</mat-label>
                         <input matInput type="email" [(ngModel)]="formData.newLeadData.email">
                       </mat-form-field>
                     </div>
@@ -152,147 +180,6 @@
                   </div>
                 }
               </div>
-
-              <hr class="divider">
-
-              <h4>Client Details</h4>
-              <div class="form-row">
-                <mat-form-field appearance="outline">
-                  <mat-label>Client Name</mat-label>
-                  <input matInput [(ngModel)]="formData.clientName" required>
-                </mat-form-field>
-                <mat-form-field appearance="outline">
-                  <mat-label>Email</mat-label>
-                  <input matInput type="email" [(ngModel)]="formData.clientEmail">
-                </mat-form-field>
-              </div>
-
-              <div class="form-row">
-                <mat-form-field appearance="outline">
-                  <mat-label>Phone</mat-label>
-                  <input matInput [(ngModel)]="formData.clientPhone">
-                </mat-form-field>
-                <mat-form-field appearance="outline">
-                  <mat-label>Purchase Type</mat-label>
-                  <mat-select [(ngModel)]="formData.purchaseType">
-                    @for (type of purchaseTypes; track type.value) {
-                      <mat-option [value]="type.value">{{ type.label }}</mat-option>
-                    }
-                  </mat-select>
-                </mat-form-field>
-              </div>
-            </div>
-          </mat-tab>
-
-          <mat-tab label="Property Criteria">
-            <div class="tab-content">
-              <div class="form-row">
-                <mat-form-field appearance="outline">
-                  <mat-label>Budget Min ($)</mat-label>
-                  <input matInput type="number" [(ngModel)]="formData.budgetMin">
-                </mat-form-field>
-                <mat-form-field appearance="outline">
-                  <mat-label>Budget Max ($)</mat-label>
-                  <input matInput type="number" [(ngModel)]="formData.budgetMax">
-                </mat-form-field>
-              </div>
-
-              <div class="form-row">
-                <mat-form-field appearance="outline">
-                  <mat-label>Property Type</mat-label>
-                  <mat-select [(ngModel)]="formData.propertyType">
-                    <mat-option value="">Any</mat-option>
-                    @for (type of propertyTypes; track type) {
-                      <mat-option [value]="type">{{ type }}</mat-option>
-                    }
-                  </mat-select>
-                </mat-form-field>
-                <mat-form-field appearance="outline">
-                  <mat-label>Bedrooms</mat-label>
-                  <mat-select [(ngModel)]="formData.bedrooms">
-                    <mat-option [value]="null">Any</mat-option>
-                    <mat-option [value]="1">1</mat-option>
-                    <mat-option [value]="2">2</mat-option>
-                    <mat-option [value]="3">3</mat-option>
-                    <mat-option [value]="4">4</mat-option>
-                    <mat-option [value]="5">5+</mat-option>
-                  </mat-select>
-                </mat-form-field>
-              </div>
-
-              <div class="form-row">
-                <mat-form-field appearance="outline">
-                  <mat-label>Bathrooms</mat-label>
-                  <mat-select [(ngModel)]="formData.bathrooms">
-                    <mat-option [value]="null">Any</mat-option>
-                    <mat-option [value]="1">1</mat-option>
-                    <mat-option [value]="2">2</mat-option>
-                    <mat-option [value]="3">3+</mat-option>
-                  </mat-select>
-                </mat-form-field>
-                <mat-form-field appearance="outline">
-                  <mat-label>Min Area (sqm)</mat-label>
-                  <input matInput type="number" [(ngModel)]="formData.minArea">
-                </mat-form-field>
-              </div>
-
-              <div class="form-row">
-                <mat-form-field appearance="outline">
-                  <mat-label>Max Area (sqm)</mat-label>
-                  <input matInput type="number" [(ngModel)]="formData.maxArea">
-                </mat-form-field>
-                <mat-form-field appearance="outline">
-                  <mat-label>Locations (comma separated)</mat-label>
-                  <input matInput [(ngModel)]="formData.preferredLocations" placeholder="Downtown, Beach, Suburbs">
-                </mat-form-field>
-              </div>
-            </div>
-          </mat-tab>
-
-          <mat-tab label="Features">
-            <div class="tab-content">
-              <div class="checkbox-group">
-                <mat-checkbox [(ngModel)]="formData.parkingRequired">Parking Required</mat-checkbox>
-                <mat-checkbox [(ngModel)]="formData.balconyRequired">Balcony Required</mat-checkbox>
-                <mat-checkbox [(ngModel)]="formData.furnishedRequired">Furnished</mat-checkbox>
-              </div>
-
-              <div class="form-row">
-                <mat-form-field appearance="outline">
-                  <mat-label>Floor Preference</mat-label>
-                  <mat-select [(ngModel)]="formData.floorPreference">
-                    <mat-option value="">Any</mat-option>
-                    @for (floor of floorOptions; track floor) {
-                      <mat-option [value]="floor">{{ floor }}</mat-option>
-                    }
-                  </mat-select>
-                </mat-form-field>
-                <mat-form-field appearance="outline">
-                  <mat-label>View Type</mat-label>
-                  <mat-select [(ngModel)]="formData.viewType">
-                    <mat-option value="">Any</mat-option>
-                    @for (view of viewOptions; track view) {
-                      <mat-option [value]="view">{{ view }}</mat-option>
-                    }
-                  </mat-select>
-                </mat-form-field>
-              </div>
-
-              <div class="form-row">
-                <mat-form-field appearance="outline">
-                  <mat-label>Distance to School (km)</mat-label>
-                  <input matInput type="number" [(ngModel)]="formData.distanceToSchool">
-                </mat-form-field>
-                <mat-form-field appearance="outline">
-                  <mat-label>Distance to Transport (km)</mat-label>
-                  <input matInput type="number" [(ngModel)]="formData.distanceToTransport">
-                </mat-form-field>
-              </div>
-
-              <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Additional Features (comma separated)</mat-label>
-                <input matInput [(ngModel)]="formData.additionalFeatures" placeholder="Pool, Gym, Security">
-              </mat-form-field>
             </div>
           </mat-tab>
 
@@ -307,16 +194,17 @@
               </div>
               <mat-form-field appearance="outline" class="full-width">
                 <mat-label>What are you looking for?</mat-label>
-                <textarea matInput [(ngModel)]="formData.description" rows="6" 
-                  placeholder="e.g., Modern apartment with ocean view, close to restaurants, quiet neighborhood, modern kitchen, at least 2 bedrooms..."></textarea>
+                <textarea matInput [(ngModel)]="formData.description" rows="8" 
+                  placeholder="e.g., Modern apartment with ocean view, close to restaurants, quiet neighborhood, modern kitchen, at least 2 bedrooms, under $500k..."></textarea>
                 <mat-hint>AI will use this description to find semantically matching properties</mat-hint>
               </mat-form-field>
               <div class="nl-examples">
                 <span class="examples-label">Example descriptions:</span>
                 <div class="example-chips">
-                  <button class="example-chip" (click)="setDescription('Modern apartment with good natural light, quiet street, close to restaurants and cafes')">Modern apartment, quiet street</button>
-                  <button class="example-chip" (click)="setDescription('Spacious family house with garden, near schools and parks, quiet neighborhood')">Family house near schools</button>
-                  <button class="example-chip" (click)="setDescription('Luxury penthouse with panoramic city views, high floor, modern finishes')">Luxury penthouse</button>
+                  <button class="example-chip" (click)="setDescription('Modern apartment with good natural light, quiet street, close to restaurants and cafes, under $400k')">Modern apartment, under $400k</button>
+                  <button class="example-chip" (click)="setDescription('Spacious family house with garden, 3+ bedrooms, near schools and parks, quiet neighborhood')">Family house near schools</button>
+                  <button class="example-chip" (click)="setDescription('Luxury penthouse with panoramic city views, high floor, modern finishes, parking included')">Luxury penthouse with parking</button>
+                  <button class="example-chip" (click)="setDescription('Beachfront villa with pool, at least 4 bedrooms, modern design, in Beirut')">Beachfront villa in Beirut</button>
                 </div>
               </div>
             </div>

@@ -91,7 +91,7 @@ export class PropertyMatcherComponent implements OnInit {
       if (saved) {
         const data: SavedSearch = JSON.parse(saved);
         if (data.preferenceId === this.preferenceId) {
-          this.matches = data.matches || [];
+          this.matches = (data.matches || []).filter((m: any) => m && m.property);
           this.totalFound = data.totalFound || 0;
           this.aiExplanation = data.aiExplanation || '';
           this.searchType = data.searchType;
@@ -120,6 +120,10 @@ export class PropertyMatcherComponent implements OnInit {
   }
 
   openWizardSearch() {
+    if (!this.preference) {
+      this.showError('Please wait, loading preference...');
+      return;
+    }
     const dialogRef = this.dialog.open(WizardSearchDialogComponent, {
       data: { preference: this.preference },
       panelClass: 'dark-dialog'
@@ -150,7 +154,7 @@ export class PropertyMatcherComponent implements OnInit {
     this.searchType = 'wizard';
     this.apiService.matchPropertiesToBuyer(this.preferenceId).subscribe({
       next: (data) => {
-        this.matches = data.matches || [];
+        this.matches = (data.matches || []).filter((m: any) => m && m.property);
         this.totalFound = data.totalFound || 0;
         this.aiExplanation = data.aiExplanation || '';
         this.hasSearched = true;
@@ -173,7 +177,7 @@ export class PropertyMatcherComponent implements OnInit {
       filters: {}
     }).subscribe({
       next: (data) => {
-        this.matches = data.results || [];
+        this.matches = (data.results || []).filter((m: any) => m && m.property);
         this.totalFound = data.totalFound || 0;
         this.hasSearched = true;
         this.saveSearch();

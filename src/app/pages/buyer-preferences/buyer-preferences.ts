@@ -65,23 +65,7 @@ export class BuyerPreferencesComponent implements OnInit {
     clientName: '',
     clientEmail: '',
     clientPhone: '',
-    budgetMin: null as number | null,
-    budgetMax: null as number | null,
-    propertyType: '',
-    bedrooms: null as number | null,
-    bathrooms: null as number | null,
-    minArea: null as number | null,
-    maxArea: null as number | null,
-    preferredLocations: '' as string,
     purchaseType: 'buy',
-    parkingRequired: false,
-    balconyRequired: false,
-    furnishedRequired: false,
-    floorPreference: '',
-    viewType: '',
-    distanceToSchool: null as number | null,
-    distanceToTransport: null as number | null,
-    additionalFeatures: '' as string,
     description: ''
   };
 
@@ -142,30 +126,14 @@ export class BuyerPreferencesComponent implements OnInit {
           name: preference.clientName || '',
           email: preference.clientEmail || '',
           phone: preference.clientPhone || '',
-          budget: preference.budgetMin || null,
-          propertyPreferences: preference.propertyType || '',
-          preferredAreas: Array.isArray(preference.preferredLocations) ? preference.preferredLocations.join(', ') : ''
+          budget: null,
+          propertyPreferences: '',
+          preferredAreas: ''
         },
         clientName: preference.clientName || '',
         clientEmail: preference.clientEmail || '',
         clientPhone: preference.clientPhone || '',
-        budgetMin: preference.budgetMin || null,
-        budgetMax: preference.budgetMax || null,
-        propertyType: preference.propertyType || '',
-        bedrooms: preference.bedrooms || null,
-        bathrooms: preference.bathrooms || null,
-        minArea: preference.minArea || null,
-        maxArea: preference.maxArea || null,
-        preferredLocations: Array.isArray(preference.preferredLocations) ? preference.preferredLocations.join(', ') : '',
         purchaseType: preference.purchaseType || 'buy',
-        parkingRequired: preference.parkingRequired || false,
-        balconyRequired: preference.balconyRequired || false,
-        furnishedRequired: preference.furnishedRequired || false,
-        floorPreference: preference.floorPreference || '',
-        viewType: preference.viewType || '',
-        distanceToSchool: preference.distanceToSchool || null,
-        distanceToTransport: preference.distanceToTransport || null,
-        additionalFeatures: Array.isArray(preference.additionalFeatures) ? preference.additionalFeatures.join(', ') : '',
         description: preference.description || ''
       };
     } else {
@@ -181,15 +149,6 @@ export class BuyerPreferencesComponent implements OnInit {
         this.formData.clientName = lead.name || '';
         this.formData.clientEmail = lead.email || '';
         this.formData.clientPhone = lead.phone || '';
-        if (lead.budget && !this.formData.budgetMin) {
-          this.formData.budgetMax = lead.budget;
-        }
-        if (lead.propertyPreferences && !this.formData.propertyType) {
-          this.formData.propertyType = lead.propertyPreferences;
-        }
-        if (lead.preferredAreas && !this.formData.preferredLocations) {
-          this.formData.preferredLocations = lead.preferredAreas;
-        }
       }
     }
   }
@@ -222,23 +181,7 @@ export class BuyerPreferencesComponent implements OnInit {
       clientName: '',
       clientEmail: '',
       clientPhone: '',
-      budgetMin: null,
-      budgetMax: null,
-      propertyType: '',
-      bedrooms: null,
-      bathrooms: null,
-      minArea: null,
-      maxArea: null,
-      preferredLocations: '',
       purchaseType: 'buy',
-      parkingRequired: false,
-      balconyRequired: false,
-      furnishedRequired: false,
-      floorPreference: '',
-      viewType: '',
-      distanceToSchool: null,
-      distanceToTransport: null,
-      additionalFeatures: '',
       description: ''
     };
   }
@@ -251,23 +194,7 @@ export class BuyerPreferencesComponent implements OnInit {
       clientName: this.formData.clientName,
       clientEmail: this.formData.clientEmail,
       clientPhone: this.formData.clientPhone,
-      budgetMin: this.formData.budgetMin,
-      budgetMax: this.formData.budgetMax,
-      propertyType: this.formData.propertyType,
-      bedrooms: this.formData.bedrooms,
-      bathrooms: this.formData.bathrooms,
-      minArea: this.formData.minArea,
-      maxArea: this.formData.maxArea,
-      preferredLocations: this.formData.preferredLocations.split(',').map((l: string) => l.trim()).filter((l: string) => l),
       purchaseType: this.formData.purchaseType,
-      parkingRequired: this.formData.parkingRequired,
-      balconyRequired: this.formData.balconyRequired,
-      furnishedRequired: this.formData.furnishedRequired,
-      floorPreference: this.formData.floorPreference,
-      viewType: this.formData.viewType,
-      distanceToSchool: this.formData.distanceToSchool,
-      distanceToTransport: this.formData.distanceToTransport,
-      additionalFeatures: this.formData.additionalFeatures.split(',').map((f: string) => f.trim()).filter((f: string) => f),
       description: this.formData.description
     };
 

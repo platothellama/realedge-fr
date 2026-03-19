@@ -80,13 +80,13 @@
             <th mat-header-cell *matHeaderCellDef align="right"> Actions </th>
             <td mat-cell *matCellDef="let user" align="right">
               <div class="action-group">
-                <button mat-icon-button class="action-btn" (click)="openUserForm(user)" matTooltip="Edit Profile">
+                <button mat-icon-button class="action-btn" (click)="openUserForm(user)">
                   <mat-icon>edit</mat-icon>
                 </button>
-                <button mat-icon-button class="action-btn" (click)="toggleStatus(user)" [matTooltip]="user.active ? 'Block Access' : 'Restore Access'">
+                <button mat-icon-button class="action-btn" (click)="toggleStatus(user)">
                   <mat-icon>{{user.active ? 'block' : 'undo'}}</mat-icon>
                 </button>
-                <button mat-icon-button class="action-btn delete" (click)="deleteUser(user)" matTooltip="Remove Member">
+                <button mat-icon-button class="action-btn delete" (click)="deleteUser(user)">
                   <mat-icon>delete_outline</mat-icon>
                 </button>
               </div>
@@ -136,10 +136,10 @@
             <th mat-header-cell *matHeaderCellDef align="right"> Actions </th>
             <td mat-cell *matCellDef="let group" align="right">
               <div class="action-group">
-                <button mat-icon-button class="action-btn" (click)="openGroupForm(group)" matTooltip="Edit Group">
+                <button mat-icon-button class="action-btn" (click)="openGroupForm(group)">
                   <mat-icon>edit</mat-icon>
                 </button>
-                <button mat-icon-button class="action-btn delete" (click)="deleteGroup(group)" matTooltip="Delete Group">
+                <button mat-icon-button class="action-btn delete" (click)="deleteGroup(group)">
                   <mat-icon>delete_outline</mat-icon>
                 </button>
               </div>

@@ -75,7 +75,7 @@
             <p>{{ totalFound }} properties found, showing {{ matches.length }} matches</p>
           </div>
           <div class="results-actions">
-            <button mat-stroked-button color="primary" (click)="rerunSearch()" matTooltip="Re-run the same search">
+            <button mat-stroked-button color="primary" (click)="rerunSearch()">
               <mat-icon>refresh</mat-icon>
               Re-run Search
             </button>
@@ -91,7 +91,7 @@
             <div class="ai-header">
               <mat-icon>smart_toy</mat-icon>
               <span>AI Analysis</span>
-              <button class="rerun-btn" mat-icon-button (click)="rerunSearch()" matTooltip="Re-run search">
+              <button class="rerun-btn" mat-icon-button (click)="rerunSearch()">
                 <mat-icon>refresh</mat-icon>
               </button>
             </div>
@@ -110,7 +110,7 @@
                     <mat-icon>home</mat-icon>
                   </div>
                 }
-                @if (match.scores?.total !== undefined) {
+                @if (match.scores && match.scores.total !== undefined) {
                   <div class="match-score" [class]="getScoreClass(match.scores.total)">
                     {{ getScorePercentage(match.scores.total) }}%
                   </div>
@@ -152,31 +152,31 @@
                       <div class="score-item">
                         <span class="label">AI</span>
                         <div class="score-bar">
-                          <div class="score-fill" [style.width.%]="match.scores.ai * 100"></div>
+                          <div class="score-fill" [style.width.%]="(match.scores.ai || 0) * 100"></div>
                         </div>
-                        <span class="value">{{ (match.scores.ai * 100) | number:'1.0-0' }}%</span>
+                        <span class="value">{{ ((match.scores.ai || 0) * 100) | number:'1.0-0' }}%</span>
                       </div>
                     }
                     <div class="score-item">
                       <span class="label">Price</span>
                       <div class="score-bar">
-                        <div class="score-fill" [style.width.%]="match.scores.price * 100"></div>
+                        <div class="score-fill" [style.width.%]="(match.scores.price || 0) * 100"></div>
                       </div>
-                      <span class="value">{{ (match.scores.price * 100) | number:'1.0-0' }}%</span>
+                      <span class="value">{{ ((match.scores.price || 0) * 100) | number:'1.0-0' }}%</span>
                     </div>
                     <div class="score-item">
                       <span class="label">Location</span>
                       <div class="score-bar">
-                        <div class="score-fill" [style.width.%]="match.scores.location * 100"></div>
+                        <div class="score-fill" [style.width.%]="(match.scores.location || 0) * 100"></div>
                       </div>
-                      <span class="value">{{ (match.scores.location * 100) | number:'1.0-0' }}%</span>
+                      <span class="value">{{ ((match.scores.location || 0) * 100) | number:'1.0-0' }}%</span>
                     </div>
                     <div class="score-item">
                       <span class="label">Features</span>
                       <div class="score-bar">
-                        <div class="score-fill" [style.width.%]="match.scores.features * 100"></div>
+                        <div class="score-fill" [style.width.%]="(match.scores.features || 0) * 100"></div>
                       </div>
-                      <span class="value">{{ (match.scores.features * 100) | number:'1.0-0' }}%</span>
+                      <span class="value">{{ ((match.scores.features || 0) * 100) | number:'1.0-0' }}%</span>
                     </div>
                   </div>
                 } @else if (match.similarity !== undefined) {
@@ -184,9 +184,9 @@
                     <div class="score-item full">
                       <span class="label">Match Score</span>
                       <div class="score-bar">
-                        <div class="score-fill" [style.width.%]="match.similarity * 100"></div>
+                        <div class="score-fill" [style.width.%]="(match.similarity || 0) * 100"></div>
                       </div>
-                      <span class="value">{{ (match.similarity * 100) | number:'1.0-0' }}%</span>
+                      <span class="value">{{ ((match.similarity || 0) * 100) | number:'1.0-0' }}%</span>
                     </div>
                   </div>
                 }
