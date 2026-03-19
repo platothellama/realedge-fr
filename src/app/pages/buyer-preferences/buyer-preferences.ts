@@ -65,8 +65,7 @@ export class BuyerPreferencesComponent implements OnInit {
     clientName: '',
     clientEmail: '',
     clientPhone: '',
-    purchaseType: 'buy',
-    description: ''
+    purchaseType: 'buy'
   };
 
   propertyTypes = ['Apartment', 'House', 'Villa', 'Office', 'Land', 'Commercial'];
@@ -133,8 +132,7 @@ export class BuyerPreferencesComponent implements OnInit {
         clientName: preference.clientName || '',
         clientEmail: preference.clientEmail || '',
         clientPhone: preference.clientPhone || '',
-        purchaseType: preference.purchaseType || 'buy',
-        description: preference.description || ''
+        purchaseType: preference.purchaseType || 'buy'
       };
     } else {
       this.resetForm();
@@ -181,8 +179,7 @@ export class BuyerPreferencesComponent implements OnInit {
       clientName: '',
       clientEmail: '',
       clientPhone: '',
-      purchaseType: 'buy',
-      description: ''
+      purchaseType: 'buy'
     };
   }
 
@@ -194,8 +191,7 @@ export class BuyerPreferencesComponent implements OnInit {
       clientName: this.formData.clientName,
       clientEmail: this.formData.clientEmail,
       clientPhone: this.formData.clientPhone,
-      purchaseType: this.formData.purchaseType,
-      description: this.formData.description
+      purchaseType: this.formData.purchaseType
     };
 
     if (this.editingPreference) {
@@ -257,10 +253,6 @@ export class BuyerPreferencesComponent implements OnInit {
       return preference.preferredLocations.join(', ');
     }
     return 'Any';
-  }
-
-  setDescription(description: string) {
-    this.formData.description = description;
   }
 
   private showSuccess(message: string) {

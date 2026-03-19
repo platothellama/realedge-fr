@@ -510,6 +510,10 @@ export class ApiService {
     return this.http.post<any>(`${this.apiUrl}/buyer-preferences/${id}/match`, {});
   }
 
+  wizardSearch(preferenceId: string, filters: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/buyer-preferences/${preferenceId}/wizard-search`, filters);
+  }
+
   naturalLanguageSearch(data: { query: string, filters?: any }): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/buyer-preferences/search`, data);
   }

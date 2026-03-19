@@ -20,6 +20,7 @@ interface SavedSearch {
   aiExplanation: string;
   searchType: 'wizard' | 'natural';
   timestamp: number;
+  lastFilters?: any;
 }
 
 @Component({
@@ -95,6 +96,7 @@ export class PropertyMatcherComponent implements OnInit {
           this.totalFound = data.totalFound || 0;
           this.aiExplanation = data.aiExplanation || '';
           this.searchType = data.searchType;
+          this.lastFilters = data.lastFilters || null;
           this.hasSearched = this.matches.length > 0;
         }
       }
@@ -111,13 +113,16 @@ export class PropertyMatcherComponent implements OnInit {
         totalFound: this.totalFound,
         aiExplanation: this.aiExplanation,
         searchType: this.searchType as 'wizard' | 'natural',
-        timestamp: Date.now()
+        timestamp: Date.now(),
+        lastFilters: this.lastFilters
       };
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(data));
     } catch (e) {
       console.error('Failed to save search', e);
     }
   }
+  
+  private lastFilters: any = null;
 
   openWizardSearch() {
     if (!this.preference) {
@@ -125,13 +130,21 @@ export class PropertyMatcherComponent implements OnInit {
       return;
     }
     const dialogRef = this.dialog.open(WizardSearchDialogComponent, {
-      data: { preference: this.preference },
+      data: { preference: this.preference, savedFilters: this.lastFilters },
       panelClass: 'dark-dialog'
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      if (result?.action === 'search') {
-        this.matchProperties();
+      if (result?.action === 'search' && result.results) {
+        this.matches = (result.results.matches || []).filter((m: any) => m && m.property);
+        this.totalFound = result.results.totalFound || 0;
+        this.aiExplanation = '';
+        this.searchType = 'wizard';
+        this.lastFilters = result.filters;
+        this.hasSearched = true;
+        this.saveSearch();
+      } else if (result?.action === 'error') {
+        this.showError(result.message || 'Search failed');
       }
     });
   }
@@ -215,11 +228,44 @@ export class PropertyMatcherComponent implements OnInit {
   }
 
   rerunSearch() {
-    if (this.searchType === 'wizard') {
-      this.matchProperties();
+    if (this.searchType === 'wizard' && this.lastFilters) {
+      this.loading = true;
+      this.apiService.wizardSearch(this.preferenceId, this.getFiltersFromLastSearch()).subscribe({
+        next: (result) => {
+          this.matches = (result.matches || []).filter((m: any) => m && m.property);
+          this.totalFound = result.totalFound || 0;
+          this.aiExplanation = '';
+          this.hasSearched = true;
+          this.saveSearch();
+          this.loading = false;
+        },
+        error: (err) => {
+          this.showError('Re-search failed');
+          this.loading = false;
+        }
+      });
     } else if (this.searchType === 'natural' && this.lastSearchQuery) {
       this.performNaturalSearch(this.lastSearchQuery);
+    } else {
+      this.openWizardSearch();
     }
+  }
+  
+  private getFiltersFromLastSearch(): any {
+    if (!this.lastFilters) return {};
+    return {
+      budgetMin: this.lastFilters.budgetMin,
+      budgetMax: this.lastFilters.budgetMax,
+      propertyType: this.lastFilters.propertyType,
+      bedrooms: this.lastFilters.bedrooms,
+      bathrooms: this.lastFilters.bathrooms,
+      preferredLocations: typeof this.lastFilters.preferredLocations === 'string' 
+        ? this.lastFilters.preferredLocations.split(',').map((l: string) => l.trim()).filter((l: string) => l)
+        : this.lastFilters.preferredLocations,
+      parkingRequired: this.lastFilters.parkingRequired,
+      balconyRequired: this.lastFilters.balconyRequired,
+      furnishedRequired: this.lastFilters.furnishedRequired
+    };
   }
 
   getScoreClass(score: number): string {

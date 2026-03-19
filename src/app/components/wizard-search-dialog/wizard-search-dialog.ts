@@ -1,12 +1,28 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatChipsModule } from '@angular/material/chips';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatChipsModule } from '@angular/material/chips';
 import { ApiService } from '../../services/api';
+
+interface WizardFilters {
+  budgetMin: number | null;
+  budgetMax: number | null;
+  propertyType: string;
+  bedrooms: number | null;
+  bathrooms: number | null;
+  preferredLocations: string;
+  parkingRequired: boolean;
+  balconyRequired: boolean;
+  furnishedRequired: boolean;
+}
 
 @Component({
   selector: 'app-wizard-search-dialog',
@@ -17,8 +33,12 @@ import { ApiService } from '../../services/api';
     MatDialogModule,
     MatButtonModule,
     MatIconModule,
-    MatChipsModule,
-    MatProgressSpinnerModule
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatCheckboxModule,
+    MatProgressSpinnerModule,
+    MatChipsModule
   ],
   template: `
     <div class="dialog-container">
@@ -27,71 +47,115 @@ import { ApiService } from '../../services/api';
           <mat-icon>tune</mat-icon>
         </div>
         <h2>Wizard Search</h2>
-        <p>Use structured filters to find matching properties</p>
+        <p>Configure filters to find matching properties</p>
       </div>
 
       <div class="dialog-content">
-        <div class="filters-section">
-          <h4>Current Filters</h4>
-          
-          @if (preference) {
-            <div class="filter-list">
-              @if (preference.budgetMin || preference.budgetMax) {
-                <div class="filter-item">
-                  <mat-icon>attach_money</mat-icon>
-                  <span class="filter-label">Budget</span>
-                  <span class="filter-value">\${{ preference.budgetMin || 0 }} - \${{ preference.budgetMax || 'any' }}</span>
-                </div>
-              }
-              @if (preference.bedrooms) {
-                <div class="filter-item">
-                  <mat-icon>bed</mat-icon>
-                  <span class="filter-label">Bedrooms</span>
-                  <span class="filter-value">{{ preference.bedrooms }}+</span>
-                </div>
-              }
-              @if (preference.bathrooms) {
-                <div class="filter-item">
-                  <mat-icon>bathtub</mat-icon>
-                  <span class="filter-label">Bathrooms</span>
-                  <span class="filter-value">{{ preference.bathrooms }}+</span>
-                </div>
-              }
-              @if (preference.propertyType) {
-                <div class="filter-item">
-                  <mat-icon>home</mat-icon>
-                  <span class="filter-label">Type</span>
-                  <span class="filter-value">{{ preference.propertyType }}</span>
-                </div>
-              }
-              @if (preference.preferredLocations?.length) {
-                <div class="filter-item">
-                  <mat-icon>location_on</mat-icon>
-                  <span class="filter-label">Locations</span>
-                  <span class="filter-value">{{ preference.preferredLocations.join(', ') }}</span>
-                </div>
-              }
-              @if (preference.parkingRequired) {
-                <div class="filter-item">
-                  <mat-icon>local_parking</mat-icon>
-                  <span class="filter-label">Parking</span>
-                  <span class="filter-value">Required</span>
-                </div>
-              }
-              
-              @if (!preference.budgetMin && !preference.budgetMax && !preference.bedrooms && !preference.propertyType && !preference.preferredLocations?.length && !preference.parkingRequired) {
-                <div class="no-filters">
-                  <mat-icon>info</mat-icon>
-                  <span>No specific filters - will match all available properties</span>
-                </div>
-              }
+        <div class="filters-grid">
+          <div class="filter-group">
+            <label>Budget Range</label>
+            <div class="range-inputs">
+              <mat-form-field appearance="outline">
+                <mat-label>Min</mat-label>
+                <input matInput type="number" [(ngModel)]="filters.budgetMin" placeholder="0">
+              </mat-form-field>
+              <span class="range-separator">to</span>
+              <mat-form-field appearance="outline">
+                <mat-label>Max</mat-label>
+                <input matInput type="number" [(ngModel)]="filters.budgetMax" placeholder="Any">
+              </mat-form-field>
             </div>
-          }
+          </div>
+
+          <div class="filter-group">
+            <label>Property Type</label>
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Select type</mat-label>
+              <mat-select [(ngModel)]="filters.propertyType">
+                <mat-option value="">Any</mat-option>
+                @for (type of propertyTypes; track type) {
+                  <mat-option [value]="type">{{ type }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <div class="filter-group">
+            <label>Bedrooms</label>
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Min bedrooms</mat-label>
+              <mat-select [(ngModel)]="filters.bedrooms">
+                <mat-option [value]="null">Any</mat-option>
+                @for (num of bedroomOptions; track num) {
+                  <mat-option [value]="num">{{ num }}+</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <div class="filter-group">
+            <label>Bathrooms</label>
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Min bathrooms</mat-label>
+              <mat-select [(ngModel)]="filters.bathrooms">
+                <mat-option [value]="null">Any</mat-option>
+                @for (num of bathroomOptions; track num) {
+                  <mat-option [value]="num">{{ num }}+</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <div class="filter-group full-width">
+            <label>Locations</label>
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Cities (comma separated)</mat-label>
+              <input matInput [(ngModel)]="filters.preferredLocations" placeholder="Beirut, Jounieh...">
+            </mat-form-field>
+          </div>
+
+          <div class="filter-group full-width">
+            <label>Required Features</label>
+            <div class="checkbox-group">
+              <mat-checkbox [(ngModel)]="filters.parkingRequired">Parking</mat-checkbox>
+              <mat-checkbox [(ngModel)]="filters.balconyRequired">Balcony</mat-checkbox>
+              <mat-checkbox [(ngModel)]="filters.furnishedRequired">Furnished</mat-checkbox>
+            </div>
+          </div>
+        </div>
+
+        <div class="active-filters" *ngIf="hasActiveFilters">
+          <span class="filters-label">Active Filters:</span>
+          <mat-chip-set>
+            <mat-chip *ngIf="filters.budgetMin || filters.budgetMax">
+              <mat-icon>attach_money</mat-icon>
+              \${{ filters.budgetMin || 0 }} - \${{ filters.budgetMax || 'any' }}
+            </mat-chip>
+            <mat-chip *ngIf="filters.propertyType">
+              <mat-icon>home</mat-icon>
+              {{ filters.propertyType }}
+            </mat-chip>
+            <mat-chip *ngIf="filters.bedrooms">
+              <mat-icon>bed</mat-icon>
+              {{ filters.bedrooms }}+ beds
+            </mat-chip>
+            <mat-chip *ngIf="filters.bathrooms">
+              <mat-icon>bathtub</mat-icon>
+              {{ filters.bathrooms }}+ baths
+            </mat-chip>
+            <mat-chip *ngIf="filters.preferredLocations">
+              <mat-icon>location_on</mat-icon>
+              {{ filters.preferredLocations }}
+            </mat-chip>
+            <mat-chip *ngIf="filters.parkingRequired">Parking</mat-chip>
+            <mat-chip *ngIf="filters.balconyRequired">Balcony</mat-chip>
+            <mat-chip *ngIf="filters.furnishedRequired">Furnished</mat-chip>
+          </mat-chip-set>
         </div>
       </div>
 
       <div class="dialog-actions">
-        <button mat-stroked-button (click)="close()">Cancel</button>
+        <button mat-button (click)="close()">Cancel</button>
         <button mat-raised-button color="primary" (click)="search()" [disabled]="loading">
           @if (loading) {
             <mat-spinner diameter="20"></mat-spinner>
@@ -107,7 +171,10 @@ import { ApiService } from '../../services/api';
   styles: [`
     .dialog-container {
       padding: 0;
-      min-width: 500px;
+      min-width: 550px;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
     }
     
     .dialog-header {
@@ -150,66 +217,88 @@ import { ApiService } from '../../services/api';
     
     .dialog-content {
       padding: 24px;
+      overflow-y: auto;
+      flex: 1;
     }
     
-    .filters-section h4 {
-      margin: 0 0 16px 0;
+    .filters-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .filter-group.full-width {
+      grid-column: 1 / -1;
+    }
+    
+    .filter-group label {
       font-size: 12px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
       color: var(--text-muted);
-    }
-    
-    .filter-list {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    
-    .filter-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 16px;
-      background: var(--bg-elevated);
-      border-radius: 10px;
-    }
-    
-    .filter-item mat-icon {
-      color: #3b82f6;
-      font-size: 20px;
-      width: 20px;
-      height: 20px;
-    }
-    
-    .filter-label {
-      color: var(--text-secondary);
-      font-size: 13px;
-      min-width: 80px;
-    }
-    
-    .filter-value {
-      color: var(--text-primary);
+      margin-bottom: 8px;
       font-weight: 600;
-      font-size: 14px;
-      margin-left: auto;
     }
     
-    .no-filters {
+    .range-inputs {
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 16px;
-      background: var(--bg-elevated);
-      border-radius: 10px;
-      color: var(--text-muted);
-      font-style: italic;
+      gap: 8px;
     }
     
-    .no-filters mat-icon {
-      font-size: 20px;
-      width: 20px;
-      height: 20px;
+    .range-inputs mat-form-field {
+      flex: 1;
+    }
+    
+    .range-separator {
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+    
+    .full-width {
+      width: 100%;
+    }
+    
+    .checkbox-group {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    
+    .checkbox-group mat-checkbox {
+      margin-bottom: 8px;
+    }
+    
+    .active-filters {
+      margin-top: 20px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+    }
+    
+    .filters-label {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      font-weight: 600;
+      display: block;
+      margin-bottom: 8px;
+    }
+    
+    .active-filters mat-chip {
+      margin: 4px;
+    }
+    
+    .active-filters mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+      margin-right: 4px;
     }
     
     .dialog-actions {
@@ -230,23 +319,104 @@ import { ApiService } from '../../services/api';
     }
   `]
 })
-export class WizardSearchDialogComponent {
+export class WizardSearchDialogComponent implements OnInit {
   preference: any;
+  savedFilters: any;
   loading = false;
-
+  
+  filters: WizardFilters = {
+    budgetMin: null,
+    budgetMax: null,
+    propertyType: '',
+    bedrooms: null,
+    bathrooms: null,
+    preferredLocations: '',
+    parkingRequired: false,
+    balconyRequired: false,
+    furnishedRequired: false
+  };
+  
+  propertyTypes = ['Apartment', 'House', 'Villa', 'Office', 'Land', 'Commercial'];
+  bedroomOptions = [1, 2, 3, 4, 5, 6];
+  bathroomOptions = [1, 2, 3, 4, 5];
+  
   constructor(
     public dialogRef: MatDialogRef<WizardSearchDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private apiService: ApiService
   ) {
     this.preference = data?.preference;
+    this.savedFilters = data?.savedFilters || null;
   }
-
+  
+  ngOnInit() {
+    const sourceFilters = this.savedFilters || this.preference;
+    
+    if (sourceFilters) {
+      this.filters.budgetMin = sourceFilters.budgetMin || null;
+      this.filters.budgetMax = sourceFilters.budgetMax || null;
+      this.filters.propertyType = sourceFilters.propertyType || '';
+      this.filters.bedrooms = sourceFilters.bedrooms || null;
+      this.filters.bathrooms = sourceFilters.bathrooms || null;
+      this.filters.preferredLocations = sourceFilters.preferredLocations 
+        ? (Array.isArray(sourceFilters.preferredLocations) 
+          ? sourceFilters.preferredLocations.join(', ') 
+          : sourceFilters.preferredLocations)
+        : '';
+      this.filters.parkingRequired = sourceFilters.parkingRequired || false;
+      this.filters.balconyRequired = sourceFilters.balconyRequired || false;
+      this.filters.furnishedRequired = sourceFilters.furnishedRequired || false;
+    }
+  }
+  
+  get hasActiveFilters(): boolean {
+    return !!(
+      this.filters.budgetMin || 
+      this.filters.budgetMax || 
+      this.filters.propertyType ||
+      this.filters.bedrooms ||
+      this.filters.bathrooms ||
+      this.filters.preferredLocations ||
+      this.filters.parkingRequired ||
+      this.filters.balconyRequired ||
+      this.filters.furnishedRequired
+    );
+  }
+  
   search() {
     this.loading = true;
-    this.dialogRef.close({ action: 'search', preferenceId: this.preference?.id });
+    
+    const data: any = {
+      budgetMin: this.filters.budgetMin,
+      budgetMax: this.filters.budgetMax,
+      propertyType: this.filters.propertyType || null,
+      bedrooms: this.filters.bedrooms,
+      bathrooms: this.filters.bathrooms,
+      preferredLocations: this.filters.preferredLocations 
+        ? this.filters.preferredLocations.split(',').map((l: string) => l.trim()).filter((l: string) => l)
+        : [],
+      parkingRequired: this.filters.parkingRequired,
+      balconyRequired: this.filters.balconyRequired,
+      furnishedRequired: this.filters.furnishedRequired
+    };
+    
+    this.apiService.wizardSearch(this.preference.id, data).subscribe({
+      next: (result) => {
+        this.loading = false;
+        this.dialogRef.close({
+          action: 'search',
+          filters: this.filters,
+          results: result
+        });
+      },
+      error: (err) => {
+        this.loading = false;
+        console.error('Search failed:', err);
+        this.dialogRef.close({ action: 'error', message: 'Search failed' });
+      }
+    });
   }
-
+  
   close() {
     this.dialogRef.close(null);
   }
