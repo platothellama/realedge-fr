@@ -42,11 +42,11 @@ export class PropertyMatcherComponent implements OnInit {
   searchLoading = false;
   aiExplanation = '';
   totalFound = 0;
-  parsedFilters: any = null;
-  expandedQuery = '';
+  hasSearched = false;
+  searchType: 'wizard' | 'natural' | null = null;
 
+  activeTab: 'wizard' | 'natural' = 'wizard';
   nlQuery = '';
-  showNlSearch = false;
 
   constructor(
     private route: ActivatedRoute,
@@ -66,15 +66,10 @@ export class PropertyMatcherComponent implements OnInit {
 
   loadPreference() {
     this.loading = true;
-    
     this.apiService.getBuyerPreferenceById(this.preferenceId).subscribe({
       next: (data) => {
         this.preference = data;
         this.loading = false;
-        if (data.matchCount && data.matchCount > 0) {
-          this.totalFound = data.matchCount;
-          this.aiExplanation = `Previously matched ${data.matchCount} properties on ${this.formatDate(data.lastMatchedAt)}`;
-        }
       },
       error: (err) => {
         this.showError('Failed to load buyer preference');
@@ -83,13 +78,24 @@ export class PropertyMatcherComponent implements OnInit {
     });
   }
 
+  setActiveTab(tab: 'wizard' | 'natural') {
+    this.activeTab = tab;
+  }
+
+  setNlQuery(query: string) {
+    this.nlQuery = query;
+    this.naturalLanguageSearch();
+  }
+
   matchProperties() {
     this.loading = true;
+    this.searchType = 'wizard';
     this.apiService.matchPropertiesToBuyer(this.preferenceId).subscribe({
       next: (data) => {
         this.matches = data.matches || [];
         this.totalFound = data.totalFound || 0;
         this.aiExplanation = data.aiExplanation || '';
+        this.hasSearched = true;
         this.loading = false;
       },
       error: (err) => {
@@ -105,6 +111,7 @@ export class PropertyMatcherComponent implements OnInit {
     }
 
     this.searchLoading = true;
+    this.searchType = 'natural';
     this.apiService.naturalLanguageSearch({ 
       query: this.nlQuery,
       filters: {}
@@ -112,17 +119,22 @@ export class PropertyMatcherComponent implements OnInit {
       next: (data) => {
         this.matches = data.results || [];
         this.totalFound = data.totalFound || 0;
-        this.parsedFilters = data.parsedFilters || null;
-        this.expandedQuery = data.expandedQuery || '';
-        this.aiExplanation = `Natural language search results for: "${this.nlQuery}"`;
+        this.hasSearched = true;
         
-        if (this.parsedFilters?.features?.length > 0) {
-          this.aiExplanation += `\n\nDetected features: ${this.parsedFilters.features.join(', ')}`;
+        const parsed = data.parsedFilters || {};
+        let explanation = `Natural language search results for: "${this.nlQuery}"`;
+        
+        if (parsed.priceRange) {
+          explanation += `\nPrice range detected: $${parsed.priceRange.min || 0} - $${parsed.priceRange.max || 'any'}`;
         }
-        if (this.parsedFilters?.priceRange) {
-          this.aiExplanation += `\nPrice range: $${this.parsedFilters.priceRange.min || 0} - $${this.parsedFilters.priceRange.max || 'any'}`;
+        if (parsed.bedrooms) {
+          explanation += `\nBedrooms: ${parsed.bedrooms}+`;
+        }
+        if (parsed.features?.length > 0) {
+          explanation += `\nFeatures: ${parsed.features.join(', ')}`;
         }
         
+        this.aiExplanation = explanation;
         this.searchLoading = false;
       },
       error: (err) => {
@@ -130,6 +142,14 @@ export class PropertyMatcherComponent implements OnInit {
         this.searchLoading = false;
       }
     });
+  }
+
+  clearResults() {
+    this.matches = [];
+    this.hasSearched = false;
+    this.searchType = null;
+    this.aiExplanation = '';
+    this.nlQuery = '';
   }
 
   getScoreClass(score: number): string {
@@ -144,28 +164,20 @@ export class PropertyMatcherComponent implements OnInit {
   }
 
   getMainImage(property: any): string {
-    if (property.photos && property.photos.length > 0) {
+    if (property?.photos && property.photos.length > 0) {
       return property.photos[0];
     }
     return '';
   }
 
   viewPropertyDetails(propertyId: string) {
-    this.router.navigate(['/properties', propertyId]);
-  }
-
-  backToPreferences() {
-    this.router.navigate(['/buyer-preferences']);
+    if (propertyId) {
+      this.router.navigate(['/properties', propertyId]);
+    }
   }
 
   goBack() {
     this.router.navigate(['/buyer-preferences']);
-  }
-
-  formatDate(dateStr: string): string {
-    if (!dateStr) return 'Never';
-    const date = new Date(dateStr);
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   }
 
   private showError(message: string) {

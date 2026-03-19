@@ -11,8 +11,7 @@
   align-items: flex-start;
   margin-bottom: 24px;
   max-width: 1400px;
-  margin-left: auto;
-  margin-right: auto;
+
 }
 
 .header-content h1 {
@@ -581,7 +580,7 @@
   .main-content {
     grid-template-columns: 1fr;
   }
-  
+
   .suggestions-panel {
     display: none;
   }
@@ -591,32 +590,32 @@
   .ai-container {
     padding: 16px;
   }
-  
+
   .header-section {
     flex-direction: column;
     gap: 16px;
   }
-  
+
   .header-content h1 {
     font-size: 24px;
   }
-  
+
   .chat-messages {
     padding: 16px;
   }
-  
+
   .message-bubble {
     max-width: 95%;
   }
-  
+
   .property-cards {
     grid-template-columns: 1fr;
   }
-  
+
   .summary-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .revenue-grid {
     grid-template-columns: 1fr;
   }

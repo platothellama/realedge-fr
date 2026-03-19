@@ -502,3 +502,125 @@ p {
   overflow-x: auto !important;
   max-width: 100% !important;
 }
+
+/* ========================
+   RADIO BUTTON STYLING
+   ======================== */
+
+.mat-mdc-radio-button,
+.mdc-radio,
+.mat-mdc-radio-group {
+  font-family: 'Urbanist', sans-serif !important;
+}
+
+.mat-mdc-radio-button .mdc-form-field {
+  color: var(--text-primary) !important;
+}
+
+.mat-mdc-radio-button .mdc-label {
+  color: var(--text-primary) !important;
+  font-family: 'Urbanist', sans-serif !important;
+}
+
+.mat-mdc-radio-button .mdc-radio__background {
+  border-color: var(--text-muted) !important;
+}
+
+.mat-mdc-radio-button.mat-mdc-radio-checked .mdc-radio__background {
+  border-color: var(--primary) !important;
+}
+
+.mat-mdc-radio-button .mdc-radio__inner-circle {
+  background-color: var(--primary) !important;
+}
+
+.mat-mdc-radio-ripple {
+  background-color: rgba(99, 102, 241, 0.1) !important;
+}
+
+/* ========================
+   SELECT DROPDOWN STYLING
+   ======================== */
+
+.mat-mdc-select {
+  font-family: 'Urbanist', sans-serif !important;
+}
+
+.mat-mdc-select-value,
+.mat-mdc-select-value-text {
+  color: var(--text-primary) !important;
+  font-family: 'Urbanist', sans-serif !important;
+}
+
+.mat-mdc-select-placeholder {
+  color: var(--text-muted) !important;
+  font-family: 'Urbanist', sans-serif !important;
+}
+
+.mat-mdc-select-arrow {
+  color: var(--text-muted) !important;
+}
+
+.mat-mdc-select-trigger {
+  color: var(--text-primary) !important;
+}
+
+.mat-mdc-select-panel {
+  background-color: var(--bg-elevated) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 8px !important;
+}
+
+.mat-mdc-option {
+  font-family: 'Urbanist', sans-serif !important;
+  color: var(--text-primary) !important;
+}
+
+.mat-mdc-option:hover:not(.mat-mdc-option-disabled) {
+  background-color: var(--bg-surface) !important;
+}
+
+.mat-mdc-option.mdc-list-item--selected:not(.mat-mdc-option-disabled) {
+  background-color: rgba(99, 102, 241, 0.15) !important;
+  color: var(--primary-bright) !important;
+}
+
+.mat-mdc-option.mdc-list-item--selected:not(.mat-mdc-option-disabled) .mdc-list-item__primary-text {
+  color: var(--primary-bright) !important;
+}
+
+/* Select dropdown text in forms */
+.mat-mdc-form-field.mat-mdc-form-field-type-mat-select .mat-mdc-floating-label {
+  color: var(--text-muted) !important;
+}
+
+.mat-mdc-form-field.mat-focused.mat-mdc-form-field-type-mat-select .mat-mdc-floating-label {
+  color: var(--primary-bright) !important;
+}
+
+/* ========================
+   CHECKBOX STYLING  
+   ======================== */
+
+.mat-mdc-checkbox,
+.mdc-checkbox {
+  font-family: 'Urbanist', sans-serif !important;
+}
+
+.mat-mdc-checkbox .mdc-form-field {
+  color: var(--text-primary) !important;
+}
+
+.mat-mdc-checkbox .mdc-label {
+  color: var(--text-primary) !important;
+  font-family: 'Urbanist', sans-serif !important;
+}
+
+.mat-mdc-checkbox .mdc-checkbox__background {
+  border-color: var(--text-muted) !important;
+}
+
+.mat-mdc-checkbox.mat-mdc-checkbox-checked .mdc-checkbox__background {
+  background-color: var(--primary) !important;
+  border-color: var(--primary) !important;
+}

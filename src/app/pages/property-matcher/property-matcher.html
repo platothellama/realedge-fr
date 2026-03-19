@@ -1,205 +1,298 @@
 <div class="page-container">
   <div class="page-header">
-    <div class="header-left">
-      <button mat-icon-button (click)="goBack()" class="back-button">
-        <mat-icon>arrow_back</mat-icon>
-      </button>
-      <div class="header-content">
-        <h1>AI Property Matcher</h1>
-        @if (preference) {
-          <p class="subtitle">Matching properties for: <strong>{{ preference.clientName }}</strong></p>
-        }
-      </div>
-    </div>
-    <div class="header-actions">
-      @if (preferenceId) {
-        <button mat-raised-button color="primary" (click)="matchProperties()">
-          <mat-icon>tune</mat-icon>
-          Wizard Search
-        </button>
+    <button mat-icon-button (click)="goBack()" class="back-button">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <div class="header-content">
+      <h1>AI Property Matcher</h1>
+      @if (preference) {
+        <p class="subtitle">Finding matches for: <strong>{{ preference.clientName }}</strong></p>
       }
     </div>
   </div>
 
-  <div class="search-modes">
-    <mat-card class="mode-card wizard-mode">
-      <mat-card-content>
-        <div class="mode-header">
-          <mat-icon>tune</mat-icon>
-          <h3>Wizard Search</h3>
-          <span class="mode-badge">Structured Filters</span>
-        </div>
-        <p class="mode-desc">Uses structured fields: budget range, bedrooms, location, property type, and features.</p>
-        @if (preference) {
-          <div class="current-filters">
-            @if (preference.budgetMin || preference.budgetMax) {
-              <mat-chip>Budget: ${{ preference.budgetMin || 0 }} - ${{ preference.budgetMax || 'any' }}</mat-chip>
-            }
-            @if (preference.bedrooms) {
-              <mat-chip>{{ preference.bedrooms }}+ Bedrooms</mat-chip>
-            }
-            @if (preference.propertyType) {
-              <mat-chip>{{ preference.propertyType }}</mat-chip>
-            }
-            @if (preference.preferredLocations?.length) {
-              <mat-chip>{{ preference.preferredLocations.join(', ') }}</mat-chip>
-            }
-          </div>
-        }
-        <div class="mode-actions">
-          <button mat-raised-button color="primary" (click)="matchProperties()" [disabled]="loading">
-            <mat-icon>refresh</mat-icon>
-            Search with Wizard Filters
-          </button>
-        </div>
-      </mat-card-content>
-    </mat-card>
-
-    <mat-card class="mode-card nl-mode">
-      <mat-card-content>
-        <div class="mode-header">
-          <mat-icon>psychology</mat-icon>
-          <h3>Natural Language Search</h3>
-          <span class="mode-badge ai">AI Semantic</span>
-        </div>
-        <p class="mode-desc">Search by describing what you want. AI understands context and finds relevant properties.</p>
-        <div class="search-input-row">
-          <mat-form-field appearance="outline" class="search-field">
-            <mat-label>Describe your ideal property</mat-label>
-            <input matInput [(ngModel)]="nlQuery" (keyup.enter)="naturalLanguageSearch()" 
-              placeholder="e.g., modern apartment under $300k with parking">
-          </mat-form-field>
-          <button mat-raised-button color="accent" (click)="naturalLanguageSearch()" [disabled]="searchLoading || !nlQuery.trim()">
-            @if (searchLoading) {
-              <mat-spinner diameter="20"></mat-spinner>
-            } @else {
-              <mat-icon>search</mat-icon>
-              Search
-            }
-          </button>
-        </div>
-      </mat-card-content>
-    </mat-card>
-  </div>
-
-  @if (loading || searchLoading) {
-    <div class="loading-container">
-      <mat-spinner diameter="50"></mat-spinner>
-      <p>Analyzing properties with AI...</p>
+  @if (!preferenceId) {
+    <div class="empty-state full">
+      <mat-icon>search_off</mat-icon>
+      <h3>No buyer preference selected</h3>
+      <p>Go back and select a buyer preference to match properties.</p>
+      <button mat-raised-button color="primary" (click)="goBack()">
+        <mat-icon>arrow_back</mat-icon>
+        Go Back
+      </button>
     </div>
-  }
+  } @else {
+    <div class="search-tabs">
+      <button class="tab-btn" [class.active]="activeTab === 'wizard'" (click)="setActiveTab('wizard')">
+        <mat-icon>tune</mat-icon>
+        <span>Wizard Search</span>
+        <small>Structured Filters</small>
+      </button>
+      <button class="tab-btn" [class.active]="activeTab === 'natural'" (click)="setActiveTab('natural')">
+        <mat-icon>psychology</mat-icon>
+        <span>Natural Language</span>
+        <small>AI Semantic Search</small>
+      </button>
+    </div>
 
-  @if (!loading && !searchLoading && matches.length > 0) {
-    @if (aiExplanation) {
-      <div class="ai-explanation-card">
-        <div class="ai-header">
-          <mat-icon>smart_toy</mat-icon>
-          <span>AI Analysis</span>
-        </div>
-        <p>{{ aiExplanation }}</p>
+    @if (activeTab === 'wizard') {
+      <div class="tab-content wizard-content">
+        <mat-card class="wizard-card">
+          <mat-card-content>
+            <h3><mat-icon>tune</mat-icon> Wizard Search</h3>
+            <p class="tab-desc">Use structured filters to find properties that match your buyer's exact requirements.</p>
+            
+            @if (preference) {
+              <div class="filters-summary">
+                <h4>Current Filters:</h4>
+                <div class="filter-chips">
+                  @if (preference.budgetMin || preference.budgetMax) {
+                    <mat-chip class="filter-chip">
+                      <mat-icon>attach_money</mat-icon>
+                      ${{ preference.budgetMin || 0 }} - ${{ preference.budgetMax || 'any' }}
+                    </mat-chip>
+                  }
+                  @if (preference.bedrooms) {
+                    <mat-chip class="filter-chip">
+                      <mat-icon>bed</mat-icon>
+                      {{ preference.bedrooms }}+ bedrooms
+                    </mat-chip>
+                  }
+                  @if (preference.propertyType) {
+                    <mat-chip class="filter-chip">
+                      <mat-icon>home</mat-icon>
+                      {{ preference.propertyType }}
+                    </mat-chip>
+                  }
+                  @if (preference.bathrooms) {
+                    <mat-chip class="filter-chip">
+                      <mat-icon>bathtub</mat-icon>
+                      {{ preference.bathrooms }}+ bathrooms
+                    </mat-chip>
+                  }
+                  @if (preference.preferredLocations?.length) {
+                    <mat-chip class="filter-chip">
+                      <mat-icon>location_on</mat-icon>
+                      {{ preference.preferredLocations.join(', ') }}
+                    </mat-chip>
+                  }
+                  @if (preference.parkingRequired) {
+                    <mat-chip class="filter-chip">
+                      <mat-icon>local_parking</mat-icon>
+                      Parking required
+                    </mat-chip>
+                  }
+                  @if (!preference.budgetMin && !preference.budgetMax && !preference.bedrooms && !preference.propertyType && !preference.preferredLocations?.length) {
+                    <span class="no-filters">No specific filters set - will match all available properties</span>
+                  }
+                </div>
+              </div>
+            }
+            
+            <div class="wizard-actions">
+              <button mat-raised-button color="primary" (click)="matchProperties()" [disabled]="loading">
+                @if (loading) {
+                  <mat-spinner diameter="20"></mat-spinner>
+                  <span>Analyzing...</span>
+                } @else {
+                  <mat-icon>search</mat-icon>
+                  <span>Find Matching Properties</span>
+                }
+              </button>
+            </div>
+          </mat-card-content>
+        </mat-card>
       </div>
     }
 
-    <div class="results-summary">
-      <span class="result-count">{{ totalFound }} properties found</span>
-      <span class="match-count">{{ matches.length }} matches shown</span>
-    </div>
-
-    <div class="matches-grid">
-        @for (match of matches; track match.property.id) {
-          <div class="property-card">
-            <div class="property-image">
-              @if (getMainImage(match.property)) {
-                <img [src]="getMainImage(match.property)" [alt]="match.property.title">
-              } @else {
-                <div class="no-image">
-                  <mat-icon>home</mat-icon>
-                </div>
-              }
-              <div class="match-score" [class]="getScoreClass(match.scores.total)">
-                {{ getScorePercentage(match.scores.total) }}%
-              </div>
+    @if (activeTab === 'natural') {
+      <div class="tab-content natural-content">
+        <mat-card class="natural-card">
+          <mat-card-content>
+            <h3><mat-icon>psychology</mat-icon> Natural Language Search</h3>
+            <p class="tab-desc">Describe what you're looking for in plain English. AI will understand and find matching properties.</p>
+            
+            <div class="suggestions">
+              <span class="suggestion-label">Try:</span>
+              <button class="suggestion-chip" (click)="setNlQuery('apartment under $500k in Beirut')">apartment under $500k in Beirut</button>
+              <button class="suggestion-chip" (click)="setNlQuery('3 bedroom villa with pool')">3 bedroom villa with pool</button>
+              <button class="suggestion-chip" (click)="setNlQuery('modern office near downtown')">modern office near downtown</button>
             </div>
             
-            <div class="property-content">
-              <div class="property-header">
-                <h3>{{ match.property.title }}</h3>
-                <span class="price">${{ match.property.price | number }}</span>
-              </div>
-              
-              <div class="property-location">
-                <mat-icon>location_on</mat-icon>
-                {{ match.property.city }}, {{ match.property.address }}
-              </div>
-              
-              <div class="property-details">
-                <span><mat-icon>bed</mat-icon> {{ match.property.bedrooms }} bed</span>
-                <span><mat-icon>bathtub</mat-icon> {{ match.property.bathrooms }} bath</span>
-                <span><mat-icon>square_foot</mat-icon> {{ match.property.area }} sqm</span>
-              </div>
-
-              @if (match.matchReasons && match.matchReasons.length > 0) {
-                <div class="match-reasons">
-                  @for (reason of match.matchReasons.slice(0, 4); track reason) {
-                    <mat-chip>{{ reason }}</mat-chip>
-                  }
-                </div>
-              }
-
-              <div class="score-details">
-                <div class="score-item" matTooltip="AI Description Match">
-                  <span class="label">AI</span>
-                  <div class="score-bar">
-                    <div class="score-fill" [style.width.%]="match.scores.ai ? match.scores.ai * 100 : 0"></div>
-                  </div>
-                  <span class="value">{{ match.scores.ai ? (match.scores.ai * 100 | number:'1.0-0') : 'N/A' }}%</span>
-                </div>
-                <div class="score-item" matTooltip="Price Match">
-                  <span class="label">Price</span>
-                  <div class="score-bar">
-                    <div class="score-fill" [style.width.%]="match.scores.price * 100"></div>
-                  </div>
-                  <span class="value">{{ match.scores.price * 100 | number:'1.0-0' }}%</span>
-                </div>
-                <div class="score-item" matTooltip="Location Match">
-                  <span class="label">Location</span>
-                  <div class="score-bar">
-                    <div class="score-fill" [style.width.%]="match.scores.location * 100"></div>
-                  </div>
-                  <span class="value">{{ match.scores.location * 100 | number:'1.0-0' }}%</span>
-                </div>
-                <div class="score-item" matTooltip="Features Match">
-                  <span class="label">Features</span>
-                  <div class="score-bar">
-                    <div class="score-fill" [style.width.%]="match.scores.features * 100"></div>
-                  </div>
-                  <span class="value">{{ match.scores.features * 100 | number:'1.0-0' }}%</span>
-                </div>
-              </div>
-
-              <div class="property-actions">
-                <button mat-stroked-button (click)="viewPropertyDetails(match.property.id)">
-                  <mat-icon>visibility</mat-icon>
-                  View Details
-                </button>
-              </div>
+            <div class="search-box">
+              <mat-form-field appearance="outline" class="search-input">
+                <mat-label>Describe your ideal property</mat-label>
+                <input matInput [(ngModel)]="nlQuery" (keyup.enter)="naturalLanguageSearch()" 
+                  placeholder="e.g., modern apartment under $300k with parking near beach">
+                <mat-icon matPrefix>search</mat-icon>
+              </mat-form-field>
+              <button mat-raised-button color="primary" (click)="naturalLanguageSearch()" [disabled]="searchLoading || !nlQuery.trim()">
+                @if (searchLoading) {
+                  <mat-spinner diameter="20"></mat-spinner>
+                } @else {
+                  <mat-icon>search</mat-icon>
+                  Search
+                }
+              </button>
             </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    }
+
+    @if (loading || searchLoading) {
+      <div class="loading-container">
+        <mat-spinner diameter="50"></mat-spinner>
+        <p>Finding matching properties...</p>
+      </div>
+    }
+
+    @if (!loading && !searchLoading && matches.length > 0) {
+      <div class="results-section">
+        <div class="results-header">
+          <div class="results-info">
+            <h2>
+              @if (searchType === 'wizard') {
+                <mat-icon>tune</mat-icon> Wizard Results
+              } @else {
+                <mat-icon>psychology</mat-icon> Natural Language Results
+              }
+            </h2>
+            <p>{{ totalFound }} properties found, showing {{ matches.length }} matches</p>
+          </div>
+          @if (searchType) {
+            <button mat-stroked-button (click)="clearResults()">
+              <mat-icon>add</mat-icon>
+              New Search
+            </button>
+          }
+        </div>
+
+        @if (aiExplanation) {
+          <div class="ai-explanation-card">
+            <div class="ai-header">
+              <mat-icon>smart_toy</mat-icon>
+              <span>AI Analysis</span>
+            </div>
+            <p>{{ aiExplanation }}</p>
           </div>
         }
-      </div>
-  }
 
-  @if (!loading && !searchLoading && matches.length === 0) {
-    <div class="empty-state">
-      <mat-icon>search</mat-icon>
-      <h3>Run a search to find matching properties</h3>
-      <p>Use the Wizard Search or Natural Language Search above to find properties that match your criteria.</p>
-      <div class="empty-actions">
-        <button mat-raised-button color="primary" (click)="matchProperties()">
-          <mat-icon>tune</mat-icon>
-          Wizard Search
+        <div class="matches-grid">
+          @for (match of matches; track match.property?.id || $index) {
+            <div class="property-card">
+              <div class="property-image">
+                @if (getMainImage(match.property)) {
+                  <img [src]="getMainImage(match.property)" [alt]="match.property?.title">
+                } @else {
+                  <div class="no-image">
+                    <mat-icon>home</mat-icon>
+                  </div>
+                }
+                @if (match.scores?.total !== undefined) {
+                  <div class="match-score" [class]="getScoreClass(match.scores.total)">
+                    {{ getScorePercentage(match.scores.total) }}%
+                  </div>
+                } @else if (match.similarity !== undefined) {
+                  <div class="match-score" [class]="getScoreClass(match.similarity)">
+                    {{ getScorePercentage(match.similarity) }}%
+                  </div>
+                }
+              </div>
+              
+              <div class="property-content">
+                <div class="property-header">
+                  <h3>{{ match.property?.title || 'Unknown Property' }}</h3>
+                  <span class="price">${{ match.property?.price | number }}</span>
+                </div>
+                
+                <div class="property-location">
+                  <mat-icon>location_on</mat-icon>
+                  {{ match.property?.city || 'N/A' }}, {{ match.property?.address || '' }}
+                </div>
+                
+                <div class="property-details">
+                  <span><mat-icon>bed</mat-icon> {{ match.property?.bedrooms || 0 }} bed</span>
+                  <span><mat-icon>bathtub</mat-icon> {{ match.property?.bathrooms || 0 }} bath</span>
+                  <span><mat-icon>square_foot</mat-icon> {{ match.property?.area || 0 }} sqm</span>
+                </div>
+
+                @if (match.matchReasons?.length > 0) {
+                  <div class="match-reasons">
+                    @for (reason of match.matchReasons.slice(0, 3); track reason) {
+                      <mat-chip class="reason-chip">{{ reason }}</mat-chip>
+                    }
+                  </div>
+                }
+
+                @if (match.scores) {
+                  <div class="score-details">
+                    @if (match.scores.ai !== undefined && match.scores.ai !== null) {
+                      <div class="score-item">
+                        <span class="label">AI</span>
+                        <div class="score-bar">
+                          <div class="score-fill" [style.width.%]="match.scores.ai * 100"></div>
+                        </div>
+                        <span class="value">{{ (match.scores.ai * 100) | number:'1.0-0' }}%</span>
+                      </div>
+                    }
+                    <div class="score-item">
+                      <span class="label">Price</span>
+                      <div class="score-bar">
+                        <div class="score-fill" [style.width.%]="match.scores.price * 100"></div>
+                      </div>
+                      <span class="value">{{ (match.scores.price * 100) | number:'1.0-0' }}%</span>
+                    </div>
+                    <div class="score-item">
+                      <span class="label">Location</span>
+                      <div class="score-bar">
+                        <div class="score-fill" [style.width.%]="match.scores.location * 100"></div>
+                      </div>
+                      <span class="value">{{ (match.scores.location * 100) | number:'1.0-0' }}%</span>
+                    </div>
+                    <div class="score-item">
+                      <span class="label">Features</span>
+                      <div class="score-bar">
+                        <div class="score-fill" [style.width.%]="match.scores.features * 100"></div>
+                      </div>
+                      <span class="value">{{ (match.scores.features * 100) | number:'1.0-0' }}%</span>
+                    </div>
+                  </div>
+                } @else if (match.similarity !== undefined) {
+                  <div class="score-details">
+                    <div class="score-item full">
+                      <span class="label">Match Score</span>
+                      <div class="score-bar">
+                        <div class="score-fill" [style.width.%]="match.similarity * 100"></div>
+                      </div>
+                      <span class="value">{{ (match.similarity * 100) | number:'1.0-0' }}%</span>
+                    </div>
+                  </div>
+                }
+
+                <div class="property-actions">
+                  <button mat-stroked-button (click)="viewPropertyDetails(match.property?.id)">
+                    <mat-icon>visibility</mat-icon>
+                    View Details
+                  </button>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    @if (!loading && !searchLoading && hasSearched && matches.length === 0) {
+      <div class="empty-state">
+        <mat-icon>search_off</mat-icon>
+        <h3>No matching properties found</h3>
+        <p>Try adjusting the search criteria or switch to Natural Language search.</p>
+        <button mat-raised-button color="primary" (click)="setActiveTab('natural')">
+          <mat-icon>psychology</mat-icon>
+          Try Natural Language Search
         </button>
       </div>
-    </div>
+    }
   }
 </div>
