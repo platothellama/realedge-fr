@@ -59,18 +59,22 @@ export class PropertyMatcherComponent implements OnInit {
     this.route.params.subscribe(params => {
       this.preferenceId = params['id'];
       if (this.preferenceId) {
-        this.loadPreferenceAndMatch();
+        this.loadPreference();
       }
     });
   }
 
-  loadPreferenceAndMatch() {
+  loadPreference() {
     this.loading = true;
     
     this.apiService.getBuyerPreferenceById(this.preferenceId).subscribe({
       next: (data) => {
         this.preference = data;
-        this.matchProperties();
+        this.loading = false;
+        if (data.matchCount && data.matchCount > 0) {
+          this.totalFound = data.matchCount;
+          this.aiExplanation = `Previously matched ${data.matchCount} properties on ${this.formatDate(data.lastMatchedAt)}`;
+        }
       },
       error: (err) => {
         this.showError('Failed to load buyer preference');
@@ -155,20 +159,13 @@ export class PropertyMatcherComponent implements OnInit {
   }
 
   goBack() {
-    if (this.showNlSearch) {
-      this.showNlSearch = false;
-      if (this.preferenceId) {
-        this.matchProperties();
-      }
-    } else {
-      this.backToPreferences();
-    }
+    this.router.navigate(['/buyer-preferences']);
   }
 
-  openNlSearch() {
-    this.showNlSearch = true;
-    this.parsedFilters = null;
-    this.expandedQuery = '';
+  formatDate(dateStr: string): string {
+    if (!dateStr) return 'Never';
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   }
 
   private showError(message: string) {
