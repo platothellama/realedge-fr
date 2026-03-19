@@ -74,10 +74,16 @@
             </h2>
             <p>{{ totalFound }} properties found, showing {{ matches.length }} matches</p>
           </div>
-          <button mat-stroked-button (click)="clearResults()">
-            <mat-icon>add</mat-icon>
-            New Search
-          </button>
+          <div class="results-actions">
+            <button mat-stroked-button color="primary" (click)="rerunSearch()" matTooltip="Re-run the same search">
+              <mat-icon>refresh</mat-icon>
+              Re-run Search
+            </button>
+            <button mat-stroked-button (click)="clearResults()">
+              <mat-icon>add</mat-icon>
+              New Search
+            </button>
+          </div>
         </div>
 
         @if (aiExplanation) {
@@ -85,6 +91,9 @@
             <div class="ai-header">
               <mat-icon>smart_toy</mat-icon>
               <span>AI Analysis</span>
+              <button class="rerun-btn" mat-icon-button (click)="rerunSearch()" matTooltip="Re-run search">
+                <mat-icon>refresh</mat-icon>
+              </button>
             </div>
             <p>{{ aiExplanation }}</p>
           </div>

@@ -13,6 +13,15 @@ import { ApiService } from '../../services/api';
 import { WizardSearchDialogComponent } from '../../components/wizard-search-dialog/wizard-search-dialog';
 import { NaturalSearchDialogComponent } from '../../components/natural-search-dialog/natural-search-dialog';
 
+interface SavedSearch {
+  preferenceId: string;
+  matches: any[];
+  totalFound: number;
+  aiExplanation: string;
+  searchType: 'wizard' | 'natural';
+  timestamp: number;
+}
+
 @Component({
   selector: 'app-property-matcher',
   standalone: true,
@@ -40,6 +49,9 @@ export class PropertyMatcherComponent implements OnInit {
   totalFound = 0;
   hasSearched = false;
   searchType: 'wizard' | 'natural' | null = null;
+  lastSearchQuery = '';
+
+  private readonly STORAGE_KEY = 'property_matcher_search';
 
   constructor(
     private route: ActivatedRoute,
@@ -54,6 +66,7 @@ export class PropertyMatcherComponent implements OnInit {
       this.preferenceId = params['id'];
       if (this.preferenceId) {
         this.loadPreference();
+        this.loadSavedSearch();
       }
     });
   }
@@ -70,6 +83,40 @@ export class PropertyMatcherComponent implements OnInit {
         this.loading = false;
       }
     });
+  }
+
+  private loadSavedSearch() {
+    try {
+      const saved = localStorage.getItem(this.STORAGE_KEY);
+      if (saved) {
+        const data: SavedSearch = JSON.parse(saved);
+        if (data.preferenceId === this.preferenceId) {
+          this.matches = data.matches || [];
+          this.totalFound = data.totalFound || 0;
+          this.aiExplanation = data.aiExplanation || '';
+          this.searchType = data.searchType;
+          this.hasSearched = this.matches.length > 0;
+        }
+      }
+    } catch (e) {
+      console.error('Failed to load saved search', e);
+    }
+  }
+
+  private saveSearch() {
+    try {
+      const data: SavedSearch = {
+        preferenceId: this.preferenceId,
+        matches: this.matches,
+        totalFound: this.totalFound,
+        aiExplanation: this.aiExplanation,
+        searchType: this.searchType as 'wizard' | 'natural',
+        timestamp: Date.now()
+      };
+      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(data));
+    } catch (e) {
+      console.error('Failed to save search', e);
+    }
   }
 
   openWizardSearch() {
@@ -107,6 +154,7 @@ export class PropertyMatcherComponent implements OnInit {
         this.totalFound = data.totalFound || 0;
         this.aiExplanation = data.aiExplanation || '';
         this.hasSearched = true;
+        this.saveSearch();
         this.loading = false;
       },
       error: (err) => {
@@ -119,6 +167,7 @@ export class PropertyMatcherComponent implements OnInit {
   performNaturalSearch(query: string) {
     this.searchLoading = true;
     this.searchType = 'natural';
+    this.lastSearchQuery = query;
     this.apiService.naturalLanguageSearch({ 
       query: query,
       filters: {}
@@ -127,6 +176,7 @@ export class PropertyMatcherComponent implements OnInit {
         this.matches = data.results || [];
         this.totalFound = data.totalFound || 0;
         this.hasSearched = true;
+        this.saveSearch();
         
         const parsed = data.parsedFilters || {};
         let explanation = `Natural language search results for: "${query}"`;
@@ -156,6 +206,16 @@ export class PropertyMatcherComponent implements OnInit {
     this.hasSearched = false;
     this.searchType = null;
     this.aiExplanation = '';
+    this.lastSearchQuery = '';
+    localStorage.removeItem(this.STORAGE_KEY);
+  }
+
+  rerunSearch() {
+    if (this.searchType === 'wizard') {
+      this.matchProperties();
+    } else if (this.searchType === 'natural' && this.lastSearchQuery) {
+      this.performNaturalSearch(this.lastSearchQuery);
+    }
   }
 
   getScoreClass(score: number): string {

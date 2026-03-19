@@ -332,6 +332,10 @@ export class BuyerPreferencesComponent implements OnInit {
     return 'Any';
   }
 
+  setDescription(description: string) {
+    this.formData.description = description;
+  }
+
   private showSuccess(message: string) {
     this.snackBar.open(message, 'Close', { duration: 3000 });
   }

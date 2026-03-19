@@ -169,6 +169,11 @@
   margin-bottom: 20px;
 }
 
+.results-actions {
+  display: flex;
+  gap: 12px;
+}
+
 .results-info h2 {
   display: flex;
   align-items: center;
@@ -204,6 +209,15 @@
 
 .ai-header mat-icon {
   font-size: 20px;
+}
+
+.rerun-btn {
+  margin-left: auto !important;
+  color: var(--text-muted) !important;
+}
+
+.rerun-btn:hover {
+  color: var(--primary) !important;
 }
 
 .ai-explanation-card p {

@@ -8,57 +8,69 @@
   <!-- Top Stats -->
   <div class="stats-grid">
     <mat-card class="stat-card">
-      <div class="stat-icon" style="color: #3b82f6; background-color: rgba(59, 130, 246, 0.1);">
-        <mat-icon>home</mat-icon>
-      </div>
-      <div class="stat-info">
-        <span class="stat-label">Properties</span>
-        <span class="stat-value">{{ totalProperties | number }}</span>
-      </div>
-    </mat-card>
-    <mat-card class="stat-card">
-      <div class="stat-icon" style="color: #10b981; background-color: rgba(16, 185, 129, 0.1);">
-        <mat-icon>people</mat-icon>
-      </div>
-      <div class="stat-info">
-        <span class="stat-label">Leads</span>
-        <span class="stat-value">{{ totalLeads | number }}</span>
+      <div class="stat-row">
+        <div class="stat-icon" style="color: #3b82f6; background-color: rgba(59, 130, 246, 0.1);">
+          <mat-icon>home</mat-icon>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">Properties</span>
+          <span class="stat-value">{{ totalProperties | number }}</span>
+        </div>
       </div>
     </mat-card>
     <mat-card class="stat-card">
-      <div class="stat-icon" style="color: #8b5cf6; background-color: rgba(139, 92, 246, 0.1);">
-        <mat-icon>handshake</mat-icon>
-      </div>
-      <div class="stat-info">
-        <span class="stat-label">Deals</span>
-        <span class="stat-value">{{ totalDeals | number }}</span>
-      </div>
-    </mat-card>
-    <mat-card class="stat-card">
-      <div class="stat-icon" style="color: #f59e0b; background-color: rgba(245, 158, 11, 0.1);">
-        <mat-icon>payments</mat-icon>
-      </div>
-      <div class="stat-info">
-        <span class="stat-label">Revenue</span>
-        <span class="stat-value">{{ formatCurrency(totalRevenue) }}</span>
+      <div class="stat-row">
+        <div class="stat-icon" style="color: #10b981; background-color: rgba(16, 185, 129, 0.1);">
+          <mat-icon>people</mat-icon>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">Leads</span>
+          <span class="stat-value">{{ totalLeads | number }}</span>
+        </div>
       </div>
     </mat-card>
     <mat-card class="stat-card">
-      <div class="stat-icon" style="color: #ef4444; background-color: rgba(239, 68, 68, 0.1);">
-        <mat-icon>percent</mat-icon>
-      </div>
-      <div class="stat-info">
-        <span class="stat-label">Commission</span>
-        <span class="stat-value">{{ formatCurrency(totalCommission) }}</span>
+      <div class="stat-row">
+        <div class="stat-icon" style="color: #8b5cf6; background-color: rgba(139, 92, 246, 0.1);">
+          <mat-icon>handshake</mat-icon>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">Deals</span>
+          <span class="stat-value">{{ totalDeals | number }}</span>
+        </div>
       </div>
     </mat-card>
     <mat-card class="stat-card">
-      <div class="stat-icon" style="color: #06b6d4; background-color: rgba(6, 182, 212, 0.1);">
-        <mat-icon>price_change</mat-icon>
+      <div class="stat-row">
+        <div class="stat-icon" style="color: #f59e0b; background-color: rgba(245, 158, 11, 0.1);">
+          <mat-icon>payments</mat-icon>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">Revenue</span>
+          <span class="stat-value">{{ formatCurrency(totalRevenue) }}</span>
+        </div>
       </div>
-      <div class="stat-info">
-        <span class="stat-label">Avg Price</span>
-        <span class="stat-value">{{ formatCurrency(avgPrice) }}</span>
+    </mat-card>
+    <mat-card class="stat-card">
+      <div class="stat-row">
+        <div class="stat-icon" style="color: #ef4444; background-color: rgba(239, 68, 68, 0.1);">
+          <mat-icon>percent</mat-icon>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">Commission</span>
+          <span class="stat-value">{{ formatCurrency(totalCommission) }}</span>
+        </div>
+      </div>
+    </mat-card>
+    <mat-card class="stat-card">
+      <div class="stat-row">
+        <div class="stat-icon" style="color: #06b6d4; background-color: rgba(6, 182, 212, 0.1);">
+          <mat-icon>price_change</mat-icon>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">Avg Price</span>
+          <span class="stat-value">{{ formatCurrency(avgPrice) }}</span>
+        </div>
       </div>
     </mat-card>
   </div>
@@ -123,20 +135,6 @@
       <div class="chart-content">
         <app-bar-chart 
           [data]="propertiesByTypeData" 
-          [loading]="chartLoading"
-          [formatValue]="formatCurrency">
-        </app-bar-chart>
-      </div>
-    </mat-card>
-
-    <!-- Lead Conversion Bar -->
-    <mat-card class="chart-card">
-      <div class="card-header">
-        <h2>Lead Pipeline</h2>
-      </div>
-      <div class="chart-content">
-        <app-bar-chart 
-          [data]="conversionBarData" 
           [loading]="chartLoading">
         </app-bar-chart>
       </div>
@@ -207,7 +205,7 @@
         } @else {
           @for (agent of topAgents; track agent.id) {
             <div class="activity-item">
-              <img [src]="agent.photo || 'https://ui-avatars.com/api/?name=' + agent.name + '&background=6366f1&color=fff'" class="agent-avatar">
+              <img [src]="agent.photo || 'https://ui-avatars.com/api/?name=' + agent.name + '&background=6366f1&color=fff&rounded=true'" class="agent-avatar">
               <div class="activity-content">
                 <span class="activity-title">{{ agent.name }}</span>
                 <span class="activity-time">{{ agent.role }}</span>

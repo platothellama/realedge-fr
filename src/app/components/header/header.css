@@ -80,6 +80,7 @@
   border-radius: var(--radius-lg) !important;
   margin-top: 16px !important;
   box-shadow: var(--shadow-xl) !important;
+  min-width: 200px !important;
 }
 
 .mat-mdc-menu-item {
@@ -87,6 +88,31 @@
   height: 48px !important;
   font-weight: 500 !important;
   font-size: 0.9rem !important;
+  font-family: 'Urbanist', sans-serif !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  padding: 0 16px !important;
+}
+
+.mat-mdc-menu-item:hover {
+  background: var(--bg-surface) !important;
+}
+
+.mat-mdc-menu-item mat-icon {
+  color: var(--text-muted) !important;
+  font-size: 20px !important;
+  width: 20px !important;
+  height: 20px !important;
+}
+
+.mat-mdc-menu-item .mat-icon[color="warn"] {
+  color: var(--error) !important;
+}
+
+.mat-divider {
+  border-color: var(--border) !important;
+  margin: 8px 0 !important;
 }
 
 @media (max-width: 768px) {
