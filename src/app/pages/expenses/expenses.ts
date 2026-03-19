@@ -53,6 +53,7 @@ export class ExpensesComponent implements OnInit {
   loading = true;
   expenses: Expense[] = [];
   stats: any = {};
+  processingId: string | null = null;
   
   categoryFilter = '';
   statusFilter = '';
@@ -129,6 +130,7 @@ export class ExpensesComponent implements OnInit {
   }
 
   approveExpense(expense: Expense) {
+    this.processingId = expense.id;
     this.api.approveExpense(expense.id).subscribe({
       next: (res: any) => {
         const index = this.expenses.findIndex(e => e.id === expense.id);
@@ -137,14 +139,17 @@ export class ExpensesComponent implements OnInit {
         }
         this.loadStats();
         this.snackBar.open('Expense approved', 'Close', { duration: 2000 });
+        this.processingId = null;
       },
       error: (err) => {
         this.snackBar.open('Failed to approve expense', 'Close', { duration: 3000 });
+        this.processingId = null;
       }
     });
   }
 
   markAsPaid(expense: Expense) {
+    this.processingId = expense.id;
     this.api.updateExpense(expense.id, { status: 'Paid', paidDate: new Date() }).subscribe({
       next: (res: any) => {
         const index = this.expenses.findIndex(e => e.id === expense.id);
@@ -153,24 +158,33 @@ export class ExpensesComponent implements OnInit {
         }
         this.loadStats();
         this.snackBar.open('Expense marked as paid', 'Close', { duration: 2000 });
+        this.processingId = null;
       },
       error: (err) => {
         this.snackBar.open('Failed to update expense', 'Close', { duration: 3000 });
+        this.processingId = null;
       }
     });
   }
 
   deleteExpense(expense: Expense) {
+    this.processingId = expense.id;
     this.api.deleteExpense(expense.id).subscribe({
       next: () => {
         this.expenses = this.expenses.filter(e => e.id !== expense.id);
         this.loadStats();
         this.snackBar.open('Expense deleted', 'Close', { duration: 2000 });
+        this.processingId = null;
       },
       error: (err) => {
         this.snackBar.open('Failed to delete expense', 'Close', { duration: 3000 });
+        this.processingId = null;
       }
     });
+  }
+
+  isProcessing(id: string): boolean {
+    return this.processingId === id;
   }
 
   formatCurrency(value: number): string {

@@ -86,6 +86,7 @@ export class InvoicesComponent implements OnInit {
   loading = true;
   invoices: Invoice[] = [];
   stats: any = {};
+  processingId: string | null = null;
   
   statusFilter = '';
   typeFilter = '';
@@ -204,6 +205,7 @@ export class InvoicesComponent implements OnInit {
   }
 
   markAsPaid(invoice: Invoice) {
+    this.processingId = invoice.id;
     this.api.markInvoiceAsPaid(invoice.id).subscribe({
       next: (res: any) => {
         const index = this.invoices.findIndex(i => i.id === invoice.id);
@@ -212,24 +214,33 @@ export class InvoicesComponent implements OnInit {
         }
         this.loadStats();
         this.snackBar.open('Invoice marked as paid', 'Close', { duration: 2000 });
+        this.processingId = null;
       },
       error: (err) => {
         this.snackBar.open('Failed to update invoice', 'Close', { duration: 3000 });
+        this.processingId = null;
       }
     });
   }
 
   deleteInvoice(invoice: Invoice) {
+    this.processingId = invoice.id;
     this.api.deleteInvoice(invoice.id).subscribe({
       next: () => {
         this.invoices = this.invoices.filter(i => i.id !== invoice.id);
         this.loadStats();
         this.snackBar.open('Invoice deleted', 'Close', { duration: 2000 });
+        this.processingId = null;
       },
       error: (err) => {
         this.snackBar.open('Failed to delete invoice', 'Close', { duration: 3000 });
+        this.processingId = null;
       }
     });
+  }
+
+  isProcessing(id: string): boolean {
+    return this.processingId === id;
   }
 
   formatCurrency(value: number): string {

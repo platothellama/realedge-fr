@@ -62,6 +62,7 @@ export class CommissionsComponent implements OnInit {
   loading = true;
   commissions: Commission[] = [];
   stats: any = {};
+  processingId: string | null = null;
   
   statusFilter = '';
   showAddDialog = false;
@@ -145,6 +146,7 @@ export class CommissionsComponent implements OnInit {
   }
 
   approveCommission(commission: Commission) {
+    this.processingId = commission.id;
     this.api.updateCommissionStatus(commission.id, { status: 'approved' }).subscribe({
       next: (res: any) => {
         const index = this.commissions.findIndex(c => c.id === commission.id);
@@ -153,14 +155,17 @@ export class CommissionsComponent implements OnInit {
         }
         this.loadStats();
         this.snackBar.open('Commission approved', 'Close', { duration: 2000 });
+        this.processingId = null;
       },
       error: (err) => {
         this.snackBar.open('Failed to approve commission', 'Close', { duration: 3000 });
+        this.processingId = null;
       }
     });
   }
 
   markAsPaid(commission: Commission) {
+    this.processingId = commission.id;
     this.api.updateCommissionStatus(commission.id, { status: 'paid', paidAmount: commission.agentCommission }).subscribe({
       next: (res: any) => {
         const index = this.commissions.findIndex(c => c.id === commission.id);
@@ -169,24 +174,33 @@ export class CommissionsComponent implements OnInit {
         }
         this.loadStats();
         this.snackBar.open('Commission marked as paid', 'Close', { duration: 2000 });
+        this.processingId = null;
       },
       error: (err) => {
         this.snackBar.open('Failed to update commission', 'Close', { duration: 3000 });
+        this.processingId = null;
       }
     });
   }
 
   deleteCommission(commission: Commission) {
+    this.processingId = commission.id;
     this.api.deleteCommission(commission.id).subscribe({
       next: () => {
         this.commissions = this.commissions.filter(c => c.id !== commission.id);
         this.loadStats();
         this.snackBar.open('Commission deleted', 'Close', { duration: 2000 });
+        this.processingId = null;
       },
       error: (err) => {
         this.snackBar.open('Failed to delete commission', 'Close', { duration: 3000 });
+        this.processingId = null;
       }
     });
+  }
+
+  isProcessing(id: string): boolean {
+    return this.processingId === id;
   }
 
   formatCurrency(value: number): string {

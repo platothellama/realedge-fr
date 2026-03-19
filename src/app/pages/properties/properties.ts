@@ -9,6 +9,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { GoogleMapsModule } from '@angular/google-maps';
@@ -29,6 +30,7 @@ import { PropertyFormComponent } from '../../components/property-form/property-f
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
+    MatProgressSpinnerModule,
     FormsModule,
     GoogleMapsModule
   ],
@@ -38,6 +40,8 @@ import { PropertyFormComponent } from '../../components/property-form/property-f
 export class PropertiesComponent implements OnInit {
   properties: any[] = [];
   filteredProperties: any[] = [];
+  loading = false;
+  deletingId: string | null = null;
 
   // Search & Map Filters
   searchQuery: string = '';
@@ -257,11 +261,22 @@ export class PropertiesComponent implements OnInit {
 
   deleteProperty(id: string) {
     if (confirm('Are you sure you want to delete this property?')) {
+      this.deletingId = id;
       this.apiService.deleteProperty(id).subscribe({
-        next: () => this.fetchProperties(),
-        error: (err) => console.error('Error deleting property', err)
+        next: () => {
+          this.fetchProperties();
+          this.deletingId = null;
+        },
+        error: (err) => {
+          console.error('Error deleting property', err);
+          this.deletingId = null;
+        }
       });
     }
+  }
+
+  isDeleting(id: string): boolean {
+    return this.deletingId === id;
   }
 
   private getMockProperties() {

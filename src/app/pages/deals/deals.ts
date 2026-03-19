@@ -40,6 +40,7 @@ export class DealsComponent implements OnInit {
   allDeals: any[] = [];
   searchQuery: string = '';
   selectedStage: string = 'All';
+  deletingId: string | null = null;
 
   pipeline: any[] = [
     { name: 'Offer Made', status: 'Offer Made', deals: [] },
@@ -202,14 +203,23 @@ export class DealsComponent implements OnInit {
 
   deleteDeal(id: string) {
     if (confirm('Are you sure you want to delete this deal?')) {
+      this.deletingId = id;
       this.apiService.deleteDeal(id).subscribe({
         next: () => {
           this.fetchDeals();
           this.snackBar.open('Deal deleted', 'Close', { duration: 3000 });
+          this.deletingId = null;
         },
-        error: (err) => this.showError('Error deleting deal')
+        error: (err) => {
+          this.showError('Error deleting deal');
+          this.deletingId = null;
+        }
       });
     }
+  }
+
+  isDeleting(id: string): boolean {
+    return this.deletingId === id;
   }
 
   private showError(msg: string) {

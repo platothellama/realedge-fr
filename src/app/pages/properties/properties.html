@@ -188,8 +188,12 @@
           <button mat-button class="edit-card-btn" (click)="openPropertyForm(prop); $event.stopPropagation()">
             <mat-icon>edit</mat-icon> Edit
           </button>
-          <button mat-icon-button color="warn" class="delete-card-btn" (click)="deleteProperty(prop.id); $event.stopPropagation()" matTooltip="Delete Property">
-            <mat-icon>delete_outline</mat-icon>
+          <button mat-icon-button color="warn" class="delete-card-btn" (click)="deleteProperty(prop.id); $event.stopPropagation()" [disabled]="isDeleting(prop.id)">
+            @if (isDeleting(prop.id)) {
+              <mat-spinner diameter="18"></mat-spinner>
+            } @else {
+              <mat-icon>delete_outline</mat-icon>
+            }
           </button>
         </mat-card-actions>
       </mat-card>

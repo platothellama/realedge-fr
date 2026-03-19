@@ -38,6 +38,7 @@ export class CrmComponent implements OnInit {
   allLeads: any[] = [];
   searchQuery: string = '';
   selectedSource: string = 'All';
+  deletingId: string | null = null;
 
   pipeline: any[] = [
     { name: 'New Lead', status: 'New Lead', leads: [] },
@@ -259,14 +260,23 @@ export class CrmComponent implements OnInit {
 
   deleteLead(id: string) {
     if (confirm('Are you sure you want to delete this lead?')) {
+      this.deletingId = id;
       this.apiService.deleteLead(id).subscribe({
         next: () => {
           this.fetchLeads();
           this.snackBar.open('Lead deleted', 'Close', { duration: 3000 });
+          this.deletingId = null;
         },
-        error: (err) => this.showError('Error deleting lead')
+        error: (err) => {
+          this.showError('Error deleting lead');
+          this.deletingId = null;
+        }
       });
     }
+  }
+
+  isDeleting(id: string): boolean {
+    return this.deletingId === id;
   }
 
   private showError(msg: string) {
