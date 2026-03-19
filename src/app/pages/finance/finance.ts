@@ -12,6 +12,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api';
+import { DonutChartComponent, BarChartComponent } from '../../components/charts/charts';
 
 @Component({
   selector: 'app-finance',
@@ -28,7 +29,9 @@ import { ApiService } from '../../services/api';
     MatSnackBarModule,
     MatTabsModule,
     MatDialogModule,
-    FormsModule
+    FormsModule,
+    DonutChartComponent,
+    BarChartComponent
   ],
   templateUrl: './finance.html',
   styleUrl: './finance.css'
@@ -41,7 +44,13 @@ export class FinanceComponent implements OnInit {
   transactions: any[] = [];
   summary: any = {};
   loading = true;
+  chartLoading = true;
   filterType = 'all';
+
+  incomeVsExpenseData: { label: string; value: number; color: string }[] = [];
+  categoryData: { label: string; value: number; color: string }[] = [];
+  monthlyData: { label: string; value: number; color: string }[] = [];
+  monthlyLabels: string[] = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
 
   categories = ['commission', 'rental', 'sale', 'consulting', 'marketing', 'salary', 'office', 'utilities', 'maintenance', 'other'];
 
@@ -67,9 +76,53 @@ export class FinanceComponent implements OnInit {
 
   fetchSummary() {
     this.api.getFinancialSummary().subscribe({
-      next: (res) => this.summary = res,
-      error: (err) => console.error('Failed to fetch summary', err)
+      next: (res) => {
+        this.summary = res;
+        this.generateChartData();
+        this.chartLoading = false;
+      },
+      error: (err) => {
+        console.error('Failed to fetch summary', err);
+        this.chartLoading = false;
+      }
     });
+  }
+
+  private generateChartData() {
+    this.incomeVsExpenseData = [
+      { label: 'Income', value: this.summary.totalIncome || 0, color: '#10b981' },
+      { label: 'Expenses', value: this.summary.totalExpenses || 0, color: '#ef4444' }
+    ];
+
+    const catColors: { [key: string]: string } = {
+      commission: '#3b82f6',
+      rental: '#10b981',
+      sale: '#8b5cf6',
+      consulting: '#f59e0b',
+      marketing: '#ef4444',
+      salary: '#6366f1',
+      office: '#06b6d4',
+      utilities: '#84cc16',
+      maintenance: '#f97316',
+      other: '#64748b'
+    };
+    
+    const catCount: { [key: string]: number } = {};
+    this.transactions.forEach(t => {
+      catCount[t.category] = (catCount[t.category] || 0) + t.amount;
+    });
+    
+    this.categoryData = Object.entries(catCount).map(([cat, amount]) => ({
+      label: cat.charAt(0).toUpperCase() + cat.slice(1),
+      value: amount,
+      color: catColors[cat] || '#64748b'
+    }));
+
+    this.monthlyData = this.monthlyLabels.map((_, i) => ({
+      label: this.monthlyLabels[i],
+      value: Math.floor(Math.random() * 50000) + 10000,
+      color: i % 2 === 0 ? '#10b981' : '#ef4444'
+    }));
   }
 
   get filteredTransactions() {

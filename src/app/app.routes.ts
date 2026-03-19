@@ -23,7 +23,7 @@ import { WebsiteEditorComponent } from './pages/website-editor/website-editor';
 import { PublicWebsiteComponent } from './pages/public-website/public-website';
 import { BuyerPreferencesComponent } from './pages/buyer-preferences/buyer-preferences';
 import { PropertyMatcherComponent } from './pages/property-matcher/property-matcher';
-import { AiAssistant } from './pages/ai-assistant/ai-assistant';
+import { AiAssistantComponent } from './pages/ai-assistant/ai-assistant';
 import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
@@ -43,7 +43,7 @@ export const routes: Routes = [
       { path: 'visits', component: VisitsComponent },
       { path: 'marketing', component: MarketingComponent },
       { path: 'marketing-automation', component: MarketingAutomationComponent },
-      { path: 'ai-assistant', component: AiAssistant },
+      { path: 'ai-assistant', component: AiAssistantComponent },
       {
         path: 'website-builder',
         component: WebsiteBuilderComponent,

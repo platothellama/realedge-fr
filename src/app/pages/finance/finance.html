@@ -29,6 +29,47 @@
     </mat-card>
   </div>
 
+  <!-- Charts Section -->
+  <div class="charts-grid">
+    <mat-card class="chart-card">
+      <div class="card-header">
+        <h2>Income vs Expenses</h2>
+      </div>
+      <div class="chart-wrapper">
+        <app-donut-chart 
+          [data]="incomeVsExpenseData" 
+          [label]="summary.netProfit >= 0 ? 'Profit' : 'Loss'"
+          [loading]="chartLoading">
+        </app-donut-chart>
+      </div>
+    </mat-card>
+
+    <mat-card class="chart-card">
+      <div class="card-header">
+        <h2>Revenue by Category</h2>
+      </div>
+      <div class="chart-wrapper">
+        <app-donut-chart 
+          [data]="categoryData" 
+          label="Total"
+          [loading]="chartLoading">
+        </app-donut-chart>
+      </div>
+    </mat-card>
+
+    <mat-card class="chart-card wide">
+      <div class="card-header">
+        <h2>Monthly Overview</h2>
+      </div>
+      <div class="chart-wrapper">
+        <app-bar-chart 
+          [data]="monthlyData" 
+          [loading]="chartLoading">
+        </app-bar-chart>
+      </div>
+    </mat-card>
+  </div>
+
   <!-- Transactions -->
   <mat-card class="transactions-card">
     <div class="card-header">

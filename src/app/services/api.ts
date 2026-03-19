@@ -338,6 +338,10 @@ export class ApiService {
     return this.http.get<any>(`${this.apiUrl}/ai/property-valuations`);
   }
 
+  aiAssistant(message: string, context?: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/ai/assistant`, { message, context });
+  }
+
   getInvoices(filters?: any): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/invoices`, { params: filters || {} });
   }

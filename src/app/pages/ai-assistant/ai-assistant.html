@@ -1,47 +1,241 @@
 <div class="ai-container">
   <div class="header-section">
-    <h1>AI Broker Assistant</h1>
-    <p>Powered by OpenAI. Ask about market trends, lead scoring, or property descriptions.</p>
+    <div class="header-content">
+      <h1>AI Real Estate Assistant</h1>
+      <p>Search properties, analyze leads, and get insights from your CRM data</p>
+    </div>
+    <button mat-stroked-button (click)="clearChat()" class="clear-btn">
+      <mat-icon>refresh</mat-icon>
+      New Chat
+    </button>
   </div>
 
-  <div class="chat-wrapper">
-    <div class="chat-messages" #scrollContainer>
-      @for (msg of messages; track msg.text) {
-        <div class="message-row" [class.user-row]="msg.sender === 'user'">
-          <div class="avatar" [class.ai-avatar]="msg.sender === 'ai'">
-            <mat-icon>{{ msg.sender === 'ai' ? 'smart_toy' : 'person' }}</mat-icon>
+  <div class="main-content">
+    <div class="chat-wrapper">
+      <div class="chat-messages" #scrollContainer>
+        @for (msg of messages; track $index) {
+          <div class="message-row" [class.user-row]="msg.sender === 'user'">
+            <div class="avatar" [class.ai-avatar]="msg.sender === 'ai'" [class.user-avatar]="msg.sender === 'user'">
+              <mat-icon>{{ msg.sender === 'ai' ? 'smart_toy' : 'person' }}</mat-icon>
+            </div>
+            <div class="message-content">
+              <div class="message-bubble" [class.user-bubble]="msg.sender === 'user'">
+                <div class="message-text">{{ msg.text }}</div>
+                <div class="message-time">{{ msg.time }}</div>
+              </div>
+
+              @if (hasProperties(msg)) {
+                <div class="data-section">
+                  <div class="section-header">
+                    <mat-icon>home</mat-icon>
+                    <span>{{ msg.data.properties.count }} Properties Found</span>
+                    <button mat-stroked-button class="view-all-btn" (click)="viewAllProperties()">
+                      View All
+                    </button>
+                  </div>
+                  <div class="property-cards">
+                    @for (property of getProperties(msg); track property.id) {
+                      <div class="property-card" (click)="viewProperty(property.id)">
+                        <div class="property-image">
+                          @if (property.image) {
+                            <img [src]="property.image" alt="{{ property.title }}">
+                          } @else {
+                            <div class="no-image">
+                              <mat-icon>home</mat-icon>
+                            </div>
+                          }
+                        </div>
+                        <div class="property-info">
+                          <div class="property-title">{{ property.title }}</div>
+                          <div class="property-price">{{ property.price }}</div>
+                          <div class="property-details">
+                            <span><mat-icon>bed</mat-icon> {{ property.bedrooms }}</span>
+                            <span><mat-icon>bathtub</mat-icon> {{ property.bathrooms }}</span>
+                            <span><mat-icon>square_foot</mat-icon> {{ property.area }}m²</span>
+                          </div>
+                          <div class="property-location">
+                            <mat-icon>location_on</mat-icon> {{ property.city }}
+                          </div>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                </div>
+              }
+
+              @if (hasLeads(msg)) {
+                <div class="data-section">
+                  <div class="section-header">
+                    <mat-icon>people</mat-icon>
+                    <span>{{ msg.data.leads.total }} Leads ({{ msg.data.leads.hotCount }} hot)</span>
+                    <button mat-stroked-button class="view-all-btn" (click)="viewLeads()">
+                      View CRM
+                    </button>
+                  </div>
+                  <div class="stats-chips">
+                    @for (status of getLeadStatusKeys(msg); track status) {
+                      <span class="stat-chip">
+                        {{ status }}: {{ getLeadStatusValue(msg, status) }}
+                      </span>
+                    }
+                  </div>
+                </div>
+              }
+
+              @if (hasDeals(msg)) {
+                <div class="data-section">
+                  <div class="section-header">
+                    <mat-icon>handshake</mat-icon>
+                    <span>{{ msg.data.deals.total }} Deals ({{ msg.data.deals.open }} open, {{ msg.data.deals.closed }} closed)</span>
+                    <button mat-stroked-button class="view-all-btn" (click)="viewDeals()">
+                      View Deals
+                    </button>
+                  </div>
+                  <div class="stats-chips">
+                    <span class="stat-chip success">Pipeline: {{ msg.data.deals.totalPipeline }}</span>
+                    <span class="stat-chip">Commissions: {{ msg.data.deals.totalCommission }}</span>
+                  </div>
+                </div>
+              }
+
+              @if (hasRevenue(msg)) {
+                <div class="data-section revenue">
+                  <div class="section-header">
+                    <mat-icon>analytics</mat-icon>
+                    <span>Financial Summary</span>
+                  </div>
+                  <div class="revenue-grid">
+                    <div class="revenue-item">
+                      <span class="revenue-label">Total Income</span>
+                      <span class="revenue-value success">{{ msg.data.revenue.totalIncome }}</span>
+                    </div>
+                    <div class="revenue-item">
+                      <span class="revenue-label">Expenses</span>
+                      <span class="revenue-value error">{{ msg.data.revenue.totalExpenses }}</span>
+                    </div>
+                    <div class="revenue-item">
+                      <span class="revenue-label">Net Profit</span>
+                      <span class="revenue-value">{{ msg.data.revenue.netProfit }}</span>
+                    </div>
+                    <div class="revenue-item">
+                      <span class="revenue-label">Pending Commissions</span>
+                      <span class="revenue-value">{{ msg.data.revenue.pendingCommissions }}</span>
+                    </div>
+                  </div>
+                </div>
+              }
+
+              @if (hasSummary(msg)) {
+                <div class="data-section summary">
+                  <div class="section-header">
+                    <mat-icon>dashboard</mat-icon>
+                    <span>Quick Summary</span>
+                  </div>
+                  <div class="summary-grid">
+                    <div class="summary-item">
+                      <mat-icon>home</mat-icon>
+                      <div>
+                        <span class="summary-value">{{ msg.data.summary.properties.total }}</span>
+                        <span class="summary-label">Properties</span>
+                      </div>
+                    </div>
+                    <div class="summary-item">
+                      <mat-icon>people</mat-icon>
+                      <div>
+                        <span class="summary-value">{{ msg.data.summary.leads.total }}</span>
+                        <span class="summary-label">Leads</span>
+                      </div>
+                    </div>
+                    <div class="summary-item">
+                      <mat-icon>handshake</mat-icon>
+                      <div>
+                        <span class="summary-value">{{ msg.data.summary.deals.total }}</span>
+                        <span class="summary-label">Deals</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
           </div>
-          <div class="message-bubble">
-            <div class="message-text">{{ msg.text }}</div>
-            <div class="message-time">{{ msg.time }}</div>
+        }
+        
+        @if (loading) {
+          <div class="message-row">
+            <div class="avatar ai-avatar">
+              <mat-icon>smart_toy</mat-icon>
+            </div>
+            <div class="message-bubble">
+              <div class="typing-indicator">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+              <span class="typing-text">Searching your database...</span>
+            </div>
           </div>
+        }
+      </div>
+
+      <div class="chat-input-area">
+        <div class="input-wrapper">
+          <mat-form-field appearance="outline" class="full-width">
+            <input matInput [(ngModel)]="userInput" (keyup.enter)="onSendMessage()" 
+              placeholder="Try: 'Show apartments under $500K' or 'Find 3 bedroom villas in Beirut'">
+            <button mat-icon-button matSuffix (click)="onSendMessage()" [disabled]="!userInput.trim() || loading">
+              <mat-icon>send</mat-icon>
+            </button>
+          </mat-form-field>
         </div>
-      }
+      </div>
     </div>
 
-    <div class="chat-input-area">
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Type your question...</mat-label>
-        <input matInput [(ngModel)]="userInput" (keyup.enter)="onSendMessage()" placeholder="Ex: Generate a description for a 3-bedroom villa">
-        <button mat-icon-button matSuffix (click)="onSendMessage()" [disabled]="!userInput.trim()">
-          <mat-icon>send</mat-icon>
-        </button>
-      </mat-form-field>
-    </div>
-  </div>
+    <div class="suggestions-panel">
+      <h3>Quick Searches</h3>
+      <div class="suggestion-list">
+        @for (s of suggestions; track s.query) {
+          <button mat-stroked-button class="suggestion-btn" (click)="useSuggestion(s.query)">
+            <mat-icon>search</mat-icon>
+            <span>{{ s.label }}</span>
+          </button>
+        }
+      </div>
 
-  <div class="suggestions">
-    <h3>Quick Actions</h3>
-    <div class="suggestion-chips">
-      <button mat-stroked-button (click)="userInput = 'Analyze my hot leads'; onSendMessage()">
-        <mat-icon>analytics</mat-icon> Analyze Hot Leads
-      </button>
-      <button mat-stroked-button (click)="userInput = 'Generate description for Villa Oasis'; onSendMessage()">
-        <mat-icon>description</mat-icon> Generate Description
-      </button>
-      <button mat-stroked-button (click)="userInput = 'Estimate price for 2BR in Downtown'; onSendMessage()">
-        <mat-icon>calculate</mat-icon> Estimate Price
-      </button>
+      <div class="capabilities">
+        <h4>What I Can Do</h4>
+        <ul>
+          <li>
+            <mat-icon>home</mat-icon>
+            <span>Search properties by price, size, location</span>
+          </li>
+          <li>
+            <mat-icon>people</mat-icon>
+            <span>Analyze and prioritize leads</span>
+          </li>
+          <li>
+            <mat-icon>handshake</mat-icon>
+            <span>Review deal pipeline</span>
+          </li>
+          <li>
+            <mat-icon>analytics</mat-icon>
+            <span>Generate financial insights</span>
+          </li>
+          <li>
+            <mat-icon>trending_up</mat-icon>
+            <span>Market trend analysis</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="examples">
+        <h4>Example Queries</h4>
+        <div class="example-chips">
+          <span class="example-chip" (click)="userInput = 'apartments in Beirut'; onSendMessage()">Beirut apartments</span>
+          <span class="example-chip" (click)="userInput = 'villas under 2 million'; onSendMessage()">Villas &lt;$2M</span>
+          <span class="example-chip" (click)="userInput = '3 bedroom properties'; onSendMessage()">3 bedroom</span>
+          <span class="example-chip" (click)="userInput = 'show hot leads'; onSendMessage()">Hot leads</span>
+        </div>
+      </div>
     </div>
   </div>
 </div>
