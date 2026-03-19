@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
@@ -8,6 +8,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ApiService } from '../../services/api';
+import { AuthService } from '../../services/auth/auth.service';
 import { UserFormComponent } from '../../components/user-form/user-form.component';
 import { GroupFormComponent } from '../../components/group-form/group-form';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
@@ -37,11 +38,18 @@ export class UserManagementComponent implements OnInit {
   displayedColumns: string[] = ['name', 'email', 'role', 'status', 'actions'];
   groupColumns: string[] = ['name', 'description', 'members', 'actions'];
 
+  private auth = inject(AuthService);
+
   constructor(
     private api: ApiService,
     private dialog: MatDialog,
     private snackBar: MatSnackBar
   ) {}
+
+  get canManageUsers(): boolean {
+    const user = this.auth.currentUser();
+    return user?.role === 'Admin' || user?.role === 'Super Admin';
+  }
 
   ngOnInit(): void {
     this.fetchUsers();

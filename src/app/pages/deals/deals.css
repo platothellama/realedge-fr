@@ -1,21 +1,24 @@
 .deals-container {
-  padding: 40px;
-  height: 100vh;
+  padding: 16px;
+  height: 100%;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  min-height: 0;
 }
 
 .header-section {
-  margin-bottom: 40px;
+  margin-bottom: 16px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 32px;
+  gap: 16px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
 }
 
 .title-area h1 {
-  font-size: 2.5rem;
+  font-size: 1.5rem;
   font-weight: 800;
   letter-spacing: -0.03em;
   margin: 0;
@@ -24,21 +27,21 @@
 
 .title-area p {
   color: var(--text-muted);
-  font-size: 1.1rem;
-  margin-top: 8px;
+  font-size: 0.9rem;
+  margin-top: 4px;
   font-weight: 500;
 }
 
 .filter-controls {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
   flex: 1;
-  max-width: 600px;
+  min-width: 200px;
 }
 
 .stage-filter {
-  width: 180px;
+  width: 140px;
 }
 
 .no-subscript ::ng-deep .mat-mdc-form-field-subscript-wrapper {
@@ -48,16 +51,18 @@
 .action-area {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 8px;
 }
 
 .data-btn {
-  height: 52px !important;
-  border-radius: 14px !important;
+  height: 40px !important;
+  border-radius: 8px !important;
   font-weight: 700 !important;
+  font-size: 0.85rem !important;
   border: 1px solid var(--border) !important;
   background: var(--bg-elevated) !important;
   color: var(--text-primary) !important;
+  padding: 0 12px !important;
 }
 
 .data-btn:hover {
@@ -68,13 +73,14 @@
 .search-box {
   background: var(--bg-elevated);
   border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 0 16px;
+  border-radius: 10px;
+  padding: 0 12px;
   display: flex;
   align-items: center;
-  gap: 12px;
-  height: 52px;
+  gap: 8px;
+  height: 40px;
   flex: 1;
+  min-width: 150px;
   transition: all 0.3s ease;
 }
 
@@ -85,9 +91,9 @@
 
 .search-box mat-icon {
   color: var(--text-muted);
-  font-size: 20px;
-  width: 20px;
-  height: 20px;
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
 }
 
 .search-box input {
@@ -99,26 +105,32 @@
   outline: none;
   font-family: 'Urbanist', sans-serif;
   font-weight: 600;
-  font-size: 0.95rem;
+  font-size: 0.85rem;
 }
 
 .create-btn {
-  height: 52px !important;
-  padding: 0 24px !important;
-  border-radius: 14px !important;
+  height: 40px !important;
+  padding: 0 16px !important;
+  border-radius: 8px !important;
   font-weight: 800 !important;
-  font-size: 0.95rem !important;
-  letter-spacing: 0.01em !important;
-  box-shadow: 0 8px 20px -4px var(--primary-glow) !important;
+  font-size: 0.85rem !important;
+  box-shadow: 0 4px 12px -2px var(--primary-glow) !important;
   display: flex !important;
   align-items: center !important;
-  gap: 8px !important;
+  gap: 6px !important;
+}
+
+.create-btn mat-icon {
+  margin: 0 !important;
+  font-size: 18px !important;
+  width: 18px !important;
+  height: 18px !important;
 }
 
 .pipeline-board {
   flex: 1;
   overflow: hidden;
-  margin: 0 -40px;
+  min-height: 0;
 }
 
 .view-tabs {
@@ -126,19 +138,20 @@
 }
 
 ::ng-deep .view-tabs .mat-mdc-tab-body-wrapper {
-  height: calc(100vh - 250px) !important;
+  height: calc(100% - 48px) !important;
 }
 
 .kanban-wrapper {
   display: flex;
-  gap: 24px;
-  padding: 24px 40px;
+  gap: 16px;
+  padding: 16px;
   overflow-x: auto;
   height: 100%;
+  min-height: 0;
 }
 
 .list-view-wrapper {
-  padding: 24px 40px;
+  padding: 16px;
   height: 100%;
   overflow-y: auto;
 }
@@ -146,7 +159,7 @@
 .table-card {
   background: var(--bg-card) !important;
   border: 1px solid var(--border) !important;
-  border-radius: 24px !important;
+  border-radius: 16px !important;
   overflow: hidden;
   padding: 0 !important;
 }
@@ -158,18 +171,18 @@
 
 .standard-table th {
   text-align: left;
-  padding: 16px 24px;
+  padding: 12px 16px;
   color: var(--text-muted);
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   border-bottom: 1px solid var(--border);
 }
 
 .data-row td {
-  padding: 16px 24px;
+  padding: 12px 16px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-  font-size: 0.9rem;
+  font-size: 0.85rem;
 }
 
 .deal-cell {
@@ -178,15 +191,14 @@
 }
 
 .primary-text { font-weight: 700; color: #fff; }
-.secondary-text { font-size: 0.75rem; color: var(--text-muted); }
+.secondary-text { font-size: 0.7rem; color: var(--text-muted); }
 
 .stage-badge {
-  padding: 4px 12px;
-  border-radius: 8px;
-  font-size: 0.7rem;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 0.65rem;
   font-weight: 800;
   text-transform: uppercase;
-  background: rgba(255, 255, 255, 0.05);
 }
 
 .stage-badge[data-stage="Closed"] { color: #34d399; background: rgba(52, 211, 153, 0.1); }
@@ -200,27 +212,28 @@
 .broker-cell {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .broker-cell img {
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   border: 1px solid var(--border);
 }
 
 .pipeline-stage {
-  min-width: 360px;
-  max-width: 360px;
+  min-width: 280px;
+  max-width: 280px;
   background: rgba(15, 23, 42, 0.4);
-  border-radius: 28px;
+  border-radius: 16px;
   display: flex;
   flex-direction: column;
-  padding: 24px;
+  padding: 16px;
   border: 1px solid var(--border);
   height: 100%;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s ease;
+  flex-shrink: 0;
 }
 
 .pipeline-stage:hover {
@@ -232,19 +245,19 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
-  padding: 0 4px;
+  margin-bottom: 12px;
+  padding: 0 2px;
 }
 
 .stage-info {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
 }
 
 .stage-header h3 {
   margin: 0;
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -254,9 +267,9 @@
 .count-badge {
   background: rgba(255, 255, 255, 0.05);
   color: var(--text-secondary);
-  padding: 2px 10px;
-  border-radius: 8px;
-  font-size: 0.75rem;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 0.7rem;
   font-weight: 700;
   border: 1px solid var(--border);
 }
@@ -266,27 +279,26 @@
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: 4px;
+  gap: 10px;
+  padding: 2px;
 }
 
-/* Deal Card */
 .deal-card {
   background: var(--bg-card) !important;
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  border-radius: 20px !important;
-  padding: 20px !important;
+  border-radius: 14px !important;
+  padding: 14px !important;
   cursor: grab;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2) !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important;
   position: relative;
   overflow: hidden;
 }
 
 .deal-card:hover {
-  transform: translateY(-4px) scale(1.01);
-  border-color: rgba(255, 255, 255, 0.3) !important;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4) !important;
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3) !important;
   background: var(--bg-elevated) !important;
 }
 
@@ -294,24 +306,28 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 16px;
+  margin-bottom: 10px;
 }
 
 .deal-main-info {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  min-width: 0;
 }
 
 .deal-title {
   font-weight: 800;
-  font-size: 1.1rem;
+  font-size: 0.9rem;
   color: #fff;
   letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .property-tag {
-  font-size: 0.75rem;
+  font-size: 0.65rem;
   color: var(--primary);
   font-weight: 700;
   text-transform: uppercase;
@@ -319,9 +335,9 @@
 }
 
 .edit-btn {
-  width: 32px !important;
-  height: 32px !important;
-  line-height: 32px !important;
+  width: 28px !important;
+  height: 28px !important;
+  line-height: 28px !important;
   color: var(--text-muted);
   opacity: 0;
 }
@@ -331,19 +347,19 @@
 .deal-details {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 10px;
 }
 
 .party-info {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 .party {
   display: flex;
   justify-content: space-between;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
 }
 
 .party .label { color: var(--text-muted); font-weight: 600; }
@@ -353,40 +369,39 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-top: 16px;
+  padding-top: 10px;
   border-top: 1px solid var(--border);
 }
 
 .stat-item {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .commission-value {
   font-weight: 800;
   color: #34d399;
-  font-size: 1rem;
+  font-size: 0.9rem;
 }
 
 .broker-info img {
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   border: 1px solid var(--border);
 }
 
 .broker-info span {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: var(--text-secondary);
   font-weight: 600;
 }
 
-/* Drag & Drop */
 .cdk-drag-preview {
   box-sizing: border-box;
-  border-radius: 20px;
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3) !important;
+  border-radius: 14px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3) !important;
   transform: rotate(2deg);
 }
 
@@ -394,9 +409,9 @@
   opacity: 0.3;
   border: 2px dashed var(--primary) !important;
   background: transparent !important;
-  min-height: 150px;
-  margin-bottom: 16px;
-  border-radius: 20px;
+  min-height: 100px;
+  margin-bottom: 10px;
+  border-radius: 14px;
 }
 
 .empty-stage {
@@ -404,14 +419,103 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 60px 20px;
+  padding: 40px 16px;
   color: var(--text-muted);
   opacity: 0.5;
 }
 
-.empty-stage mat-icon { font-size: 40px; width: 40px; height: 40px; margin-bottom: 12px; }
-.empty-stage p { font-size: 0.9rem; font-weight: 600; margin: 0; }
+.empty-stage mat-icon { font-size: 32px; width: 32px; height: 32px; margin-bottom: 8px; }
+.empty-stage p { font-size: 0.8rem; font-weight: 600; margin: 0; }
 
-.custom-scrollbar::-webkit-scrollbar { width: 5px; }
+.custom-scrollbar::-webkit-scrollbar { width: 4px; }
 .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-.custom-scrollbar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+.custom-scrollbar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 6px; }
+
+/* ========================
+   RESPONSIVE
+   ======================== */
+
+@media (max-width: 992px) {
+  .header-section {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .title-area {
+    text-align: center;
+  }
+
+  .filter-controls {
+    width: 100%;
+    min-width: auto;
+  }
+
+  .action-area {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .pipeline-stage {
+    min-width: 260px;
+    max-width: 260px;
+  }
+}
+
+@media (max-width: 768px) {
+  .deals-container {
+    padding: 12px;
+  }
+
+  .title-area h1 {
+    font-size: 1.25rem;
+  }
+
+  .search-box {
+    height: 36px;
+  }
+
+  .data-btn, .create-btn {
+    height: 36px !important;
+    font-size: 0.8rem !important;
+    padding: 0 10px !important;
+  }
+
+  .kanban-wrapper {
+    padding: 12px;
+    gap: 12px;
+  }
+
+  .pipeline-stage {
+    min-width: 240px;
+    max-width: 240px;
+    padding: 12px;
+  }
+
+  .deal-card {
+    padding: 12px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .filter-controls {
+    flex-direction: column;
+  }
+
+  .search-box {
+    width: 100%;
+  }
+
+  .stage-filter {
+    width: 100%;
+  }
+
+  .action-area {
+    flex-direction: column;
+  }
+
+  .data-btn, .create-btn {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+}

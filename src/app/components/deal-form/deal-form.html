@@ -12,6 +12,7 @@
         <mat-label>Deal Title</mat-label>
         <input matInput formControlName="title" placeholder="e.g. Sale of Downtown Penthouse">
         <mat-icon matSuffix>label</mat-icon>
+        <mat-error *ngIf="dealForm.get('title')?.hasError('required')">Deal title is required</mat-error>
       </mat-form-field>
     </div>
 
@@ -19,11 +20,13 @@
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Property</mat-label>
         <mat-select formControlName="propertyId">
+          <mat-option [value]="''" disabled>Select a property</mat-option>
           @for (prop of properties; track prop.id) {
             <mat-option [value]="prop.id">{{ prop.title }} - ${{ prop.price | number }}</mat-option>
           }
         </mat-select>
         <mat-icon matSuffix>home</mat-icon>
+        <mat-error *ngIf="dealForm.get('propertyId')?.hasError('required')">Please select a property</mat-error>
       </mat-form-field>
     </div>
 
@@ -34,6 +37,7 @@
         <mat-label>Buyer Name</mat-label>
         <input matInput formControlName="buyerName">
         <mat-icon matSuffix>person</mat-icon>
+        <mat-error *ngIf="dealForm.get('buyerName')?.hasError('required')">Buyer name is required</mat-error>
       </mat-form-field>
     </div>
 
@@ -55,6 +59,7 @@
         <mat-label>Seller Name</mat-label>
         <input matInput formControlName="sellerName">
         <mat-icon matSuffix>person_outline</mat-icon>
+        <mat-error *ngIf="dealForm.get('sellerName')?.hasError('required')">Seller name is required</mat-error>
       </mat-form-field>
     </div>
 
@@ -67,6 +72,7 @@
           }
         </mat-select>
         <mat-icon matSuffix>badge</mat-icon>
+        <mat-error *ngIf="dealForm.get('brokerId')?.hasError('required')">Please assign a broker</mat-error>
       </mat-form-field>
     </div>
 
@@ -81,6 +87,7 @@
           }
         </mat-select>
         <mat-icon matSuffix>stacked_line_chart</mat-icon>
+        <mat-error *ngIf="dealForm.get('dealStage')?.hasError('required')">Deal stage is required</mat-error>
       </mat-form-field>
     </div>
 
@@ -92,6 +99,8 @@
         @if (!isAdmin) {
           <mat-hint>Commission can only be edited by an Admin</mat-hint>
         }
+        <mat-error *ngIf="dealForm.get('commission')?.hasError('required')">Commission is required</mat-error>
+        <mat-error *ngIf="dealForm.get('commission')?.hasError('min')">Commission must be 0 or greater</mat-error>
       </mat-form-field>
     </div>
 

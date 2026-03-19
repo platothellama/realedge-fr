@@ -11,12 +11,15 @@
         <mat-label>Lead Name</mat-label>
         <input matInput formControlName="name" placeholder="Full Name">
         <mat-icon matSuffix>person</mat-icon>
+        <mat-error *ngIf="leadForm.get('name')?.hasError('required')">Name is required</mat-error>
       </mat-form-field>
 
       <mat-form-field appearance="outline">
         <mat-label>Email Address</mat-label>
         <input matInput type="email" formControlName="email" placeholder="email@example.com">
         <mat-icon matSuffix>email</mat-icon>
+        <mat-error *ngIf="leadForm.get('email')?.hasError('required')">Email is required</mat-error>
+        <mat-error *ngIf="leadForm.get('email')?.hasError('email')">Please enter a valid email</mat-error>
       </mat-form-field>
     </div>
 
@@ -25,6 +28,7 @@
         <mat-label>Phone Number</mat-label>
         <input matInput formControlName="phone" placeholder="+1 234 567 890">
         <mat-icon matSuffix>phone</mat-icon>
+        <mat-error *ngIf="leadForm.get('phone')?.hasError('required')">Phone number is required</mat-error>
       </mat-form-field>
 
       <mat-form-field appearance="outline">
@@ -46,6 +50,7 @@
           <mat-option value="Walk-in">Walk-in</mat-option>
         </mat-select>
         <mat-icon matSuffix>campaign</mat-icon>
+        <mat-error *ngIf="leadForm.get('source')?.hasError('required')">Source is required</mat-error>
       </mat-form-field>
 
       <mat-form-field appearance="outline">
@@ -59,6 +64,7 @@
           <mat-option value="Lost Lead">Lost Lead</mat-option>
         </mat-select>
         <mat-icon matSuffix>account_tree</mat-icon>
+        <mat-error *ngIf="leadForm.get('status')?.hasError('required')">Status is required</mat-error>
       </mat-form-field>
     </div>
 
@@ -68,6 +74,8 @@
         <input matInput type="number" formControlName="budget" placeholder="0.00">
         <span matPrefix class="currency-prefix">$</span>
         <mat-hint>Enter the maximum amount the client is willing to spend</mat-hint>
+        <mat-error *ngIf="leadForm.get('budget')?.hasError('required')">Budget is required</mat-error>
+        <mat-error *ngIf="leadForm.get('budget')?.hasError('min')">Budget must be a positive number</mat-error>
       </mat-form-field>
 
       <mat-form-field appearance="outline">

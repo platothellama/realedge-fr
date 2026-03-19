@@ -1,5 +1,5 @@
 .commissions-container {
-  padding: 24px;
+  padding: 16px;
   height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
@@ -9,7 +9,9 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 32px;
+  margin-bottom: 16px;
+  gap: 16px;
+  flex-wrap: wrap;
 }
 
 .header-content {
@@ -18,7 +20,7 @@
 }
 
 .page-title {
-  font-size: 32px;
+  font-size: 1.5rem;
   font-weight: 800;
   letter-spacing: -0.02em;
   color: var(--text-primary);
@@ -26,9 +28,9 @@
 }
 
 .page-subtitle {
-  font-size: 15px;
+  font-size: 0.9rem;
   color: var(--text-secondary);
-  margin: 6px 0 0 0;
+  margin: 4px 0 0 0;
   font-weight: 400;
 }
 
@@ -36,45 +38,40 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 400px;
+  min-height: 300px;
 }
 
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-  margin-bottom: 32px;
-}
-
-@media (max-width: 1200px) {
-  .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
+  gap: 12px;
+  margin-bottom: 16px;
 }
 
 .stat-card {
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding: 20px;
+  gap: 12px;
+  padding: 14px;
   background: var(--bg-surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
 }
 
 .stat-icon {
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: var(--radius-sm);
+  flex-shrink: 0;
 }
 
 .stat-icon mat-icon {
-  font-size: 24px;
-  width: 24px;
-  height: 24px;
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
 }
 
 .stat-icon.pending {
@@ -100,16 +97,20 @@
 .stat-content {
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 
 .stat-value {
-  font-size: 22px;
+  font-size: 1.25rem;
   font-weight: 700;
   color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .stat-label {
-  font-size: 13px;
+  font-size: 0.75rem;
   color: var(--text-muted);
 }
 
@@ -123,12 +124,14 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 24px;
+  padding: 14px 16px;
   border-bottom: 1px solid var(--border);
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
 .table-header h3 {
-  font-size: 18px;
+  font-size: 1rem;
   font-weight: 700;
   color: var(--text-primary);
   margin: 0;
@@ -136,11 +139,12 @@
 
 .filters {
   display: flex;
-  gap: 12px;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .filters mat-form-field {
-  width: 140px;
+  width: 130px;
 }
 
 .table-container {
@@ -154,13 +158,13 @@
 
 .commissions-table th,
 .commissions-table td {
-  padding: 16px;
+  padding: 12px 14px;
   text-align: left;
   border-bottom: 1px solid var(--border);
 }
 
 .commissions-table th {
-  font-size: 11px;
+  font-size: 0.7rem;
   font-weight: 700;
   text-transform: uppercase;
   color: var(--text-muted);
@@ -168,7 +172,7 @@
 }
 
 .commissions-table td {
-  font-size: 14px;
+  font-size: 0.85rem;
   color: var(--text-primary);
 }
 
@@ -183,9 +187,9 @@
 }
 
 .agent-cell mat-icon {
-  font-size: 18px;
-  width: 18px;
-  height: 18px;
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
   color: var(--text-muted);
 }
 
@@ -199,51 +203,36 @@
 
 .status-badge {
   display: inline-block;
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.7rem;
+  font-weight: 700;
   text-transform: capitalize;
 }
 
-.status-paid {
-  background: rgba(16, 185, 129, 0.12);
-  color: var(--success);
-}
-
-.status-disbursed {
-  background: rgba(99, 102, 241, 0.12);
-  color: var(--primary);
-}
-
-.status-approved {
-  background: rgba(59, 130, 246, 0.12);
-  color: #3b82f6;
-}
-
-.status-pending {
-  background: rgba(245, 158, 11, 0.12);
-  color: var(--warning);
-}
+.status-paid { background: rgba(16, 185, 129, 0.12); color: var(--success); }
+.status-disbursed { background: rgba(99, 102, 241, 0.12); color: var(--primary); }
+.status-approved { background: rgba(59, 130, 246, 0.12); color: #3b82f6; }
+.status-pending { background: rgba(245, 158, 11, 0.12); color: var(--warning); }
 
 .empty-state {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 60px 20px;
+  padding: 40px 20px;
   color: var(--text-muted);
 }
 
 .empty-state mat-icon {
-  font-size: 48px;
-  width: 48px;
-  height: 48px;
-  margin-bottom: 16px;
+  font-size: 40px;
+  width: 40px;
+  height: 40px;
+  margin-bottom: 12px;
 }
 
 .empty-state p {
-  font-size: 15px;
+  font-size: 0.9rem;
   margin: 0;
 }
 
@@ -268,8 +257,8 @@
   background: var(--bg-surface);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  width: 100%;
-  max-width: 520px;
+  width: 90%;
+  max-width: 500px;
   max-height: 90vh;
   overflow-y: auto;
 }
@@ -278,19 +267,19 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 24px;
+  padding: 16px 20px;
   border-bottom: 1px solid var(--border);
 }
 
 .dialog-header h2 {
-  font-size: 20px;
+  font-size: 1.1rem;
   font-weight: 700;
   color: var(--text-primary);
   margin: 0;
 }
 
 .dialog-body {
-  padding: 24px;
+  padding: 20px;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -299,14 +288,14 @@
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  gap: 12px;
 }
 
 .commission-preview {
   background: var(--bg-elevated);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
-  padding: 16px;
+  padding: 14px;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -315,7 +304,7 @@
 .preview-row {
   display: flex;
   justify-content: space-between;
-  font-size: 14px;
+  font-size: 0.85rem;
 }
 
 .preview-row span:first-child {
@@ -331,7 +320,7 @@
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-  padding: 16px 24px;
+  padding: 14px 20px;
   border-top: 1px solid var(--border);
 }
 
@@ -345,4 +334,101 @@
 
 :host ::ng-deep .mat-mdc-option {
   font-family: 'Urbanist', sans-serif !important;
+}
+
+/* ========================
+   RESPONSIVE
+   ======================== */
+
+@media (max-width: 1200px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 992px) {
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .filters {
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .page-title {
+    font-size: 1.25rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .stat-card {
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .stat-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .stat-icon mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+
+  .stat-value {
+    font-size: 1.1rem;
+  }
+
+  .stat-label {
+    font-size: 0.7rem;
+  }
+
+  .commissions-table th,
+  .commissions-table td {
+    padding: 10px 12px;
+    font-size: 0.8rem;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .commissions-container {
+    padding: 12px;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .table-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .filters {
+    width: 100%;
+  }
+
+  .filters mat-form-field {
+    width: 100%;
+  }
+
+  .table-container {
+    overflow-x: auto;
+  }
+
+  .commissions-table {
+    min-width: 500px;
+  }
 }

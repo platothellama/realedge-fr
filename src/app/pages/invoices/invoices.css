@@ -309,3 +309,265 @@
 :host ::ng-deep .mat-mdc-option {
   font-family: 'Urbanist', sans-serif !important;
 }
+
+/* Responsive Styles */
+@media (max-width: 1024px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .invoices-container {
+    padding: 16px;
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .page-title {
+    font-size: 24px;
+  }
+
+  .page-subtitle {
+    font-size: 14px;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stat-card {
+    padding: 16px;
+  }
+
+  .table-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .filters {
+    width: 100%;
+  }
+
+  .filters mat-form-field {
+    width: 100%;
+  }
+
+  .invoices-table {
+    font-size: 12px;
+  }
+
+  .invoices-table th,
+  .invoices-table td {
+    padding: 12px 8px;
+  }
+}
+
+/* Dialog Styles */
+.invoice-dialog {
+  max-width: 700px !important;
+  max-height: 85vh !important;
+}
+
+.dialog-body {
+  max-height: calc(85vh - 140px);
+  overflow-y: auto;
+}
+
+.full-width {
+  width: 100%;
+}
+
+/* Form Sections */
+.form-section {
+  background: var(--bg-elevated);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  margin-bottom: 8px;
+}
+
+.form-section h4 {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 16px 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Client Info */
+.client-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.client-name {
+  font-weight: 600;
+}
+
+.client-tax-id {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* Currency Badge */
+.currency-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  background: rgba(99, 102, 241, 0.1);
+  color: var(--primary);
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* Line Items */
+.line-items-header {
+  display: grid;
+  grid-template-columns: 1fr 80px 120px 100px 40px;
+  gap: 8px;
+  padding: 8px 0;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.line-item-row {
+  display: grid;
+  grid-template-columns: 1fr 80px 120px 100px 40px;
+  gap: 8px;
+  margin-bottom: 8px;
+  align-items: center;
+}
+
+.line-item-row input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.line-item-row input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.line-item-row input[type="number"] {
+  text-align: right;
+}
+
+.item-total {
+  font-weight: 600;
+  color: var(--text-primary);
+  text-align: right;
+  padding-right: 8px;
+}
+
+.remove-item-btn {
+  color: var(--error) !important;
+}
+
+.add-item-btn {
+  margin-top: 8px;
+  width: 100%;
+  border-style: dashed !important;
+}
+
+/* Totals Section */
+.totals-section {
+  background: var(--bg-surface);
+}
+
+.calculated-totals {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+.total-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.total-row.discount {
+  color: var(--success);
+}
+
+.total-row.grand-total {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  border-top: 2px solid var(--border);
+  padding-top: 12px;
+  margin-top: 8px;
+}
+
+@media (max-width: 640px) {
+  .invoice-dialog {
+    max-width: 95vw !important;
+    max-height: 90vh !important;
+  }
+
+  .form-section {
+    padding: 12px;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .line-items-header {
+    display: none;
+  }
+
+  .line-item-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    background: var(--bg-surface);
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+  }
+
+  .line-item-row input {
+    flex: 1 1 calc(50% - 4px);
+    min-width: 0;
+  }
+
+  .line-item-row input:first-child {
+    flex: 1 1 100%;
+  }
+
+  .item-total {
+    flex: 1 1 100%;
+    text-align: left;
+    padding: 8px 0 0 0;
+    border-top: 1px dashed var(--border);
+    margin-top: 4px;
+  }
+
+  .remove-item-btn {
+    position: absolute;
+    right: 8px;
+    top: 8px;
+  }
+
+  .line-item-row {
+    position: relative;
+  }
+}

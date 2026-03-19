@@ -183,3 +183,108 @@
   height: 3px !important;
   border-radius: 3px 3px 0 0;
 }
+
+/* Responsive Styles */
+@media (max-width: 1024px) {
+  .user-mgmt-container {
+    padding: 40px 24px;
+  }
+
+  .create-btn {
+    height: 48px !important;
+    font-size: 1rem !important;
+  }
+
+  .create-btn .mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+@media (max-width: 768px) {
+  .user-mgmt-container {
+    padding: 24px 16px;
+  }
+
+  .header-section {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+    margin-bottom: 32px;
+  }
+
+  .title-area h1 {
+    font-size: 1.75rem;
+  }
+
+  .title-area p {
+    font-size: 1rem;
+    margin-top: 8px;
+  }
+
+  .header-section > div:last-child {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .header-section > div:last-child button {
+    flex: 1;
+    height: 48px !important;
+  }
+
+  .create-btn .mat-icon {
+    margin-right: 4px !important;
+  }
+
+  .create-btn span {
+    display: none;
+  }
+
+  .table-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+  }
+
+  .user-name {
+    font-size: 1rem;
+  }
+
+  .user-email-text {
+    font-size: 0.85rem;
+  }
+
+  .role-badge {
+    font-size: 0.7rem;
+    padding: 4px 10px;
+  }
+}
+
+@media (max-width: 640px) {
+  .mgmt-tabs ::ng-deep .mat-mdc-tab .mdc-tab__text-label {
+    font-size: 0.9rem !important;
+  }
+
+  .tab-icon {
+    margin-right: 4px;
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+
+  .action-group {
+    gap: 4px;
+  }
+
+  .action-btn {
+    width: 32px !important;
+    height: 32px !important;
+  }
+
+  .action-btn mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}

@@ -1,13 +1,19 @@
 .finance-container {
-  padding: 40px;
+  padding: 16px;
+  max-width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
 }
 
 .header-section {
-  margin-bottom: 40px;
+  margin-bottom: 16px;
+  flex-shrink: 0;
 }
 
 .title-area h1 {
-  font-size: 2.5rem;
+  font-size: 1.5rem;
   font-weight: 800;
   letter-spacing: -0.03em;
   margin: 0;
@@ -16,24 +22,23 @@
 
 .title-area p {
   color: var(--text-muted);
-  font-size: 1.1rem;
-  margin-top: 8px;
+  font-size: 0.9rem;
+  margin-top: 4px;
   font-weight: 500;
 }
 
-/* Metrics */
 .metrics-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 24px;
-  margin-bottom: 40px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
 }
 
 .metric-card {
   background: var(--bg-card) !important;
   border: 1px solid var(--border) !important;
-  border-radius: 20px !important;
-  padding: 24px !important;
+  border-radius: 14px !important;
+  padding: 16px !important;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -46,7 +51,7 @@
 }
 
 .metric-label {
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   font-weight: 700;
   color: var(--text-muted);
   text-transform: uppercase;
@@ -54,28 +59,28 @@
 }
 
 .metric-value {
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-weight: 800;
   color: #fff;
 }
 
 .metric-card mat-icon {
-  font-size: 40px;
-  width: 40px;
-  height: 40px;
+  font-size: 32px;
+  width: 32px;
+  height: 32px;
   opacity: 0.2;
 }
 
 .revenue { border-left: 4px solid #34d399 !important; }
 .pending { border-left: 4px solid #f59e0b !important; }
 
-/* Table */
 .table-card {
   background: var(--bg-card) !important;
   border: 1px solid var(--border) !important;
-  border-radius: 24px !important;
+  border-radius: 16px !important;
   overflow: hidden;
   padding: 0 !important;
+  flex-shrink: 0;
 }
 
 table {
@@ -87,16 +92,17 @@ th {
   color: var(--text-muted) !important;
   font-weight: 700 !important;
   text-transform: uppercase;
-  font-size: 0.75rem !important;
+  font-size: 0.7rem !important;
   letter-spacing: 0.05em !important;
-  padding: 20px 24px !important;
+  padding: 12px 16px !important;
   border-bottom: 1px solid var(--border) !important;
 }
 
 td {
-  padding: 20px 24px !important;
+  padding: 12px 16px !important;
   border-bottom: 1px solid rgba(255, 255, 255, 0.03) !important;
   color: var(--text-primary) !important;
+  font-size: 0.85rem;
 }
 
 tr:last-child td { border-bottom: none !important; }
@@ -104,38 +110,38 @@ tr:last-child td { border-bottom: none !important; }
 .deal-info, .property-info {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
 }
 
 .deal-title, .prop-title {
   font-weight: 700;
   color: #fff;
+  font-size: 0.9rem;
 }
 
 .deal-date, .prop-price {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: var(--text-muted);
 }
 
 .broker-cell {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
 }
 
 .table-avatar {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
   border: 1px solid var(--border);
 }
 
 .stage-badge {
-  padding: 4px 12px;
-  border-radius: 8px;
-  font-size: 0.75rem;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 0.7rem;
   font-weight: 700;
-  background: rgba(255, 255, 255, 0.05);
 }
 
 .stage-badge[data-stage="Closed"] { color: #34d399; background: rgba(52, 211, 153, 0.1); }
@@ -144,19 +150,20 @@ tr:last-child td { border-bottom: none !important; }
 .commission-text {
   font-weight: 800;
   color: #34d399;
-  font-size: 1rem;
+  font-size: 0.9rem;
 }
 
 .edit-btn {
-  height: 36px !important;
-  border-radius: 10px !important;
+  height: 32px !important;
+  border-radius: 8px !important;
   font-weight: 700 !important;
-  font-size: 0.8rem !important;
+  font-size: 0.75rem !important;
   border-color: var(--border) !important;
+  padding: 0 10px !important;
 }
 
 .edit-field {
-  width: 120px;
+  width: 100px;
 }
 
 .edit-field input {
@@ -169,12 +176,66 @@ tr:last-child td { border-bottom: none !important; }
 }
 
 .empty-state {
-  padding: 80px 40px;
+  padding: 40px 20px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
   color: var(--text-muted);
 }
 
-.empty-state mat-icon { font-size: 48px; width: 48px; height: 48px; }
+.empty-state mat-icon { font-size: 40px; width: 40px; height: 40px; }
+
+/* ========================
+   RESPONSIVE
+   ======================== */
+
+@media (max-width: 992px) {
+  .metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .finance-container {
+    padding: 12px;
+  }
+
+  .title-area h1 {
+    font-size: 1.25rem;
+  }
+
+  .metrics-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .metric-card {
+    padding: 12px !important;
+  }
+
+  .metric-value {
+    font-size: 1.25rem;
+  }
+
+  th {
+    font-size: 0.65rem !important;
+    padding: 10px 12px !important;
+  }
+
+  td {
+    padding: 10px 12px !important;
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .table-card {
+    overflow-x: auto;
+  }
+
+  table {
+    min-width: 500px;
+  }
+}

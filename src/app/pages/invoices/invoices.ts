@@ -15,23 +15,45 @@ import { MatSelectModule } from '@angular/material/select';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api';
 
+interface LineItem {
+  description: string;
+  quantity: number;
+  unitPrice: number;
+  total: number;
+}
+
 interface Invoice {
   id: string;
   invoiceNumber: string;
   type: string;
   status: string;
+  currency: string;
   issueDate: string;
+  supplyDate?: string;
   dueDate: string;
   clientName: string;
-  clientEmail: string;
+  clientEmail?: string;
+  clientPhone?: string;
+  clientAddress?: string;
+  clientTaxId?: string;
   subtotal: number;
   taxRate: number;
   taxAmount: number;
   discount: number;
   total: number;
+  lineItems: LineItem[];
+  notes?: string;
+  paymentTerms?: string;
   paidAmount: number;
   paidDate?: string;
-  notes?: string;
+  sellerName?: string;
+  sellerLegalForm?: string;
+  sellerCapital?: string;
+  sellerTradeRegister?: string;
+  sellerTaxId?: string;
+  sellerAddress?: string;
+  sellerPhone?: string;
+  sellerEmail?: string;
 }
 
 @Component({
@@ -69,17 +91,27 @@ export class InvoicesComponent implements OnInit {
   typeFilter = '';
   showAddDialog = false;
   
+  lineItems: LineItem[] = [];
+
   newInvoice: Partial<Invoice> = {
     type: 'Sale',
     status: 'Draft',
+    currency: 'USD',
     clientName: '',
     subtotal: 0,
-    taxRate: 0,
-    discount: 0
+    taxRate: 11,
+    discount: 0,
+    paymentTerms: 'Net 30'
   };
 
   statusOptions = ['Draft', 'Sent', 'Paid', 'Overdue', 'Cancelled'];
   typeOptions = ['Sale', 'Rental', 'Commission', 'Management Fee', 'Other'];
+  currencyOptions = ['USD', 'LBP'];
+  taxRateOptions = [
+    { label: '0% - Exempt', value: 0 },
+    { label: '11% - Standard Rate', value: 11 },
+    { label: 'No VAT', value: 0 }
+  ];
 
   ngOnInit() {
     this.loadInvoices();
@@ -116,14 +148,43 @@ export class InvoicesComponent implements OnInit {
     });
   }
 
+  addLineItem() {
+    this.lineItems.push({
+      description: '',
+      quantity: 1,
+      unitPrice: 0,
+      total: 0
+    });
+  }
+
+  removeLineItem(index: number) {
+    this.lineItems.splice(index, 1);
+    this.calculateSubtotal();
+  }
+
+  updateLineItemTotal(item: LineItem) {
+    item.total = item.quantity * item.unitPrice;
+    this.calculateSubtotal();
+  }
+
+  calculateSubtotal() {
+    this.newInvoice.subtotal = this.lineItems.reduce((sum, item) => sum + (item.total || 0), 0);
+  }
+
   createInvoice() {
-    if (!this.newInvoice.clientName || !this.newInvoice.subtotal) {
-      this.snackBar.open('Client name and amount are required', 'Close', { duration: 3000 });
+    if (!this.newInvoice.clientName) {
+      this.snackBar.open('Client name is required', 'Close', { duration: 3000 });
+      return;
+    }
+
+    if (this.lineItems.length === 0) {
+      this.snackBar.open('Please add at least one line item', 'Close', { duration: 3000 });
       return;
     }
 
     const invoiceData = {
       ...this.newInvoice,
+      lineItems: this.lineItems,
       issueDate: new Date(),
       dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
     };
@@ -132,12 +193,12 @@ export class InvoicesComponent implements OnInit {
       next: (res) => {
         this.invoices.unshift(res);
         this.showAddDialog = false;
-        this.newInvoice = { type: 'Sale', status: 'Draft', clientName: '', subtotal: 0, taxRate: 0, discount: 0 };
+        this.resetForm();
         this.loadStats();
         this.snackBar.open('Invoice created successfully', 'Close', { duration: 3000 });
       },
       error: (err) => {
-        this.snackBar.open('Failed to create invoice', 'Close', { duration: 3000 });
+        this.snackBar.open('Failed to create invoice: ' + (err.error?.message || 'Unknown error'), 'Close', { duration: 3000 });
       }
     });
   }
@@ -175,6 +236,13 @@ export class InvoicesComponent implements OnInit {
     return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value);
   }
 
+  formatCurrencyWithSymbol(value: number, currency: string = 'USD'): string {
+    if (currency === 'LBP') {
+      return new Intl.NumberFormat('en-LB', { style: 'decimal', maximumFractionDigits: 0 }).format(value) + ' LBP';
+    }
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value);
+  }
+
   formatDate(date: string): string {
     return new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
   }
@@ -198,8 +266,22 @@ export class InvoicesComponent implements OnInit {
     return this.stats.totalOutstanding || 0;
   }
 
+  resetForm() {
+    this.newInvoice = {
+      type: 'Sale',
+      status: 'Draft',
+      currency: 'USD',
+      clientName: '',
+      subtotal: 0,
+      taxRate: 11,
+      discount: 0,
+      paymentTerms: 'Net 30'
+    };
+    this.lineItems = [];
+  }
+
   closeDialog() {
     this.showAddDialog = false;
-    this.newInvoice = { type: 'Sale', status: 'Draft', clientName: '', subtotal: 0, taxRate: 0, discount: 0 };
+    this.resetForm();
   }
 }

@@ -13,6 +13,7 @@
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>Property Title</mat-label>
             <input matInput formControlName="title" placeholder="Ex: Modern Penthouse in Downtown">
+            <mat-error *ngIf="propertyForm.get('title')?.hasError('required')">Property title is required</mat-error>
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="full-width">
@@ -25,6 +26,8 @@
               <mat-label>Asking Price</mat-label>
               <input matInput type="number" formControlName="price" placeholder="0.00">
               <span matPrefix class="currency-prefix">$</span>
+              <mat-error *ngIf="propertyForm.get('price')?.hasError('required')">Price is required</mat-error>
+              <mat-error *ngIf="propertyForm.get('price')?.hasError('min')">Price must be 0 or greater</mat-error>
             </mat-form-field>
 
             <mat-form-field appearance="outline">
@@ -34,6 +37,7 @@
                   <mat-option [value]="s">{{s}}</mat-option>
                 }
               </mat-select>
+              <mat-error *ngIf="propertyForm.get('status')?.hasError('required')">Status is required</mat-error>
             </mat-form-field>
           </div>
 
@@ -44,6 +48,7 @@
                 <mat-option [value]="t">{{t}}</mat-option>
               }
             </mat-select>
+            <mat-error *ngIf="propertyForm.get('type')?.hasError('required')">Property type is required</mat-error>
           </mat-form-field>
         </div>
       </mat-tab>
@@ -98,6 +103,7 @@
               <mat-label>Street Address</mat-label>
               <input matInput formControlName="address">
               <mat-icon matSuffix>location_on</mat-icon>
+              <mat-error *ngIf="propertyForm.get('address')?.hasError('required')">Address is required</mat-error>
             </mat-form-field>
           </div>
 
@@ -120,10 +126,12 @@
             <mat-form-field appearance="outline">
               <mat-label>City</mat-label>
               <input matInput formControlName="city">
+              <mat-error *ngIf="propertyForm.get('city')?.hasError('required')">City is required</mat-error>
             </mat-form-field>
             <mat-form-field appearance="outline">
               <mat-label>Country</mat-label>
               <input matInput formControlName="country">
+              <mat-error *ngIf="propertyForm.get('country')?.hasError('required')">Country is required</mat-error>
             </mat-form-field>
           </div>
 
@@ -225,6 +233,8 @@
             @if (!isAdmin) {
               <mat-hint>Only Admin/Super Admin can set the commission percentage</mat-hint>
             }
+            <mat-error *ngIf="propertyForm.get('commissionPercentage')?.hasError('min')">Commission cannot be negative</mat-error>
+            <mat-error *ngIf="propertyForm.get('commissionPercentage')?.hasError('max')">Commission cannot exceed 100%</mat-error>
           </mat-form-field>
         </div>
       </mat-tab>

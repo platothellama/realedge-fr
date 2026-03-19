@@ -1,19 +1,24 @@
 .visits-container {
-  padding: 40px;
-  height: 100vh;
+  padding: 16px;
+  height: 100%;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
 }
 
 .header-section {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 40px;
+  margin-bottom: 16px;
+  gap: 16px;
+  flex-wrap: wrap;
+  flex-shrink: 0;
 }
 
 .title-area h1 {
-  font-size: 2.5rem;
+  font-size: 1.5rem;
   font-weight: 800;
   letter-spacing: -0.03em;
   margin: 0;
@@ -22,34 +27,45 @@
 
 .title-area p {
   color: var(--text-muted);
-  font-size: 1.1rem;
-  margin-top: 8px;
+  font-size: 0.9rem;
+  margin-top: 4px;
   font-weight: 500;
 }
 
 .action-area {
   display: flex;
-  gap: 16px;
+  gap: 8px;
 }
 
 .schedule-btn, .google-sync-btn {
-  height: 52px !important;
-  border-radius: 14px !important;
-  font-weight: 800 !important;
-  padding: 0 24px !important;
+  height: 40px !important;
+  border-radius: 8px !important;
+  font-weight: 700 !important;
+  font-size: 0.85rem !important;
+  padding: 0 12px !important;
 }
 
 .schedule-btn {
-  box-shadow: 0 8px 20px -4px var(--primary-glow) !important;
+  box-shadow: 0 4px 12px -2px var(--primary-glow) !important;
+}
+
+.schedule-btn mat-icon, .google-sync-btn mat-icon {
+  font-size: 18px !important;
+  width: 18px !important;
+  height: 18px !important;
+  margin: 0 !important;
 }
 
 .calendar-card {
   flex: 1;
+  min-height: 0;
   background: var(--bg-card) !important;
   border: 1px solid var(--border) !important;
-  border-radius: 24px !important;
-  padding: 32px !important;
+  border-radius: 16px !important;
+  padding: 16px !important;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 /* FullCalendar Custom Styling for Dark Theme */
@@ -65,35 +81,60 @@
   --fc-event-bg-color: var(--primary);
   --fc-event-border-color: transparent;
   --fc-today-bg-color: rgba(99, 102, 241, 0.05);
+  --fc-button-text-color: var(--text-primary);
   
   font-family: 'Urbanist', sans-serif !important;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+::ng-deep .fc .fc-toolbar {
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px !important;
 }
 
 ::ng-deep .fc .fc-toolbar-title {
   font-weight: 800 !important;
   color: #fff !important;
-  font-size: 1.5rem !important;
+  font-size: 1.25rem !important;
+}
+
+::ng-deep .fc .fc-toolbar-chunk {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+::ng-deep .fc .fc-button {
+  height: 36px !important;
+  padding: 0 12px !important;
+  font-size: 0.8rem !important;
+  font-weight: 700 !important;
+  border-radius: 8px !important;
 }
 
 ::ng-deep .fc .fc-col-header-cell-cushion {
-  padding: 12px 0 !important;
+  padding: 8px 0 !important;
   font-weight: 700 !important;
   color: var(--text-muted) !important;
   text-transform: uppercase;
-  font-size: 0.75rem !important;
+  font-size: 0.7rem !important;
   letter-spacing: 0.05em !important;
 }
 
 ::ng-deep .fc .fc-timegrid-slot-label-cushion {
   font-weight: 600 !important;
   color: var(--text-secondary) !important;
-  font-size: 0.8rem !important;
+  font-size: 0.75rem !important;
 }
 
 ::ng-deep .fc .fc-event {
-  border-radius: 8px !important;
-  padding: 4px 8px !important;
+  border-radius: 6px !important;
+  padding: 2px 6px !important;
   font-weight: 600 !important;
+  font-size: 0.75rem !important;
   cursor: pointer;
   transition: transform 0.2s ease;
 }
@@ -101,4 +142,162 @@
 ::ng-deep .fc .fc-event:hover {
   transform: scale(1.02);
   filter: brightness(1.1);
+}
+
+::ng-deep .fc-theme-standard td,
+::ng-deep .fc-theme-standard th {
+  border-color: var(--border) !important;
+}
+
+::ng-deep .fc .fc-scrollgrid {
+  border-color: var(--border) !important;
+}
+
+::ng-deep .fc .fc-daygrid-day-number,
+::ng-deep .fc .fc-col-header-cell-cushion {
+  color: var(--text-primary) !important;
+}
+
+::ng-deep .fc .fc-daygrid-day.fc-day-today {
+  background: rgba(99, 102, 241, 0.05) !important;
+}
+
+::ng-deep .fc .fc-timegrid-now-indicator-line {
+  border-color: var(--primary) !important;
+}
+
+::ng-deep .fc .fc-timegrid-now-indicator-arrow {
+  border-color: var(--primary) !important;
+}
+
+/* ========================
+   RESPONSIVE
+   ======================== */
+
+@media (max-width: 992px) {
+  .header-section {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .action-area {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .calendar-card {
+    padding: 12px !important;
+    border-radius: 12px !important;
+  }
+
+  ::ng-deep .fc .fc-toolbar-title {
+    font-size: 1rem !important;
+  }
+
+  ::ng-deep .fc .fc-button {
+    height: 32px !important;
+    padding: 0 8px !important;
+    font-size: 0.75rem !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .visits-container {
+    padding: 12px;
+  }
+
+  .title-area h1 {
+    font-size: 1.25rem;
+  }
+
+  .title-area p {
+    font-size: 0.8rem;
+  }
+
+  .schedule-btn, .google-sync-btn {
+    height: 36px !important;
+    font-size: 0.75rem !important;
+    padding: 0 8px !important;
+  }
+
+  .schedule-btn mat-icon, .google-sync-btn mat-icon {
+    font-size: 16px !important;
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  .calendar-card {
+    padding: 8px !important;
+    border-radius: 10px !important;
+  }
+
+  ::ng-deep .fc .fc-toolbar {
+    gap: 4px;
+  }
+
+  ::ng-deep .fc .fc-toolbar-title {
+    font-size: 0.9rem !important;
+  }
+
+  ::ng-deep .fc .fc-button {
+    height: 28px !important;
+    padding: 0 6px !important;
+    font-size: 0.7rem !important;
+  }
+
+  ::ng-deep .fc .fc-col-header-cell-cushion {
+    font-size: 0.6rem !important;
+    padding: 4px 0 !important;
+  }
+
+  ::ng-deep .fc .fc-daygrid-day-number {
+    font-size: 0.75rem !important;
+  }
+
+  ::ng-deep .fc .fc-event {
+    font-size: 0.65rem !important;
+    padding: 1px 4px !important;
+  }
+
+  ::ng-deep .fc-direction-ltr .fc-toolbar > * > :not(:first-child) {
+    margin-left: 4px !important;
+  }
+
+  ::ng-deep .fc-direction-ltr .fc-button-group > .fc-button {
+    border-radius: 0 !important;
+  }
+
+  ::ng-deep .fc-direction-ltr .fc-button-group > :first-child {
+    border-radius: 6px 0 0 6px !important;
+  }
+
+  ::ng-deep .fc-direction-ltr .fc-button-group > :last-child {
+    border-radius: 0 6px 6px 0 !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .header-section {
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .action-area {
+    flex-wrap: wrap;
+  }
+
+  .schedule-btn, .google-sync-btn {
+    flex: 1;
+    min-width: calc(50% - 4px);
+    justify-content: center;
+  }
+
+  .schedule-btn span, .google-sync-btn span {
+    display: none;
+  }
+
+  .calendar-card {
+    border-radius: 8px !important;
+  }
 }

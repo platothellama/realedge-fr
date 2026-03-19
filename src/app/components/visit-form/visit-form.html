@@ -12,6 +12,7 @@
         <mat-label>Meeting Title</mat-label>
         <input matInput formControlName="title" placeholder="e.g. Viewing for Downtown Penthouse">
         <mat-icon matSuffix>event</mat-icon>
+        <mat-error *ngIf="visitForm.get('title')?.hasError('required')">Title is required</mat-error>
       </mat-form-field>
     </div>
 
@@ -19,11 +20,13 @@
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Property</mat-label>
         <mat-select formControlName="propertyId">
+          <mat-option [value]="null" disabled>Select a property</mat-option>
           @for (prop of properties; track prop.id) {
             <mat-option [value]="prop.id">{{ prop.title }}</mat-option>
           }
         </mat-select>
         <mat-icon matSuffix>home</mat-icon>
+        <mat-error *ngIf="visitForm.get('propertyId')?.hasError('required')">Please select a property</mat-error>
       </mat-form-field>
     </div>
 
@@ -35,12 +38,14 @@
         <input matInput [matDatepicker]="picker" formControlName="visitDate">
         <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
         <mat-datepicker #picker></mat-datepicker>
+        <mat-error *ngIf="visitForm.get('visitDate')?.hasError('required')">Date is required</mat-error>
       </mat-form-field>
 
       <mat-form-field appearance="outline">
         <mat-label>Time</mat-label>
         <input matInput type="time" formControlName="visitTime">
         <mat-icon matSuffix>schedule</mat-icon>
+        <mat-error *ngIf="visitForm.get('visitTime')?.hasError('required')">Time is required</mat-error>
       </mat-form-field>
     </div>
 
@@ -51,6 +56,7 @@
         <mat-label>Client Name</mat-label>
         <input matInput formControlName="clientName">
         <mat-icon matSuffix>person</mat-icon>
+        <mat-error *ngIf="visitForm.get('clientName')?.hasError('required')">Client name is required</mat-error>
       </mat-form-field>
     </div>
 
@@ -59,6 +65,7 @@
         <mat-label>Client Email</mat-label>
         <input matInput formControlName="clientEmail" type="email">
         <mat-icon matSuffix>email</mat-icon>
+        <mat-error *ngIf="visitForm.get('clientEmail')?.hasError('email')">Please enter a valid email</mat-error>
       </mat-form-field>
     </div>
 
@@ -81,6 +88,7 @@
           }
         </mat-select>
         <mat-icon matSuffix>badge</mat-icon>
+        <mat-error *ngIf="visitForm.get('brokerId')?.hasError('required')">Please assign a broker</mat-error>
       </mat-form-field>
     </div>
 
@@ -92,6 +100,7 @@
             <mat-option [value]="s">{{ s }}</mat-option>
           }
         </mat-select>
+        <mat-error *ngIf="visitForm.get('status')?.hasError('required')">Status is required</mat-error>
       </mat-form-field>
     </div>
 

@@ -2,7 +2,7 @@
   <div class="page-header">
     <div class="header-content">
       <h1 class="page-title">Invoices</h1>
-      <p class="page-subtitle">Manage and track all invoices</p>
+      <p class="page-subtitle">Manage and track all invoices (Lebanese Law Compliant)</p>
     </div>
     <button mat-raised-button color="primary" (click)="showAddDialog = true">
       <mat-icon>add</mat-icon>
@@ -84,6 +84,7 @@
               <th>Invoice #</th>
               <th>Client</th>
               <th>Type</th>
+              <th>Currency</th>
               <th>Issue Date</th>
               <th>Due Date</th>
               <th>Amount</th>
@@ -95,8 +96,16 @@
             @for (invoice of invoices; track invoice.id) {
               <tr>
                 <td class="invoice-number">{{ invoice.invoiceNumber }}</td>
-                <td>{{ invoice.clientName }}</td>
+                <td>
+                  <div class="client-info">
+                    <span class="client-name">{{ invoice.clientName }}</span>
+                    @if (invoice.clientTaxId) {
+                      <span class="client-tax-id">Tax ID: {{ invoice.clientTaxId }}</span>
+                    }
+                  </div>
+                </td>
                 <td>{{ invoice.type }}</td>
+                <td><span class="currency-badge">{{ invoice.currency }}</span></td>
                 <td>{{ formatDate(invoice.issueDate) }}</td>
                 <td>{{ formatDate(invoice.dueDate) }}</td>
                 <td class="amount">{{ formatCurrency(invoice.total) }}</td>
@@ -138,7 +147,7 @@
 
   @if (showAddDialog) {
     <div class="dialog-overlay" (click)="closeDialog()">
-      <div class="dialog-content" (click)="$event.stopPropagation()">
+      <div class="dialog-content invoice-dialog" (click)="$event.stopPropagation()">
         <div class="dialog-header">
           <h2>New Invoice</h2>
           <button mat-icon-button (click)="closeDialog()">
@@ -146,49 +155,141 @@
           </button>
         </div>
         <div class="dialog-body">
-          <mat-form-field appearance="outline">
-            <mat-label>Client Name</mat-label>
-            <input matInput [(ngModel)]="newInvoice.clientName" placeholder="Enter client name">
-          </mat-form-field>
-          <mat-form-field appearance="outline">
-            <mat-label>Client Email</mat-label>
-            <input matInput [(ngModel)]="newInvoice.clientEmail" placeholder="client@email.com">
-          </mat-form-field>
-          <div class="form-row">
-            <mat-form-field appearance="outline">
-              <mat-label>Type</mat-label>
-              <mat-select [(ngModel)]="newInvoice.type">
-                @for (type of typeOptions; track type) {
-                  <mat-option [value]="type">{{ type }}</mat-option>
-                }
-              </mat-select>
+          <div class="form-section">
+            <h4>Client Information</h4>
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Client Name *</mat-label>
+              <input matInput [(ngModel)]="newInvoice.clientName" placeholder="Full name or company name" required>
+              <mat-error>Client name is required</mat-error>
             </mat-form-field>
-            <mat-form-field appearance="outline">
-              <mat-label>Status</mat-label>
-              <mat-select [(ngModel)]="newInvoice.status">
-                @for (status of statusOptions; track status) {
-                  <mat-option [value]="status">{{ status }}</mat-option>
-                }
-              </mat-select>
+            <div class="form-row">
+              <mat-form-field appearance="outline">
+                <mat-label>Client Tax ID (NIF)</mat-label>
+                <input matInput [(ngModel)]="newInvoice.clientTaxId" placeholder="Tax Identification Number">
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Client Phone</mat-label>
+                <input matInput [(ngModel)]="newInvoice.clientPhone" placeholder="+961 XX XXX XXX">
+              </mat-form-field>
+            </div>
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Client Email</mat-label>
+              <input matInput [(ngModel)]="newInvoice.clientEmail" placeholder="client@email.com" type="email">
             </mat-form-field>
-          </div>
-          <mat-form-field appearance="outline">
-            <mat-label>Subtotal</mat-label>
-            <input matInput type="number" [(ngModel)]="newInvoice.subtotal" placeholder="0">
-          </mat-form-field>
-          <div class="form-row">
-            <mat-form-field appearance="outline">
-              <mat-label>Tax Rate (%)</mat-label>
-              <input matInput type="number" [(ngModel)]="newInvoice.taxRate" placeholder="0">
-            </mat-form-field>
-            <mat-form-field appearance="outline">
-              <mat-label>Discount</mat-label>
-              <input matInput type="number" [(ngModel)]="newInvoice.discount" placeholder="0">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Client Address</mat-label>
+              <textarea matInput [(ngModel)]="newInvoice.clientAddress" placeholder="Full address" rows="2"></textarea>
             </mat-form-field>
           </div>
-          <mat-form-field appearance="outline">
+
+          <div class="form-section">
+            <h4>Invoice Details</h4>
+            <div class="form-row">
+              <mat-form-field appearance="outline">
+                <mat-label>Type</mat-label>
+                <mat-select [(ngModel)]="newInvoice.type">
+                  @for (type of typeOptions; track type) {
+                    <mat-option [value]="type">{{ type }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Currency</mat-label>
+                <mat-select [(ngModel)]="newInvoice.currency">
+                  @for (curr of currencyOptions; track curr) {
+                    <mat-option [value]="curr">{{ curr }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+            </div>
+            <div class="form-row">
+              <mat-form-field appearance="outline">
+                <mat-label>Status</mat-label>
+                <mat-select [(ngModel)]="newInvoice.status">
+                  @for (status of statusOptions; track status) {
+                    <mat-option [value]="status">{{ status }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Payment Terms</mat-label>
+                <mat-select [(ngModel)]="newInvoice.paymentTerms">
+                  <mat-option value="Due on Receipt">Due on Receipt</mat-option>
+                  <mat-option value="Net 15">Net 15</mat-option>
+                  <mat-option value="Net 30">Net 30</mat-option>
+                  <mat-option value="Net 60">Net 60</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h4>Line Items</h4>
+            <div class="line-items-header">
+              <span class="col-desc">Description</span>
+              <span class="col-qty">Qty</span>
+              <span class="col-price">Unit Price</span>
+              <span class="col-total">Total</span>
+              <span class="col-action"></span>
+            </div>
+            @for (item of lineItems; track $index) {
+              <div class="line-item-row">
+                <input class="col-desc" matInput [(ngModel)]="item.description" placeholder="Description" (input)="updateLineItemTotal(item)">
+                <input class="col-qty" type="number" matInput [(ngModel)]="item.quantity" min="1" (input)="updateLineItemTotal(item)">
+                <input class="col-price" type="number" matInput [(ngModel)]="item.unitPrice" min="0" (input)="updateLineItemTotal(item)">
+                <span class="col-total item-total">{{ formatCurrencyWithSymbol(item.total, newInvoice.currency) }}</span>
+                <button mat-icon-button class="col-action remove-item-btn" (click)="removeLineItem($index)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            }
+            <button mat-stroked-button class="add-item-btn" (click)="addLineItem()">
+              <mat-icon>add</mat-icon>
+              Add Line Item
+            </button>
+          </div>
+
+          <div class="form-section totals-section">
+            <h4>Totals</h4>
+            <div class="form-row">
+              <mat-form-field appearance="outline">
+                <mat-label>Tax Rate (%)</mat-label>
+                <mat-select [(ngModel)]="newInvoice.taxRate">
+                  @for (rate of taxRateOptions; track rate.value) {
+                    <mat-option [value]="rate.value">{{ rate.label }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Discount</mat-label>
+                <input matInput type="number" [(ngModel)]="newInvoice.discount" placeholder="0" min="0">
+              </mat-form-field>
+            </div>
+            <div class="calculated-totals">
+              <div class="total-row">
+                <span>Subtotal:</span>
+                <span>{{ formatCurrencyWithSymbol(newInvoice.subtotal ?? 0, newInvoice.currency ?? 'USD') }}</span>
+              </div>
+              <div class="total-row">
+                <span>Tax ({{ newInvoice.taxRate ?? 11 }}%):</span>
+                <span>{{ formatCurrencyWithSymbol((newInvoice.subtotal ?? 0) * ((newInvoice.taxRate ?? 11) / 100), newInvoice.currency ?? 'USD') }}</span>
+              </div>
+              @if ((newInvoice.discount ?? 0) > 0) {
+                <div class="total-row discount">
+                  <span>Discount:</span>
+                  <span>-{{ formatCurrencyWithSymbol(newInvoice.discount ?? 0, newInvoice.currency ?? 'USD') }}</span>
+                </div>
+              }
+              <div class="total-row grand-total">
+                <span>Total:</span>
+                <span>{{ formatCurrencyWithSymbol((newInvoice.subtotal ?? 0) + ((newInvoice.subtotal ?? 0) * ((newInvoice.taxRate ?? 11) / 100)) - (newInvoice.discount ?? 0), newInvoice.currency ?? 'USD') }}</span>
+              </div>
+            </div>
+          </div>
+
+          <mat-form-field appearance="outline" class="full-width">
             <mat-label>Notes</mat-label>
-            <textarea matInput [(ngModel)]="newInvoice.notes" rows="3" placeholder="Optional notes"></textarea>
+            <textarea matInput [(ngModel)]="newInvoice.notes" rows="2" placeholder="Additional notes"></textarea>
           </mat-form-field>
         </div>
         <div class="dialog-footer">
