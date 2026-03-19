@@ -150,6 +150,39 @@ mat-divider { margin: 32px 0; border-color: rgba(255,255,255,0.05); }
 .description-section h3 { font-size: 1.5rem; margin-bottom: 16px; }
 .description-section p { color: var(--text-secondary); line-height: 1.8; font-size: 1.1rem; }
 
+.features-section {
+  margin-top: 32px;
+  padding-top: 32px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+.features-section h3 { font-size: 1.5rem; margin-bottom: 20px; }
+
+.features-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.feature-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  background: rgba(99, 102, 241, 0.1);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  border-radius: 30px;
+  font-size: 0.95rem;
+  color: var(--text);
+}
+
+.feature-badge mat-icon {
+  color: var(--primary);
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
 /* Right Column Cards */
 .side-card {
   background: var(--surface);

@@ -102,7 +102,10 @@ export class PropertyFormComponent implements OnInit, AfterViewInit {
       photos: [''],
       videos: [''],
       tours360: [''],
-      documents: ['']
+      documents: [''],
+
+      // Features
+      features: ['']
     });
   }
 
@@ -122,7 +125,8 @@ export class PropertyFormComponent implements OnInit, AfterViewInit {
         photos: prop.photos?.join(', ') || '',
         videos: prop.videos?.join(', ') || '',
         tours360: prop.tours360?.join(', ') || '',
-        documents: prop.documents?.join(', ') || ''
+        documents: prop.documents?.join(', ') || '',
+        features: prop.features?.join(', ') || ''
       });
 
       if (prop.lat && prop.lng) {
@@ -232,7 +236,8 @@ export class PropertyFormComponent implements OnInit, AfterViewInit {
         photos: allPhotos,
         videos: val.videos ? val.videos.split(',').map((s: string) => s.trim()) : [],
         tours360: val.tours360 ? val.tours360.split(',').map((s: string) => s.trim()) : [],
-        documents: val.documents ? val.documents.split(',').map((s: string) => s.trim()) : []
+        documents: val.documents ? val.documents.split(',').map((s: string) => s.trim()) : [],
+        features: val.features ? val.features.split(',').map((s: string) => s.trim()) : []
       };
 
       this.dialogRef.close(payload);

@@ -206,6 +206,20 @@
           <h3>Description</h3>
           <p>{{ property.description || 'No description provided for this luxury property.' }}</p>
         </div>
+
+        @if (property.features?.length) {
+          <div class="features-section">
+            <h3>Features</h3>
+            <div class="features-grid">
+              @for (feature of property.features; track feature) {
+                <span class="feature-badge">
+                  <mat-icon>check</mat-icon>
+                  {{ feature }}
+                </span>
+              }
+            </div>
+          </div>
+        }
       </div>
     </div>
 
