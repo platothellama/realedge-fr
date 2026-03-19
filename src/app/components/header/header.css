@@ -2,32 +2,65 @@
   background: var(--bg-header) !important;
   backdrop-filter: blur(24px) saturate(180%);
   border-bottom: 1px solid var(--border);
-  height: 88px !important;
-  padding: 0 48px !important;
+  height: 72px !important;
+  min-height: 72px !important;
+  padding: 0 32px !important;
   display: flex;
   align-items: center;
   position: sticky;
   top: 0;
   z-index: 1000;
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .header-toolbar {
+    height: 64px !important;
+    min-height: 64px !important;
+    padding: 0 16px !important;
+  }
+}
+
+@media (max-width: 992px) {
+  .header-toolbar {
+    padding: 0 24px !important;
+  }
 }
 
 .notification-btn {
-  margin-right: 24px;
+  margin-right: 16px;
   color: var(--text-secondary) !important;
-  width: 48px !important;
-  height: 48px !important;
+  width: 40px !important;
+  height: 40px !important;
 }
 
 .profile-btn {
   display: flex !important;
   align-items: center;
-  gap: 16px;
-  padding: 8px 16px !important;
-  height: 56px !important;
-  border-radius: 14px !important;
+  gap: 12px;
+  padding: 6px 12px !important;
+  height: 44px !important;
+  border-radius: 10px !important;
   background: rgba(255, 255, 255, 0.03) !important;
   border: 1px solid var(--border) !important;
   transition: all 0.2s ease !important;
+}
+
+@media (max-width: 768px) {
+  .notification-btn {
+    margin-right: 8px;
+    width: 36px !important;
+    height: 36px !important;
+  }
+
+  .profile-btn {
+    padding: 4px 8px !important;
+    gap: 8px;
+  }
+
+  .username {
+    display: none;
+  }
 }
 
 .profile-btn:hover {
@@ -37,7 +70,7 @@
 
 .username {
   font-weight: 700;
-  font-size: 1rem;
+  font-size: 0.9rem;
   color: var(--text-primary);
 }
 
@@ -51,6 +84,13 @@
 
 .mat-mdc-menu-item {
   color: var(--text-primary) !important;
-  height: 56px !important;
+  height: 48px !important;
   font-weight: 500 !important;
+  font-size: 0.9rem !important;
+}
+
+@media (max-width: 768px) {
+  .mat-mdc-menu-item {
+    height: 44px !important;
+  }
 }
