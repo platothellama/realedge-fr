@@ -88,7 +88,8 @@ export class DashboardComponent implements OnInit {
   }
 
   private processLeads(leads: any[]) {
-    this.totalLeads = leads.length;
+    const leadList = Array.isArray(leads) ? leads : [];
+    this.totalLeads = leadList.length;
     const sourceColors: { [key: string]: string } = {
       'Website': '#3b82f6',
       'Facebook': '#8b5cf6',
@@ -111,17 +112,18 @@ export class DashboardComponent implements OnInit {
 
     const statuses = ['New', 'Contacted', 'Qualified', 'Negotiation', 'Visit Scheduled'];
     this.leadConversionData = statuses.map(status => 
-      leads.filter(l => l.status === status).length
+      leadList.filter(l => l.status === status).length
     );
     this.conversionLabels = statuses;
   }
 
   private processDeals(deals: any[]) {
-    this.totalDeals = deals.length;
-    this.totalRevenue = deals.reduce((sum, d) => sum + (d.finalPrice || 0), 0);
-    this.totalCommission = deals.reduce((sum, d) => sum + (d.commission || 0), 0);
+    const dealList = Array.isArray(deals) ? deals : [];
+    this.totalDeals = dealList.length;
+    this.totalRevenue = dealList.reduce((sum, d) => sum + (d.finalPrice || 0), 0);
+    this.totalCommission = dealList.reduce((sum, d) => sum + (d.commission || 0), 0);
     
-    const recent = deals.slice(0, 5).map(d => ({
+    const recent = dealList.slice(0, 5).map(d => ({
       title: `Deal: ${d.title}`,
       time: this.getTimeAgo(d.createdAt),
       type: 'deal',
@@ -133,9 +135,10 @@ export class DashboardComponent implements OnInit {
   }
 
   private processProperties(properties: any[]) {
-    this.totalProperties = properties.length;
-    this.avgPrice = properties.length > 0 
-      ? properties.reduce((sum, p) => sum + Number(p.price || 0), 0) / properties.length 
+    const propList = Array.isArray(properties) ? properties : [];
+    this.totalProperties = propList.length;
+    this.avgPrice = propList.length > 0 
+      ? propList.reduce((sum, p) => sum + Number(p.price || 0), 0) / propList.length 
       : 0;
 
     const statusColors: { [key: string]: string } = {
@@ -146,7 +149,7 @@ export class DashboardComponent implements OnInit {
     };
     
     const statusCount: { [key: string]: number } = {};
-    properties.forEach(p => {
+    propList.forEach(p => {
       statusCount[p.status || 'Other'] = (statusCount[p.status || 'Other'] || 0) + 1;
     });
     
@@ -166,7 +169,7 @@ export class DashboardComponent implements OnInit {
     };
     
     const typeCount: { [key: string]: number } = {};
-    properties.forEach(p => {
+    propList.forEach(p => {
       typeCount[p.type || 'Other'] = (typeCount[p.type || 'Other'] || 0) + 1;
     });
     
@@ -178,7 +181,8 @@ export class DashboardComponent implements OnInit {
   }
 
   private processVisits(visits: any[]) {
-    const recent = visits.slice(0, 5).map(v => ({
+    const visitList = Array.isArray(visits) ? visits : [];
+    const recent = visitList.slice(0, 5).map(v => ({
       title: `Visit: ${v.title || 'Property Visit'}`,
       time: this.getTimeAgo(v.createdAt),
       type: 'visit',
@@ -190,7 +194,7 @@ export class DashboardComponent implements OnInit {
   }
 
   private processUsers(users: any) {
-    const userList = users?.users || users || [];
+    const userList = Array.isArray(users) ? users : (users?.users || []);
     this.topAgents = userList
       .filter((u: any) => u.role === 'Broker' || u.role === 'Agent')
       .slice(0, 5);

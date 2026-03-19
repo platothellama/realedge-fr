@@ -624,3 +624,255 @@ p {
   background-color: var(--primary) !important;
   border-color: var(--primary) !important;
 }
+
+/* ========================
+   CDK OVERLAY STYLES
+   ======================== */
+
+.cdk-overlay-container {
+  background: transparent !important;
+}
+
+.cdk-overlay-backdrop {
+  background: rgba(0, 0, 0, 0.7) !important;
+  backdrop-filter: blur(4px) !important;
+}
+
+.cdk-overlay-pane {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8) !important;
+}
+
+.cdk-overlay-connected-position-bounding-box {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.7) !important;
+}
+
+/* Menu Dropdown */
+.mat-mdc-menu-panel {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.7) !important;
+}
+
+.mat-mdc-menu-item {
+  color: var(--text-primary) !important;
+  font-family: 'Urbanist', sans-serif !important;
+}
+
+.mat-mdc-menu-item:hover {
+  background: var(--bg-elevated) !important;
+}
+
+.mat-mdc-menu-item .mat-icon {
+  color: var(--text-muted) !important;
+}
+
+/* Autocomplete Dropdown */
+.mat-mdc-autocomplete-panel {
+  background: var(--bg-elevated) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 10px !important;
+}
+
+.mat-mdc-autocomplete-option {
+  color: var(--text-primary) !important;
+  font-family: 'Urbanist', sans-serif !important;
+}
+
+.mat-mdc-autocomplete-option:hover,
+.mat-mdc-autocomplete-option.mdc-list-item--selected {
+  background: var(--bg-surface) !important;
+}
+
+/* Tooltip */
+.mat-mdc-tooltip {
+  background: var(--bg-elevated) !important;
+  color: var(--text-primary) !important;
+  font-family: 'Urbanist', sans-serif !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 8px !important;
+  font-size: 12px !important;
+}
+
+.mat-mdc-tooltip .mdc-tooltip__surface {
+  background: var(--bg-elevated) !important;
+  color: var(--text-primary) !important;
+  border-radius: 8px !important;
+}
+
+/* Snackbar */
+.mat-mdc-snack-bar-container {
+  background: var(--bg-elevated) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 12px !important;
+  color: var(--text-primary) !important;
+}
+
+.mat-mdc-snack-bar-label {
+  color: var(--text-primary) !important;
+  font-family: 'Urbanist', sans-serif !important;
+}
+
+/* Datepicker */
+.mat-datepicker-content {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 16px !important;
+}
+
+.mat-calendar {
+  background: var(--bg-surface) !important;
+  color: var(--text-primary) !important;
+}
+
+.mat-calendar-header {
+  background: var(--bg-elevated) !important;
+}
+
+.mat-calendar-body-cell-content {
+  color: var(--text-primary) !important;
+}
+
+.mat-calendar-body-selected {
+  background: var(--primary) !important;
+  color: white !important;
+}
+
+.mat-calendar-body-today {
+  border-color: var(--primary) !important;
+}
+
+/* Paginator */
+.mat-mdc-paginator {
+  background: transparent !important;
+  color: var(--text-secondary) !important;
+}
+
+.mat-mdc-paginator-page-size-label,
+.mat-mdc-paginator-range-label {
+  color: var(--text-secondary) !important;
+}
+
+.mat-mdc-icon-button {
+  color: var(--text-secondary) !important;
+}
+
+.mat-mdc-icon-button:hover {
+  background: var(--bg-elevated) !important;
+}
+
+/* Sort Header */
+.mat-sort-header-arrow {
+  color: var(--text-muted) !important;
+}
+
+/* Expansion Panel */
+.mat-expansion-panel {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 12px !important;
+}
+
+.mat-expansion-panel-header {
+  color: var(--text-primary) !important;
+}
+
+.mat-expansion-panel-header-title {
+  color: var(--text-primary) !important;
+  font-family: 'Urbanist', sans-serif !important;
+}
+
+.mat-expansion-panel-body {
+  color: var(--text-secondary) !important;
+}
+
+/* Slide Toggle */
+.mat-mdc-slide-toggle {
+  --mdc-switch-selected-track-color: var(--primary) !important;
+  --mdc-switch-selected-handle-color: white !important;
+  --mdc-switch-selected-hover-track-color: var(--primary-bright) !important;
+  --mdc-switch-selected-focus-track-color: var(--primary) !important;
+  --mdc-switch-selected-pressed-track-color: var(--primary) !important;
+}
+
+.mat-mdc-slide-toggle .mdc-label {
+  color: var(--text-primary) !important;
+  font-family: 'Urbanist', sans-serif !important;
+}
+
+/* Slider */
+.mat-mdc-slider {
+  --mdc-slider-handle-color: var(--primary) !important;
+  --mdc-slider-focus-handle-color: var(--primary-bright) !important;
+  --mdc-slider-hover-handle-color: var(--primary-bright) !important;
+  --mdc-slider-active-track-color: var(--primary) !important;
+  --mdc-slider-inactive-track-color: var(--bg-elevated) !important;
+  --mdc-slider-with-tick-marks-active-container-color: var(--primary) !important;
+  --mdc-slider-label-container-color: var(--primary) !important;
+}
+
+/* Progress Bar */
+.mat-mdc-progress-bar {
+  --mdc-linear-progress-active-indicator-color: var(--primary) !important;
+  --mdc-linear-progress-track-color: var(--bg-elevated) !important;
+}
+
+/* Progress Spinner */
+.mat-mdc-progress-spinner circle {
+  stroke: var(--primary) !important;
+}
+
+/* Chips */
+.mat-mdc-chip {
+  background: var(--bg-elevated) !important;
+  color: var(--text-primary) !important;
+  font-family: 'Urbanist', sans-serif !important;
+}
+
+.mat-mdc-chip-action-label {
+  color: var(--text-primary) !important;
+}
+
+.mat-mdc-chip-remove {
+  color: var(--text-muted) !important;
+}
+
+/* Form Field */
+.mat-mdc-form-field {
+  font-family: 'Urbanist', sans-serif !important;
+}
+
+.mat-mdc-form-field-focus-overlay {
+  background: transparent !important;
+}
+
+/* Badge */
+.mat-badge-content {
+  background: var(--primary) !important;
+  color: white !important;
+  font-family: 'Urbanist', sans-serif !important;
+}
+
+/* Divider */
+.mat-divider {
+  border-color: var(--border) !important;
+}
+
+/* Bottom Sheet */
+.mat-bottom-sheet-container {
+  background: var(--bg-surface) !important;
+  color: var(--text-primary) !important;
+  border-top-left-radius: 20px !important;
+  border-top-right-radius: 20px !important;
+}
+
+/* Simple Changes */
+.mat-mdc-simple-changes-cell {
+  background: var(--bg-surface) !important;
+}

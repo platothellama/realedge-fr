@@ -7,12 +7,11 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatExpansionModule } from '@angular/material/expansion';
-import { FormsModule } from '@angular/forms';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { ApiService } from '../../services/api';
+import { WizardSearchDialogComponent } from '../../components/wizard-search-dialog/wizard-search-dialog';
+import { NaturalSearchDialogComponent } from '../../components/natural-search-dialog/natural-search-dialog';
 
 @Component({
   selector: 'app-property-matcher',
@@ -25,10 +24,7 @@ import { ApiService } from '../../services/api';
     MatProgressSpinnerModule,
     MatChipsModule,
     MatTooltipModule,
-    MatExpansionModule,
-    FormsModule,
-    MatFormFieldModule,
-    MatInputModule,
+    MatDialogModule,
     MatSnackBarModule
   ],
   templateUrl: './property-matcher.html',
@@ -45,13 +41,11 @@ export class PropertyMatcherComponent implements OnInit {
   hasSearched = false;
   searchType: 'wizard' | 'natural' | null = null;
 
-  activeTab: 'wizard' | 'natural' = 'wizard';
-  nlQuery = '';
-
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private apiService: ApiService,
+    private dialog: MatDialog,
     private snackBar: MatSnackBar
   ) {}
 
@@ -78,13 +72,30 @@ export class PropertyMatcherComponent implements OnInit {
     });
   }
 
-  setActiveTab(tab: 'wizard' | 'natural') {
-    this.activeTab = tab;
+  openWizardSearch() {
+    const dialogRef = this.dialog.open(WizardSearchDialogComponent, {
+      data: { preference: this.preference },
+      panelClass: 'dark-dialog'
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result?.action === 'search') {
+        this.matchProperties();
+      }
+    });
   }
 
-  setNlQuery(query: string) {
-    this.nlQuery = query;
-    this.naturalLanguageSearch();
+  openNaturalSearch() {
+    const dialogRef = this.dialog.open(NaturalSearchDialogComponent, {
+      data: {},
+      panelClass: 'dark-dialog'
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result?.query) {
+        this.performNaturalSearch(result.query);
+      }
+    });
   }
 
   matchProperties() {
@@ -105,15 +116,11 @@ export class PropertyMatcherComponent implements OnInit {
     });
   }
 
-  naturalLanguageSearch() {
-    if (!this.nlQuery.trim()) {
-      return;
-    }
-
+  performNaturalSearch(query: string) {
     this.searchLoading = true;
     this.searchType = 'natural';
     this.apiService.naturalLanguageSearch({ 
-      query: this.nlQuery,
+      query: query,
       filters: {}
     }).subscribe({
       next: (data) => {
@@ -122,7 +129,7 @@ export class PropertyMatcherComponent implements OnInit {
         this.hasSearched = true;
         
         const parsed = data.parsedFilters || {};
-        let explanation = `Natural language search results for: "${this.nlQuery}"`;
+        let explanation = `Natural language search results for: "${query}"`;
         
         if (parsed.priceRange) {
           explanation += `\nPrice range detected: $${parsed.priceRange.min || 0} - $${parsed.priceRange.max || 'any'}`;
@@ -149,7 +156,6 @@ export class PropertyMatcherComponent implements OnInit {
     this.hasSearched = false;
     this.searchType = null;
     this.aiExplanation = '';
-    this.nlQuery = '';
   }
 
   getScoreClass(score: number): string {

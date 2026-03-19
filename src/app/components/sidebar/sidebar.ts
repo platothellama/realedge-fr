@@ -39,6 +39,7 @@ export class Sidebar {
       items.push({ label: 'Market Intelligence', icon: 'analytics', link: '/market' });
       items.push({ label: 'AI Insights', icon: 'psychology', link: '/ai-insights' });
       items.push({ label: 'Announcements', icon: 'campaign', link: '/announcements' });
+      items.push({ label: 'Organization', icon: 'admin_panel_settings', link: '/user-management' });
       // Website Builder - disabled for now
       // items.push({ label: 'Website Builder', icon: 'web', link: '/website-builder' });
     }

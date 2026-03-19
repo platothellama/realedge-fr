@@ -22,123 +22,37 @@
       </button>
     </div>
   } @else {
-    <div class="search-tabs">
-      <button class="tab-btn" [class.active]="activeTab === 'wizard'" (click)="setActiveTab('wizard')">
-        <mat-icon>tune</mat-icon>
-        <span>Wizard Search</span>
-        <small>Structured Filters</small>
-      </button>
-      <button class="tab-btn" [class.active]="activeTab === 'natural'" (click)="setActiveTab('natural')">
-        <mat-icon>psychology</mat-icon>
-        <span>Natural Language</span>
-        <small>AI Semantic Search</small>
-      </button>
+    <div class="search-options">
+      <mat-card class="search-card wizard-card" (click)="openWizardSearch()">
+        <mat-card-content>
+          <div class="card-icon">
+            <mat-icon>tune</mat-icon>
+          </div>
+          <div class="card-info">
+            <h3>Wizard Search</h3>
+            <p>Use structured filters like budget, bedrooms, location to find exact matches.</p>
+          </div>
+          <div class="card-action">
+            <mat-icon>open_in_new</mat-icon>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="search-card natural-card" (click)="openNaturalSearch()">
+        <mat-card-content>
+          <div class="card-icon">
+            <mat-icon>psychology</mat-icon>
+          </div>
+          <div class="card-info">
+            <h3>Natural Language Search</h3>
+            <p>Describe what you want in plain English and let AI find matching properties.</p>
+          </div>
+          <div class="card-action">
+            <mat-icon>open_in_new</mat-icon>
+          </div>
+        </mat-card-content>
+      </mat-card>
     </div>
-
-    @if (activeTab === 'wizard') {
-      <div class="tab-content wizard-content">
-        <mat-card class="wizard-card">
-          <mat-card-content>
-            <h3><mat-icon>tune</mat-icon> Wizard Search</h3>
-            <p class="tab-desc">Use structured filters to find properties that match your buyer's exact requirements.</p>
-            
-            @if (preference) {
-              <div class="filters-summary">
-                <h4>Current Filters:</h4>
-                <div class="filter-chips">
-                  @if (preference.budgetMin || preference.budgetMax) {
-                    <mat-chip class="filter-chip">
-                      <mat-icon>attach_money</mat-icon>
-                      ${{ preference.budgetMin || 0 }} - ${{ preference.budgetMax || 'any' }}
-                    </mat-chip>
-                  }
-                  @if (preference.bedrooms) {
-                    <mat-chip class="filter-chip">
-                      <mat-icon>bed</mat-icon>
-                      {{ preference.bedrooms }}+ bedrooms
-                    </mat-chip>
-                  }
-                  @if (preference.propertyType) {
-                    <mat-chip class="filter-chip">
-                      <mat-icon>home</mat-icon>
-                      {{ preference.propertyType }}
-                    </mat-chip>
-                  }
-                  @if (preference.bathrooms) {
-                    <mat-chip class="filter-chip">
-                      <mat-icon>bathtub</mat-icon>
-                      {{ preference.bathrooms }}+ bathrooms
-                    </mat-chip>
-                  }
-                  @if (preference.preferredLocations?.length) {
-                    <mat-chip class="filter-chip">
-                      <mat-icon>location_on</mat-icon>
-                      {{ preference.preferredLocations.join(', ') }}
-                    </mat-chip>
-                  }
-                  @if (preference.parkingRequired) {
-                    <mat-chip class="filter-chip">
-                      <mat-icon>local_parking</mat-icon>
-                      Parking required
-                    </mat-chip>
-                  }
-                  @if (!preference.budgetMin && !preference.budgetMax && !preference.bedrooms && !preference.propertyType && !preference.preferredLocations?.length) {
-                    <span class="no-filters">No specific filters set - will match all available properties</span>
-                  }
-                </div>
-              </div>
-            }
-            
-            <div class="wizard-actions">
-              <button mat-raised-button color="primary" (click)="matchProperties()" [disabled]="loading">
-                @if (loading) {
-                  <mat-spinner diameter="20"></mat-spinner>
-                  <span>Analyzing...</span>
-                } @else {
-                  <mat-icon>search</mat-icon>
-                  <span>Find Matching Properties</span>
-                }
-              </button>
-            </div>
-          </mat-card-content>
-        </mat-card>
-      </div>
-    }
-
-    @if (activeTab === 'natural') {
-      <div class="tab-content natural-content">
-        <mat-card class="natural-card">
-          <mat-card-content>
-            <h3><mat-icon>psychology</mat-icon> Natural Language Search</h3>
-            <p class="tab-desc">Describe what you're looking for in plain English. AI will understand and find matching properties.</p>
-            
-            <div class="suggestions">
-              <span class="suggestion-label">Try:</span>
-              <button class="suggestion-chip" (click)="setNlQuery('apartment under $500k in Beirut')">apartment under $500k in Beirut</button>
-              <button class="suggestion-chip" (click)="setNlQuery('3 bedroom villa with pool')">3 bedroom villa with pool</button>
-              <button class="suggestion-chip" (click)="setNlQuery('modern office near downtown')">modern office near downtown</button>
-            </div>
-            
-            <div class="search-box">
-              <mat-form-field appearance="outline" class="search-input">
-                <mat-label>Describe your ideal property</mat-label>
-                <input matInput [(ngModel)]="nlQuery" (keyup.enter)="naturalLanguageSearch()" 
-                  placeholder="e.g., modern apartment under $300k with parking near beach">
-                <mat-icon matPrefix>search</mat-icon>
-              </mat-form-field>
-              <button mat-raised-button color="primary" (click)="naturalLanguageSearch()" [disabled]="searchLoading || !nlQuery.trim()">
-                @if (searchLoading) {
-                  <mat-spinner diameter="20"></mat-spinner>
-                } @else {
-                  <mat-icon>search</mat-icon>
-                  Search
-                }
-              </button>
-            </div>
-          </mat-card-content>
-        </mat-card>
-      </div>
-    }
 
     @if (loading || searchLoading) {
       <div class="loading-container">
@@ -147,7 +61,7 @@
       </div>
     }
 
-    @if (!loading && !searchLoading && matches.length > 0) {
+    @if (!loading && !searchLoading && hasSearched && matches.length > 0) {
       <div class="results-section">
         <div class="results-header">
           <div class="results-info">
@@ -160,12 +74,10 @@
             </h2>
             <p>{{ totalFound }} properties found, showing {{ matches.length }} matches</p>
           </div>
-          @if (searchType) {
-            <button mat-stroked-button (click)="clearResults()">
-              <mat-icon>add</mat-icon>
-              New Search
-            </button>
-          }
+          <button mat-stroked-button (click)="clearResults()">
+            <mat-icon>add</mat-icon>
+            New Search
+          </button>
         </div>
 
         @if (aiExplanation) {
@@ -287,11 +199,7 @@
       <div class="empty-state">
         <mat-icon>search_off</mat-icon>
         <h3>No matching properties found</h3>
-        <p>Try adjusting the search criteria or switch to Natural Language search.</p>
-        <button mat-raised-button color="primary" (click)="setActiveTab('natural')">
-          <mat-icon>psychology</mat-icon>
-          Try Natural Language Search
-        </button>
+        <p>Try adjusting the search criteria.</p>
       </div>
     }
   }
