@@ -634,9 +634,16 @@ p {
    CDK OVERLAY STYLES
    ======================== */
 
-.cdk-overlay-container,
-.cdk-overlay-container * {
-  pointer-events: none;
+.cdk-overlay-container {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  pointer-events: none !important;
+  z-index: 1000 !important;
 }
 
 .cdk-overlay-backdrop,
@@ -644,8 +651,7 @@ p {
 .mat-drawer-backdrop,
 .mat-dialog-backdrop,
 .mdc-dialog__scrim,
-.mat-mdc-dialog-backdrop,
-.cdk-overlay-backdrop-showing {
+.mat-mdc-dialog-backdrop {
   position: fixed !important;
   top: 0 !important;
   left: 0 !important;
@@ -683,7 +689,24 @@ p {
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8) !important;
   max-height: 90vh !important;
   max-width: 90vw !important;
-  overflow: hidden !important;
+  overflow: auto !important;
+  pointer-events: all !important;
+}
+
+/* Ensure all dialog content is clickable */
+.cdk-overlay-pane,
+.mdc-dialog__surface {
+  pointer-events: all !important;
+}
+
+.cdk-overlay-pane > *,
+.mdc-dialog__surface > * {
+  pointer-events: all !important;
+}
+
+.dark-dialog .cdk-overlay-pane > *,
+.dark-dialog .mdc-dialog__surface > * {
+  pointer-events: all !important;
 }
 
 /* Menu Dropdown */
