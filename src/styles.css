@@ -662,7 +662,7 @@ p {
   opacity: 1 !important;
 }
 
-/* Menu panels should be clickable - override the container */
+/* Menu panels should be clickable */
 .cdk-overlay-pane {
   pointer-events: all !important;
   position: relative !important;
@@ -718,26 +718,12 @@ p {
   transform: none !important;
 }
 
-.mat-mdc-menu-panel:not(.mat-mdc-menu-panel-below) {
-  transform-origin: top right !important;
-}
-
-.cdk-overlay-pane:has(> .mat-mdc-menu-panel) {
-  position: relative !important;
-  pointer-events: auto !important;
-  transform: none !important;
-}
-
-.cdk-overlay-pane:has(> .mat-mdc-menu-panel) > .mat-mdc-menu-panel {
-  position: relative !important;
-  top: auto !important;
-  left: auto !important;
-  right: auto !important;
-  bottom: auto !important;
-  transform: none !important;
-  box-shadow: none !important;
-  border: none !important;
-  margin: 8px !important;
+/* Hide backdrop for menus - it blocks clicks */
+.cdk-overlay-backdrop:not(.mat-drawer-backdrop):not(.mat-dialog-backdrop):not(.mdc-dialog__scrim):not(.mat-mdc-dialog-backdrop) {
+  visibility: hidden !important;
+  pointer-events: none !important;
+  opacity: 0 !important;
+  background: transparent !important;
 }
 
 /* Menu Items */
@@ -775,6 +761,24 @@ p {
 .mat-divider {
   border-color: var(--border) !important;
   margin: 8px 0 !important;
+}
+
+/* Menu panel connected position */
+.cdk-overlay-pane:has(> .mat-mdc-menu-panel) {
+  position: relative !important;
+  transform: none !important;
+}
+
+.cdk-overlay-pane:has(> .mat-mdc-menu-panel) > .mat-mdc-menu-panel {
+  position: relative !important;
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  transform: none !important;
+  box-shadow: none !important;
+  border: none !important;
+  margin: 8px !important;
 }
 
 /* Autocomplete Dropdown */
