@@ -48,6 +48,7 @@ export class BuyerPreferencesComponent implements OnInit {
   preferences: any[] = [];
   leads: any[] = [];
   loading = false;
+  saving = false;
   showForm = false;
   editingPreference: any = null;
 
@@ -184,6 +185,12 @@ export class BuyerPreferencesComponent implements OnInit {
   }
 
   savePreference() {
+    if (!this.formData.clientName?.trim()) {
+      this.showError('Client name is required');
+      return;
+    }
+    
+    this.saving = true;
     const data: any = {
       leadId: this.formData.leadId,
       createNewLead: this.formData.createNewLead,
@@ -200,9 +207,11 @@ export class BuyerPreferencesComponent implements OnInit {
           this.showSuccess('Buyer preference updated');
           this.fetchPreferences();
           this.closeForm();
+          this.saving = false;
         },
         error: (err) => {
           this.showError('Failed to update preference');
+          this.saving = false;
         }
       });
     } else {
@@ -211,9 +220,11 @@ export class BuyerPreferencesComponent implements OnInit {
           this.showSuccess('Buyer preference created');
           this.fetchPreferences();
           this.closeForm();
+          this.saving = false;
         },
         error: (err) => {
           this.showError('Failed to create preference');
+          this.saving = false;
         }
       });
     }

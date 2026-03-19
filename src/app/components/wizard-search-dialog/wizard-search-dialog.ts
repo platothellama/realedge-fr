@@ -155,8 +155,8 @@ interface WizardFilters {
       </div>
 
       <div class="dialog-actions">
-        <button mat-button (click)="close()">Cancel</button>
-        <button mat-raised-button color="primary" (click)="search()" [disabled]="loading">
+        <button mat-button (click)="close()" [disabled]="loading">Cancel</button>
+        <button mat-raised-button color="primary" (click)="search()" [disabled]="loading" [class.loading]="loading">
           @if (loading) {
             <mat-spinner diameter="20"></mat-spinner>
             <span>Searching...</span>

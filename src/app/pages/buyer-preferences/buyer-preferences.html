@@ -182,9 +182,13 @@
       </div>
 
       <div class="modal-footer">
-        <button mat-button (click)="closeForm()">Cancel</button>
-        <button mat-raised-button color="primary" (click)="savePreference()">
-          {{ editingPreference ? 'Update' : 'Create' }}
+        <button mat-button (click)="closeForm()" [disabled]="saving">Cancel</button>
+        <button mat-raised-button color="primary" (click)="savePreference()" [disabled]="saving" [class.loading]="saving">
+          @if (saving) {
+            <mat-spinner diameter="20"></mat-spinner>
+          } @else {
+            {{ editingPreference ? 'Update' : 'Create' }}
+          }
         </button>
       </div>
     </div>

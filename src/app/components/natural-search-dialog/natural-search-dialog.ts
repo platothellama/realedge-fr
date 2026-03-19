@@ -62,8 +62,8 @@ import { ApiService } from '../../services/api';
       </div>
 
       <div class="dialog-actions">
-        <button mat-stroked-button (click)="close()">Cancel</button>
-        <button mat-raised-button color="primary" (click)="search()" [disabled]="!query.trim() || loading">
+        <button mat-stroked-button (click)="close()" [disabled]="loading">Cancel</button>
+        <button mat-raised-button color="primary" (click)="search()" [disabled]="!query.trim() || loading" [class.loading]="loading">
           @if (loading) {
             <mat-spinner diameter="20"></mat-spinner>
             <span>Searching...</span>
