@@ -1,202 +1,145 @@
-<div class="properties-container">
-  <div class="header-section">
+<div class="page">
+  <div class="page-header">
     <div>
-      <h1>Property Listings</h1>
-      <p>Manage and track all real estate assets.</p>
+      <h1>Properties</h1>
+      <p>{{ pagination.totalItems }} listings</p>
     </div>
-    <button mat-raised-button color="primary" class="create-btn" (click)="openPropertyForm()">
-      <mat-icon>add_home</mat-icon>
-      List New Property
-    </button>
+    <div class="header-actions">
+      <button mat-stroked-button class="btn-outline" (click)="seedProperties()" [disabled]="seeding">
+        @if (seeding) {
+          <mat-spinner diameter="16"></mat-spinner>
+        } @else {
+          <mat-icon>auto_awesome</mat-icon>
+        }
+        Seed Data
+      </button>
+      <button mat-raised-button color="primary" (click)="openPropertyForm()">
+        <mat-icon>add</mat-icon>
+        Add Property
+      </button>
+    </div>
   </div>
 
-  <div class="filter-bar">
-
-    <span class="spacer"></span>
-
-    <div class="map-search-tools" style="display: flex; gap: 16px; align-items: center;">
-      <button mat-stroked-button color="primary" class="filter-toggle-btn" (click)="isFiltersExpanded = !isFiltersExpanded">
-        <mat-icon>{{ isFiltersExpanded ? 'expand_less' : 'tune' }}</mat-icon>
-        Filters
-      </button>
-
-      @if (isMapView) {
-        <mat-form-field appearance="outline" class="distance-input no-subscript">
-          <mat-label>Radius (km)</mat-label>
-          <input matInput type="number" [(ngModel)]="searchRadius" (ngModelChange)="applyMapFilter()">
-        </mat-form-field>
-      }
-
-      <button mat-stroked-button color="primary" class="map-toggle-btn" (click)="toggleMapView()">
-        <mat-icon>{{ isMapView ? 'view_list' : 'map' }}</mat-icon>
-        {{ isMapView ? 'List View' : 'Map Search' }}
-      </button>
-
-      <div class="search-box">
+  <div class="toolbar">
+    <div class="toolbar-left">
+      <div class="search-input">
         <mat-icon>search</mat-icon>
-        <input type="text" placeholder="Search properties..." [(ngModel)]="searchQuery" (ngModelChange)="applyMapFilter()">
+        <input type="text" placeholder="Search properties..." [(ngModel)]="searchQuery" (keyup.enter)="applyFilters()">
         @if (searchQuery) {
-          <button mat-icon-button (click)="searchQuery = ''; applyMapFilter()">
+          <button mat-icon-button (click)="searchQuery = ''; applyFilters()">
             <mat-icon>close</mat-icon>
           </button>
         }
       </div>
+      <mat-form-field appearance="outline" class="filter-select">
+        <mat-select [(ngModel)]="selectedStatus" (selectionChange)="applyFilters()">
+          <mat-option value="All">All Status</mat-option>
+          <mat-option value="Available">Available</mat-option>
+          <mat-option value="Sold">Sold</mat-option>
+          <mat-option value="Reserved">Reserved</mat-option>
+          <mat-option value="Rented">Rented</mat-option>
+        </mat-select>
+      </mat-form-field>
     </div>
-  </div>
-
-  <mat-card class="advanced-filters-panel" *ngIf="isFiltersExpanded">
-    <div class="filters-grid">
-      <div class="filter-group">
-        <label>Price Range</label>
-        <div class="input-row">
-          <input type="number" placeholder="Min Price" [(ngModel)]="minPrice" (ngModelChange)="applyMapFilter()">
-          <span>-</span>
-          <input type="number" placeholder="Max Price" [(ngModel)]="maxPrice" (ngModelChange)="applyMapFilter()">
-        </div>
-      </div>
-
-      <div class="filter-group">
-        <label>Status</label>
-        <mat-form-field appearance="outline" class="no-subscript">
-          <mat-select [(ngModel)]="selectedStatus" (selectionChange)="applyMapFilter()">
-            <mat-option value="All">All Statuses</mat-option>
-            <mat-option value="Available">Available</mat-option>
-            <mat-option value="Sold">Sold</mat-option>
-            <mat-option value="Reserved">Reserved</mat-option>
-            <mat-option value="Rented">Rented</mat-option>
-          </mat-select>
-        </mat-form-field>
-      </div>
-
-      <div class="filter-group">
-        <label>Min Bedrooms</label>
-        <div class="bedroom-selector">
-          @for (num of [1,2,3,4,5]; track num) {
-            <button class="bed-btn" [class.active]="minBedrooms === num" (click)="minBedrooms = num; applyMapFilter()">
-              {{ num }}+
-            </button>
-          }
-          <button class="bed-btn" [class.active]="minBedrooms === null" (click)="minBedrooms = null; applyMapFilter()">Any</button>
-        </div>
-      </div>
-
-      <div class="filter-group">
-        <label>Area (sqm)</label>
-        <div class="input-row">
-          <input type="number" placeholder="Min Area" [(ngModel)]="minArea" (ngModelChange)="applyMapFilter()">
-          <span>-</span>
-          <input type="number" placeholder="Max Area" [(ngModel)]="maxArea" (ngModelChange)="applyMapFilter()">
-        </div>
-      </div>
-    </div>
-
-    <div class="filter-actions">
-      <button mat-button color="warn" (click)="clearFilters()">
-        <mat-icon>refresh</mat-icon> Reset Filters
+    <div class="toolbar-right">
+      <button mat-icon-button [matMenuTriggerFor]="bedMenu" class="filter-btn">
+        <mat-icon>bed</mat-icon>
+        @if (minBedrooms) { <span class="filter-badge">{{ minBedrooms }}+</span> }
+      </button>
+      <mat-menu #bedMenu="matMenu">
+        <button mat-menu-item (click)="minBedrooms = null; applyFilters()">Any</button>
+        @for (num of [1,2,3,4,5]; track num) {
+          <button mat-menu-item (click)="minBedrooms = num; applyFilters()">{{ num }}+ Bedrooms</button>
+        }
+      </mat-menu>
+      <button mat-icon-button (click)="clearFilters()" [disabled]="!searchQuery && selectedStatus === 'All' && !minBedrooms">
+        <mat-icon>filter_list_off</mat-icon>
       </button>
     </div>
-  </mat-card>
-
-  @if (isMapView) {
-    <mat-card class="map-view-card" style="margin-bottom: 40px; padding: 20px;">
-      <h3 style="margin-top:0">Select a point on the map to find properties within {{searchRadius}} km!</h3>
-      <google-map
-        height="500px"
-        width="100%"
-        [center]="mapCenter"
-        [zoom]="mapZoom"
-        [options]="mapOptions"
-        (mapClick)="onMainMapClick($event)">
-
-        @if (searchCenterMarker) {
-          <map-marker [position]="searchCenterMarker" [options]="{icon: 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'}"></map-marker>
-          <map-circle
-            [center]="searchCenterMarker"
-            [radius]="searchRadius * 1000"
-            [options]="circleOptions">
-          </map-circle>
-        }
-
-        @for (prop of filteredProperties; track prop.id) {
-          @if (prop.lat && prop.lng) {
-            <map-marker
-              [position]="{lat: parseNumber(prop.lat), lng: parseNumber(prop.lng)}"
-              [title]="prop.title"
-              (mapClick)="openPropertyDetails(prop)">
-            </map-marker>
-          }
-        }
-      </google-map>
-    </mat-card>
-  }
-
-  <div class="properties-grid" *ngIf="!isMapView">
-    @for (prop of filteredProperties; track prop.id) {
-      <mat-card class="property-card" (click)="openPropertyDetails(prop)">
-        <div class="property-image" [style.backgroundImage]="'url(' + (prop.photos?.length ? prop.photos[0] : 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=800&q=80') + ')'">
-          <span class="status-badge" [class.available]="prop.status === 'Available'"
-                                      [class.sold]="prop.status === 'Sold'"
-                                      [class.pending]="prop.status === 'Reserved'"
-                                      [class.rented]="prop.status === 'Rented'">
-            {{ prop.status }}
-          </span>
-        </div>
-        <div class="property-content">
-          <div class="card-header">
-            <span class="property-type">{{ prop.type }}</span>
-            <span class="property-price">${{ prop.price | number }}</span>
-          </div>
-          <h3 class="property-title text-truncate">{{ prop.title }}</h3>
-          <p class="property-address">
-            <mat-icon>location_on</mat-icon>
-            {{ prop.address }}, {{ prop.city }}
-          </p>
-          <div class="property-features">
-            <span><mat-icon>bed</mat-icon> {{ prop.bedrooms }} Bed</span>
-            <span><mat-icon>bathtub</mat-icon> {{ prop.bathrooms }} Bath</span>
-            <span><mat-icon>square_foot</mat-icon> {{ prop.area }} sqm</span>
-          </div>
-
-          <!-- Assignment Info -->
-          @if (prop.assignedUser || prop.assignedGroup) {
-            <div class="property-assignment">
-              @if (prop.assignedUser) {
-                <img [src]="prop.assignedUser.photo || 'https://ui-avatars.com/api/?name=' + prop.assignedUser.name" alt="Assigned User">
-                <div class="assignment-info">
-                  <span class="assigned-to-label">Assigned To</span>
-                  <span class="assigned-to-name">{{ prop.assignedUser.name }}</span>
-                </div>
-              } @else if (prop.assignedGroup) {
-                <mat-icon style="font-size: 24px; width: 24px; height: 24px; color: var(--primary);">group</mat-icon>
-                <div class="assignment-info">
-                  <span class="assigned-to-label">Assigned Group</span>
-                  <span class="assigned-to-name">{{ prop.assignedGroup.name }}</span>
-                </div>
-              }
-            </div>
-          }
-
-          <!-- Negotiation History Insight -->
-          @if (prop.priceHistoryEntries?.length > 1) {
-            <div class="negotiation-badge">
-              <mat-icon>analytics</mat-icon>
-              <span>{{ prop.priceHistoryEntries.length }} negotiation stages</span>
-            </div>
-          }
-        </div>
-        <mat-card-actions align="end">
-          <button mat-button class="edit-card-btn" (click)="openPropertyForm(prop); $event.stopPropagation()">
-            <mat-icon>edit</mat-icon> Edit
-          </button>
-          <button mat-icon-button color="warn" class="delete-card-btn" (click)="deleteProperty(prop.id); $event.stopPropagation()" [disabled]="isDeleting(prop.id)">
-            @if (isDeleting(prop.id)) {
-              <mat-spinner diameter="18"></mat-spinner>
-            } @else {
-              <mat-icon>delete_outline</mat-icon>
-            }
-          </button>
-        </mat-card-actions>
-      </mat-card>
-    }
   </div>
+
+  @if (loading) {
+    <div class="loading-grid">
+      @for (i of [1,2,3,4,5,6]; track i) {
+        <div class="skeleton-card">
+          <div class="skeleton-image"></div>
+          <div class="skeleton-body">
+            <div class="skeleton-line w-50"></div>
+            <div class="skeleton-line w-75"></div>
+            <div class="skeleton-line w-60"></div>
+          </div>
+        </div>
+      }
+    </div>
+  } @else if (properties.length === 0) {
+    <div class="empty-state">
+      <mat-icon>apartment</mat-icon>
+      <h3>No properties found</h3>
+      <p>Adjust your search or add a new property</p>
+    </div>
+  } @else {
+    <div class="properties-grid">
+      @for (prop of properties; track prop.id) {
+        <div class="property-card" (click)="openPropertyDetails(prop)">
+          <div class="card-image">
+            <img [src]="prop.photos?.length ? prop.photos[0] : 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80'" alt="">
+            <div class="card-badges">
+              <span class="badge-status" [class]="prop.status?.toLowerCase()">{{ prop.status }}</span>
+              <span class="badge-type">{{ prop.type }}</span>
+            </div>
+            <div class="card-overlay">
+              <button mat-icon-button (click)="openPropertyForm(prop); $event.stopPropagation()">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button (click)="deleteProperty(prop.id); $event.stopPropagation()">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </div>
+          <div class="card-content">
+            <div class="card-price">${{ prop.price | number }}</div>
+            <h3 class="card-title">{{ prop.title }}</h3>
+            <p class="card-location">
+              <mat-icon>place</mat-icon>
+              {{ prop.city }}
+            </p>
+            <div class="card-specs">
+              <span><mat-icon>bed</mat-icon>{{ prop.bedrooms }}</span>
+              <span><mat-icon>bathtub</mat-icon>{{ prop.bathrooms }}</span>
+              <span><mat-icon>square</mat-icon>{{ prop.area }}m²</span>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="pagination">
+      <span class="pagination-info">
+        Showing {{ ((pagination.page - 1) * pagination.limit) + 1 }}-{{ Math.min(pagination.page * pagination.limit, pagination.totalItems) }} of {{ pagination.totalItems }} properties
+      </span>
+      <div class="pagination-controls">
+        <button mat-icon-button [disabled]="pagination.page === 1" (click)="pagination.page = 1; fetchProperties()">
+          <mat-icon>first_page</mat-icon>
+        </button>
+        <button mat-icon-button [disabled]="pagination.page === 1" (click)="pagination.page = pagination.page - 1; fetchProperties()">
+          <mat-icon>chevron_left</mat-icon>
+        </button>
+        @for (page of getPageNumbers(); track page) {
+          @if (page === -1) {
+            <span class="page-ellipsis">...</span>
+          } @else {
+            <button mat-button [class.active]="page === pagination.page" (click)="pagination.page = page; fetchProperties()">
+              {{ page }}
+            </button>
+          }
+        }
+        <button mat-icon-button [disabled]="pagination.page === pagination.totalPages" (click)="pagination.page = pagination.page + 1; fetchProperties()">
+          <mat-icon>chevron_right</mat-icon>
+        </button>
+        <button mat-icon-button [disabled]="pagination.page === pagination.totalPages" (click)="pagination.page = pagination.totalPages; fetchProperties()">
+          <mat-icon>last_page</mat-icon>
+        </button>
+      </div>
+    </div>
+  }
 </div>

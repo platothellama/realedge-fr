@@ -1294,3 +1294,7 @@ button.loading mat-spinner {
   display: none !important;
 }
 
+.page {
+  padding: 16px;
+}
+

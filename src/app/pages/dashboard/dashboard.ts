@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -6,18 +6,19 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { forkJoin } from 'rxjs';
 import { AuthService } from '../../services/auth/auth.service';
 import { ApiService } from '../../services/api';
-import { DonutChartComponent, BarChartComponent, LineChartComponent } from '../../components/charts/charts';
+import { DonutChartComponent, LineChartComponent } from '../../components/charts/charts';
+import { NgClass } from '@angular/common';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
   imports: [
     CommonModule,
+    NgClass,
     MatCardModule,
     MatIconModule,
     MatProgressSpinnerModule,
     DonutChartComponent,
-    BarChartComponent,
     LineChartComponent
   ],
   templateUrl: './dashboard.html',
@@ -28,29 +29,36 @@ export class DashboardComponent implements OnInit {
   private api = inject(ApiService);
   user = this.auth.currentUser;
 
-  stats: any[] = [];
-  recentActivities: any[] = [];
-  topAgents: any[] = [];
-  negotiations: any[] = [];
   loading = true;
   chartLoading = true;
 
+  overview = {
+    totalProperties: 0,
+    totalLeads: 0,
+    totalDeals: 0,
+    totalUsers: 0,
+    hotLeads: 0,
+    totalRevenue: 0,
+    pendingCommissions: 0,
+    thisMonthRevenue: 0,
+    totalExpenses: 0,
+    netProfit: 0
+  };
+
   propertyStatusData: { label: string; value: number; color: string }[] = [];
+  propertyTypeData: { label: string; value: number; color: string }[] = [];
   leadSourcesData: { label: string; value: number; color: string }[] = [];
-  propertiesByTypeData: { label: string; value: number; color: string }[] = [];
-  monthlyRevenueData: number[] = [];
+  leadStatusData: { label: string; value: number; color: string }[] = [];
+  monthlyRevenueData: { label: string; value: number }[] = [];
   monthlyLabels: string[] = [];
-  leadConversionData: number[] = [];
-  conversionLabels: string[] = [];
+  monthlyValues: number[] = [];
 
-  totalRevenue = 0;
-  totalCommission = 0;
-  totalProperties = 0;
-  totalLeads = 0;
-  totalDeals = 0;
-  avgPrice = 0;
+  recentProperties: any[] = [];
+  recentLeads: any[] = [];
+  recentDeals: any[] = [];
+  topAgents: any[] = [];
 
-  constructor() {}
+  recentActivities: any[] = [];
 
   ngOnInit() {
     this.loadDashboardData();
@@ -60,22 +68,29 @@ export class DashboardComponent implements OnInit {
     this.loading = true;
     this.chartLoading = true;
 
-    forkJoin({
-      dashboardStats: this.api.getDashboardStats(),
-      leads: this.api.getLeads(),
-      deals: this.api.getDeals(),
-      properties: this.api.getProperties(),
-      visits: this.api.getVisits(),
-      users: this.api.getUsers()
-    }).subscribe({
-      next: (data) => {
-        this.stats = data.dashboardStats;
-        this.processLeads(data.leads);
-        this.processDeals(data.deals);
-        this.processProperties(data.properties);
-        this.processVisits(data.visits);
-        this.processUsers(data.users);
-        this.generateMockChartData();
+    this.api.getDashboardStats().subscribe({
+      next: (data: any) => {
+        if (data) {
+          this.overview = data.overview || this.overview;
+          this.propertyStatusData = data.charts?.propertyByStatus || [];
+          this.propertyTypeData = data.charts?.propertyByType || [];
+          this.leadSourcesData = data.charts?.leadBySource || [];
+          this.leadStatusData = data.charts?.leadByStatus || [];
+          
+          if (data.charts?.monthlyRevenue?.length > 0) {
+            this.monthlyLabels = data.charts.monthlyRevenue.map((m: any) => this.formatMonthLabel(m.label));
+            this.monthlyValues = data.charts.monthlyRevenue.map((m: any) => m.value || 0);
+          } else {
+            this.generateEmptyChart();
+          }
+
+          this.recentProperties = data.recent?.properties || [];
+          this.recentLeads = data.recent?.leads || [];
+          this.recentDeals = data.recent?.deals || [];
+          this.topAgents = data.topAgents || [];
+
+          this.buildRecentActivities();
+        }
         this.loading = false;
         this.chartLoading = false;
       },
@@ -83,127 +98,58 @@ export class DashboardComponent implements OnInit {
         console.error('Dashboard error:', err);
         this.loading = false;
         this.chartLoading = false;
+        this.generateEmptyChart();
       }
     });
   }
 
-  private processLeads(leads: any[]) {
-    const leadList = Array.isArray(leads) ? leads : [];
-    this.totalLeads = leadList.length;
-    const sourceColors: { [key: string]: string } = {
-      'Website': '#3b82f6',
-      'Facebook': '#8b5cf6',
-      'Google Ads': '#f59e0b',
-      'Referral': '#10b981',
-      'Walk-in': '#ef4444',
-      'Other': '#64748b'
-    };
-    
-    const sourceCount: { [key: string]: number } = {};
-    leads.forEach(l => {
-      sourceCount[l.source || 'Other'] = (sourceCount[l.source || 'Other'] || 0) + 1;
+  private buildRecentActivities() {
+    const activities: any[] = [];
+
+    this.recentProperties.forEach((p: any) => {
+      activities.push({
+        title: `New listing: ${p.title}`,
+        time: p.createdAt,
+        icon: 'home',
+        type: 'property'
+      });
     });
-    
-    this.leadSourcesData = Object.entries(sourceCount).map(([source, count]) => ({
-      label: source,
-      value: count,
-      color: sourceColors[source] || '#64748b'
-    }));
 
-    const statuses = ['New', 'Contacted', 'Qualified', 'Negotiation', 'Visit Scheduled'];
-    this.leadConversionData = statuses.map(status => 
-      leadList.filter(l => l.status === status).length
-    );
-    this.conversionLabels = statuses;
-  }
+    this.recentLeads.forEach((l: any) => {
+      activities.push({
+        title: `New lead: ${l.name}`,
+        time: l.createdAt,
+        icon: 'person_add',
+        type: 'lead'
+      });
+    });
 
-  private processDeals(deals: any[]) {
-    const dealList = Array.isArray(deals) ? deals : [];
-    this.totalDeals = dealList.length;
-    this.totalRevenue = dealList.reduce((sum, d) => sum + (d.finalPrice || 0), 0);
-    this.totalCommission = dealList.reduce((sum, d) => sum + (d.commission || 0), 0);
-    
-    const recent = dealList.slice(0, 5).map(d => ({
-      title: `Deal: ${d.title}`,
-      time: this.getTimeAgo(d.createdAt),
-      type: 'deal',
-      icon: 'handshake'
-    }));
-    this.recentActivities = [...this.recentActivities, ...recent]
+    this.recentDeals.forEach((d: any) => {
+      activities.push({
+        title: `Deal: ${d.title}`,
+        time: d.createdAt,
+        icon: 'handshake',
+        type: 'deal'
+      });
+    });
+
+    this.recentActivities = activities
+      .filter(a => a.time)
       .sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime())
       .slice(0, 10);
   }
 
-  private processProperties(properties: any[]) {
-    const propList = Array.isArray(properties) ? properties : [];
-    this.totalProperties = propList.length;
-    this.avgPrice = propList.length > 0 
-      ? propList.reduce((sum, p) => sum + Number(p.price || 0), 0) / propList.length 
-      : 0;
-
-    const statusColors: { [key: string]: string } = {
-      'Available': '#10b981',
-      'Reserved': '#f59e0b',
-      'Sold': '#ef4444',
-      'Rented': '#3b82f6'
-    };
-    
-    const statusCount: { [key: string]: number } = {};
-    propList.forEach(p => {
-      statusCount[p.status || 'Other'] = (statusCount[p.status || 'Other'] || 0) + 1;
-    });
-    
-    this.propertyStatusData = Object.entries(statusCount).map(([status, count]) => ({
-      label: status,
-      value: count,
-      color: statusColors[status] || '#64748b'
-    }));
-
-    const typeColors: { [key: string]: string } = {
-      'Apartment': '#3b82f6',
-      'House': '#10b981',
-      'Villa': '#8b5cf6',
-      'Office': '#f59e0b',
-      'Land': '#ef4444',
-      'Commercial': '#06b6d4'
-    };
-    
-    const typeCount: { [key: string]: number } = {};
-    propList.forEach(p => {
-      typeCount[p.type || 'Other'] = (typeCount[p.type || 'Other'] || 0) + 1;
-    });
-    
-    this.propertiesByTypeData = Object.entries(typeCount).map(([type, count]) => ({
-      label: type,
-      value: count,
-      color: typeColors[type] || '#64748b'
-    }));
+  private formatMonthLabel(monthStr: string): string {
+    if (!monthStr) return '';
+    const [year, month] = monthStr.split('-');
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return months[parseInt(month) - 1] || monthStr;
   }
 
-  private processVisits(visits: any[]) {
-    const visitList = Array.isArray(visits) ? visits : [];
-    const recent = visitList.slice(0, 5).map(v => ({
-      title: `Visit: ${v.title || 'Property Visit'}`,
-      time: this.getTimeAgo(v.createdAt),
-      type: 'visit',
-      icon: 'calendar_today'
-    }));
-    this.recentActivities = [...this.recentActivities, ...recent]
-      .sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime())
-      .slice(0, 10);
-  }
-
-  private processUsers(users: any) {
-    const userList = Array.isArray(users) ? users : (users?.users || []);
-    this.topAgents = userList
-      .filter((u: any) => u.role === 'Broker' || u.role === 'Agent')
-      .slice(0, 5);
-  }
-
-  private generateMockChartData() {
+  private generateEmptyChart() {
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
     this.monthlyLabels = months;
-    this.monthlyRevenueData = months.map(() => Math.floor(Math.random() * 500000) + 100000);
+    this.monthlyValues = [0, 0, 0, 0, 0, 0];
   }
 
   getTimeAgo(dateString: string): string {
@@ -222,37 +168,26 @@ export class DashboardComponent implements OnInit {
     return date.toLocaleDateString();
   }
 
-  formatCurrency(value: number): string {
+  formatCurrency(value: number | undefined): string {
+    if (!value) return '$0';
     if (value >= 1000000) return `$${(value / 1000000).toFixed(1)}M`;
     if (value >= 1000) return `$${(value / 1000).toFixed(0)}K`;
     return `$${value}`;
   }
 
-  get conversionBarData() {
-    const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
-    return this.conversionLabels.map((label, i) => ({
-      label,
-      value: this.leadConversionData[i] || 0,
-      color: colors[i % colors.length]
-    }));
-  }
-
-  getStatusColor(status: string): string {
-    const colors: { [key: string]: string } = {
-      'Available': '#10b981',
-      'Reserved': '#f59e0b',
-      'Sold': '#ef4444',
-      'Rented': '#6366f1'
+  getStatusClass(status: string): string {
+    const classes: { [key: string]: string } = {
+      'Available': 'badge-success',
+      'Reserved': 'badge-warning',
+      'Sold': 'badge-danger',
+      'Rented': 'badge-info',
+      'New': 'badge-primary',
+      'Contacted': 'badge-primary',
+      'Qualified': 'badge-success',
+      'Hot': 'badge-danger',
+      'Negotiation': 'badge-warning',
+      'Closed': 'badge-success'
     };
-    return colors[status] || '#64748b';
-  }
-
-  getActivityIcon(type: string): string {
-    switch (type) {
-      case 'lead': return 'person_add';
-      case 'deal': return 'handshake';
-      case 'visit': return 'calendar_today';
-      default: return 'notifications';
-    }
+    return classes[status] || 'badge-primary';
   }
 }

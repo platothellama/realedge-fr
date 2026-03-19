@@ -11,8 +11,18 @@ export class ApiService {
   constructor(private http: HttpClient) {}
 
   // Properties
-  getProperties(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/properties`);
+  getProperties(params?: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    status?: string;
+    type?: string;
+    minPrice?: number;
+    maxPrice?: number;
+    minBedrooms?: number;
+    city?: string;
+  }): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/properties`, { params: params as any });
   }
 
   getPropertyById(id: string): Observable<any> {
@@ -536,5 +546,10 @@ export class ApiService {
 
   clearEmbeddingCache(): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/buyer-preferences/clear-cache`, {});
+  }
+
+  // Admin - Seed Properties
+  seedProperties(): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/admin/seed-properties`, {});
   }
 }
