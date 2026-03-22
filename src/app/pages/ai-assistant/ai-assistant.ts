@@ -66,15 +66,17 @@ export class AiAssistantComponent implements OnInit {
       sender: 'ai',
       text: `Welcome to your AI Real Estate Assistant! I can help you:
 
-• Search properties by price, bedrooms, location, type
+• Search properties by price, bedrooms, area, location
+• Find by Lebanese locations (Beirut, Mount Lebanon, Jounieh, Baadba, etc.)
 • Analyze leads and identify hot prospects
 • Review deal pipeline and commissions
-• Generate insights from your CRM data
+• Generate financial insights
 
 Try asking:
-• "Show apartments under $500K in Beirut"
-• "Find 3 bedroom villas"
+• "Show 120 sqm apartments in Baadba"
+• "Find 3 bedroom villas under 2 million"
 • "List hot leads"
+• "Properties in Mount Lebanon"
 • "What is my revenue this month?"`,
       time: this.formatTime(new Date())
     });

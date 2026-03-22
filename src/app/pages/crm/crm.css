@@ -626,12 +626,21 @@
   flex-shrink: 0;
 }
 
+.status-filter {
+  width: 160px !important;
+}
+.lead-card {
+
+  display: inline-table;
+}
+
 .list-item {
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: 12px;
   overflow: hidden;
   transition: all 0.3s ease;
+  display: inline-table;
 }
 
 .list-item:hover {

@@ -31,6 +31,43 @@
   border-radius: 12px !important;
 }
 
+/* Capabilities Banner */
+.capabilities-banner {
+  display: flex;
+  gap: 16px;
+  padding: 16px 24px;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(129, 140, 248, 0.05) 100%);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 20px;
+  max-width: 1400px;
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.capability-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  flex: 1;
+  justify-content: center;
+}
+
+.capability-item mat-icon {
+  color: var(--primary);
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
 .main-content {
   flex: 1;
   display: grid;
@@ -589,6 +626,18 @@
 @media (max-width: 768px) {
   .ai-container {
     padding: 16px;
+  }
+
+  .capabilities-banner {
+    flex-wrap: wrap;
+    padding: 12px;
+    gap: 8px;
+  }
+
+  .capability-item {
+    flex: 1 1 calc(50% - 8px);
+    padding: 6px 12px;
+    font-size: 12px;
   }
 
   .header-section {

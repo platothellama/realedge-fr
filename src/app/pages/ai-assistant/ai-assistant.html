@@ -10,6 +10,33 @@
     </button>
   </div>
 
+  <div class="capabilities-banner">
+    <div class="capability-item">
+      <mat-icon>home</mat-icon>
+      <span>Property Search</span>
+    </div>
+    <div class="capability-item">
+      <mat-icon>people</mat-icon>
+      <span>Lead Analysis</span>
+    </div>
+    <div class="capability-item">
+      <mat-icon>handshake</mat-icon>
+      <span>Deal Pipeline</span>
+    </div>
+    <div class="capability-item">
+      <mat-icon>analytics</mat-icon>
+      <span>Revenue Stats</span>
+    </div>
+    <div class="capability-item">
+      <mat-icon>square_foot</mat-icon>
+      <span>Area Queries</span>
+    </div>
+    <div class="capability-item">
+      <mat-icon>location_on</mat-icon>
+      <span>Lebanon Locations</span>
+    </div>
+  </div>
+
   <div class="main-content">
     <div class="chat-wrapper">
       <div class="chat-messages" #scrollContainer>
@@ -181,7 +208,7 @@
         <div class="input-wrapper">
           <mat-form-field appearance="outline" class="full-width">
             <input matInput [(ngModel)]="userInput" (keyup.enter)="onSendMessage()" 
-              placeholder="Try: 'Show apartments under $500K' or 'Find 3 bedroom villas in Beirut'">
+              placeholder="Try: '120 sqm apartment in Baadba' or '3 bedroom villas in Mount Lebanon'">
             <button mat-icon-button matSuffix (click)="onSendMessage()" [disabled]="!userInput.trim() || loading">
               <mat-icon>send</mat-icon>
             </button>
@@ -206,7 +233,15 @@
         <ul>
           <li>
             <mat-icon>home</mat-icon>
-            <span>Search properties by price, size, location</span>
+            <span>Search by price, size, bedrooms, location</span>
+          </li>
+          <li>
+            <mat-icon>square_foot</mat-icon>
+            <span>Find by area (e.g., "120 sqm apartments")</span>
+          </li>
+          <li>
+            <mat-icon>location_on</mat-icon>
+            <span>Lebanon locations (Beirut, Mount Lebanon, Jounieh, etc.)</span>
           </li>
           <li>
             <mat-icon>people</mat-icon>
@@ -214,26 +249,26 @@
           </li>
           <li>
             <mat-icon>handshake</mat-icon>
-            <span>Review deal pipeline</span>
+            <span>Review deal pipeline & commissions</span>
           </li>
           <li>
             <mat-icon>analytics</mat-icon>
-            <span>Generate financial insights</span>
-          </li>
-          <li>
-            <mat-icon>trending_up</mat-icon>
-            <span>Market trend analysis</span>
+            <span>Financial insights and summaries</span>
           </li>
         </ul>
       </div>
 
       <div class="examples">
-        <h4>Example Queries</h4>
+        <h4>Try These Queries</h4>
         <div class="example-chips">
-          <span class="example-chip" (click)="userInput = 'apartments in Beirut'; onSendMessage()">Beirut apartments</span>
+          <span class="example-chip" (click)="userInput = '120 sqm apartment in Baadba'; onSendMessage()">120 sqm in Baadba</span>
+          <span class="example-chip" (click)="userInput = 'apartments in Mount Lebanon'; onSendMessage()">Mount Lebanon</span>
           <span class="example-chip" (click)="userInput = 'villas under 2 million'; onSendMessage()">Villas &lt;$2M</span>
-          <span class="example-chip" (click)="userInput = '3 bedroom properties'; onSendMessage()">3 bedroom</span>
+          <span class="example-chip" (click)="userInput = '3 bedroom apartments in Beirut'; onSendMessage()">3BR in Beirut</span>
           <span class="example-chip" (click)="userInput = 'show hot leads'; onSendMessage()">Hot leads</span>
+          <span class="example-chip" (click)="userInput = 'open deals'; onSendMessage()">Open deals</span>
+          <span class="example-chip" (click)="userInput = 'revenue this month'; onSendMessage()">Revenue</span>
+          <span class="example-chip" (click)="userInput = 'properties in Jounieh'; onSendMessage()">Jounieh</span>
         </div>
       </div>
     </div>

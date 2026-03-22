@@ -63,7 +63,7 @@
   border: 1px solid var(--border) !important;
   border-radius: 16px !important;
   padding: 16px !important;
-  overflow: hidden;
+  overflow-y: auto;
   display: flex;
   flex-direction: column;
 }
