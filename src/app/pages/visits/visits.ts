@@ -60,8 +60,8 @@ export class VisitsComponent implements OnInit {
 
   fetchVisits() {
     this.api.getVisits().subscribe({
-      next: (res) => {
-        const visits = Array.isArray(res) ? res : (res.data || []);
+      next: (res: any) => {
+        const visits = Array.isArray(res) ? res : (res?.data || []);
         const events = visits.map((v: any) => ({
           id: v.id,
           title: `${v.clientName} - ${v.title}`,

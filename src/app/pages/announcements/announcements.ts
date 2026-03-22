@@ -98,8 +98,8 @@ export class AnnouncementsComponent implements OnInit {
   fetchAnnouncements() {
     this.loading = true;
     this.api.getAnnouncements().subscribe({
-      next: (res) => {
-        this.announcements = Array.isArray(res) ? res : (res.data || []);
+      next: (res: any) => {
+        this.announcements = Array.isArray(res) ? res : (res?.data || []);
         this.loading = false;
       },
       error: (err) => {

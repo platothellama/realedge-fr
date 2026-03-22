@@ -62,8 +62,8 @@ export class DealsComponent implements OnInit {
 
   fetchDeals() {
     this.apiService.getDeals().subscribe({
-      next: (data) => {
-        this.allDeals = Array.isArray(data) ? data : (data.data || []);
+      next: (data: any) => {
+        this.allDeals = Array.isArray(data) ? data : (data?.data || []);
         this.applyFilters();
       },
       error: (err) => {

@@ -61,8 +61,8 @@ export class UserFormComponent implements OnInit {
 
   ngOnInit(): void {
     this.apiService.getGroups().subscribe({
-      next: (res) => {
-        this.groups = Array.isArray(res) ? res : (res.data || []);
+      next: (res: any) => {
+        this.groups = Array.isArray(res) ? res : (res?.data || []);
       },
       error: (err) => {
         console.error('Error fetching groups', err);

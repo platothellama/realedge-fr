@@ -92,8 +92,8 @@ export class DealFormComponent implements OnInit {
     this.api.getUsers().subscribe(res => {
       this.brokers = Array.isArray(res) ? res : (res.data || []);
     });
-    this.api.getLeads().subscribe(res => {
-      this.leads = Array.isArray(res) ? res : (res.data || []);
+    this.api.getLeads().subscribe((res: any) => {
+      this.leads = Array.isArray(res) ? res : (res?.data || []);
     });
 
     // Watch for property selection changes

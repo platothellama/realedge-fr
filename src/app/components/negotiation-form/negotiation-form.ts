@@ -53,8 +53,8 @@ export class NegotiationFormComponent implements OnInit {
 
   ngOnInit(): void {
     this.apiService.getLeads().subscribe({
-      next: (res) => {
-        this.leads = Array.isArray(res) ? res : (res.data || []);
+      next: (res: any) => {
+        this.leads = Array.isArray(res) ? res : (res?.data || []);
       },
       error: (err) => {
         console.error('Error fetching leads:', err);

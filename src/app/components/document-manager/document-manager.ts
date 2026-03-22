@@ -47,8 +47,8 @@ export class DocumentManagerComponent implements OnInit {
     if (this.dealId) params.dealId = this.dealId;
 
     this.api.getDocuments(params).subscribe({
-      next: (res) => {
-        this.documents = Array.isArray(res) ? res : (res.data || []);
+      next: (res: any) => {
+        this.documents = Array.isArray(res) ? res : (res?.data || []);
         this.loading = false;
       },
       error: (err) => {

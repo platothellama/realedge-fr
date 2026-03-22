@@ -55,8 +55,8 @@ export class DocumentsPageComponent implements OnInit {
   fetchDocuments() {
     this.loading = true;
     this.api.getDocuments({}).subscribe({
-      next: (res) => {
-        this.documents = Array.isArray(res) ? res : (res.data || []);
+      next: (res: any) => {
+        this.documents = Array.isArray(res) ? res : (res?.data || []);
         this.loading = false;
       },
       error: (err) => {

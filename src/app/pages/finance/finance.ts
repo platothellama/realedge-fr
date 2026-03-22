@@ -62,8 +62,8 @@ export class FinanceComponent implements OnInit {
   fetchTransactions() {
     this.loading = true;
     this.api.getTransactions().subscribe({
-      next: (res) => {
-        this.transactions = Array.isArray(res) ? res : (res.data || []);
+      next: (res: any) => {
+        this.transactions = Array.isArray(res) ? res : (res?.data || []);
         this.loading = false;
       },
       error: (err) => {

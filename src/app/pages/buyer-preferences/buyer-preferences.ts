@@ -92,7 +92,7 @@ export class BuyerPreferencesComponent implements OnInit {
 
   fetchLeads() {
     this.apiService.getLeadsForMatcher().subscribe({
-      next: (data) => {
+      next: (data: any) => {
         this.leads = Array.isArray(data) ? data : (data?.data || []);
       },
       error: (err) => {
