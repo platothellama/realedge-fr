@@ -33,28 +33,24 @@
       <div class="form-row">
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Client Name</mat-label>
-          <input matInput [formControl]="clientForm.get('name')!" placeholder="Full Name" (input)="onNewClientChange()">
+          <input matInput [(ngModel)]="newClientName" placeholder="Full Name" (input)="onNewClientChange()">
           <mat-icon matSuffix>person</mat-icon>
-          <mat-error *ngIf="clientForm.get('name')?.hasError('required')">Name is required</mat-error>
         </mat-form-field>
       </div>
 
       <div class="form-row">
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Email Address</mat-label>
-          <input matInput type="email" [formControl]="clientForm.get('email')!" placeholder="email@example.com" (input)="onNewClientChange()">
+          <input matInput type="email" [(ngModel)]="newClientEmail" placeholder="email@example.com" (input)="onNewClientChange()">
           <mat-icon matSuffix>email</mat-icon>
-          <mat-error *ngIf="clientForm.get('email')?.hasError('required')">Email is required</mat-error>
-          <mat-error *ngIf="clientForm.get('email')?.hasError('email')">Please enter a valid email</mat-error>
         </mat-form-field>
       </div>
 
       <div class="form-row">
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Phone Number</mat-label>
-          <input matInput [formControl]="clientForm.get('phone')!" placeholder="+1 234 567 890" (input)="onNewClientChange()">
+          <input matInput [(ngModel)]="newClientPhone" placeholder="+1 234 567 890" (input)="onNewClientChange()">
           <mat-icon matSuffix>phone</mat-icon>
-          <mat-error *ngIf="clientForm.get('phone')?.hasError('required')">Phone is required</mat-error>
         </mat-form-field>
       </div>
 
