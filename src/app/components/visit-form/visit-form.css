@@ -94,3 +94,19 @@
 .custom-scrollbar::-webkit-scrollbar { width: 5px; }
 .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
 .custom-scrollbar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+
+.property-info-badge {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+  background: var(--primary-soft);
+  border: 1px solid var(--primary);
+  border-radius: 12px;
+  color: var(--primary-bright);
+  font-weight: 600;
+}
+
+.property-info-badge mat-icon {
+  color: var(--primary);
+}

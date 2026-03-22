@@ -61,7 +61,10 @@ export class MarketingAutomationComponent implements OnInit {
 
   loadCampaigns() {
     this.api.getCampaigns().subscribe({
-      next: (res: any) => { this.campaigns = res || []; this.loading = false; },
+      next: (res: any) => {
+        this.campaigns = Array.isArray(res) ? res : (res?.data || []);
+        this.loading = false;
+      },
       error: () => { this.campaigns = []; this.loading = false; }
     });
   }

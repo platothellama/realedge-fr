@@ -7,6 +7,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ApiService } from '../../services/api';
 
 @Component({
@@ -20,7 +21,8 @@ import { ApiService } from '../../services/api';
     MatInputModule,
     MatSelectModule,
     MatButtonModule,
-    MatIconModule
+    MatIconModule,
+    MatProgressSpinnerModule
   ],
   templateUrl: './deal-form.html',
   styleUrl: './deal-form.css'
@@ -33,6 +35,7 @@ export class DealFormComponent implements OnInit {
   leads: any[] = [];
   currentUser: any = null;
   isAdmin = false;
+  isSubmitting = false;
 
   stages = ['Offer Made', 'Negotiation', 'Contract Signed', 'Payment', 'Closed'];
 
@@ -81,13 +84,17 @@ export class DealFormComponent implements OnInit {
     });
 
     this.api.getProperties().subscribe(res => {
-      this.properties = res;
+      this.properties = Array.isArray(res) ? res : (res.data || []);
       // If editing or pre-selected, trigger calculation
       const selectedId = this.dealForm.get('propertyId')?.value;
       if (selectedId) this.calculateCommission(selectedId);
     });
-    this.api.getUsers().subscribe(res => this.brokers = res.data || res);
-    this.api.getLeads().subscribe(res => this.leads = res);
+    this.api.getUsers().subscribe(res => {
+      this.brokers = Array.isArray(res) ? res : (res.data || []);
+    });
+    this.api.getLeads().subscribe(res => {
+      this.leads = Array.isArray(res) ? res : (res.data || []);
+    });
 
     // Watch for property selection changes
     this.dealForm.get('propertyId')?.valueChanges.subscribe(id => {
@@ -104,8 +111,8 @@ export class DealFormComponent implements OnInit {
   }
 
   onSubmit(): void {
-    if (this.dealForm.valid) {
-      // Include disabled fields in the value
+    if (this.dealForm.valid && !this.isSubmitting) {
+      this.isSubmitting = true;
       const val = this.dealForm.getRawValue();
       this.dialogRef.close(val);
     }

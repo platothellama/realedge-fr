@@ -6,6 +6,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ApiService } from '../../services/api';
 import { MatIconModule } from '@angular/material/icon';
 
@@ -20,7 +21,8 @@ import { MatIconModule } from '@angular/material/icon';
     MatInputModule,
     MatSelectModule,
     MatButtonModule,
-    MatIconModule
+    MatIconModule,
+    MatProgressSpinnerModule
   ],
   templateUrl: './lead-form.html',
   styleUrl: './lead-form.css'
@@ -29,6 +31,7 @@ export class LeadFormComponent implements OnInit {
   leadForm: FormGroup;
   isEdit = false;
   users: any[] = [];
+  isSubmitting = false;
 
   constructor(
     private fb: FormBuilder,
@@ -61,13 +64,19 @@ export class LeadFormComponent implements OnInit {
 
   fetchUsers() {
     this.api.getUsers().subscribe({
-      next: (res) => this.users = res.data || (Array.isArray(res) ? res : []),
-      error: (err) => console.error('Error fetching users', err)
+      next: (res) => {
+        this.users = Array.isArray(res) ? res : (res.data || []);
+      },
+      error: (err) => {
+        console.error('Error fetching users', err);
+        this.users = [];
+      }
     });
   }
 
   onSubmit(): void {
-    if (this.leadForm.valid) {
+    if (this.leadForm.valid && !this.isSubmitting) {
+      this.isSubmitting = true;
       this.dialogRef.close(this.leadForm.value);
     }
   }

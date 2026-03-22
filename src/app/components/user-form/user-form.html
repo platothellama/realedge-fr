@@ -69,9 +69,13 @@
   </mat-dialog-content>
 
   <mat-dialog-actions align="end">
-    <button mat-button mat-dialog-close class="cancel-btn">Discard</button>
-    <button mat-raised-button color="primary" class="submit-btn" (click)="onSubmit()" [disabled]="!userForm.valid">
-      {{ isEdit ? 'Save Changes' : 'Confirm & Add' }}
+    <button mat-button mat-dialog-close class="cancel-btn" [disabled]="isSubmitting">Discard</button>
+    <button mat-raised-button color="primary" class="submit-btn" (click)="onSubmit()" [disabled]="!userForm.valid || isSubmitting" [class.loading]="isSubmitting">
+      @if (isSubmitting) {
+        <mat-spinner diameter="20"></mat-spinner>
+      } @else {
+        {{ isEdit ? 'Save Changes' : 'Confirm & Add' }}
+      }
     </button>
   </mat-dialog-actions>
 </div>

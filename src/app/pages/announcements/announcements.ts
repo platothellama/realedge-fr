@@ -99,13 +99,13 @@ export class AnnouncementsComponent implements OnInit {
     this.loading = true;
     this.api.getAnnouncements().subscribe({
       next: (res) => {
-        this.announcements = res;
+        this.announcements = Array.isArray(res) ? res : (res.data || []);
         this.loading = false;
       },
       error: (err) => {
         console.error('Failed to fetch announcements', err);
         this.loading = false;
-        this.announcements = this.getMockAnnouncements();
+        this.announcements = [];
       }
     });
   }

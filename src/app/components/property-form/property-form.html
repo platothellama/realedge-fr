@@ -249,9 +249,13 @@
   </mat-dialog-content>
 
   <mat-dialog-actions align="end">
-    <button mat-button (click)="onCancel()" class="cancel-btn">Discard</button>
-    <button mat-raised-button color="primary" class="submit-btn" (click)="onSubmit()" [disabled]="!propertyForm.valid">
-      {{ isEdit ? 'Update Listing' : 'Publish Listing' }}
+    <button mat-button (click)="onCancel()" class="cancel-btn" [disabled]="isSubmitting">Discard</button>
+    <button mat-raised-button color="primary" class="submit-btn" (click)="onSubmit()" [disabled]="!propertyForm.valid || isSubmitting" [class.loading]="isSubmitting">
+      @if (isSubmitting) {
+        <mat-spinner diameter="20"></mat-spinner>
+      } @else {
+        {{ isEdit ? 'Update Listing' : 'Publish Listing' }}
+      }
     </button>
   </mat-dialog-actions>
 </div>

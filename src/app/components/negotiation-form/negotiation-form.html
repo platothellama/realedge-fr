@@ -43,9 +43,13 @@
   </mat-dialog-content>
  
   <mat-dialog-actions align="end">
-    <button mat-button (click)="onCancel()" class="cancel-btn">Cancel</button>
-    <button mat-raised-button color="primary" class="submit-btn" (click)="onSubmit()" [disabled]="!negotiationForm.valid">
-      Add Event
+    <button mat-button (click)="onCancel()" class="cancel-btn" [disabled]="isSubmitting">Cancel</button>
+    <button mat-raised-button color="primary" class="submit-btn" (click)="onSubmit()" [disabled]="!negotiationForm.valid || isSubmitting" [class.loading]="isSubmitting">
+      @if (isSubmitting) {
+        <mat-spinner diameter="20"></mat-spinner>
+      } @else {
+        Add Event
+      }
     </button>
   </mat-dialog-actions>
 </div>

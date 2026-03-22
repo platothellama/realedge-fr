@@ -56,9 +56,13 @@
   </mat-dialog-content>
 
   <mat-dialog-actions align="end">
-    <button mat-button (click)="onCancel()" class="cancel-btn">Discard</button>
-    <button mat-raised-button color="primary" class="submit-btn" (click)="onSubmit()" [disabled]="!uploadForm.valid || (!selectedFile && !data.isNewVersion)">
-      {{ data.isNewVersion ? 'Upload New Version' : 'Upload Document' }}
+    <button mat-button (click)="onCancel()" class="cancel-btn" [disabled]="isSubmitting">Discard</button>
+    <button mat-raised-button color="primary" class="submit-btn" (click)="onSubmit()" [disabled]="!uploadForm.valid || (!selectedFile && !data.isNewVersion) || isSubmitting" [class.loading]="isSubmitting">
+      @if (isSubmitting) {
+        <mat-spinner diameter="20"></mat-spinner>
+      } @else {
+        {{ data.isNewVersion ? 'Upload New Version' : 'Upload Document' }}
+      }
     </button>
   </mat-dialog-actions>
 </div>

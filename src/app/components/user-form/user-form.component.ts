@@ -7,6 +7,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ApiService } from '../../services/api';
 
 @Component({
@@ -20,7 +21,8 @@ import { ApiService } from '../../services/api';
     MatInputModule,
     MatSelectModule,
     MatButtonModule,
-    MatIconModule
+    MatIconModule,
+    MatProgressSpinnerModule
   ],
   templateUrl: './user-form.html',
   styleUrl: './user-form.css'
@@ -40,6 +42,7 @@ export class UserFormComponent implements OnInit {
   ];
   groups: any[] = [];
   hidePassword = true;
+  isSubmitting = false;
 
   constructor(
     private fb: FormBuilder,
@@ -58,8 +61,13 @@ export class UserFormComponent implements OnInit {
 
   ngOnInit(): void {
     this.apiService.getGroups().subscribe({
-      next: (res) => this.groups = res,
-      error: (err) => console.error('Error fetching groups', err)
+      next: (res) => {
+        this.groups = Array.isArray(res) ? res : (res.data || []);
+      },
+      error: (err) => {
+        console.error('Error fetching groups', err);
+        this.groups = [];
+      }
     });
 
     if (this.data && this.data.user) {
@@ -76,7 +84,8 @@ export class UserFormComponent implements OnInit {
   }
 
   onSubmit(): void {
-    if (this.userForm.valid) {
+    if (this.userForm.valid && !this.isSubmitting) {
+      this.isSubmitting = true;
       this.dialogRef.close(this.userForm.value);
     }
   }

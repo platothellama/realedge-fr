@@ -61,7 +61,8 @@ export class VisitsComponent implements OnInit {
   fetchVisits() {
     this.api.getVisits().subscribe({
       next: (res) => {
-        const events = res.map(v => ({
+        const visits = Array.isArray(res) ? res : (res.data || []);
+        const events = visits.map((v: any) => ({
           id: v.id,
           title: `${v.clientName} - ${v.title}`,
           start: v.visitDate,

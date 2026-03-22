@@ -16,7 +16,7 @@
       </mat-form-field>
     </div>
 
-    <div class="form-row">
+    <div class="form-row" *ngIf="!data?.propertyId">
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Property</mat-label>
         <mat-select formControlName="propertyId">
@@ -28,6 +28,13 @@
         <mat-icon matSuffix>home</mat-icon>
         <mat-error *ngIf="visitForm.get('propertyId')?.hasError('required')">Please select a property</mat-error>
       </mat-form-field>
+    </div>
+    
+    <div class="form-row" *ngIf="data?.propertyId">
+      <div class="property-info-badge">
+        <mat-icon>home</mat-icon>
+        <span>{{ getPropertyTitle() }}</span>
+      </div>
     </div>
 
     <div class="section-label">Schedule</div>
@@ -114,9 +121,13 @@
   </mat-dialog-content>
 
   <mat-dialog-actions align="end">
-    <button mat-button (click)="onCancel()" class="cancel-btn">Discard</button>
-    <button mat-raised-button color="primary" class="submit-btn" (click)="onSubmit()" [disabled]="!visitForm.valid">
-      {{ isEdit ? 'Update Schedule' : 'Schedule Visit' }}
+    <button mat-button (click)="onCancel()" class="cancel-btn" [disabled]="isSubmitting">Discard</button>
+    <button mat-raised-button color="primary" class="submit-btn" (click)="onSubmit()" [disabled]="!visitForm.valid || isSubmitting" [class.loading]="isSubmitting">
+      @if (isSubmitting) {
+        <mat-spinner diameter="20"></mat-spinner>
+      } @else {
+        {{ isEdit ? 'Update Schedule' : 'Schedule Visit' }}
+      }
     </button>
   </mat-dialog-actions>
 </div>

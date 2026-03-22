@@ -7,6 +7,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ApiService } from '../../services/api';
 
 @Component({
@@ -20,7 +21,8 @@ import { ApiService } from '../../services/api';
     MatInputModule,
     MatButtonModule,
     MatIconModule,
-    MatSelectModule
+    MatSelectModule,
+    MatProgressSpinnerModule
   ],
   templateUrl: './group-form.html',
   styleUrl: './group-form.css'
@@ -29,6 +31,7 @@ export class GroupFormComponent implements OnInit {
   groupForm: FormGroup;
   isEdit: boolean = false;
   users: any[] = [];
+  isSubmitting = false;
 
   constructor(
     private fb: FormBuilder,
@@ -55,14 +58,18 @@ export class GroupFormComponent implements OnInit {
   fetchUsers() {
     this.api.getUsers().subscribe({
       next: (res) => {
-        this.users = res.data || (Array.isArray(res) ? res : []);
+        this.users = Array.isArray(res) ? res : (res.data || []);
       },
-      error: (err) => console.error('Failed to fetch users', err)
+      error: (err) => {
+        console.error('Failed to fetch users', err);
+        this.users = [];
+      }
     });
   }
 
   onSubmit(): void {
-    if (this.groupForm.valid) {
+    if (this.groupForm.valid && !this.isSubmitting) {
+      this.isSubmitting = true;
       this.dialogRef.close(this.groupForm.value);
     }
   }

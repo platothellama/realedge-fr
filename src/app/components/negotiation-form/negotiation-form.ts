@@ -8,6 +8,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ApiService } from '../../services/api';
 
 @Component({
@@ -22,7 +23,8 @@ import { ApiService } from '../../services/api';
     MatSelectModule,
     MatButtonModule,
     MatIconModule,
-    MatCheckboxModule
+    MatCheckboxModule,
+    MatProgressSpinnerModule
   ],
   templateUrl: './negotiation-form.html',
   styleUrl: './negotiation-form.css'
@@ -31,6 +33,7 @@ export class NegotiationFormComponent implements OnInit {
   negotiationForm: FormGroup;
   leads: any[] = [];
   propertyPrice: number = 0;
+  isSubmitting = false;
 
   constructor(
     private fb: FormBuilder,
@@ -50,13 +53,19 @@ export class NegotiationFormComponent implements OnInit {
 
   ngOnInit(): void {
     this.apiService.getLeads().subscribe({
-      next: (res) => this.leads = res,
-      error: (err) => console.error('Error fetching leads:', err)
+      next: (res) => {
+        this.leads = Array.isArray(res) ? res : (res.data || []);
+      },
+      error: (err) => {
+        console.error('Error fetching leads:', err);
+        this.leads = [];
+      }
     });
   }
 
   onSubmit(): void {
-    if (this.negotiationForm.valid) {
+    if (this.negotiationForm.valid && !this.isSubmitting) {
+      this.isSubmitting = true;
       this.dialogRef.close(this.negotiationForm.value);
     }
   }

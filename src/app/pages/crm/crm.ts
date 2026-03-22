@@ -62,12 +62,13 @@ export class CrmComponent implements OnInit {
   fetchLeads() {
     this.apiService.getLeads().subscribe({
       next: (data) => {
-        this.allLeads = data;
+        this.allLeads = Array.isArray(data) ? data : (data.data || []);
         this.applyFilters();
       },
       error: (err) => {
         console.error('Failed to fetch leads', err);
         this.showError('Failed to load leads');
+        this.allLeads = [];
       }
     });
   }

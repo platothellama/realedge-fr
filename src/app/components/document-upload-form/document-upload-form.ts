@@ -8,6 +8,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-document-upload-form',
@@ -21,7 +22,8 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
     MatSelectModule,
     MatButtonModule,
     MatIconModule,
-    MatCheckboxModule
+    MatCheckboxModule,
+    MatProgressSpinnerModule
   ],
   templateUrl: './document-upload-form.html',
   styleUrl: './document-upload-form.css'
@@ -30,6 +32,7 @@ export class DocumentUploadFormComponent implements OnInit {
   uploadForm: FormGroup;
   selectedFile: File | null = null;
   types = ['Contract', 'Property Paper', 'Client ID', 'Permit', 'Other'];
+  isSubmitting = false;
 
   constructor(
     private fb: FormBuilder,
@@ -57,7 +60,8 @@ export class DocumentUploadFormComponent implements OnInit {
   }
 
   onSubmit() {
-    if (this.uploadForm.valid && (this.selectedFile || this.data.isNewVersion)) {
+    if (this.uploadForm.valid && (this.selectedFile || this.data.isNewVersion) && !this.isSubmitting) {
+      this.isSubmitting = true;
       const formData = new FormData();
       if (this.selectedFile) {
         formData.append('file', this.selectedFile);

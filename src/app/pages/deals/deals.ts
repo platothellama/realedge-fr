@@ -63,12 +63,13 @@ export class DealsComponent implements OnInit {
   fetchDeals() {
     this.apiService.getDeals().subscribe({
       next: (data) => {
-        this.allDeals = data;
+        this.allDeals = Array.isArray(data) ? data : (data.data || []);
         this.applyFilters();
       },
       error: (err) => {
         console.error('Failed to fetch deals', err);
         this.showError('Failed to load deals');
+        this.allDeals = [];
       }
     });
   }

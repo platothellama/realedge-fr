@@ -62,7 +62,12 @@ export class PropertyDetailsComponent implements OnInit {
     this.loading = true;
     this.api.getPropertyById(id).subscribe({
       next: (res) => {
-        this.property = res;
+        this.property = {
+          ...res,
+          photos: Array.isArray(res.photos) ? res.photos : [],
+          features: Array.isArray(res.features) ? res.features : [],
+          priceHistoryEntries: Array.isArray(res.priceHistoryEntries) ? res.priceHistoryEntries : []
+        };
         this.calculateAnalytics();
         this.loading = false;
       },

@@ -8,6 +8,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTabsModule } from '@angular/material/tabs';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { GoogleMapsModule } from '@angular/google-maps';
 import { ApiService } from '../../services/api';
 import { AuthService } from '../../services/auth/auth.service';
@@ -25,6 +26,7 @@ import { AuthService } from '../../services/auth/auth.service';
     MatButtonModule,
     MatIconModule,
     MatTabsModule,
+    MatProgressSpinnerModule,
     GoogleMapsModule
   ],
   templateUrl: './property-form.html',
@@ -60,6 +62,7 @@ export class PropertyFormComponent implements OnInit, AfterViewInit {
   };
 
   isAdmin = false;
+  isSubmitting = false;
 
   constructor(
     private fb: FormBuilder,
@@ -110,8 +113,24 @@ export class PropertyFormComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
-    this.api.getUsers().subscribe(res => this.users = res.data || res);
-    this.api.getGroups().subscribe((res: any) => this.groups = res.data || res);
+    this.api.getUsers().subscribe({
+      next: (res) => {
+        this.users = Array.isArray(res) ? res : (res.data || []);
+      },
+      error: (err) => {
+        console.error('Error fetching users', err);
+        this.users = [];
+      }
+    });
+    this.api.getGroups().subscribe({
+      next: (res: any) => {
+        this.groups = Array.isArray(res) ? res : (res.data || []);
+      },
+      error: (err) => {
+        console.error('Error fetching groups', err);
+        this.groups = [];
+      }
+    });
 
     if (this.data && this.data.property) {
       this.isEdit = true;
@@ -222,10 +241,10 @@ export class PropertyFormComponent implements OnInit, AfterViewInit {
   }
 
   onSubmit(): void {
-    if (this.propertyForm.valid) {
+    if (this.propertyForm.valid && !this.isSubmitting) {
+      this.isSubmitting = true;
       const val = this.propertyForm.getRawValue();
 
-      // Merge manually uploaded photos with those in text input
       const manualPhotos = val.photos ? val.photos.split(',').map((s: string) => s.trim()).filter((s: string) => s !== '') : [];
       const allPhotos = [...new Set([...this.uploadedPhotos, ...manualPhotos])];
 

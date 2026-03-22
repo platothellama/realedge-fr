@@ -101,7 +101,9 @@ export class WebsiteEditorComponent implements OnInit {
 
   loadComponentTemplates() {
     this.api.getComponentTemplates(this.selectedCategory).subscribe({
-      next: (res) => { this.componentTemplates = res || []; }
+      next: (res) => {
+        this.componentTemplates = Array.isArray(res) ? res : (res?.data || []);
+      }
     });
   }
 

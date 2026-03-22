@@ -63,13 +63,13 @@ export class FinanceComponent implements OnInit {
     this.loading = true;
     this.api.getTransactions().subscribe({
       next: (res) => {
-        this.transactions = res;
+        this.transactions = Array.isArray(res) ? res : (res.data || []);
         this.loading = false;
       },
       error: (err) => {
         console.error('Failed to fetch transactions', err);
         this.loading = false;
-        this.transactions = this.getMockTransactions();
+        this.transactions = [];
       }
     });
   }

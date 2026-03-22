@@ -9,6 +9,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ApiService } from '../../services/api';
 
 @Component({
@@ -24,7 +25,8 @@ import { ApiService } from '../../services/api';
     MatButtonModule,
     MatIconModule,
     MatDatepickerModule,
-    MatNativeDateModule
+    MatNativeDateModule,
+    MatProgressSpinnerModule
   ],
   templateUrl: './visit-form.html',
   styleUrl: './visit-form.css'
@@ -35,6 +37,7 @@ export class VisitFormComponent implements OnInit {
   properties: any[] = [];
   brokers: any[] = [];
   statuses = ['Scheduled', 'Completed', 'Cancelled', 'No Show'];
+  isSubmitting = false;
 
   constructor(
     private fb: FormBuilder,
@@ -76,8 +79,12 @@ export class VisitFormComponent implements OnInit {
   }
 
   private loadInitialData() {
-    this.api.getProperties().subscribe(res => this.properties = res);
-    this.api.getUsers().subscribe(res => this.brokers = res.data || res);
+    this.api.getProperties().subscribe(res => {
+      this.properties = Array.isArray(res) ? res : (res.data || []);
+    });
+    this.api.getUsers().subscribe(res => {
+      this.brokers = Array.isArray(res) ? res : (res.data || []);
+    });
     
     this.api.getMe().subscribe(user => {
       if (!this.isEdit && !this.visitForm.get('brokerId')?.value) {
@@ -87,9 +94,9 @@ export class VisitFormComponent implements OnInit {
   }
 
   onSubmit(): void {
-    if (this.visitForm.valid) {
+    if (this.visitForm.valid && !this.isSubmitting) {
+      this.isSubmitting = true;
       const val = this.visitForm.value;
-      // Combine date and time
       const date = new Date(val.visitDate);
       const [hours, minutes] = val.visitTime.split(':');
       date.setHours(parseInt(hours), parseInt(minutes));
@@ -106,5 +113,13 @@ export class VisitFormComponent implements OnInit {
 
   onCancel(): void {
     this.dialogRef.close();
+  }
+
+  getPropertyTitle(): string {
+    if (this.data?.propertyId && this.properties.length) {
+      const prop = this.properties.find(p => p.id === this.data.propertyId);
+      return prop?.title || 'Selected Property';
+    }
+    return '';
   }
 }

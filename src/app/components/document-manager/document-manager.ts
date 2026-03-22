@@ -48,12 +48,13 @@ export class DocumentManagerComponent implements OnInit {
 
     this.api.getDocuments(params).subscribe({
       next: (res) => {
-        this.documents = res;
+        this.documents = Array.isArray(res) ? res : (res.data || []);
         this.loading = false;
       },
       error: (err) => {
         console.error('Failed to fetch documents', err);
         this.loading = false;
+        this.documents = [];
       }
     });
   }

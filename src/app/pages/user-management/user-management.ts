@@ -58,8 +58,13 @@ export class UserManagementComponent implements OnInit {
 
   fetchUsers() {
     this.api.getUsers().subscribe({
-      next: (res) => this.users = res.data,
-      error: (err) => this.showError('Failed to fetch users')
+      next: (res) => {
+        this.users = Array.isArray(res) ? res : (res.data || []);
+      },
+      error: (err) => {
+        this.showError('Failed to fetch users');
+        this.users = [];
+      }
     });
   }
 

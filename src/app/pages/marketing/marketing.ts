@@ -63,11 +63,12 @@ export class MarketingComponent implements OnInit {
   fetchProperties() {
     this.api.getProperties().subscribe({
       next: (data) => {
-        this.properties = data && data.length > 0 ? data : this.getMockProperties();
+        const arr = Array.isArray(data) ? data : (data?.data || []);
+        this.properties = arr.length > 0 ? arr : this.getMockProperties();
       },
       error: (err) => {
         console.error('Failed to fetch properties', err);
-        this.properties = this.getMockProperties();
+        this.properties = [];
       }
     });
   }

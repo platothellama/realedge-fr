@@ -93,10 +93,11 @@ export class BuyerPreferencesComponent implements OnInit {
   fetchLeads() {
     this.apiService.getLeadsForMatcher().subscribe({
       next: (data) => {
-        this.leads = data;
+        this.leads = Array.isArray(data) ? data : (data?.data || []);
       },
       error: (err) => {
         console.error('Failed to fetch leads', err);
+        this.leads = [];
       }
     });
   }
