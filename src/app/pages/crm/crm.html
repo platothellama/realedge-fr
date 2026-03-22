@@ -11,17 +11,6 @@
         <input type="text" placeholder="Search leads..." [(ngModel)]="searchQuery" (ngModelChange)="applyFilters()">
       </div>
       
-      <mat-form-field appearance="outline" class="source-filter no-subscript">
-        <mat-select [(ngModel)]="selectedSource" (ngModelChange)="applyFilters()" placeholder="Source">
-          <mat-option value="All">All Sources</mat-option>
-          <mat-option value="Website">Website</mat-option>
-          <mat-option value="Facebook">Facebook</mat-option>
-          <mat-option value="Google Ads">Google Ads</mat-option>
-          <mat-option value="Referral">Referral</mat-option>
-          <mat-option value="Walk-in">Walk-in</mat-option>
-        </mat-select>
-      </mat-form-field>
-
       <mat-form-field appearance="outline" class="status-filter no-subscript">
         <mat-select [(ngModel)]="selectedStatus" (ngModelChange)="applyFilters()" placeholder="Status">
           @for (status of statuses; track status) {

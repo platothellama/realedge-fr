@@ -41,7 +41,6 @@ import { MatExpansionModule } from '@angular/material/expansion';
 export class CrmComponent implements OnInit {
   allLeads: any[] = [];
   searchQuery: string = '';
-  selectedSource: string = 'All';
   selectedStatus: string = 'All';
   deletingId: string | null = null;
   viewMode: 'pipeline' | 'list' = 'list';
@@ -94,10 +93,6 @@ export class CrmComponent implements OnInit {
       );
     }
 
-    if (this.selectedSource !== 'All') {
-      filtered = filtered.filter(l => l.source === this.selectedSource);
-    }
-
     if (this.selectedStatus !== 'All') {
       filtered = filtered.filter(l => l.status === this.selectedStatus);
     }
@@ -115,10 +110,6 @@ export class CrmComponent implements OnInit {
         l.email?.toLowerCase().includes(q) ||
         l.phone?.toLowerCase().includes(q)
       );
-    }
-
-    if (this.selectedSource !== 'All') {
-      filtered = filtered.filter(l => l.source === this.selectedSource);
     }
 
     if (this.selectedStatus !== 'All') {
