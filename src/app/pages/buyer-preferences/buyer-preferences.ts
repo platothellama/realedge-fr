@@ -18,6 +18,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatRadioModule } from '@angular/material/radio';
 import { ApiService } from '../../services/api';
 import { Router } from '@angular/router';
+import { ClientSelectorComponent, ClientSelection } from '../../components/client-selector/client-selector';
 
 @Component({
   selector: 'app-buyer-preferences',
@@ -39,7 +40,8 @@ import { Router } from '@angular/router';
     MatTableModule,
     MatProgressSpinnerModule,
     MatTooltipModule,
-    MatRadioModule
+    MatRadioModule,
+    ClientSelectorComponent
   ],
   templateUrl: './buyer-preferences.html',
   styleUrl: './buyer-preferences.css',
@@ -53,19 +55,7 @@ export class BuyerPreferencesComponent implements OnInit {
   editingPreference: any = null;
 
   formData = {
-    leadId: null as string | null,
-    createNewLead: false,
-    newLeadData: {
-      name: '',
-      email: '',
-      phone: '',
-      budget: null as number | null,
-      propertyPreferences: '',
-      preferredAreas: ''
-    },
-    clientName: '',
-    clientEmail: '',
-    clientPhone: '',
+    selectedClient: null as ClientSelection | null,
     purchaseType: 'buy'
   };
 
@@ -121,19 +111,15 @@ export class BuyerPreferencesComponent implements OnInit {
     if (preference) {
       this.editingPreference = preference;
       this.formData = {
-        leadId: preference.clientId || null,
-        createNewLead: false,
-        newLeadData: {
-          name: preference.clientName || '',
-          email: preference.clientEmail || '',
-          phone: preference.clientPhone || '',
-          budget: null,
-          propertyPreferences: '',
-          preferredAreas: ''
+        selectedClient: {
+          leadId: preference.clientId || null,
+          createNew: !preference.clientId,
+          client: {
+            name: preference.clientName || '',
+            email: preference.clientEmail || '',
+            phone: preference.clientPhone || ''
+          }
         },
-        clientName: preference.clientName || '',
-        clientEmail: preference.clientEmail || '',
-        clientPhone: preference.clientPhone || '',
         purchaseType: preference.purchaseType || 'buy'
       };
     } else {
@@ -142,22 +128,8 @@ export class BuyerPreferencesComponent implements OnInit {
     this.showForm = true;
   }
 
-  onLeadSelect(leadId: string | null) {
-    if (leadId) {
-      const lead = this.leads.find(l => l.id === leadId);
-      if (lead) {
-        this.formData.clientName = lead.name || '';
-        this.formData.clientEmail = lead.email || '';
-        this.formData.clientPhone = lead.phone || '';
-      }
-    }
-  }
-
-  toggleNewLead(isNew: boolean) {
-    this.formData.createNewLead = isNew;
-    if (isNew) {
-      this.formData.leadId = null;
-    }
+  onClientSelected(selection: ClientSelection): void {
+    this.formData.selectedClient = selection;
   }
 
   closeForm() {
@@ -168,37 +140,26 @@ export class BuyerPreferencesComponent implements OnInit {
 
   resetForm() {
     this.formData = {
-      leadId: null,
-      createNewLead: false,
-      newLeadData: {
-        name: '',
-        email: '',
-        phone: '',
-        budget: null,
-        propertyPreferences: '',
-        preferredAreas: ''
-      },
-      clientName: '',
-      clientEmail: '',
-      clientPhone: '',
+      selectedClient: null,
       purchaseType: 'buy'
     };
   }
 
   savePreference() {
-    if (!this.formData.clientName?.trim()) {
+    if (!this.formData.selectedClient?.client.name?.trim()) {
       this.showError('Client name is required');
       return;
     }
     
     this.saving = true;
+    const client = this.formData.selectedClient!;
     const data: any = {
-      leadId: this.formData.leadId,
-      createNewLead: this.formData.createNewLead,
-      newLeadData: this.formData.createNewLead ? this.formData.newLeadData : null,
-      clientName: this.formData.clientName,
-      clientEmail: this.formData.clientEmail,
-      clientPhone: this.formData.clientPhone,
+      leadId: client.leadId,
+      createNewLead: client.createNew,
+      newLeadData: client.createNew ? client.client : null,
+      clientName: client.client.name,
+      clientEmail: client.client.email,
+      clientPhone: client.client.phone,
       purchaseType: this.formData.purchaseType
     };
 

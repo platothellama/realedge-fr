@@ -56,33 +56,11 @@
       </mat-form-field>
     </div>
 
-    <div class="section-label">Client Details</div>
-
-    <div class="form-row">
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Client Name</mat-label>
-        <input matInput formControlName="clientName">
-        <mat-icon matSuffix>person</mat-icon>
-        <mat-error *ngIf="visitForm.get('clientName')?.hasError('required')">Client name is required</mat-error>
-      </mat-form-field>
-    </div>
-
-    <div class="form-row">
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Client Email</mat-label>
-        <input matInput formControlName="clientEmail" type="email">
-        <mat-icon matSuffix>email</mat-icon>
-        <mat-error *ngIf="visitForm.get('clientEmail')?.hasError('email')">Please enter a valid email</mat-error>
-      </mat-form-field>
-    </div>
-
-    <div class="form-row">
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Client Phone</mat-label>
-        <input matInput formControlName="clientPhone">
-        <mat-icon matSuffix>phone</mat-icon>
-      </mat-form-field>
-    </div>
+    <app-client-selector
+      [initialLeadId]="selectedClient?.leadId || null"
+      [initialClient]="isEdit && !selectedClient?.leadId ? selectedClient?.client : null"
+      (clientSelected)="onClientSelected($event)">
+    </app-client-selector>
 
     <div class="section-label">Assignment & Status</div>
 
@@ -122,7 +100,7 @@
 
   <mat-dialog-actions align="end">
     <button mat-button (click)="onCancel()" class="cancel-btn" [disabled]="isSubmitting">Discard</button>
-    <button mat-raised-button color="primary" class="submit-btn" (click)="onSubmit()" [disabled]="!visitForm.valid || isSubmitting" [class.loading]="isSubmitting">
+    <button mat-raised-button color="primary" class="submit-btn" (click)="onSubmit()" [disabled]="!visitForm.valid || !selectedClient || isSubmitting" [class.loading]="isSubmitting">
       @if (isSubmitting) {
         <mat-spinner diameter="20"></mat-spinner>
       } @else {

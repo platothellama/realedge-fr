@@ -104,79 +104,21 @@
 
       <div class="modal-body">
         <div class="form-content">
-          <div class="lead-selection-section">
-            <h4>Client Information</h4>
-            <div class="form-row">
-              <mat-form-field appearance="outline">
-                <mat-label>Client Name</mat-label>
-                <input matInput [(ngModel)]="formData.clientName" required>
-              </mat-form-field>
-              <mat-form-field appearance="outline">
-                <mat-label>Email</mat-label>
-                <input matInput type="email" [(ngModel)]="formData.clientEmail">
-              </mat-form-field>
-            </div>
-            <div class="form-row">
-              <mat-form-field appearance="outline">
-                <mat-label>Phone</mat-label>
-                <input matInput [(ngModel)]="formData.clientPhone">
-              </mat-form-field>
-              <mat-form-field appearance="outline">
-                <mat-label>Purchase Type</mat-label>
-                <mat-select [(ngModel)]="formData.purchaseType">
-                  @for (type of purchaseTypes; track type.value) {
-                    <mat-option [value]="type.value">{{ type.label }}</mat-option>
-                  }
-                </mat-select>
-              </mat-form-field>
-            </div>
-          </div>
+          <app-client-selector
+            [initialLeadId]="formData.selectedClient?.leadId || null"
+            [initialClient]="editingPreference && !formData.selectedClient?.leadId ? formData.selectedClient?.client : null"
+            (clientSelected)="onClientSelected($event)">
+          </app-client-selector>
 
-          <div class="lead-selection-section" style="margin-top: 20px;">
-            <h4>Link to CRM Lead (Optional)</h4>
-            <div class="lead-options">
-              <mat-radio-group [(ngModel)]="formData.createNewLead" (change)="toggleNewLead($event.value)">
-                <mat-radio-button [value]="false">Select Existing Lead</mat-radio-button>
-                <mat-radio-button [value]="true">Create New Lead</mat-radio-button>
-              </mat-radio-group>
-            </div>
-            
-            @if (!formData.createNewLead) {
-              <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Select from CRM Leads</mat-label>
-                <mat-select [(ngModel)]="formData.leadId" (selectionChange)="onLeadSelect($event.value)">
-                  <mat-option [value]="null">-- Select a lead --</mat-option>
-                  @for (lead of leads; track lead.id) {
-                    <mat-option [value]="lead.id">
-                      {{ lead.name }} - {{ lead.email }} ({{ lead.status }})
-                    </mat-option>
-                  }
-                </mat-select>
-              </mat-form-field>
-            } @else {
-              <div class="new-lead-form">
-                <div class="form-row">
-                  <mat-form-field appearance="outline">
-                    <mat-label>Lead Name</mat-label>
-                    <input matInput [(ngModel)]="formData.newLeadData.name">
-                  </mat-form-field>
-                  <mat-form-field appearance="outline">
-                    <mat-label>Lead Email</mat-label>
-                    <input matInput type="email" [(ngModel)]="formData.newLeadData.email">
-                  </mat-form-field>
-                </div>
-                <div class="form-row">
-                  <mat-form-field appearance="outline">
-                    <mat-label>Phone</mat-label>
-                    <input matInput [(ngModel)]="formData.newLeadData.phone">
-                  </mat-form-field>
-                  <mat-form-field appearance="outline">
-                    <mat-label>Budget</mat-label>
-                    <input matInput type="number" [(ngModel)]="formData.newLeadData.budget">
-                  </mat-form-field>
-                </div>
-              </div>
-            }
+          <div class="form-row" style="margin-top: 20px;">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Purchase Type</mat-label>
+              <mat-select [(ngModel)]="formData.purchaseType">
+                @for (type of purchaseTypes; track type.value) {
+                  <mat-option [value]="type.value">{{ type.label }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
           </div>
         </div>
       </div>

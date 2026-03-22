@@ -9,6 +9,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ApiService } from '../../services/api';
+import { ClientSelectorComponent, ClientSelection } from '../client-selector/client-selector';
 
 @Component({
   selector: 'app-deal-form',
@@ -22,7 +23,8 @@ import { ApiService } from '../../services/api';
     MatSelectModule,
     MatButtonModule,
     MatIconModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    ClientSelectorComponent
   ],
   templateUrl: './deal-form.html',
   styleUrl: './deal-form.css'
@@ -37,6 +39,7 @@ export class DealFormComponent implements OnInit {
   isAdmin = false;
   isSubmitting = false;
   preSelectedPropertyId: string | null = null;
+  selectedClient: ClientSelection | null = null;
 
   stages = ['Offer Made', 'Negotiation', 'Contract Signed', 'Payment', 'Closed'];
 
@@ -62,7 +65,27 @@ export class DealFormComponent implements OnInit {
   ngOnInit(): void {
     if (this.data && this.data.deal) {
       this.isEdit = true;
-      this.dealForm.patchValue(this.data.deal);
+      this.dealForm.patchValue({
+        title: this.data.deal.title,
+        buyerName: this.data.deal.buyerName,
+        sellerName: this.data.deal.sellerName,
+        commission: this.data.deal.commission,
+        dealStage: this.data.deal.dealStage,
+        notes: this.data.deal.notes,
+        propertyId: this.data.deal.propertyId,
+        brokerId: this.data.deal.brokerId,
+        buyerLeadId: this.data.deal.buyerLeadId
+      });
+      
+      this.selectedClient = {
+        leadId: this.data.deal.buyerLeadId || null,
+        createNew: !this.data.deal.buyerLeadId,
+        client: {
+          name: this.data.deal.buyerName || '',
+          email: '',
+          phone: ''
+        }
+      };
     }
     
     if (this.data && this.data.propertyId) {
@@ -121,15 +144,27 @@ export class DealFormComponent implements OnInit {
   }
 
   onSubmit(): void {
-    if (this.dealForm.valid && !this.isSubmitting) {
+    if (this.dealForm.valid && !this.isSubmitting && this.selectedClient) {
       this.isSubmitting = true;
       const val = this.dealForm.getRawValue();
-      this.dialogRef.close(val);
+      const payload: any = {
+        ...val,
+        buyerLeadId: this.selectedClient.leadId,
+        buyerName: this.selectedClient.client.name
+      };
+      this.dialogRef.close(payload);
     }
   }
 
   onCancel(): void {
     this.dialogRef.close();
+  }
+
+  onClientSelected(selection: ClientSelection): void {
+    this.selectedClient = selection;
+    if (!selection.createNew && selection.leadId) {
+      this.dealForm.get('buyerLeadId')?.setValue(selection.leadId);
+    }
   }
 
   getPropertyTitle(propertyId: string): string {

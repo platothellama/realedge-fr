@@ -10,35 +10,15 @@
         <mat-icon>search</mat-icon>
         <input type="text" placeholder="Search leads..." [(ngModel)]="searchQuery" (ngModelChange)="applyFilters()">
       </div>
-
-      <mat-form-field appearance="outline" class="source-filter no-subscript">
-        <mat-label>Source</mat-label>
-        <mat-select [(ngModel)]="selectedSource" (selectionChange)="applyFilters()">
-          <mat-option value="All">All Sources</mat-option>
-          <mat-option value="Website">Website</mat-option>
-          <mat-option value="Facebook">Facebook</mat-option>
-          <mat-option value="Google Ads">Google Ads</mat-option>
-          <mat-option value="Referral">Referral</mat-option>
-          <mat-option value="Walk-in">Walk-in</mat-option>
-        </mat-select>
-      </mat-form-field>
+      
     </div>
 
     <div class="action-area">
-      <button mat-stroked-button color="primary" [matMenuTriggerFor]="dataMenu" class="data-btn">
-        <mat-icon>import_export</mat-icon>
-        Data
-      </button>
-      <mat-menu #dataMenu="matMenu">
-        <button mat-menu-item (click)="triggerImport()">
-          <mat-icon>upload</mat-icon>
-          <span>Import CSV</span>
-        </button>
+
         <button mat-menu-item (click)="exportToCSV()">
           <mat-icon>download</mat-icon>
           <span>Export CSV</span>
         </button>
-      </mat-menu>
 
       <button mat-raised-button color="primary" class="create-btn" (click)="openLeadForm()">
         <mat-icon>person_add</mat-icon>

@@ -14,6 +14,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api';
+import { ClientSelectorComponent, ClientSelection } from '../../components/client-selector/client-selector';
 
 interface LineItem {
   description: string;
@@ -73,7 +74,8 @@ interface Invoice {
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
-    FormsModule
+    FormsModule,
+    ClientSelectorComponent
   ],
   templateUrl: './invoices.html',
   styleUrl: './invoices.css'
@@ -93,6 +95,7 @@ export class InvoicesComponent implements OnInit {
   showAddDialog = false;
   
   lineItems: LineItem[] = [];
+  selectedClient: ClientSelection | null = null;
 
   newInvoice: Partial<Invoice> = {
     type: 'Sale',
@@ -172,6 +175,15 @@ export class InvoicesComponent implements OnInit {
     this.newInvoice.subtotal = this.lineItems.reduce((sum, item) => sum + (item.total || 0), 0);
   }
 
+  onClientSelected(selection: ClientSelection): void {
+    this.selectedClient = selection;
+    if (selection.client) {
+      this.newInvoice.clientName = selection.client.name;
+      this.newInvoice.clientEmail = selection.client.email;
+      this.newInvoice.clientPhone = selection.client.phone;
+    }
+  }
+
   createInvoice() {
     if (!this.newInvoice.clientName) {
       this.snackBar.open('Client name is required', 'Close', { duration: 3000 });
@@ -183,8 +195,9 @@ export class InvoicesComponent implements OnInit {
       return;
     }
 
-    const invoiceData = {
+    const invoiceData: any = {
       ...this.newInvoice,
+      leadId: this.selectedClient?.leadId || null,
       lineItems: this.lineItems,
       issueDate: new Date(),
       dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
@@ -289,6 +302,7 @@ export class InvoicesComponent implements OnInit {
       paymentTerms: 'Net 30'
     };
     this.lineItems = [];
+    this.selectedClient = null;
   }
 
   closeDialog() {

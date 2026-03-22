@@ -39,29 +39,13 @@
 
     <div class="section-label">Parties & Broker</div>
 
-    <div class="form-row">
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Buyer Name</mat-label>
-        <input matInput formControlName="buyerName">
-        <mat-icon matSuffix>person</mat-icon>
-        <mat-error *ngIf="dealForm.get('buyerName')?.hasError('required')">Buyer name is required</mat-error>
-      </mat-form-field>
-    </div>
+    <app-client-selector
+      [initialLeadId]="selectedClient?.leadId || null"
+      [initialClient]="isEdit && !selectedClient?.leadId ? selectedClient?.client : null"
+      (clientSelected)="onClientSelected($event)">
+    </app-client-selector>
 
-    <div class="form-row">
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Link to Lead (Optional)</mat-label>
-        <mat-select formControlName="buyerLeadId">
-          <mat-option [value]="null">-- None --</mat-option>
-          @for (lead of leads; track lead.id) {
-            <mat-option [value]="lead.id">{{ lead.name }} ({{ lead.email }})</mat-option>
-          }
-        </mat-select>
-        <mat-icon matSuffix>link</mat-icon>
-      </mat-form-field>
-    </div>
-
-    <div class="form-row">
+    <div class="form-row" style="margin-top: 16px;">
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Seller Name</mat-label>
         <input matInput formControlName="sellerName">
@@ -122,7 +106,7 @@
 
   <mat-dialog-actions align="end">
     <button mat-button (click)="onCancel()" class="cancel-btn" [disabled]="isSubmitting">Discard</button>
-    <button mat-raised-button color="primary" class="submit-btn" (click)="onSubmit()" [disabled]="!dealForm.valid || isSubmitting" [class.loading]="isSubmitting">
+    <button mat-raised-button color="primary" class="submit-btn" (click)="onSubmit()" [disabled]="!dealForm.valid || !selectedClient || isSubmitting" [class.loading]="isSubmitting">
       @if (isSubmitting) {
         <mat-spinner diameter="20"></mat-spinner>
       } @else {

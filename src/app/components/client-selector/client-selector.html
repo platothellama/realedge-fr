@@ -1,0 +1,82 @@
+<div class="client-selector">
+  <div class="section-label">Client Information</div>
+  
+  @if (!showNewClientForm) {
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Select Existing Client</mat-label>
+        <mat-select [value]="selectedLead?.id || ''" (selectionChange)="onLeadSelect($event.value)">
+          <mat-option [value]="''" disabled>-- Select a client --</mat-option>
+          @for (lead of filteredLeads; track lead.id) {
+            <mat-option [value]="lead.id">
+              <div class="lead-option">
+                <span class="lead-name">{{ lead.name }}</span>
+                <span class="lead-email">{{ lead.email }}</span>
+              </div>
+            </mat-option>
+          }
+        </mat-select>
+        <mat-icon matSuffix>person</mat-icon>
+      </mat-form-field>
+    </div>
+
+    <div class="divider-text">
+      <span>or</span>
+    </div>
+
+    <button mat-stroked-button type="button" class="new-client-btn" (click)="toggleNewClient()">
+      <mat-icon>add</mat-icon>
+      Create New Client
+    </button>
+  } @else {
+    <div class="new-client-form">
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Client Name</mat-label>
+          <input matInput [formControl]="clientForm.get('name')!" placeholder="Full Name" (input)="onNewClientChange()">
+          <mat-icon matSuffix>person</mat-icon>
+          <mat-error *ngIf="clientForm.get('name')?.hasError('required')">Name is required</mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Email Address</mat-label>
+          <input matInput type="email" [formControl]="clientForm.get('email')!" placeholder="email@example.com" (input)="onNewClientChange()">
+          <mat-icon matSuffix>email</mat-icon>
+          <mat-error *ngIf="clientForm.get('email')?.hasError('required')">Email is required</mat-error>
+          <mat-error *ngIf="clientForm.get('email')?.hasError('email')">Please enter a valid email</mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Phone Number</mat-label>
+          <input matInput [formControl]="clientForm.get('phone')!" placeholder="+1 234 567 890" (input)="onNewClientChange()">
+          <mat-icon matSuffix>phone</mat-icon>
+          <mat-error *ngIf="clientForm.get('phone')?.hasError('required')">Phone is required</mat-error>
+        </mat-form-field>
+      </div>
+
+      <button mat-stroked-button type="button" class="select-existing-btn" (click)="toggleNewClient()">
+        <mat-icon>search</mat-icon>
+        Select Existing Client Instead
+      </button>
+    </div>
+  }
+
+  @if (selectedLead) {
+    <div class="selected-client-info">
+      <div class="info-card">
+        <mat-icon>check_circle</mat-icon>
+        <div class="info-details">
+          <span class="info-name">{{ selectedLead.name }}</span>
+          <span class="info-contact">{{ selectedLead.email }} | {{ selectedLead.phone }}</span>
+          @if (selectedLead.budget) {
+            <span class="info-budget">Budget: ${{ selectedLead.budget | number }}</span>
+          }
+        </div>
+      </div>
+    </div>
+  }
+</div>

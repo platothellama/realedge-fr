@@ -157,25 +157,18 @@
         <div class="dialog-body">
           <div class="form-section">
             <h4>Client Information</h4>
-            <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Client Name *</mat-label>
-              <input matInput [(ngModel)]="newInvoice.clientName" placeholder="Full name or company name" required>
-              <mat-error>Client name is required</mat-error>
-            </mat-form-field>
-            <div class="form-row">
-              <mat-form-field appearance="outline">
+            <app-client-selector
+              [initialLeadId]="selectedClient?.leadId || null"
+              [initialClient]="selectedClient?.client || null"
+              (clientSelected)="onClientSelected($event)">
+            </app-client-selector>
+            
+            <div class="form-row" style="margin-top: 16px;">
+              <mat-form-field appearance="outline" class="full-width">
                 <mat-label>Client Tax ID (NIF)</mat-label>
                 <input matInput [(ngModel)]="newInvoice.clientTaxId" placeholder="Tax Identification Number">
               </mat-form-field>
-              <mat-form-field appearance="outline">
-                <mat-label>Client Phone</mat-label>
-                <input matInput [(ngModel)]="newInvoice.clientPhone" placeholder="+961 XX XXX XXX">
-              </mat-form-field>
             </div>
-            <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Client Email</mat-label>
-              <input matInput [(ngModel)]="newInvoice.clientEmail" placeholder="client@email.com" type="email">
-            </mat-form-field>
             <mat-form-field appearance="outline" class="full-width">
               <mat-label>Client Address</mat-label>
               <textarea matInput [(ngModel)]="newInvoice.clientAddress" placeholder="Full address" rows="2"></textarea>

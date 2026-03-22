@@ -11,6 +11,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ApiService } from '../../services/api';
+import { ClientSelectorComponent, ClientSelection } from '../client-selector/client-selector';
 
 @Component({
   selector: 'app-visit-form',
@@ -26,7 +27,8 @@ import { ApiService } from '../../services/api';
     MatIconModule,
     MatDatepickerModule,
     MatNativeDateModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    ClientSelectorComponent
   ],
   templateUrl: './visit-form.html',
   styleUrl: './visit-form.css'
@@ -38,6 +40,7 @@ export class VisitFormComponent implements OnInit {
   brokers: any[] = [];
   statuses = ['Scheduled', 'Completed', 'Cancelled', 'No Show'];
   isSubmitting = false;
+  selectedClient: ClientSelection | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -49,9 +52,6 @@ export class VisitFormComponent implements OnInit {
       title: ['', Validators.required],
       visitDate: [new Date(), Validators.required],
       visitTime: ['10:00', Validators.required],
-      clientName: ['', Validators.required],
-      clientEmail: ['', [Validators.email]],
-      clientPhone: [''],
       status: ['Scheduled', Validators.required],
       propertyId: [null, Validators.required],
       brokerId: [null, Validators.required],
@@ -64,15 +64,28 @@ export class VisitFormComponent implements OnInit {
     if (this.data && this.data.visit) {
       this.isEdit = true;
       const v = this.data.visit;
-      // Extract time from visitDate
       const date = new Date(v.visitDate);
       const time = `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
       
       this.visitForm.patchValue({
-        ...v,
+        title: v.title,
         visitDate: date,
-        visitTime: time
+        visitTime: time,
+        status: v.status,
+        propertyId: v.propertyId,
+        brokerId: v.brokerId,
+        notes: v.notes
       });
+      
+      this.selectedClient = {
+        leadId: v.leadId || null,
+        createNew: !v.leadId,
+        client: {
+          name: v.clientName || '',
+          email: v.clientEmail || '',
+          phone: v.clientPhone || ''
+        }
+      };
     } else if (this.data && this.data.propertyId) {
       this.visitForm.get('propertyId')?.setValue(this.data.propertyId);
     }
@@ -94,21 +107,32 @@ export class VisitFormComponent implements OnInit {
   }
 
   onSubmit(): void {
-    if (this.visitForm.valid && !this.isSubmitting) {
+    if (this.visitForm.valid && !this.isSubmitting && this.selectedClient) {
       this.isSubmitting = true;
       const val = this.visitForm.value;
       const date = new Date(val.visitDate);
       const [hours, minutes] = val.visitTime.split(':');
       date.setHours(parseInt(hours), parseInt(minutes));
       
-      const payload = {
-        ...val,
-        visitDate: date.toISOString()
+      const payload: any = {
+        title: val.title,
+        visitDate: date.toISOString(),
+        status: val.status,
+        propertyId: val.propertyId,
+        brokerId: val.brokerId,
+        notes: val.notes,
+        leadId: this.selectedClient.leadId,
+        clientName: this.selectedClient.client.name,
+        clientEmail: this.selectedClient.client.email,
+        clientPhone: this.selectedClient.client.phone
       };
-      delete payload.visitTime;
       
       this.dialogRef.close(payload);
     }
+  }
+
+  onClientSelected(selection: ClientSelection): void {
+    this.selectedClient = selection;
   }
 
   onCancel(): void {
