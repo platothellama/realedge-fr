@@ -60,7 +60,6 @@ export class VisitFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadInitialData();
     if (this.data && this.data.visit) {
       this.isEdit = true;
       const v = this.data.visit;
@@ -89,6 +88,8 @@ export class VisitFormComponent implements OnInit {
     } else if (this.data && this.data.propertyId) {
       this.visitForm.get('propertyId')?.setValue(this.data.propertyId);
     }
+    
+    this.loadInitialData();
   }
 
   private loadInitialData() {

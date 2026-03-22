@@ -51,14 +51,12 @@ export class DealFormComponent implements OnInit {
   ) {
     this.dealForm = this.fb.group({
       title: ['', Validators.required],
-      buyerName: ['', Validators.required],
       sellerName: ['', Validators.required],
       commission: [{ value: 0, disabled: true }, [Validators.required, Validators.min(0)]],
       dealStage: ['Offer Made', Validators.required],
       notes: [''],
       propertyId: ['', Validators.required],
-      brokerId: [null, Validators.required],
-      buyerLeadId: [null]
+      brokerId: [null, Validators.required]
     });
   }
 
@@ -67,14 +65,12 @@ export class DealFormComponent implements OnInit {
       this.isEdit = true;
       this.dealForm.patchValue({
         title: this.data.deal.title,
-        buyerName: this.data.deal.buyerName,
         sellerName: this.data.deal.sellerName,
         commission: this.data.deal.commission,
         dealStage: this.data.deal.dealStage,
         notes: this.data.deal.notes,
         propertyId: this.data.deal.propertyId,
-        brokerId: this.data.deal.brokerId,
-        buyerLeadId: this.data.deal.buyerLeadId
+        brokerId: this.data.deal.brokerId
       });
       
       this.selectedClient = {

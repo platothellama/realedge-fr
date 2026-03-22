@@ -106,7 +106,7 @@
 
   <mat-dialog-actions align="end">
     <button mat-button (click)="onCancel()" class="cancel-btn" [disabled]="isSubmitting">Discard</button>
-    <button mat-raised-button color="primary" class="submit-btn" (click)="onSubmit()" [disabled]="!dealForm.valid || !selectedClient || isSubmitting" [class.loading]="isSubmitting">
+    <button mat-raised-button color="primary" class="submit-btn" (click)="onSubmit()" [disabled]="!dealForm.valid || isSubmitting" [class.loading]="isSubmitting">
       @if (isSubmitting) {
         <mat-spinner diameter="20"></mat-spinner>
       } @else {
