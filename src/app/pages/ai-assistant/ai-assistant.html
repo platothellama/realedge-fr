@@ -11,29 +11,32 @@
   </div>
 
   <div class="capabilities-banner">
-    <div class="capability-item">
-      <mat-icon>home</mat-icon>
-      <span>Property Search</span>
-    </div>
-    <div class="capability-item">
-      <mat-icon>people</mat-icon>
-      <span>Lead Analysis</span>
-    </div>
-    <div class="capability-item">
-      <mat-icon>handshake</mat-icon>
-      <span>Deal Pipeline</span>
-    </div>
-    <div class="capability-item">
-      <mat-icon>analytics</mat-icon>
-      <span>Revenue Stats</span>
-    </div>
-    <div class="capability-item">
-      <mat-icon>square_foot</mat-icon>
-      <span>Area Queries</span>
-    </div>
-    <div class="capability-item">
-      <mat-icon>location_on</mat-icon>
-      <span>Lebanon Locations</span>
+    <h1>Type of question I can answer</h1>
+    <div class="capabilities-holder">
+      <div class="capability-item">
+        <mat-icon>home</mat-icon>
+        <span>Property Search</span>
+      </div>
+      <div class="capability-item">
+        <mat-icon>people</mat-icon>
+        <span>Lead Analysis</span>
+      </div>
+      <div class="capability-item">
+        <mat-icon>handshake</mat-icon>
+        <span>Deal Pipeline</span>
+      </div>
+      <div class="capability-item">
+        <mat-icon>analytics</mat-icon>
+        <span>Revenue Stats</span>
+      </div>
+      <div class="capability-item">
+        <mat-icon>square_foot</mat-icon>
+        <span>Area Queries</span>
+      </div>
+      <div class="capability-item">
+        <mat-icon>location_on</mat-icon>
+        <span>Lebanon Locations</span>
+      </div>
     </div>
   </div>
 
@@ -186,7 +189,7 @@
             </div>
           </div>
         }
-        
+
         @if (loading) {
           <div class="message-row">
             <div class="avatar ai-avatar">
@@ -207,7 +210,7 @@
       <div class="chat-input-area">
         <div class="input-wrapper">
           <mat-form-field appearance="outline" class="full-width">
-            <input matInput [(ngModel)]="userInput" (keyup.enter)="onSendMessage()" 
+            <input matInput [(ngModel)]="userInput" (keyup.enter)="onSendMessage()"
               placeholder="Try: '120 sqm apartment in Baadba' or '3 bedroom villas in Mount Lebanon'">
             <button mat-icon-button matSuffix (click)="onSendMessage()" [disabled]="!userInput.trim() || loading">
               <mat-icon>send</mat-icon>
