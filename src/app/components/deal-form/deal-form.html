@@ -16,19 +16,26 @@
       </mat-form-field>
     </div>
 
-    <div class="form-row">
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Property</mat-label>
-        <mat-select formControlName="propertyId">
-          <mat-option [value]="''" disabled>Select a property</mat-option>
-          @for (prop of properties; track prop.id) {
-            <mat-option [value]="prop.id">{{ prop.title }} - ${{ prop.price | number }}</mat-option>
-          }
-        </mat-select>
-        <mat-icon matSuffix>home</mat-icon>
-        <mat-error *ngIf="dealForm.get('propertyId')?.hasError('required')">Please select a property</mat-error>
-      </mat-form-field>
-    </div>
+    @if (!preSelectedPropertyId) {
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Property</mat-label>
+          <mat-select formControlName="propertyId">
+            <mat-option [value]="''" disabled>Select a property</mat-option>
+            @for (prop of properties; track prop.id) {
+              <mat-option [value]="prop.id">{{ prop.title }} - ${{ prop.price | number }}</mat-option>
+            }
+          </mat-select>
+          <mat-icon matSuffix>home</mat-icon>
+          <mat-error *ngIf="dealForm.get('propertyId')?.hasError('required')">Please select a property</mat-error>
+        </mat-form-field>
+      </div>
+    } @else {
+      <div class="property-info-badge">
+        <mat-icon>home</mat-icon>
+        <span>Property: {{ getPropertyTitle(preSelectedPropertyId) }}</span>
+      </div>
+    }
 
     <div class="section-label">Parties & Broker</div>
 

@@ -1,5 +1,19 @@
 .group-form-container {
   padding: 24px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  max-height: 90vh;
+}
+
+.group-form-container .mat-mdc-dialog-content {
+  flex: 1;
+  overflow-y: auto !important;
+  min-height: 0 !important;
+}
+
+.group-form-container .mat-mdc-dialog-actions {
+  flex-shrink: 0;
 }
 .full-width {
   width: 100%;

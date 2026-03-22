@@ -36,6 +36,7 @@ export class DealFormComponent implements OnInit {
   currentUser: any = null;
   isAdmin = false;
   isSubmitting = false;
+  preSelectedPropertyId: string | null = null;
 
   stages = ['Offer Made', 'Negotiation', 'Contract Signed', 'Payment', 'Closed'];
 
@@ -59,12 +60,16 @@ export class DealFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadInitialData();
-
     if (this.data && this.data.deal) {
       this.isEdit = true;
       this.dealForm.patchValue(this.data.deal);
     }
+    
+    if (this.data && this.data.propertyId) {
+      this.preSelectedPropertyId = this.data.propertyId;
+    }
+    
+    this.loadInitialData();
   }
 
   private loadInitialData() {
@@ -85,9 +90,14 @@ export class DealFormComponent implements OnInit {
 
     this.api.getProperties().subscribe(res => {
       this.properties = Array.isArray(res) ? res : (res.data || []);
-      // If editing or pre-selected, trigger calculation
-      const selectedId = this.dealForm.get('propertyId')?.value;
-      if (selectedId) this.calculateCommission(selectedId);
+      
+      if (this.preSelectedPropertyId) {
+        this.dealForm.get('propertyId')?.setValue(this.preSelectedPropertyId);
+        this.calculateCommission(this.preSelectedPropertyId);
+      } else {
+        const selectedId = this.dealForm.get('propertyId')?.value;
+        if (selectedId) this.calculateCommission(selectedId);
+      }
     });
     this.api.getUsers().subscribe(res => {
       this.brokers = Array.isArray(res) ? res : (res.data || []);
@@ -120,5 +130,10 @@ export class DealFormComponent implements OnInit {
 
   onCancel(): void {
     this.dialogRef.close();
+  }
+
+  getPropertyTitle(propertyId: string): string {
+    const prop = this.properties.find(p => p.id === propertyId);
+    return prop ? `${prop.title} - $${prop.price?.toLocaleString()}` : 'Loading...';
   }
 }

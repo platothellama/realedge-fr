@@ -143,15 +143,21 @@ export class PropertyDetailsComponent implements OnInit {
 
   openNegotiationForm() {
     const dialogRef = this.dialog.open(NegotiationFormComponent, {
-      width: '500px',
+      width: '550px',
       data: { propertyPrice: this.property.price }
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.api.addNegotiation(this.property.id, result).subscribe({
-          next: () => this.fetchProperty(this.property.id),
-          error: (err) => console.error('Error adding negotiation', err)
+          next: () => {
+            this.snackBar.open('Negotiation log added successfully!', 'Close', { duration: 3000 });
+            this.fetchProperty(this.property.id);
+          },
+          error: (err) => {
+            console.error('Error adding negotiation', err);
+            this.snackBar.open('Failed to add negotiation log', 'Close', { duration: 3000 });
+          }
         });
       }
     });
@@ -161,6 +167,7 @@ export class PropertyDetailsComponent implements OnInit {
     const dialogRef = this.dialog.open(DealFormComponent, {
       width: '850px',
       data: {
+        propertyId: this.property.id,
         deal: {
           propertyId: this.property.id,
           title: `Sale of ${this.property.title}`

@@ -1,6 +1,10 @@
 .lead-form-container {
   background: var(--bg-surface);
   color: var(--text-primary);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  max-height: 90vh;
 }
 
 .modal-header {
@@ -39,8 +43,9 @@
 
 .mat-mdc-dialog-content {
   padding: 0 32px !important;
-  max-height: 80vh !important;
-  min-height: 450px;
+  flex: 1;
+  overflow-y: auto !important;
+  min-height: 0 !important;
 }
 
 .form-row {
@@ -86,6 +91,7 @@
   padding: 24px 32px 32px !important;
   border-top: 1px solid var(--border);
   gap: 16px;
+  flex-shrink: 0;
 }
 
 .cancel-btn {

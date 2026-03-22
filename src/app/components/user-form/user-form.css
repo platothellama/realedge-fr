@@ -2,6 +2,10 @@
   padding: 32px;
   background-color: var(--bg-surface);
   color: var(--text-primary);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  max-height: 90vh;
 }
 
 h2[mat-dialog-title] {
@@ -16,7 +20,9 @@ h2[mat-dialog-title] {
 .mat-mdc-dialog-content {
   padding: 0 !important;
   margin: 0 !important;
-  max-height: 70vh;
+  flex: 1;
+  overflow-y: auto !important;
+  min-height: 0 !important;
 }
 
 .form-row {
@@ -37,6 +43,7 @@ h2[mat-dialog-title] {
 .mat-mdc-dialog-actions {
   padding: 24px 0 0 !important;
   gap: 12px;
+  flex-shrink: 0;
 }
 
 .cancel-btn {
