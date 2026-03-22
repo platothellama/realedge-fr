@@ -13,6 +13,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatExpansionModule } from '@angular/material/expansion';
 
 @Component({
   selector: 'app-crm',
@@ -29,7 +31,9 @@ import { MatMenuModule } from '@angular/material/menu';
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
-    MatMenuModule
+    MatMenuModule,
+    MatTooltipModule,
+    MatExpansionModule
   ],
   templateUrl: './crm.html',
   styleUrl: './crm.css',
@@ -38,7 +42,12 @@ export class CrmComponent implements OnInit {
   allLeads: any[] = [];
   searchQuery: string = '';
   selectedSource: string = 'All';
+  selectedStatus: string = 'All';
   deletingId: string | null = null;
+  viewMode: 'pipeline' | 'list' = 'list';
+  expandedLeadId: string | null = null;
+
+  statuses = ['All', 'New Lead', 'Contacted', 'Visit Scheduled', 'Negotiation', 'Closed Deal', 'Lost Lead'];
 
   pipeline: any[] = [
     { name: 'New Lead', status: 'New Lead', leads: [] },
@@ -89,7 +98,50 @@ export class CrmComponent implements OnInit {
       filtered = filtered.filter(l => l.source === this.selectedSource);
     }
 
+    if (this.selectedStatus !== 'All') {
+      filtered = filtered.filter(l => l.status === this.selectedStatus);
+    }
+
     this.mapLeadsToPipeline(filtered);
+  }
+
+  get filteredLeads(): any[] {
+    let filtered = [...this.allLeads];
+
+    if (this.searchQuery) {
+      const q = this.searchQuery.toLowerCase();
+      filtered = filtered.filter(l =>
+        l.name?.toLowerCase().includes(q) ||
+        l.email?.toLowerCase().includes(q) ||
+        l.phone?.toLowerCase().includes(q)
+      );
+    }
+
+    if (this.selectedSource !== 'All') {
+      filtered = filtered.filter(l => l.source === this.selectedSource);
+    }
+
+    if (this.selectedStatus !== 'All') {
+      filtered = filtered.filter(l => l.status === this.selectedStatus);
+    }
+
+    return filtered;
+  }
+
+  toggleExpand(leadId: string) {
+    this.expandedLeadId = this.expandedLeadId === leadId ? null : leadId;
+  }
+
+  getScheduledVisits(lead: any): any[] {
+    return (lead.visits || []).filter((v: any) => v.status === 'Scheduled');
+  }
+
+  getCompletedVisits(lead: any): any[] {
+    return (lead.visits || []).filter((v: any) => v.status === 'Completed');
+  }
+
+  getAllVisits(lead: any): any[] {
+    return lead.visits || [];
   }
 
   private mapLeadsToPipeline(leads: any[]) {
@@ -282,5 +334,11 @@ export class CrmComponent implements OnInit {
 
   private showError(msg: string) {
     this.snackBar.open(msg, 'Close', { duration: 5000, panelClass: ['error-snackbar'] });
+  }
+
+  scheduleVisit(lead: any) {
+    // This would open the visit form dialog
+    // For now, we'll just show a message
+    this.snackBar.open('Schedule visit for ' + lead.name, 'Close', { duration: 3000 });
   }
 }
