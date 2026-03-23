@@ -85,6 +85,9 @@
               <span class="visit-count completed">{{ getCompletedVisits(lead).length }}</span>
             </div>
             <div class="col-actions">
+              <button mat-icon-button (click)="$event.stopPropagation(); convertToDeal(lead)" matTooltip="Convert to Deal">
+                <mat-icon>trending_up</mat-icon>
+              </button>
               <button mat-icon-button (click)="$event.stopPropagation(); openLeadForm(lead)" matTooltip="Edit">
                 <mat-icon>edit</mat-icon>
               </button>
@@ -204,6 +207,9 @@
                     <span class="lead-name">{{ lead.name }}</span>
                     <span class="lead-source-badge" [attr.data-source]="lead.source">{{ lead.source }}</span>
                   </div>
+                  <button mat-icon-button (click)="$event.stopPropagation(); convertToDeal(lead)" matTooltip="Convert to Deal">
+                    <mat-icon>trending_up</mat-icon>
+                  </button>
                   <button mat-icon-button class="edit-btn" (click)="$event.stopPropagation(); openLeadForm(lead)">
                     <mat-icon>edit</mat-icon>
                   </button>

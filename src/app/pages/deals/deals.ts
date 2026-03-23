@@ -43,8 +43,8 @@ export class DealsComponent implements OnInit {
   deletingId: string | null = null;
 
   pipeline: any[] = [
-    { name: 'Offer Made', status: 'Offer Made', deals: [] },
     { name: 'Negotiation', status: 'Negotiation', deals: [] },
+    { name: 'Reserved', status: 'Reserved', deals: [] },
     { name: 'Contract Signed', status: 'Contract Signed', deals: [] },
     { name: 'Payment', status: 'Payment', deals: [] },
     { name: 'Closed', status: 'Closed', deals: [] }
@@ -154,7 +154,12 @@ export class DealsComponent implements OnInit {
   updateDealStage(id: string, dealStage: string) {
     this.apiService.updateDeal(id, { dealStage }).subscribe({
       next: () => {
-        this.snackBar.open(`Deal moved to ${dealStage}`, 'Close', { duration: 3000 });
+        let msg = `Deal moved to ${dealStage}`;
+        if (dealStage === 'Reserved') {
+          msg += ' - Property is now reserved';
+        }
+        this.snackBar.open(msg, 'Close', { duration: 3000 });
+        this.fetchDeals();
       },
       error: (err) => {
         console.error('Error updating stage', err);

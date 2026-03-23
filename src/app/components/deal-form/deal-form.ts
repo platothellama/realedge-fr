@@ -41,7 +41,7 @@ export class DealFormComponent implements OnInit {
   preSelectedPropertyId: string | null = null;
   selectedClient: ClientSelection | null = null;
 
-  stages = ['Offer Made', 'Negotiation', 'Contract Signed', 'Payment', 'Closed'];
+  stages = ['Negotiation', 'Reserved', 'Contract Signed', 'Payment', 'Closed'];
 
   constructor(
     private fb: FormBuilder,

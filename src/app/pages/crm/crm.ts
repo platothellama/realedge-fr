@@ -15,6 +15,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatExpansionModule } from '@angular/material/expansion';
+import { MatStepperModule } from '@angular/material/stepper';
 
 @Component({
   selector: 'app-crm',
@@ -33,7 +34,8 @@ import { MatExpansionModule } from '@angular/material/expansion';
     MatSelectModule,
     MatMenuModule,
     MatTooltipModule,
-    MatExpansionModule
+    MatExpansionModule,
+    MatStepperModule
   ],
   templateUrl: './crm.html',
   styleUrl: './crm.css',
@@ -331,5 +333,26 @@ export class CrmComponent implements OnInit {
     // This would open the visit form dialog
     // For now, we'll just show a message
     this.snackBar.open('Schedule visit for ' + lead.name, 'Close', { duration: 3000 });
+  }
+
+  convertToDeal(lead: any) {
+    if (!lead.interestedIn) {
+      this.snackBar.open('No property specified for this lead. Please add a property first.', 'Close', { duration: 5000 });
+      return;
+    }
+
+    const propertyId = lead.interestedIn;
+    const sellerName = 'Seller'; 
+
+    this.apiService.convertLeadToDeal(lead.id, { propertyId, sellerName }).subscribe({
+      next: (response) => {
+        this.fetchLeads();
+        this.snackBar.open('Lead converted to deal!', 'Close', { duration: 3000 });
+      },
+      error: (err) => {
+        console.error('Error converting lead', err);
+        this.showError('Failed to convert lead to deal');
+      }
+    });
   }
 }

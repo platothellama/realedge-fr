@@ -68,6 +68,10 @@ export class ApiService {
     return this.http.delete<any>(`${this.apiUrl}/leads/${id}`);
   }
 
+  convertLeadToDeal(leadId: string, data: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/leads/${leadId}/convert-to-deal`, data);
+  }
+
   // Auth
   login(credentials: any): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/auth/login`, credentials);
