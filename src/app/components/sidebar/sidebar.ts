@@ -45,16 +45,16 @@ export class Sidebar {
     ];
 
     if (['Super Admin', 'Admin', 'Accountant'].includes(role || '')) {
-      items.push({ label: 'Invoices', icon: 'receipt_long', link: '/invoices' });
-      items.push({ label: 'Expenses', icon: 'account_balance_wallet', link: '/expenses' });
+      items.push({ label: 'Invoices', icon: 'receipt_long', link: '/invoices', feature: 'invoices' });
+      items.push({ label: 'Expenses', icon: 'account_balance_wallet', link: '/expenses', feature: 'expenses' });
       items.push({ label: 'Commissions', icon: 'percent', link: '/commissions', feature: 'commission_tracking' });
     }
 
     if (['Super Admin', 'Admin'].includes(role || '')) {
-      items.push({ label: 'Office Tasks', icon: 'task_alt', link: '/tasks' });
-      items.push({ label: 'Announcements', icon: 'campaign', link: '/announcements' });
-      items.push({ label: 'Organization', icon: 'admin_panel_settings', link: '/user-management' });
-      items.push({ label: 'Market Intelligence', icon: 'analytics', link: '/market' });
+      items.push({ label: 'Office Tasks', icon: 'task_alt', link: '/tasks', feature: 'tasks' });
+      items.push({ label: 'Announcements', icon: 'campaign', link: '/announcements', feature: 'announcements' });
+      items.push({ label: 'Organization', icon: 'admin_panel_settings', link: '/user-management', feature: 'user_management' });
+      items.push({ label: 'Market Intelligence', icon: 'analytics', link: '/market', feature: 'market_intelligence' });
       items.push({ label: 'AI Insights', icon: 'psychology', link: '/ai-insights', feature: 'ai_assistant' });
     }
 

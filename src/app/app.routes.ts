@@ -41,7 +41,7 @@ export const routes: Routes = [
       { path: 'deals', component: DealsComponent },
       { path: 'documents', component: DocumentsPageComponent },
       { path: 'visits', component: VisitsComponent },
-      { path: 'marketing', component: MarketingComponent },
+      { path: 'marketing', component: MarketingComponent, data: { feature: 'marketing_automation' } },
       { path: 'marketing-automation', component: MarketingAutomationComponent, data: { feature: 'marketing_automation' } },
       { path: 'ai-assistant', component: AiAssistantComponent, data: { feature: 'ai_assistant' } },
       {
@@ -52,27 +52,27 @@ export const routes: Routes = [
       {
         path: 'website-editor/:id',
         component: WebsiteEditorComponent,
-        data: { roles: ['Super Admin', 'Admin'] }
+        data: { roles: ['Super Admin', 'Admin'], feature: 'website_builder' }
       },
       {
         path: 'finance',
         component: FinanceComponent,
-        data: { roles: ['Super Admin', 'Admin', 'Accountant'] }
+        data: { roles: ['Super Admin', 'Admin', 'Accountant'], feature: 'finance' }
       },
       {
         path: 'user-management',
         component: UserManagementComponent,
-        data: { roles: ['Super Admin', 'Admin', 'Office Manager'] }
+        data: { roles: ['Super Admin', 'Admin', 'Office Manager'], feature: 'user_management' }
       },
       {
         path: 'invoices',
         component: InvoicesComponent,
-        data: { roles: ['Super Admin', 'Admin', 'Accountant'] }
+        data: { roles: ['Super Admin', 'Admin', 'Accountant'], feature: 'invoices' }
       },
       {
         path: 'expenses',
         component: ExpensesComponent,
-        data: { roles: ['Super Admin', 'Admin', 'Accountant'] }
+        data: { roles: ['Super Admin', 'Admin', 'Accountant'], feature: 'expenses' }
       },
       {
         path: 'commissions',
@@ -82,17 +82,17 @@ export const routes: Routes = [
       {
         path: 'tasks',
         component: TasksComponent,
-        data: { roles: ['Super Admin', 'Admin'] }
+        data: { roles: ['Super Admin', 'Admin'], feature: 'tasks' }
       },
       {
         path: 'market',
         component: MarketComponent,
-        data: { roles: ['Super Admin', 'Admin'] }
+        data: { roles: ['Super Admin', 'Admin'], feature: 'market_intelligence' }
       },
       {
         path: 'announcements',
         component: AnnouncementsComponent,
-        data: { roles: ['Super Admin', 'Admin'] }
+        data: { roles: ['Super Admin', 'Admin'], feature: 'announcements' }
       },
       {
         path: 'ai-insights',
