@@ -46,6 +46,7 @@ export class Sidebar {
 
     if (['Super Admin', 'Admin', 'Accountant'].includes(role || '')) {
       items.push({ label: 'Invoices', icon: 'receipt_long', link: '/invoices', feature: 'invoices' });
+      items.push({ label: 'Payments', icon: 'payments', link: '/payments' });
       items.push({ label: 'Expenses', icon: 'account_balance_wallet', link: '/expenses', feature: 'expenses' });
       items.push({ label: 'Commissions', icon: 'percent', link: '/commissions', feature: 'commission_tracking' });
     }

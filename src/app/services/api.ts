@@ -129,8 +129,8 @@ export class ApiService {
   }
 
   // Deals
-  getDeals(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/deals`);
+  getDeals(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/deals`);
   }
 
   getDealById(id: string): Observable<any> {
@@ -258,6 +258,11 @@ export class ApiService {
 
   deleteCommission(id: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/commissions/${id}`);
+  }
+
+  // Teams
+  getTeams(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/teams`);
   }
 
   // Tasks
@@ -555,5 +560,68 @@ export class ApiService {
   // Admin - Seed Properties
   seedProperties(): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/admin/seed-properties`, {});
+  }
+
+  // Payments
+  getPayments(filters?: any): Observable<any> {
+    const params = new URLSearchParams();
+    if (filters?.dealId) params.set('dealId', filters.dealId);
+    if (filters?.startDate) params.set('startDate', filters.startDate);
+    if (filters?.endDate) params.set('endDate', filters.endDate);
+    const query = params.toString() ? `?${params.toString()}` : '';
+    return this.http.get<any>(`${this.apiUrl}/payments${query}`);
+  }
+
+  getPaymentById(id: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/payments/${id}`);
+  }
+
+  getDealPaymentSummary(dealId: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/payments/deal/${dealId}`);
+  }
+
+  createPayment(data: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/payments`, data);
+  }
+
+  updatePayment(id: string, data: any): Observable<any> {
+    return this.http.patch<any>(`${this.apiUrl}/payments/${id}`, data);
+  }
+
+  deletePayment(id: string): Observable<any> {
+    return this.http.delete<any>(`${this.apiUrl}/payments/${id}`);
+  }
+
+  getCashTracking(filters?: any): Observable<any> {
+    const params = new URLSearchParams();
+    if (filters?.startDate) params.set('startDate', filters.startDate);
+    if (filters?.endDate) params.set('endDate', filters.endDate);
+    if (filters?.userId) params.set('userId', filters.userId);
+    const query = params.toString() ? `?${params.toString()}` : '';
+    return this.http.get<any>(`${this.apiUrl}/payments/cash-tracking${query}`);
+  }
+
+  // Payment Plans
+  getPaymentPlans(filters?: any): Observable<any> {
+    const params = new URLSearchParams();
+    if (filters?.dealId) params.set('dealId', filters.dealId);
+    const query = params.toString() ? `?${params.toString()}` : '';
+    return this.http.get<any>(`${this.apiUrl}/payments/payment-plans${query}`);
+  }
+
+  getPaymentPlanById(id: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/payments/payment-plans/${id}`);
+  }
+
+  createPaymentPlan(data: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/payments/payment-plans`, data);
+  }
+
+  updatePaymentPlan(id: string, data: any): Observable<any> {
+    return this.http.patch<any>(`${this.apiUrl}/payments/payment-plans/${id}`, data);
+  }
+
+  deletePaymentPlan(id: string): Observable<any> {
+    return this.http.delete<any>(`${this.apiUrl}/payments/payment-plans/${id}`);
   }
 }

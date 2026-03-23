@@ -12,6 +12,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { GoogleMapsModule } from '@angular/google-maps';
 import { ApiService } from '../../services/api';
 import { AuthService } from '../../services/auth/auth.service';
+import { GoogleMapsService } from '../../services/google-maps.service';
 
 @Component({
   selector: 'app-property-form',
@@ -69,6 +70,7 @@ export class PropertyFormComponent implements OnInit, AfterViewInit {
     private dialogRef: MatDialogRef<PropertyFormComponent>,
     private api: ApiService,
     private auth: AuthService,
+    private mapsService: GoogleMapsService,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
     const user = this.auth.currentUser();
@@ -169,7 +171,7 @@ export class PropertyFormComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    // If not edit mode and API loaded, could try to geolocate user here
+    this.mapsService.load().catch(err => console.warn('Google Maps not loaded:', err.message));
   }
 
   updateMarkerFromInputs(lat: number, lng: number) {

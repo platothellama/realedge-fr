@@ -1,0 +1,461 @@
+<div class="page-container">
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">Payments</h1>
+      <p class="page-subtitle">Track payments, payment plans & cash flow</p>
+    </div>
+    <div class="header-actions">
+      <button mat-raised-button color="primary" (click)="showAddPaymentDialog = true">
+        <mat-icon>add</mat-icon>
+        Record Payment
+      </button>
+    </div>
+  </div>
+
+  <mat-tab-group [(selectedIndex)]="selectedTab" (selectedIndexChange)="onTabChange($event)" class="main-tabs">
+    <mat-tab label="Payments">
+      <div class="tab-content">
+        @if (loading) {
+          <div class="loading-container">
+            <mat-spinner diameter="40"></mat-spinner>
+          </div>
+        } @else {
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon total">
+                <mat-icon>payments</mat-icon>
+              </div>
+              <div class="stat-content">
+                <span class="stat-value">{{ payments.length }}</span>
+                <span class="stat-label">Total Payments</span>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon received">
+                <mat-icon>account_balance_wallet</mat-icon>
+              </div>
+              <div class="stat-content">
+                <span class="stat-value">{{ formatCurrency(payments.reduce((sum, p) => sum + p.amountInUSD, 0)) }}</span>
+                <span class="stat-label">Total Received (USD)</span>
+              </div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon cash">
+                <mat-icon>local_atm</mat-icon>
+              </div>
+              <div class="stat-content">
+                <span class="stat-value">{{ payments.filter(p => p.paymentMethod === 'Cash').length }}</span>
+                <span class="stat-label">Cash Payments</span>
+              </div>
+            </div>
+          </div>
+
+          <mat-card class="table-card">
+            <div class="table-header">
+              <h3>All Payments</h3>
+              <div class="filters">
+                <mat-form-field appearance="outline">
+                  <mat-label>Filter by Deal</mat-label>
+                  <mat-select [(ngModel)]="filterDealId" (selectionChange)="loadPayments()">
+                    <mat-option value="">All Deals</mat-option>
+                    @for (deal of deals; track deal.id) {
+                      <mat-option [value]="deal.id">{{ deal.title }}</mat-option>
+                    }
+                  </mat-select>
+                </mat-form-field>
+              </div>
+            </div>
+
+            <div class="table-container">
+              <table class="payments-table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Payer</th>
+                    <th>Deal</th>
+                    <th>Amount</th>
+                    <th>Method</th>
+                    <th>Reference</th>
+                    <th>Status</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (p of payments; track p.id) {
+                    <tr>
+                      <td>{{ formatDate(p.paymentDate) }}</td>
+                      <td>
+                        <div class="payer-info">
+                          <span class="payer-name">{{ p.payerName }}</span>
+                          @if (p.payerPhone) {
+                            <span class="payer-phone">{{ p.payerPhone }}</span>
+                          }
+                        </div>
+                      </td>
+                      <td>{{ p.deal?.title || '-' }}</td>
+                      <td>
+                        <div class="amount-cell">
+                          <span class="amount">{{ formatCurrency(p.amount, p.currency) }}</span>
+                          @if (p.currency === 'LBP') {
+                            <span class="usd-equivalent">~({{ formatCurrency(p.amountInUSD) }})</span>
+                          }
+                        </div>
+                      </td>
+                      <td>
+                        <div class="method-chip">
+                          <mat-icon>{{ getPaymentMethodIcon(p.paymentMethod) }}</mat-icon>
+                          {{ p.paymentMethod }}
+                        </div>
+                      </td>
+                      <td>
+                        @if (p.referenceNumber) {
+                          <span>{{ p.referenceNumber }}</span>
+                        } @else if (p.bankName) {
+                          <span>{{ p.bankName }}</span>
+                        } @else {
+                          <span class="no-ref">-</span>
+                        }
+                      </td>
+                      <td>
+                        <span class="status-badge" [class]="getStatusClass(p.status)">{{ p.status }}</span>
+                      </td>
+                      <td>
+                        <button mat-icon-button [matMenuTriggerFor]="menu" [disabled]="isProcessing(p.id)">
+                          <mat-icon>more_vert</mat-icon>
+                        </button>
+                        <mat-menu #menu="matMenu">
+                          <button mat-menu-item (click)="deletePayment(p)" class="delete-option">
+                            <mat-icon>delete</mat-icon>
+                            Delete
+                          </button>
+                        </mat-menu>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+
+              @if (payments.length === 0) {
+                <div class="empty-state">
+                  <mat-icon>payments</mat-icon>
+                  <p>No payments recorded yet</p>
+                </div>
+              }
+            </div>
+          </mat-card>
+        }
+      </div>
+    </mat-tab>
+
+    <mat-tab label="Payment Plans">
+      <div class="tab-content">
+        <div class="page-header compact">
+          <button mat-raised-button color="primary" (click)="showAddPlanDialog = true">
+            <mat-icon>add</mat-icon>
+            Create Payment Plan
+          </button>
+        </div>
+
+        @if (loading) {
+          <div class="loading-container">
+            <mat-spinner diameter="40"></mat-spinner>
+          </div>
+        } @else {
+          <div class="plans-grid">
+            @for (plan of paymentPlans; track plan.id) {
+              <mat-card class="plan-card">
+                <mat-card-header>
+                  <mat-card-title>{{ plan.planName }}</mat-card-title>
+                  <mat-card-subtitle>{{ plan.deal?.title || 'No Deal' }}</mat-card-subtitle>
+                </mat-card-header>
+                <mat-card-content>
+                  <div class="plan-details">
+                    <div class="detail-row">
+                      <span class="label">Total Amount:</span>
+                      <span class="value">{{ formatCurrency(plan.totalAmount, plan.currency) }}</span>
+                    </div>
+                    <div class="detail-row">
+                      <span class="label">Installments:</span>
+                      <span class="value">{{ plan.numberOfInstallments }} x {{ formatCurrency(plan.installmentAmount, plan.currency) }}</span>
+                    </div>
+                    <div class="detail-row">
+                      <span class="label">Start Date:</span>
+                      <span class="value">{{ formatDate(plan.startDate) }}</span>
+                    </div>
+                    @if (plan.endDate) {
+                      <div class="detail-row">
+                        <span class="label">End Date:</span>
+                        <span class="value">{{ formatDate(plan.endDate) }}</span>
+                      </div>
+                    }
+                    <div class="detail-row">
+                      <span class="label">Status:</span>
+                      <span class="status-badge" [class]="getStatusClass(plan.status)">{{ plan.status }}</span>
+                    </div>
+                  </div>
+                  @if (plan.notes) {
+                    <p class="plan-notes">{{ plan.notes }}</p>
+                  }
+                </mat-card-content>
+                <mat-card-actions>
+                  <button mat-button color="warn" (click)="deletePaymentPlan(plan)" [disabled]="isProcessing(plan.id)">
+                    <mat-icon>delete</mat-icon>
+                    Delete
+                  </button>
+                </mat-card-actions>
+              </mat-card>
+            }
+
+            @if (paymentPlans.length === 0) {
+              <div class="empty-state grid-empty">
+                <mat-icon>calendar_month</mat-icon>
+                <p>No payment plans created yet</p>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </mat-tab>
+
+    <mat-tab label="Cash Tracking">
+      <div class="tab-content">
+        <div class="stats-grid">
+          <div class="stat-card gradient-cash">
+            <div class="stat-icon">
+              <mat-icon>payments</mat-icon>
+            </div>
+            <div class="stat-content">
+              <span class="stat-value">{{ formatCurrency(cashTracking?.summary?.totalInUSD || 0) }}</span>
+              <span class="stat-label">Total Cash (USD)</span>
+            </div>
+          </div>
+<!--          <div class="stat-card gradient-lbp">-->
+<!--            <div class="stat-icon">-->
+<!--              <mat-icon>local_atm</mat-icon>-->
+<!--            </div>-->
+<!--            <div class="stat-content">-->
+<!--              <span class="stat-value">{{ (cashTracking?.summary?.totalInLBP || 0) | number:'1.0-0' }} LBP</span>-->
+<!--              <span class="stat-label">Total Cash (LBP)</span>-->
+<!--            </div>-->
+<!--          </div>-->
+          <div class="stat-card gradient-lbp">
+            <div class="stat-icon transactions">
+              <mat-icon>receipt_long</mat-icon>
+            </div>
+            <div class="stat-content">
+              <span class="stat-value">{{ cashTracking?.summary?.totalPayments || 0 }}</span>
+              <span class="stat-label">Cash Transactions</span>
+            </div>
+          </div>
+        </div>
+
+        <mat-card class="table-card">
+          <div class="table-header">
+            <h3>Recent Cash Payments</h3>
+          </div>
+          <div class="cash-list">
+            @for (payment of cashTracking?.payments || []; track payment.id) {
+              <div class="cash-item">
+                <div class="cash-item-left">
+                  <mat-icon>payments</mat-icon>
+                  <div class="cash-item-info">
+                    <span class="cash-payer">{{ payment.payerName }}</span>
+                    <span class="cash-deal">{{ payment.deal?.title || 'No Deal' }}</span>
+                  </div>
+                </div>
+                <div class="cash-item-right">
+                  <span class="cash-amount">{{ formatCurrency(payment.amount, payment.currency) }}</span>
+                  <span class="cash-date">{{ formatDate(payment.paymentDate) }}</span>
+                </div>
+              </div>
+            }
+
+            @if (!cashTracking?.payments?.length) {
+              <div class="empty-state">
+                <mat-icon>account_balance_wallet</mat-icon>
+                <p>No cash payments recorded</p>
+              </div>
+            }
+          </div>
+        </mat-card>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>
+
+@if (showAddPaymentDialog) {
+  <div class="dialog-overlay" (click)="closePaymentDialog()">
+    <div class="dialog-content" (click)="$event.stopPropagation()">
+      <div class="dialog-header">
+        <h2>Record Payment</h2>
+        <button mat-icon-button (click)="closePaymentDialog()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+      <div class="dialog-body">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Deal</mat-label>
+          <mat-select [(ngModel)]="newPayment.dealId" required>
+            <mat-option value="">Select Deal</mat-option>
+            @for (deal of deals; track deal.id) {
+              <mat-option [value]="deal.id">{{ deal.title }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Payer Name</mat-label>
+          <input matInput [(ngModel)]="newPayment.payerName" required>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Payer Phone</mat-label>
+          <input matInput [(ngModel)]="newPayment.payerPhone">
+        </mat-form-field>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Amount</mat-label>
+            <input matInput type="number" [(ngModel)]="newPayment.amount" required>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Currency</mat-label>
+            <mat-select [(ngModel)]="newPayment.currency">
+              @for (c of currencyOptions; track c) {
+                <mat-option [value]="c">{{ c }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        @if (newPayment.currency === 'LBP') {
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Exchange Rate to USD</mat-label>
+            <input matInput type="number" [(ngModel)]="newPayment.exchangeRate">
+          </mat-form-field>
+        }
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Payment Method</mat-label>
+          <mat-select [(ngModel)]="newPayment.paymentMethod" required>
+            @for (m of paymentMethodOptions; track m) {
+              <mat-option [value]="m">{{ m }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Payment Date</mat-label>
+          <input matInput type="date" [(ngModel)]="newPayment.paymentDate" required>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Reference Number</mat-label>
+          <input matInput [(ngModel)]="newPayment.referenceNumber">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Bank Name</mat-label>
+          <input matInput [(ngModel)]="newPayment.bankName">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Notes</mat-label>
+          <textarea matInput [(ngModel)]="newPayment.notes" rows="2"></textarea>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Status</mat-label>
+          <mat-select [(ngModel)]="newPayment.status">
+            @for (s of paymentStatusOptions; track s) {
+              <mat-option [value]="s">{{ s }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+      <div class="dialog-footer">
+        <button mat-button (click)="closePaymentDialog()">Cancel</button>
+        <button mat-raised-button color="primary" (click)="createPayment()">Record Payment</button>
+      </div>
+    </div>
+  </div>
+}
+
+@if (showAddPlanDialog) {
+  <div class="dialog-overlay" (click)="closePlanDialog()">
+    <div class="dialog-content" (click)="$event.stopPropagation()">
+      <div class="dialog-header">
+        <h2>Create Payment Plan</h2>
+        <button mat-icon-button (click)="closePlanDialog()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+      <div class="dialog-body">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Deal</mat-label>
+          <mat-select [(ngModel)]="newPlan.dealId" required>
+            <mat-option value="">Select Deal</mat-option>
+            @for (deal of deals; track deal.id) {
+              <mat-option [value]="deal.id">{{ deal.title }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Plan Name</mat-label>
+          <input matInput [(ngModel)]="newPlan.planName" placeholder="e.g., Standard Plan, 3 Installments" required>
+        </mat-form-field>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Total Amount</mat-label>
+            <input matInput type="number" [(ngModel)]="newPlan.totalAmount" (ngModelChange)="onAmountChange()" required>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Currency</mat-label>
+            <mat-select [(ngModel)]="newPlan.currency">
+              @for (c of currencyOptions; track c) {
+                <mat-option [value]="c">{{ c }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Number of Installments</mat-label>
+            <input matInput type="number" [(ngModel)]="newPlan.numberOfInstallments" (ngModelChange)="onAmountChange()" min="1" required>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Amount per Installment</mat-label>
+            <input matInput type="number" [(ngModel)]="newPlan.installmentAmount" readonly>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Start Date</mat-label>
+            <input matInput type="date" [(ngModel)]="newPlan.startDate" required>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>End Date (Optional)</mat-label>
+            <input matInput type="date" [(ngModel)]="newPlan.endDate">
+          </mat-form-field>
+        </div>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Notes</mat-label>
+          <textarea matInput [(ngModel)]="newPlan.notes" rows="2"></textarea>
+        </mat-form-field>
+      </div>
+      <div class="dialog-footer">
+        <button mat-button (click)="closePlanDialog()">Cancel</button>
+        <button mat-raised-button color="primary" (click)="createPaymentPlan()">Create Plan</button>
+      </div>
+    </div>
+  </div>
+}

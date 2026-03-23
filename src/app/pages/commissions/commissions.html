@@ -78,7 +78,12 @@
               <th>Sale Price</th>
               <th>Commission %</th>
               <th>Agent Commission</th>
-              <th>Office Commission</th>
+              @if (commissions && commissions.length > 0 && hasMultiAgentOrTeam(commissions[0])) {
+                <th>Agent 2/Team</th>
+                <th>Company</th>
+              } @else {
+                <th>Office Commission</th>
+              }
               <th>Status</th>
               <th>Actions</th>
             </tr>
@@ -96,7 +101,18 @@
                 <td class="amount">{{ formatCurrency(commission.salePrice) }}</td>
                 <td>{{ commission.commissionPercentage }}%</td>
                 <td class="amount agent-commission">{{ formatCurrency(commission.agentCommission) }}</td>
-                <td class="amount">{{ formatCurrency(commission.officeCommission) }}</td>
+              @if (commissions && commissions.length > 0 && hasMultiAgentOrTeam(commissions[0])) {
+                  <td class="amount">
+                    @if (commission.splitType === 'multi_agent') {
+                      {{ formatCurrency(commission.agent2Commission || 0) }}
+                    } @else {
+                      {{ formatCurrency(commission.teamCommission || 0) }}
+                    }
+                  </td>
+                  <td class="amount">{{ formatCurrency(commission.companyCommission || commission.officeCommission) }}</td>
+                } @else {
+                  <td class="amount">{{ formatCurrency(commission.officeCommission) }}</td>
+                }
                 <td>
                   <span class="status-badge" [class]="getStatusClass(commission.status)">
                     {{ commission.status }}
@@ -150,12 +166,50 @@
         </div>
         <div class="dialog-body">
           <mat-form-field appearance="outline">
-            <mat-label>Agent</mat-label>
-            <mat-select [(ngModel)]="newCommission.agentId" placeholder="Select agent">
-              <!-- Will be populated from users API if needed -->
-              <mat-option value="">Select agent</mat-option>
+            <mat-label>Split Type</mat-label>
+            <mat-select [(ngModel)]="newCommission.splitType" (selectionChange)="onSplitTypeChange()">
+              <mat-option value="single">Single Agent</mat-option>
+              <mat-option value="multi_agent">Multi-Agent (Co-listing)</mat-option>
+              <mat-option value="team">Team Split</mat-option>
             </mat-select>
           </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Primary Agent</mat-label>
+            <mat-select [(ngModel)]="newCommission.agentId" placeholder="Select agent">
+              <mat-option value="">Select agent</mat-option>
+              @for (agent of agents; track agent.id) {
+                <mat-option [value]="agent.id">{{ agent.name || agent.email }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+          @if (newCommission.splitType === 'multi_agent') {
+            <mat-form-field appearance="outline">
+              <mat-label>Second Agent (Co-listing)</mat-label>
+              <mat-select [(ngModel)]="newCommission.agent2Id" placeholder="Select second agent">
+                <mat-option value="">Select agent</mat-option>
+                @for (agent of agents; track agent.id) {
+                  @if (agent.id !== newCommission.agentId) {
+                    <mat-option [value]="agent.id">{{ agent.name || agent.email }}</mat-option>
+                  }
+                }
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+              <mat-label>Second Agent Share %</mat-label>
+              <input matInput type="number" [(ngModel)]="newCommission.agent2SharePercentage" placeholder="50" step="1">
+            </mat-form-field>
+          }
+          @if (newCommission.splitType === 'team') {
+            <mat-form-field appearance="outline">
+              <mat-label>Team</mat-label>
+              <mat-select [(ngModel)]="newCommission.teamId" placeholder="Select team">
+                <mat-option value="">Select team</mat-option>
+                @for (team of teams; track team.id) {
+                  <mat-option [value]="team.id">{{ team.name }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          }
           <mat-form-field appearance="outline">
             <mat-label>Sale Price</mat-label>
             <input matInput type="number" [(ngModel)]="newCommission.salePrice" placeholder="0">
@@ -175,14 +229,45 @@
               <span>Gross Commission:</span>
               <span>{{ formatCurrency((newCommission.salePrice || 0) * ((newCommission.commissionPercentage || 0) / 100)) }}</span>
             </div>
-            <div class="preview-row">
-              <span>Agent Share:</span>
-              <span>{{ formatCurrency((newCommission.salePrice || 0) * ((newCommission.commissionPercentage || 0) / 100) * ((newCommission.agentSharePercentage || 0) / 100)) }}</span>
-            </div>
-            <div class="preview-row">
-              <span>Office Share:</span>
-              <span>{{ formatCurrency((newCommission.salePrice || 0) * ((newCommission.commissionPercentage || 0) / 100) * (1 - (newCommission.agentSharePercentage || 0) / 100)) }}</span>
-            </div>
+            @if (newCommission.splitType === 'multi_agent' && newCommission.agent2Id) {
+              <div class="preview-row">
+                <span>Primary Agent ({{newCommission.agentSharePercentage || 60}}%):</span>
+                <span>{{ formatCurrency((newCommission.salePrice || 0) * ((newCommission.commissionPercentage || 0) / 100) * ((newCommission.agentSharePercentage || 60) / 100)) }}</span>
+              </div>
+              <div class="preview-row">
+                <span>Second Agent ({{newCommission.agent2SharePercentage || 50}}%):</span>
+                <span>{{ formatCurrency((newCommission.salePrice || 0) * ((newCommission.commissionPercentage || 0) / 100) * ((newCommission.agent2SharePercentage || 50) / 100)) }}</span>
+              </div>
+              <div class="preview-row">
+                <span>Company:</span>
+                <span>{{ formatCurrency((newCommission.salePrice || 0) * ((newCommission.commissionPercentage || 0) / 100) * (1 - ((newCommission.agentSharePercentage || 60) + (newCommission.agent2SharePercentage || 50)) / 100)) }}</span>
+              </div>
+            } @else if (newCommission.splitType === 'team' && newCommission.teamId) {
+              @if (teams && newCommission.teamId) {
+                @let team = teams.find(t => t.id === newCommission.teamId);
+                <div class="preview-row">
+                  <span>Agent ({{newCommission.agentSharePercentage || 60}}%):</span>
+                  <span>{{ formatCurrency((newCommission.salePrice || 0) * ((newCommission.commissionPercentage || 0) / 100) * ((newCommission.agentSharePercentage || 60) / 100)) }}</span>
+                </div>
+                <div class="preview-row">
+                  <span>Team ({{team?.commissionSplit || 50}}%):</span>
+                  <span>{{ formatCurrency((newCommission.salePrice || 0) * ((newCommission.commissionPercentage || 0) / 100) * ((team?.commissionSplit || 50) / 100)) }}</span>
+                </div>
+                <div class="preview-row">
+                  <span>Company:</span>
+                  <span>{{ formatCurrency((newCommission.salePrice || 0) * ((newCommission.commissionPercentage || 0) / 100) * (1 - ((newCommission.agentSharePercentage || 60) + (team?.commissionSplit || 50)) / 100)) }}</span>
+                </div>
+              }
+            } @else {
+              <div class="preview-row">
+                <span>Agent Share:</span>
+                <span>{{ formatCurrency((newCommission.salePrice || 0) * ((newCommission.commissionPercentage || 0) / 100) * ((newCommission.agentSharePercentage || 0) / 100)) }}</span>
+              </div>
+              <div class="preview-row">
+                <span>Office/Company Share:</span>
+                <span>{{ formatCurrency((newCommission.salePrice || 0) * ((newCommission.commissionPercentage || 0) / 100) * (1 - (newCommission.agentSharePercentage || 0) / 100)) }}</span>
+              </div>
+            }
           </div>
           <mat-form-field appearance="outline">
             <mat-label>Notes</mat-label>

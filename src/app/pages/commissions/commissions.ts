@@ -29,9 +29,20 @@ interface Commission {
   paidAmount: number;
   paidAt?: string;
   notes?: string;
+  splitType?: string;
+  agent2Id?: string;
+  agent2SharePercentage?: number;
+  agent2Commission?: number;
+  teamId?: string;
+  teamSharePercentage?: number;
+  teamCommission?: number;
+  companySharePercentage?: number;
+  companyCommission?: number;
   deal?: { id: string; title: string };
   property?: { id: string; title: string };
   agent?: { id: string; name: string; photo?: string };
+  agent2?: { id: string; name: string; photo?: string };
+  team?: { id: string; name: string };
 }
 
 @Component({
@@ -74,10 +85,33 @@ export class CommissionsComponent implements OnInit {
   };
 
   statusOptions = ['pending', 'approved', 'paid', 'disbursed'];
+  splitTypeOptions = ['single', 'multi_agent', 'team'];
+  agents: any[] = [];
+  teams: any[] = [];
 
   ngOnInit() {
     this.loadCommissions();
     this.loadStats();
+    this.loadAgents();
+    this.loadTeams();
+  }
+
+  loadAgents() {
+    this.api.getUsers().subscribe({
+      next: (res: any) => {
+        this.agents = Array.isArray(res) ? res : res.data || [];
+      },
+      error: (err) => console.error('Failed to fetch agents', err)
+    });
+  }
+
+  loadTeams() {
+    this.api.getTeams().subscribe({
+      next: (res: any) => {
+        this.teams = Array.isArray(res) ? res : res.data || [];
+      },
+      error: (err) => console.error('Failed to fetch teams', err)
+    });
   }
 
   loadCommissions() {
@@ -118,16 +152,49 @@ export class CommissionsComponent implements OnInit {
     const salePrice = this.newCommission.salePrice;
     const commissionPercentage = this.newCommission.commissionPercentage || 2.5;
     const agentSharePercentage = this.newCommission.agentSharePercentage || 60;
+    const splitType = this.newCommission.splitType || 'single';
     
     const grossCommission = salePrice * (commissionPercentage / 100);
-    const agentCommission = grossCommission * (agentSharePercentage / 100);
-    const officeCommission = grossCommission - agentCommission;
+    let agentCommission = 0;
+    let officeCommission = 0;
+    let agent2Commission = 0;
+    let teamCommission = 0;
+    let companyCommission = 0;
+
+    if (splitType === 'multi_agent' && this.newCommission.agent2Id) {
+      const agent2SharePercentage = this.newCommission.agent2SharePercentage || 50;
+      const totalAgentShare = agentSharePercentage + agent2SharePercentage;
+      const companyShare = 100 - totalAgentShare;
+      
+      agentCommission = grossCommission * (agentSharePercentage / 100);
+      agent2Commission = grossCommission * (agent2SharePercentage / 100);
+      companyCommission = grossCommission * (companyShare / 100);
+      officeCommission = companyCommission;
+    } else if (splitType === 'team' && this.newCommission.teamId) {
+      const team = this.teams.find(t => t.id === this.newCommission.teamId);
+      const teamSharePercentage = team?.commissionSplit || 50;
+      const agentPortion = grossCommission * (agentSharePercentage / 100);
+      const teamPortion = grossCommission * (teamSharePercentage / 100);
+      
+      agentCommission = agentPortion;
+      teamCommission = teamPortion;
+      companyCommission = grossCommission - agentPortion - teamPortion;
+      officeCommission = companyCommission;
+    } else {
+      agentCommission = grossCommission * (agentSharePercentage / 100);
+      officeCommission = grossCommission - agentCommission;
+      companyCommission = officeCommission;
+    }
 
     const commissionData = {
       ...this.newCommission,
+      splitType,
       grossCommission,
       agentCommission,
       officeCommission,
+      companyCommission,
+      agent2Commission: agent2Commission || undefined,
+      teamCommission: teamCommission || undefined,
       status: 'pending'
     };
 
@@ -135,7 +202,7 @@ export class CommissionsComponent implements OnInit {
       next: (res: any) => {
         this.commissions.unshift(res);
         this.showAddDialog = false;
-        this.newCommission = { salePrice: 0, commissionPercentage: 2.5, agentSharePercentage: 60 };
+        this.newCommission = { salePrice: 0, commissionPercentage: 2.5, agentSharePercentage: 60, splitType: 'single' };
         this.loadStats();
         this.snackBar.open('Commission created successfully', 'Close', { duration: 3000 });
       },
@@ -223,6 +290,16 @@ export class CommissionsComponent implements OnInit {
 
   closeDialog() {
     this.showAddDialog = false;
-    this.newCommission = { salePrice: 0, commissionPercentage: 2.5, agentSharePercentage: 60 };
+    this.newCommission = { salePrice: 0, commissionPercentage: 2.5, agentSharePercentage: 60, splitType: 'single' };
+  }
+
+  onSplitTypeChange() {
+    this.newCommission.agent2Id = undefined;
+    this.newCommission.agent2SharePercentage = undefined;
+    this.newCommission.teamId = undefined;
+  }
+
+  hasMultiAgentOrTeam(commission: Commission): boolean {
+    return commission.splitType === 'multi_agent' || commission.splitType === 'team';
   }
 }
