@@ -42,12 +42,12 @@ export const routes: Routes = [
       { path: 'documents', component: DocumentsPageComponent },
       { path: 'visits', component: VisitsComponent },
       { path: 'marketing', component: MarketingComponent },
-      { path: 'marketing-automation', component: MarketingAutomationComponent },
-      { path: 'ai-assistant', component: AiAssistantComponent },
+      { path: 'marketing-automation', component: MarketingAutomationComponent, data: { feature: 'marketing_automation' } },
+      { path: 'ai-assistant', component: AiAssistantComponent, data: { feature: 'ai_assistant' } },
       {
         path: 'website-builder',
         component: WebsiteBuilderComponent,
-        data: { roles: ['Super Admin', 'Admin'] }
+        data: { roles: ['Super Admin', 'Admin'], feature: 'website_builder' }
       },
       {
         path: 'website-editor/:id',
@@ -77,7 +77,7 @@ export const routes: Routes = [
       {
         path: 'commissions',
         component: CommissionsComponent,
-        data: { roles: ['Super Admin', 'Admin', 'Accountant'] }
+        data: { roles: ['Super Admin', 'Admin', 'Accountant'], feature: 'commission_tracking' }
       },
       {
         path: 'tasks',
@@ -97,15 +97,17 @@ export const routes: Routes = [
       {
         path: 'ai-insights',
         component: AiInsightsComponent,
-        data: { roles: ['Super Admin', 'Admin'] }
+        data: { roles: ['Super Admin', 'Admin'], feature: 'ai_assistant' }
       },
       {
         path: 'buyer-preferences',
-        component: BuyerPreferencesComponent
+        component: BuyerPreferencesComponent,
+        data: { feature: 'ai_assistant' }
       },
       {
         path: 'property-matcher/:id',
-        component: PropertyMatcherComponent
+        component: PropertyMatcherComponent,
+        data: { feature: 'ai_assistant' }
       }
     ]
   },

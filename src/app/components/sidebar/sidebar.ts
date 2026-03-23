@@ -3,6 +3,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth/auth.service';
+import { FeatureService } from '../../services/feature/feature.service';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -14,12 +15,14 @@ import { CommonModule } from '@angular/common';
 })
 export class Sidebar {
   private auth = inject(AuthService);
+  private features = inject(FeatureService);
   user = this.auth.currentUser;
 
   constructor() {}
 
   menuItems = computed(() => {
     const role = this.user()?.role;
+    const isEnabled = (key: string) => this.features.isEnabled(key, role);
 
     const items = [
       // Dashboard
@@ -33,18 +36,18 @@ export class Sidebar {
       { label: 'Documents', icon: 'description', link: '/documents' },
       
       // Marketing
-      { label: 'Marketing Tools', icon: 'campaign', link: '/marketing' },
-      { label: 'Marketing Automation', icon: 'autorenew', link: '/marketing-automation' },
+      { label: 'Marketing Tools', icon: 'campaign', link: '/marketing', feature: 'marketing_automation' },
+      { label: 'Marketing Automation', icon: 'autorenew', link: '/marketing-automation', feature: 'marketing_automation' },
       
       // AI Tools
-      { label: 'AI Assistant', icon: 'smart_toy', link: '/ai-assistant' },
-      { label: 'Property Matcher', icon: 'auto_awesome', link: '/buyer-preferences' },
+      { label: 'AI Assistant', icon: 'smart_toy', link: '/ai-assistant', feature: 'ai_assistant' },
+      { label: 'Property Matcher', icon: 'auto_awesome', link: '/buyer-preferences', feature: 'ai_assistant' },
     ];
 
     if (['Super Admin', 'Admin', 'Accountant'].includes(role || '')) {
       items.push({ label: 'Invoices', icon: 'receipt_long', link: '/invoices' });
       items.push({ label: 'Expenses', icon: 'account_balance_wallet', link: '/expenses' });
-      items.push({ label: 'Commissions', icon: 'percent', link: '/commissions' });
+      items.push({ label: 'Commissions', icon: 'percent', link: '/commissions', feature: 'commission_tracking' });
     }
 
     if (['Super Admin', 'Admin'].includes(role || '')) {
@@ -52,12 +55,15 @@ export class Sidebar {
       items.push({ label: 'Announcements', icon: 'campaign', link: '/announcements' });
       items.push({ label: 'Organization', icon: 'admin_panel_settings', link: '/user-management' });
       items.push({ label: 'Market Intelligence', icon: 'analytics', link: '/market' });
-      items.push({ label: 'AI Insights', icon: 'psychology', link: '/ai-insights' });
+      items.push({ label: 'AI Insights', icon: 'psychology', link: '/ai-insights', feature: 'ai_assistant' });
     }
 
     items.push({ label: 'Settings', icon: 'settings', link: '#' });
 
-    return items;
+    return items.filter(item => {
+      if (!item.feature) return true;
+      return isEnabled(item.feature);
+    });
   });
 
   logout() {

@@ -73,6 +73,10 @@ export class AuthService {
     return localStorage.getItem('token');
   }
 
+  isAuthenticatedSignal(): boolean {
+    return this.isAuthenticated();
+  }
+
   hasRole(roles: string[]): boolean {
     const user = this.currentUser();
     return user ? roles.includes(user.role) : false;
