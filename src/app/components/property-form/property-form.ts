@@ -13,6 +13,7 @@ import { GoogleMapsModule } from '@angular/google-maps';
 import { ApiService } from '../../services/api';
 import { AuthService } from '../../services/auth/auth.service';
 import { GoogleMapsService } from '../../services/google-maps.service';
+import { SellerSelectorComponent, SellerSelection } from '../seller-selector/seller-selector';
 
 @Component({
   selector: 'app-property-form',
@@ -28,7 +29,8 @@ import { GoogleMapsService } from '../../services/google-maps.service';
     MatIconModule,
     MatTabsModule,
     MatProgressSpinnerModule,
-    GoogleMapsModule
+    GoogleMapsModule,
+    SellerSelectorComponent
   ],
   templateUrl: './property-form.html',
   styleUrl: './property-form.css'
@@ -101,6 +103,7 @@ export class PropertyFormComponent implements OnInit, AfterViewInit {
       // Assignments
       assignedToUserId: [null],
       assignedToGroupId: [null],
+      sellerId: [null],
       commissionPercentage: [{ value: 0, disabled: !this.isAdmin }, [Validators.required, Validators.min(0), Validators.max(100)]],
 
       // Media (Strings for now, split by comma for array)
@@ -143,6 +146,7 @@ export class PropertyFormComponent implements OnInit, AfterViewInit {
       // Patch values, converting arrays to strings for form
       this.propertyForm.patchValue({
         ...prop,
+        sellerId: prop.seller?.id || prop.sellerId || null,
         photos: prop.photos?.join(', ') || '',
         videos: prop.videos?.join(', ') || '',
         tours360: prop.tours360?.join(', ') || '',
@@ -267,5 +271,18 @@ export class PropertyFormComponent implements OnInit, AfterViewInit {
 
   onCancel(): void {
     this.dialogRef.close();
+  }
+
+  onSellerSelected(selection: SellerSelection): void {
+    if (selection.createNew && selection.seller.name) {
+      this.api.createSeller(selection.seller).subscribe({
+        next: (newSeller: any) => {
+          this.propertyForm.patchValue({ sellerId: newSeller.id });
+        },
+        error: (err) => console.error('Error creating seller', err)
+      });
+    } else {
+      this.propertyForm.patchValue({ sellerId: selection.sellerId });
+    }
   }
 }
