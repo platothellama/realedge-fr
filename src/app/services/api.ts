@@ -129,8 +129,8 @@ export class ApiService {
   }
 
   // Deals
-  getDeals(): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/deals`);
+  getDeals(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/deals`);
   }
 
   getDealById(id: string): Observable<any> {
@@ -258,11 +258,6 @@ export class ApiService {
 
   deleteCommission(id: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/commissions/${id}`);
-  }
-
-  // Teams
-  getTeams(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/teams`);
   }
 
   // Tasks
@@ -563,13 +558,13 @@ export class ApiService {
   }
 
   // Payments
-  getPayments(filters?: any): Observable<any> {
+  getPayments(filters?: any): Observable<any[]> {
     const params = new URLSearchParams();
     if (filters?.dealId) params.set('dealId', filters.dealId);
     if (filters?.startDate) params.set('startDate', filters.startDate);
     if (filters?.endDate) params.set('endDate', filters.endDate);
     const query = params.toString() ? `?${params.toString()}` : '';
-    return this.http.get<any>(`${this.apiUrl}/payments${query}`);
+    return this.http.get<any[]>(`${this.apiUrl}/payments${query}`);
   }
 
   getPaymentById(id: string): Observable<any> {
@@ -602,11 +597,11 @@ export class ApiService {
   }
 
   // Payment Plans
-  getPaymentPlans(filters?: any): Observable<any> {
+  getPaymentPlans(filters?: any): Observable<any[]> {
     const params = new URLSearchParams();
     if (filters?.dealId) params.set('dealId', filters.dealId);
     const query = params.toString() ? `?${params.toString()}` : '';
-    return this.http.get<any>(`${this.apiUrl}/payments/payment-plans${query}`);
+    return this.http.get<any[]>(`${this.apiUrl}/payments/payment-plans${query}`);
   }
 
   getPaymentPlanById(id: string): Observable<any> {
