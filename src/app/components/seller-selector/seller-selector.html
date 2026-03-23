@@ -1,0 +1,106 @@
+<div class="client-selector">
+  <div class="section-label">Seller Information</div>
+  
+  @if (!showNewSellerForm) {
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Select Existing Seller</mat-label>
+        <mat-select [value]="selectedSeller?.id || ''" (selectionChange)="onSellerSelect($event.value)" [disabled]="loading">
+          @if (loading) {
+            <mat-option disabled>Loading...</mat-option>
+          } @else {
+            <mat-option [value]="''" disabled>-- Select a seller --</mat-option>
+            @for (seller of sellers; track seller.id) {
+              <mat-option [value]="seller.id">
+                <div class="lead-option">
+                  <span class="lead-name">{{ seller.name }}</span>
+                  <span class="lead-email">{{ seller.phone }} {{ seller.email ? '| ' + seller.email : '' }}</span>
+                </div>
+              </mat-option>
+            }
+          }
+        </mat-select>
+        <mat-icon matSuffix>person</mat-icon>
+      </mat-form-field>
+    </div>
+
+    <div class="divider-text">
+      <span>or</span>
+    </div>
+
+    <button mat-stroked-button type="button" class="new-client-btn" (click)="toggleNewSeller()">
+      <mat-icon>add</mat-icon>
+      Create New Seller
+    </button>
+  } @else {
+    <div class="new-client-form">
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Seller Name</mat-label>
+          <input matInput [(ngModel)]="newSellerName" placeholder="Full Name" (input)="onNewSellerChange()">
+          <mat-icon matSuffix>person</mat-icon>
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Email Address</mat-label>
+          <input matInput type="email" [(ngModel)]="newSellerEmail" placeholder="email@example.com" (input)="onNewSellerChange()">
+          <mat-icon matSuffix>email</mat-icon>
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Phone Number</mat-label>
+          <input matInput [(ngModel)]="newSellerPhone" placeholder="+1 234 567 890" (input)="onNewSellerChange()">
+          <mat-icon matSuffix>phone</mat-icon>
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Address</mat-label>
+          <input matInput [(ngModel)]="newSellerAddress" placeholder="Address" (input)="onNewSellerChange()">
+          <mat-icon matSuffix>location_on</mat-icon>
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>City</mat-label>
+          <input matInput [(ngModel)]="newSellerCity" placeholder="City" (input)="onNewSellerChange()">
+          <mat-icon matSuffix>location_city</mat-icon>
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Country</mat-label>
+          <input matInput [(ngModel)]="newSellerCountry" placeholder="Country" (input)="onNewSellerChange()">
+          <mat-icon matSuffix>public</mat-icon>
+        </mat-form-field>
+      </div>
+
+      <button mat-stroked-button type="button" class="select-existing-btn" (click)="toggleNewSeller()">
+        <mat-icon>search</mat-icon>
+        Select Existing Seller Instead
+      </button>
+    </div>
+  }
+
+  @if (selectedSeller) {
+    <div class="selected-client-info">
+      <div class="info-card">
+        <mat-icon>check_circle</mat-icon>
+        <div class="info-details">
+          <span class="info-name">{{ selectedSeller.name }}</span>
+          <span class="info-contact">{{ selectedSeller.phone }} {{ selectedSeller.email ? '| ' + selectedSeller.email : '' }}</span>
+          @if (selectedSeller.city) {
+            <span class="info-budget">{{ selectedSeller.city }}, {{ selectedSeller.country }}</span>
+          }
+        </div>
+      </div>
+    </div>
+  }
+</div>

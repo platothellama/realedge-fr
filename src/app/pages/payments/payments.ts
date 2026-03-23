@@ -126,7 +126,7 @@ export class PaymentsComponent implements OnInit {
 
   loadDeals() {
     this.api.getDeals().subscribe({
-      next: (res) => {
+      next: (res: any) => {
         this.deals = Array.isArray(res) ? res : res.data || [];
       },
       error: (err) => console.error('Failed to load deals', err)
@@ -139,7 +139,7 @@ export class PaymentsComponent implements OnInit {
     if (this.filterDealId) filters.dealId = this.filterDealId;
 
     this.api.getPayments(filters).subscribe({
-      next: (res) => {
+      next: (res: any) => {
         this.payments = Array.isArray(res) ? res : res.data || [];
         this.loading = false;
       },
@@ -156,7 +156,7 @@ export class PaymentsComponent implements OnInit {
     if (this.filterDealId) filters.dealId = this.filterDealId;
 
     this.api.getPaymentPlans(filters).subscribe({
-      next: (res) => {
+      next: (res: any) => {
         this.paymentPlans = Array.isArray(res) ? res : res.data || [];
       },
       error: (err) => {

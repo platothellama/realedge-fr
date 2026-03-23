@@ -30,6 +30,7 @@ export class Sidebar {
       
       // Core Business
       { label: 'Properties', icon: 'home', link: '/properties' },
+      { label: 'Sellers', icon: 'person', link: '/sellers' },
       { label: 'CRM / Leads', icon: 'people', link: '/crm' },
       { label: 'Visits Calendar', icon: 'calendar_today', link: '/visits' },
       { label: 'Deals & Contracts', icon: 'handshake', link: '/deals' },

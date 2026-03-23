@@ -123,6 +123,23 @@ export class ApiService {
     return this.http.patch<any>(`https://realedge-frontend-production.up.railway.app/api/users/${id}/toggle-status`, {});
   }
 
+  // Sellers
+  getSellers(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/sellers`);
+  }
+
+  getSellerById(id: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/sellers/${id}`);
+  }
+
+  createSeller(data: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/sellers`, data);
+  }
+
+  updateSeller(id: string, data: any): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/sellers/${id}`, data);
+  }
+
   // AI
   onPriceEstimate(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/ai/estimate`, data);
