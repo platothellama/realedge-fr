@@ -8,16 +8,31 @@
     <div class="file-drop-area" (click)="fileInput.click()">
       <mat-icon>cloud_upload</mat-icon>
       <div class="drop-text">
-        @if (selectedFile) {
-          <span class="file-name">{{ selectedFile.name }}</span>
-          <span class="file-size">({{ (selectedFile.size / 1024).toFixed(1) }} KB)</span>
+        @if (selectedFiles.length > 0) {
+          <span>{{ selectedFiles.length }} file(s) selected</span>
+          <span class="file-size">Total: {{ getTotalSize() }}</span>
         } @else {
-          <span>Click to browse or drag and drop a file</span>
-          <span class="file-types">PDF, DOCX, PNG, JPG (Max 10MB)</span>
+          <span>Click to browse or drag and drop files</span>
+          <span class="file-types">PDF, DOCX, PNG, JPG (Max 10MB each)</span>
         }
       </div>
-      <input #fileInput type="file" style="display: none" (change)="onFileSelected($event)">
+      <input #fileInput type="file" multiple style="display: none" (change)="onFileSelected($event)">
     </div>
+
+    @if (selectedFiles.length > 0) {
+      <div class="file-list">
+        @for (file of selectedFiles; track $index; let i = $index) {
+          <div class="file-item">
+            <mat-icon>insert_drive_file</mat-icon>
+            <span class="file-name">{{ file.name }}</span>
+            <span class="file-size">({{ (file.size / 1024).toFixed(1) }} KB)</span>
+            <button mat-icon-button class="remove-btn" (click)="removeFile(i); $event.stopPropagation()">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+        }
+      </div>
+    }
 
     <div class="section-label">Document Info</div>
     
@@ -32,7 +47,7 @@
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Document Type</mat-label>
         <mat-select formControlName="type">
-          @for (t of types; track t) {
+          @for (t of filteredTypes; track t) {
             <mat-option [value]="t">{{ t }}</mat-option>
           }
         </mat-select>
@@ -40,11 +55,90 @@
     </div>
 
     @if (!data.isNewVersion) {
+      <div class="section-label">Link & Visibility</div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Link to Property (Optional)</mat-label>
+          <mat-select formControlName="propertyId">
+            <mat-option value="">No property</mat-option>
+            @for (property of properties; track property.id) {
+              <mat-option [value]="property.id">{{ property.title }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="form-row two-col">
+        <mat-form-field appearance="outline">
+          <mat-label>Seller (Optional)</mat-label>
+          <mat-select formControlName="sellerId">
+            <mat-option value="">None</mat-option>
+            @for (seller of sellers; track seller.id) {
+              <mat-option [value]="seller.id">{{ seller.name }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Visibility</mat-label>
+          <mat-select formControlName="visibility">
+            <mat-option value="internal">
+              <span class="visibility-option">
+                <mat-icon>lock</mat-icon> Internal (Team Only)
+              </span>
+            </mat-option>
+            <mat-option value="shareable">
+              <span class="visibility-option">
+                <mat-icon>share</mat-icon> Shareable (Can Send to Client)
+              </span>
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="section-label">Digital Signature</div>
+
       <div class="form-row checkbox-row">
         <mat-checkbox formControlName="isDigitalSignatureEnabled" color="primary">
-          Enable Digital Signature tracking
+          Enable Digital Signature
         </mat-checkbox>
       </div>
+
+      @if (uploadForm.get('isDigitalSignatureEnabled')?.value) {
+        <div class="signers-section">
+          <label class="signers-label">Select Signers:</label>
+          <div class="signers-list">
+            @for (signer of signerTypes; track signer) {
+              <button 
+                type="button"
+                class="signer-chip"
+                [class.selected]="isSignerSelected(signer)"
+                (click)="toggleSigner(signer)">
+                <mat-icon>{{ isSignerSelected(signer) ? 'check_box' : 'check_box_outline_blank' }}</mat-icon>
+                {{ signer }}
+              </button>
+            }
+          </div>
+          @if (selectedSigners.length > 0) {
+            <div class="signer-emails">
+              @for (signer of selectedSigners; track signer) {
+                <div class="signer-email-row">
+                  <span class="signer-type-label">{{ signer }}:</span>
+                  <mat-form-field appearance="outline" class="email-field">
+                    <input matInput 
+                      type="email" 
+                      [placeholder]="signer + ' email address'"
+                      [value]="getSignerEmail(signer)"
+                      (input)="setSignerEmail(signer, $any($event.target).value)">
+                  </mat-form-field>
+                </div>
+              }
+            </div>
+            <p class="signer-hint">Email addresses are used to send signature links. You can also add them later.</p>
+          }
+        </div>
+      }
     }
 
     <div class="form-row">
@@ -57,11 +151,11 @@
 
   <mat-dialog-actions align="end">
     <button mat-button (click)="onCancel()" class="cancel-btn" [disabled]="isSubmitting">Discard</button>
-    <button mat-raised-button color="primary" class="submit-btn" (click)="onSubmit()" [disabled]="!uploadForm.valid || (!selectedFile && !data.isNewVersion) || isSubmitting" [class.loading]="isSubmitting">
+    <button mat-raised-button color="primary" class="submit-btn" (click)="onSubmit()" [disabled]="!uploadForm.valid || (selectedFiles.length === 0 && !data.isNewVersion) || isSubmitting" [class.loading]="isSubmitting">
       @if (isSubmitting) {
         <mat-spinner diameter="20"></mat-spinner>
       } @else {
-        {{ data.isNewVersion ? 'Upload New Version' : 'Upload Document' }}
+        {{ data.isNewVersion ? 'Upload New Version' : (selectedFiles.length > 1 ? 'Upload ' + selectedFiles.length + ' Documents' : 'Upload Document') }}
       }
     </button>
   </mat-dialog-actions>

@@ -1,0 +1,176 @@
+@if (loading) {
+  <div class="loading-container">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>Loading document...</p>
+  </div>
+} @else if (error) {
+  <div class="error-container">
+    <mat-icon class="error-icon">error_outline</mat-icon>
+    <h2>Unable to Load Document</h2>
+    <p>{{ error }}</p>
+    <button mat-raised-button color="primary" (click)="goHome()">
+      <mat-icon>home</mat-icon>
+      Go to Homepage
+    </button>
+  </div>
+} @else if (signed) {
+  <div class="success-container">
+    <div class="success-icon">
+      <mat-icon>check_circle</mat-icon>
+    </div>
+    <h2>Document Signed Successfully</h2>
+    <p class="success-message">
+      Thank you for signing. Your signature has been recorded securely.
+    </p>
+
+    <mat-card class="signature-details">
+      <h3>Signature Details</h3>
+      <div class="detail-row">
+        <span class="label">Document:</span>
+        <span class="value">{{ document?.title }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="label">Signer Role:</span>
+        <span class="value">{{ signerType }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="label">Signed By:</span>
+        <span class="value">{{ signatureDetails?.signerName }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="label">Signed At:</span>
+        <span class="value">{{ formatDate(signatureDetails?.signedAt) }}</span>
+      </div>
+      <div class="detail-row">
+        <span class="label">IP Address:</span>
+        <span class="value ip">{{ signatureDetails?.ipAddress }}</span>
+      </div>
+      <div class="detail-row signature-hash">
+        <span class="label">Signature Hash:</span>
+        <span class="value hash">{{ signatureDetails?.signatureHash }}</span>
+      </div>
+    </mat-card>
+
+    <p class="legal-note">
+      This signature is legally binding. The signature hash above serves as proof of authenticity.
+    </p>
+
+    <button mat-raised-button color="primary" (click)="goHome()">
+      <mat-icon>home</mat-icon>
+      Done
+    </button>
+  </div>
+} @else {
+  <div class="sign-container">
+    <div class="header-section">
+      <div class="logo-area">
+        <mat-icon class="logo-icon">description</mat-icon>
+        <span class="logo-text">Digital Signature</span>
+      </div>
+    </div>
+
+    <mat-card class="document-card">
+      <div class="document-header">
+        <div class="doc-icon">
+          <mat-icon>description</mat-icon>
+        </div>
+        <div class="doc-info">
+          <h2>{{ document?.title }}</h2>
+          <span class="doc-type">{{ document?.type }}</span>
+        </div>
+      </div>
+
+      @if (property) {
+        <div class="property-info">
+          <mat-icon>home</mat-icon>
+          <span>{{ property.title }}</span>
+          @if (property.address || property.city) {
+            <span class="location">{{ property.address }}, {{ property.city }}</span>
+          }
+        </div>
+      }
+
+      <div class="doc-meta">
+        <div class="meta-item">
+          <span class="label">Version</span>
+          <span class="value">v{{ document?.currentVersion }}</span>
+        </div>
+        <div class="meta-item">
+          <span class="label">File</span>
+          <span class="value">{{ version?.fileName }} ({{ getFileSize(version?.fileSize) }})</span>
+        </div>
+      </div>
+
+      <div class="signer-info">
+        <mat-icon>person</mat-icon>
+        <span>Signing as: <strong>{{ signerType }}</strong></span>
+      </div>
+
+      <div class="actions-row">
+        <button mat-stroked-button (click)="downloadDocument()">
+          <mat-icon>download</mat-icon>
+          View Document
+        </button>
+      </div>
+    </mat-card>
+
+    @if (canSign) {
+      <mat-card class="sign-form-card">
+        <h3>Sign Document</h3>
+        <p class="form-description">
+          By signing, you agree that your electronic signature is the legal equivalent of your manual signature.
+        </p>
+
+        <form [formGroup]="signForm" (ngSubmit)="signDocument()">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Your Full Name</mat-label>
+            <input matInput formControlName="signerName" placeholder="Enter your full legal name">
+            @if (signForm.get('signerName')?.hasError('required') && signForm.get('signerName')?.touched) {
+              <mat-error>Name is required</mat-error>
+            }
+          </mat-form-field>
+
+          <div class="terms-section">
+            <mat-checkbox formControlName="agreedToTerms" color="primary">
+              <span class="terms-text">
+                I agree that my electronic signature is legally binding. I have read and understood the document.
+              </span>
+            </mat-checkbox>
+          </div>
+
+          <button 
+            mat-raised-button 
+            color="primary" 
+            type="submit" 
+            class="sign-btn"
+            [disabled]="!signForm.valid || signing">
+            @if (signing) {
+              <mat-spinner diameter="20"></mat-spinner>
+              Processing...
+            } @else {
+              <mat-icon>draw</mat-icon>
+              Sign Document
+            }
+          </button>
+        </form>
+      </mat-card>
+    } @else {
+      <mat-card class="already-signed">
+        <mat-icon>info</mat-icon>
+        <h3>Document Already Signed</h3>
+        <p>This document has already been signed or the signing link is no longer valid.</p>
+      </mat-card>
+    }
+
+    <div class="security-notice">
+      <mat-icon>security</mat-icon>
+      <div class="notice-content">
+        <strong>Secure Digital Signature</strong>
+        <p>
+          This signing process records your identity, IP address, and timestamp for legal verification.
+          The signature is cryptographically linked to the document.
+        </p>
+      </div>
+    </div>
+  </div>
+}

@@ -1,0 +1,69 @@
+<div class="suggestion-container">
+  <div class="suggestion-header">
+    <div class="icon-area" [attr.data-type]="uploadForm.get('type')?.value">
+      <mat-icon>description</mat-icon>
+    </div>
+    <div class="header-text">
+      <h2>Upload {{ data?.suggestedType || 'Document' }}</h2>
+      <p>{{ data?.message || 'This document is needed for this stage' }}</p>
+    </div>
+  </div>
+
+  <mat-dialog-content [formGroup]="uploadForm" class="custom-scrollbar">
+    <div class="file-drop-area" (click)="fileInput.click()">
+      <mat-icon>cloud_upload</mat-icon>
+      <div class="drop-text">
+        @if (selectedFile) {
+          <span class="file-name">{{ selectedFile.name }}</span>
+          <span class="file-size">({{ (selectedFile.size / 1024).toFixed(1) }} KB)</span>
+        } @else {
+          <span>Click to select file</span>
+          <span class="file-types">PDF, DOCX, PNG, JPG</span>
+        }
+      </div>
+      <input #fileInput type="file" style="display: none" (change)="onFileSelected($event)">
+    </div>
+
+    @if (selectedFile) {
+      <button class="remove-file-btn" (click)="removeFile()">
+        <mat-icon>close</mat-icon> Remove file
+      </button>
+    }
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Document Title</mat-label>
+        <input matInput formControlName="title" placeholder="Document name">
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Document Type</mat-label>
+        <mat-select formControlName="type">
+          @for (type of suggestedTypes; track type) {
+            <mat-option [value]="type">{{ type }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Notes (Optional)</mat-label>
+        <textarea matInput formControlName="notes" rows="2" placeholder="Add any notes..."></textarea>
+      </mat-form-field>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="skip()" class="skip-btn">Skip</button>
+    <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="!uploadForm.valid || !selectedFile || isSubmitting" [class.loading]="isSubmitting">
+      @if (isSubmitting) {
+        <mat-spinner diameter="20"></mat-spinner>
+      } @else {
+        Upload Document
+      }
+    </button>
+  </mat-dialog-actions>
+</div>

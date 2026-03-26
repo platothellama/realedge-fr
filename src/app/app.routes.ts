@@ -24,12 +24,12 @@ import { PublicWebsiteComponent } from './pages/public-website/public-website';
 import { BuyerPreferencesComponent } from './pages/buyer-preferences/buyer-preferences';
 import { PropertyMatcherComponent } from './pages/property-matcher/property-matcher';
 import { AiAssistantComponent } from './pages/ai-assistant/ai-assistant';
-import { PaymentsComponent } from './pages/payments/payments';
-import { SellersComponent } from './pages/sellers/sellers';
+import { DocumentSignPageComponent } from './pages/document-sign/document-sign';
 import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
+  { path: 'sign/:documentId/:token', component: DocumentSignPageComponent },
   { path: 'website/:slug', component: PublicWebsiteComponent },
   {
     path: '',
@@ -39,10 +39,8 @@ export const routes: Routes = [
       { path: 'dashboard', component: DashboardComponent },
       { path: 'properties', component: PropertiesComponent },
       { path: 'properties/:id', component: PropertyDetailsComponent },
-      { path: 'sellers', component: SellersComponent },
       { path: 'crm', component: CrmComponent },
       { path: 'deals', component: DealsComponent },
-      { path: 'payments', component: PaymentsComponent },
       { path: 'documents', component: DocumentsPageComponent },
       { path: 'visits', component: VisitsComponent },
       { path: 'marketing', component: MarketingComponent, data: { feature: 'marketing_automation' } },

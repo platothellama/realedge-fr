@@ -41,7 +41,21 @@
         </mat-select>
       </mat-form-field>
     </div>
-    
+    <div class="toolbar-right">
+      <button mat-icon-button [matMenuTriggerFor]="bedMenu" class="filter-btn">
+        <mat-icon>bed</mat-icon>
+        @if (minBedrooms) { <span class="filter-badge">{{ minBedrooms }}+</span> }
+      </button>
+      <mat-menu #bedMenu="matMenu">
+        <button mat-menu-item (click)="minBedrooms = null; applyFilters()">Any</button>
+        @for (num of [1,2,3,4,5]; track num) {
+          <button mat-menu-item (click)="minBedrooms = num; applyFilters()">{{ num }}+ Bedrooms</button>
+        }
+      </mat-menu>
+      <button mat-icon-button (click)="clearFilters()" [disabled]="!searchQuery && selectedStatus === 'All' && !minBedrooms">
+        <mat-icon>filter_list_off</mat-icon>
+      </button>
+    </div>
   </div>
 
   @if (loading) {

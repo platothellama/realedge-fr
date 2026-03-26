@@ -239,6 +239,45 @@
   color: #f59e0b;
 }
 
+.status-badge.draft {
+  background: rgba(100, 116, 139, 0.1);
+  color: #64748b;
+}
+
+.signers-row {
+  display: flex;
+  gap: 6px;
+  margin: 8px 0;
+  flex-wrap: wrap;
+}
+
+.signer-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.6rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 6px;
+  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.1);
+}
+
+.signer-badge mat-icon {
+  font-size: 11px;
+  width: 11px;
+  height: 11px;
+}
+
+.signer-badge.signed {
+  color: #34d399;
+  background: rgba(52, 211, 153, 0.1);
+}
+
+.text-warn {
+  color: #ef4444 !important;
+}
+
 .doc-actions {
   display: flex;
   flex-direction: row;

@@ -313,42 +313,11 @@
         </div>
       </mat-card>
 
-      @if (property.seller) {
-        <mat-card class="side-card seller-card">
-          <h3>Seller Information</h3>
-          <div class="seller-content">
-            <div class="seller-avatar">
-              <mat-icon>person</mat-icon>
-            </div>
-            <div class="seller-details">
-              <span class="seller-name">{{ property.seller.name }}</span>
-              @if (property.seller.email) {
-                <span class="seller-info">
-                  <mat-icon>email</mat-icon>
-                  {{ property.seller.email }}
-                </span>
-              }
-              @if (property.seller.phone) {
-                <span class="seller-info">
-                  <mat-icon>phone</mat-icon>
-                  {{ property.seller.phone }}
-                </span>
-              }
-              @if (property.seller.city || property.seller.country) {
-                <span class="seller-info">
-                  <mat-icon>location_on</mat-icon>
-                  {{ property.seller.city }}{{ property.seller.city && property.seller.country ? ', ' : '' }}{{ property.seller.country }}
-                </span>
-              }
-            </div>
-          </div>
-        </mat-card>
-      }
-
       <mat-card class="side-card media-card">
-        <h3>Associated Files</h3>
+        <h3>Key Documents</h3>
+        <p class="card-subtitle">Quick access to essential property documents</p>
         <div class="docs-tab-content">
-          <app-document-manager [propertyId]="property.id"></app-document-manager>
+          <app-document-manager [propertyId]="property.id" [keyDocsOnly]="true"></app-document-manager>
         </div>
       </mat-card>
     </div>

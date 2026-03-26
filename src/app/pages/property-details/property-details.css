@@ -194,6 +194,11 @@ mat-divider { margin: 32px 0; border-color: rgba(255,255,255,0.05); }
 
 .side-card h3 { font-size: 1.2rem; font-weight: 700; margin-bottom: 8px; }
 .subtitle { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 24px; }
+.card-subtitle { color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 16px; margin-top: -4px; }
+
+.docs-tab-content {
+  margin-top: 8px;
+}
 
 /* Timeline */
 .timeline { display: flex; flex-direction: column; gap: 24px; }
@@ -450,68 +455,4 @@ mat-divider { margin: 32px 0; border-color: rgba(255,255,255,0.05); }
   .analytics-grid {
     grid-template-columns: 1fr;
   }
-}
-
-.seller-card {
-  padding: 20px !important;
-  background: var(--bg-elevated) !important;
-  border-radius: 16px !important;
-  border: 1px solid var(--border) !important;
-}
-
-.seller-card h3 {
-  margin: 0 0 16px 0;
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--text-primary);
-}
-
-.seller-content {
-  display: flex;
-  gap: 16px;
-  align-items: flex-start;
-}
-
-.seller-avatar {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: var(--primary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.seller-avatar mat-icon {
-  color: #fff;
-  font-size: 24px;
-  width: 24px;
-  height: 24px;
-}
-
-.seller-details {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.seller-name {
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.seller-info {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.85rem;
-  color: var(--text-muted);
-}
-
-.seller-info mat-icon {
-  font-size: 14px;
-  width: 14px;
-  height: 14px;
 }

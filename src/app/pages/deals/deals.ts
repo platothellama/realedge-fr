@@ -7,6 +7,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { DragDropModule, CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { ApiService } from '../../services/api';
 import { DealFormComponent } from '../../components/deal-form/deal-form';
+import { DocumentSuggestionComponent } from '../../components/document-suggestion/document-suggestion';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -31,7 +32,8 @@ import { MatTabsModule } from '@angular/material/tabs';
     MatInputModule,
     MatSelectModule,
     MatMenuModule,
-    MatTabsModule
+    MatTabsModule,
+    DocumentSuggestionComponent
   ],
   templateUrl: './deals.html',
   styleUrl: './deals.css',
@@ -153,18 +155,73 @@ export class DealsComponent implements OnInit {
 
   updateDealStage(id: string, dealStage: string) {
     this.apiService.updateDeal(id, { dealStage }).subscribe({
-      next: () => {
+      next: (deal: any) => {
         let msg = `Deal moved to ${dealStage}`;
-        if (dealStage === 'Reserved') {
-          msg += ' - Property is now reserved';
+        
+        const docSuggestion = this.getDocumentSuggestion(dealStage, deal);
+        if (docSuggestion) {
+          this.snackBar.open(msg, 'Close', { duration: 4000 });
+          setTimeout(() => {
+            this.openDocumentSuggestion(deal, docSuggestion);
+          }, 500);
+        } else {
+          this.snackBar.open(msg, 'Close', { duration: 3000 });
         }
-        this.snackBar.open(msg, 'Close', { duration: 3000 });
+        
         this.fetchDeals();
       },
       error: (err) => {
         console.error('Error updating stage', err);
         this.showError('Failed to update stage');
         this.fetchDeals();
+      }
+    });
+  }
+
+  getDocumentSuggestion(stage: string, deal: any): { type: string; message: string } | null {
+    switch (stage) {
+      case 'Reserved':
+        return {
+          type: 'Reservation Form',
+          message: 'Ready to upload Reservation Form for this deal?'
+        };
+      case 'Contract Signed':
+        return {
+          type: 'Contract',
+          message: 'Upload the signed Contract for this deal?'
+        };
+      case 'Payment':
+        return {
+          type: 'Payment Receipt',
+          message: 'Add Payment Receipt for this deal?'
+        };
+      default:
+        return null;
+    }
+  }
+
+  openDocumentSuggestion(deal: any, suggestion: { type: string; message: string }) {
+    const dialogRef = this.dialog.open(DocumentSuggestionComponent, {
+      width: '500px',
+      data: {
+        suggestedType: suggestion.type,
+        message: suggestion.message,
+        propertyId: deal.propertyId,
+        dealId: deal.id,
+        propertyTitle: deal.property?.title
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(formData => {
+      if (formData) {
+        this.apiService.uploadDocument(formData).subscribe({
+          next: () => {
+            this.snackBar.open('Document uploaded successfully', 'Close', { duration: 3000 });
+          },
+          error: () => {
+            this.snackBar.open('Failed to upload document', 'Close', { duration: 3000 });
+          }
+        });
       }
     });
   }
