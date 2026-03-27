@@ -43,6 +43,11 @@
               @if (doc.status === 'Signed') {
                 <span class="sign-meta">Signed {{ doc.signedAt | date:'shortDate' }}</span>
               }
+              @if (doc.signingToken) {
+                <span class="sign-link-meta" (click)="copySigningUrl(doc)">
+                  <mat-icon>link</mat-icon>Click to copy signing link
+                </span>
+              }
               @if (doc.user || doc.group) {
                 <span class="connect-meta">
                   @if (doc.user) {
@@ -69,11 +74,13 @@
                 <mat-icon>history</mat-icon>
                 <span>Upload New Version</span>
               </button>
-              @if (doc.isDigitalSignatureEnabled && doc.status !== 'Signed') {
-                <button mat-menu-item (click)="signDocument(doc)">
-                  <mat-icon color="primary">draw</mat-icon>
-                  <span>Sign Digitally</span>
-                </button>
+              @if (doc.isDigitalSignatureEnabled) {
+                @if (doc.status !== 'Signed') {
+                  <button mat-menu-item (click)="signDocument(doc)">
+                    <mat-icon color="primary">draw</mat-icon>
+                    <span>Sign Digitally</span>
+                  </button>
+                }
                 <button mat-menu-item (click)="copySigningUrl(doc)">
                   <mat-icon color="primary">link</mat-icon>
                   <span>Copy Signing URL</span>

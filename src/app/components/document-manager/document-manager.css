@@ -115,6 +115,26 @@
   color: var(--text-muted);
 }
 
+.sign-link-meta {
+  font-size: 0.7rem;
+  color: var(--primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  text-decoration: underline;
+}
+
+.sign-link-meta:hover {
+  color: #818cf8;
+}
+
+.sign-link-meta mat-icon {
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
+}
+
 .connect-meta {
   font-size: 0.7rem;
   color: var(--text-muted);

@@ -115,17 +115,30 @@ export class DocumentManagerComponent implements OnInit {
   }
 
   copySigningUrl(doc: any) {
-    this.api.generateSigningLink(doc.id).subscribe({
-      next: (res) => {
-        const url = res.signingLink;
-        navigator.clipboard.writeText(url).then(() => {
-          this.snackBar.open('Signing URL copied to clipboard!', 'Close', { duration: 3000 });
-        }).catch(() => {
-          this.snackBar.open('Signing URL: ' + url, 'Close', { duration: 5000 });
-        });
-      },
-      error: (err) => this.snackBar.open('Failed to generate signing URL', 'Close', { duration: 3000 })
-    });
+    if (doc.signingToken) {
+      const baseUrl = window.location.origin;
+      const url = `${baseUrl}/sign/${doc.id}/${doc.signingToken}`;
+      navigator.clipboard.writeText(url).then(() => {
+        this.snackBar.open('Signing URL copied to clipboard!', 'Close', { duration: 3000 });
+      }).catch(() => {
+        this.snackBar.open('Signing URL: ' + url, 'Close', { duration: 5000 });
+      });
+    } else {
+      this.api.generateSigningLink(doc.id).subscribe({
+        next: (res) => {
+          const url = res.signingLink;
+          const token = url.split('/sign/')[1];
+          doc.signingToken = token;
+          this.fetchDocuments();
+          navigator.clipboard.writeText(url).then(() => {
+            this.snackBar.open('Signing URL copied to clipboard!', 'Close', { duration: 3000 });
+          }).catch(() => {
+            this.snackBar.open('Signing URL: ' + url, 'Close', { duration: 5000 });
+          });
+        },
+        error: (err) => this.snackBar.open('Failed to generate signing URL', 'Close', { duration: 3000 })
+      });
+    }
   }
 
   deleteDocument(doc: any) {
