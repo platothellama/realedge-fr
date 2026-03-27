@@ -50,6 +50,18 @@
 
       <div class="form-row">
         <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Property</mat-label>
+          <mat-select formControlName="propertyId">
+            <mat-option value="">None</mat-option>
+            @for (property of properties; track property.id) {
+              <mat-option [value]="property.id">{{ property.title || property.name || property.address }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="full-width">
           <mat-label>User</mat-label>
           <mat-select formControlName="userId">
             <mat-option value="">None</mat-option>

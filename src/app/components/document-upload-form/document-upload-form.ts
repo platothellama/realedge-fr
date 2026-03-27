@@ -36,6 +36,7 @@ export class DocumentUploadFormComponent implements OnInit {
   isSubmitting = false;
   users: any[] = [];
   groups: any[] = [];
+  properties: any[] = [];
 
   private api = inject(ApiService);
 
@@ -50,12 +51,25 @@ export class DocumentUploadFormComponent implements OnInit {
       isDigitalSignatureEnabled: [false],
       notes: [''],
       userId: [''],
-      groupId: ['']
+      groupId: [''],
+      propertyId: [this.data?.propertyId || '']
     });
   }
 
   ngOnInit(): void {
     this.loadUsersAndGroups();
+    this.loadProperties();
+  }
+
+  loadProperties() {
+    this.api.getProperties().subscribe({
+      next: (res: any) => {
+        this.properties = Array.isArray(res) ? res : (res?.data || []);
+        if (this.data?.propertyId) {
+          this.uploadForm.get('propertyId')?.setValue(this.data.propertyId);
+        }
+      }
+    });
   }
 
   loadUsersAndGroups() {
@@ -91,9 +105,6 @@ export class DocumentUploadFormComponent implements OnInit {
           formData.append(key, formValue[key]);
         }
       });
-
-      if (this.data.propertyId) formData.append('propertyId', this.data.propertyId);
-      if (this.data.dealId) formData.append('dealId', this.data.dealId);
 
       this.dialogRef.close(formData);
     }
