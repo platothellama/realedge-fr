@@ -133,3 +133,24 @@
 .custom-scrollbar::-webkit-scrollbar { width: 5px; }
 .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
 .custom-scrollbar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+
+.signature-section {
+  background: rgba(99, 102, 241, 0.05);
+  border: 1px solid var(--primary);
+  border-radius: 12px;
+  padding: 16px;
+  margin-top: 8px;
+}
+
+.signers-label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  display: block;
+}
+
+.signers-row {
+  display: flex;
+  gap: 24px;
+}

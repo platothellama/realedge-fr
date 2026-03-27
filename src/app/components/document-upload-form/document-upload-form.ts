@@ -48,7 +48,12 @@ export class DocumentUploadFormComponent implements OnInit {
     this.uploadForm = this.fb.group({
       title: ['', Validators.required],
       type: ['Contract', Validators.required],
+      visibility: ['shareable'],
       isDigitalSignatureEnabled: [false],
+      signerClient: [false],
+      signerAgent: [false],
+      signerOwner: [false],
+      signatureStatus: ['pending'],
       notes: [''],
       userId: [''],
       groupId: [''],

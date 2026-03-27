@@ -114,6 +114,20 @@ export class DocumentManagerComponent implements OnInit {
     });
   }
 
+  copySigningUrl(doc: any) {
+    this.api.generateSigningLink(doc.id).subscribe({
+      next: (res) => {
+        const url = res.signingLink;
+        navigator.clipboard.writeText(url).then(() => {
+          this.snackBar.open('Signing URL copied to clipboard!', 'Close', { duration: 3000 });
+        }).catch(() => {
+          this.snackBar.open('Signing URL: ' + url, 'Close', { duration: 5000 });
+        });
+      },
+      error: (err) => this.snackBar.open('Failed to generate signing URL', 'Close', { duration: 3000 })
+    });
+  }
+
   deleteDocument(doc: any) {
     if (confirm('Are you sure you want to delete this document?')) {
       this.api.deleteDocument(doc.id).subscribe({

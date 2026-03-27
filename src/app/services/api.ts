@@ -201,6 +201,10 @@ export class ApiService {
     return this.http.post<any>(`${this.apiUrl}/documents/${id}/sign`, {});
   }
 
+  generateSigningLink(id: string): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/documents/${id}/generate-signing-link`, {});
+  }
+
   deleteDocument(id: string): Observable<any> {
     return this.http.delete<any>(`${this.apiUrl}/documents/${id}`);
   }

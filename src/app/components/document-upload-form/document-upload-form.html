@@ -40,11 +40,44 @@
     </div>
 
     @if (!data.isNewVersion) {
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Visibility</mat-label>
+          <mat-select formControlName="visibility">
+            <mat-option value="internal">Internal (team only)</mat-option>
+            <mat-option value="shareable">Shareable (can send to client)</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
       <div class="form-row checkbox-row">
         <mat-checkbox formControlName="isDigitalSignatureEnabled" color="primary">
           Enable Digital Signature tracking
         </mat-checkbox>
       </div>
+
+      @if (uploadForm.get('isDigitalSignatureEnabled')?.value) {
+        <div class="signature-section">
+          <div class="form-row">
+            <mat-label class="signers-label">Select Signers</mat-label>
+            <div class="signers-row">
+              <mat-checkbox formControlName="signerClient" color="primary">Client</mat-checkbox>
+              <mat-checkbox formControlName="signerAgent" color="primary">Agent</mat-checkbox>
+              <mat-checkbox formControlName="signerOwner" color="primary">Owner</mat-checkbox>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Status</mat-label>
+              <mat-select formControlName="signatureStatus">
+                <mat-option value="pending">Pending</mat-option>
+                <mat-option value="signed">Signed</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </div>
+      }
 
       <div class="section-label">Connect to</div>
 

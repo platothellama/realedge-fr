@@ -74,6 +74,10 @@
                   <mat-icon color="primary">draw</mat-icon>
                   <span>Sign Digitally</span>
                 </button>
+                <button mat-menu-item (click)="copySigningUrl(doc)">
+                  <mat-icon color="primary">link</mat-icon>
+                  <span>Copy Signing URL</span>
+                </button>
               }
               <button mat-menu-item (click)="deleteDocument(doc)" class="text-warn">
                 <mat-icon color="warn">delete_outline</mat-icon>
