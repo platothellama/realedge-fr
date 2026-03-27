@@ -4,10 +4,21 @@
       <h3>Documents & Files</h3>
       <p>Secure version tracking and digital signatures</p>
     </div>
-    <button mat-stroked-button color="primary" class="upload-btn" (click)="openUploadForm()">
-      <mat-icon>cloud_upload</mat-icon>
-      Upload
-    </button>
+    <div class="header-actions">
+      <mat-form-field class="search-field" appearance="outline">
+        <mat-icon matPrefix>search</mat-icon>
+        <input matInput placeholder="Search documents..." [(ngModel)]="searchQuery" (ngModelChange)="onSearchChange()">
+        @if (searchQuery) {
+          <button matSuffix mat-icon-button (click)="searchQuery = ''; onSearchChange()">
+            <mat-icon>close</mat-icon>
+          </button>
+        }
+      </mat-form-field>
+      <button mat-stroked-button color="primary" class="upload-btn" (click)="openUploadForm()">
+        <mat-icon>cloud_upload</mat-icon>
+        Upload
+      </button>
+    </div>
   </div>
 
   @if (loading) {
@@ -20,29 +31,71 @@
       <mat-icon>folder_open</mat-icon>
       <p>No documents uploaded yet</p>
     </div>
+  } @else if (filteredDocuments.length === 0) {
+    <div class="empty-state">
+      <mat-icon>search_off</mat-icon>
+      <p>No documents match your search</p>
+    </div>
   } @else {
     <div class="doc-list">
-      @for (doc of documents; track doc.id) {
+      @for (doc of paginatedDocuments; track doc.id) {
         <mat-card class="doc-card">
-          <div class="doc-icon-area" [attr.data-type]="doc.type">
-            <mat-icon>{{ getIconForType(doc.type) }}</mat-icon>
+          <div class="doc-card-header">
+            <div class="doc-icon-area" [attr.data-type]="doc.type">
+              <mat-icon>{{ getIconForType(doc.type) }}</mat-icon>
+            </div>
+            <div class="doc-info">
+              <div class="doc-main">
+                <span class="doc-title">{{ doc.title }}</span>
+                <span class="doc-meta">
+                  v{{ doc.currentVersion }} • {{ doc.type }} • 
+                  {{ (doc.versions[0]?.fileSize / 1024).toFixed(1) }} KB
+                </span>
+              </div>
+              <div class="doc-status-row">
+                <span class="status-badge" [attr.data-status]="doc.status">
+                  {{ doc.status }}
+                </span>
+                @if (doc.status === 'Signed') {
+                  <span class="sign-meta">Signed {{ doc.signedAt | date:'shortDate' }}</span>
+                }
+              </div>
+            </div>
+            <div class="doc-actions">
+              <button mat-icon-button [matMenuTriggerFor]="docMenu">
+                <mat-icon>more_vert</mat-icon>
+              </button>
+              <mat-menu #docMenu="matMenu">
+                <button mat-menu-item (click)="downloadDocument(doc)">
+                  <mat-icon>download</mat-icon>
+                  <span>Download Latest</span>
+                </button>
+                <button mat-menu-item (click)="openUploadForm(true, doc.id)">
+                  <mat-icon>history</mat-icon>
+                  <span>Upload New Version</span>
+                </button>
+                @if (doc.isDigitalSignatureEnabled) {
+                  @if (doc.status !== 'Signed') {
+                    <button mat-menu-item (click)="signDocument(doc)">
+                      <mat-icon color="primary">draw</mat-icon>
+                      <span>Sign Digitally</span>
+                    </button>
+                  }
+                  <button mat-menu-item (click)="copySigningUrl(doc)">
+                    <mat-icon color="primary">link</mat-icon>
+                    <span>Copy Signing URL</span>
+                  </button>
+                }
+                <button mat-menu-item (click)="deleteDocument(doc)" class="text-warn">
+                  <mat-icon color="warn">delete_outline</mat-icon>
+                  <span>Delete</span>
+                </button>
+              </mat-menu>
+            </div>
           </div>
           
-          <div class="doc-info">
-            <div class="doc-main">
-              <span class="doc-title">{{ doc.title }}</span>
-              <span class="doc-meta">
-                v{{ doc.currentVersion }} • {{ doc.type }} • 
-                {{ (doc.versions[0]?.fileSize / 1024).toFixed(1) }} KB
-              </span>
-            </div>
-            <div class="doc-status-row">
-              <span class="status-badge" [attr.data-status]="doc.status">
-                {{ doc.status }}
-              </span>
-              @if (doc.status === 'Signed') {
-                <span class="sign-meta">Signed {{ doc.signedAt | date:'shortDate' }}</span>
-              }
+          @if (doc.signingToken || doc.user || doc.group) {
+            <div class="doc-card-footer">
               @if (doc.signingToken) {
                 <span class="sign-link-meta" (click)="copySigningUrl(doc)">
                   <mat-icon>link</mat-icon>Click to copy signing link
@@ -59,41 +112,38 @@
                 </span>
               }
             </div>
-          </div>
-
-          <div class="doc-actions">
-            <button mat-icon-button [matMenuTriggerFor]="docMenu">
-              <mat-icon>more_vert</mat-icon>
-            </button>
-            <mat-menu #docMenu="matMenu">
-              <button mat-menu-item (click)="downloadDocument(doc)">
-                <mat-icon>download</mat-icon>
-                <span>Download Latest</span>
-              </button>
-              <button mat-menu-item (click)="openUploadForm(true, doc.id)">
-                <mat-icon>history</mat-icon>
-                <span>Upload New Version</span>
-              </button>
-              @if (doc.isDigitalSignatureEnabled) {
-                @if (doc.status !== 'Signed') {
-                  <button mat-menu-item (click)="signDocument(doc)">
-                    <mat-icon color="primary">draw</mat-icon>
-                    <span>Sign Digitally</span>
-                  </button>
-                }
-                <button mat-menu-item (click)="copySigningUrl(doc)">
-                  <mat-icon color="primary">link</mat-icon>
-                  <span>Copy Signing URL</span>
-                </button>
-              }
-              <button mat-menu-item (click)="deleteDocument(doc)" class="text-warn">
-                <mat-icon color="warn">delete_outline</mat-icon>
-                <span>Delete</span>
-              </button>
-            </mat-menu>
-          </div>
+          }
         </mat-card>
       }
+    </div>
+
+    <div class="pagination">
+      <span class="pagination-info">
+        Showing {{ ((pagination.page - 1) * pagination.limit) + 1 }}-{{ Math.min(pagination.page * pagination.limit, pagination.totalItems) }} of {{ pagination.totalItems }} documents
+      </span>
+      <div class="pagination-controls">
+        <button mat-icon-button [disabled]="pagination.page === 1" (click)="pagination.page = 1; updatePaginatedDocuments()">
+          <mat-icon>first_page</mat-icon>
+        </button>
+        <button mat-icon-button [disabled]="pagination.page === 1" (click)="pagination.page = pagination.page - 1; updatePaginatedDocuments()">
+          <mat-icon>chevron_left</mat-icon>
+        </button>
+        @for (page of getPageNumbers(); track page) {
+          @if (page === -1) {
+            <span class="page-ellipsis">...</span>
+          } @else {
+            <button [class.active]="page === pagination.page" (click)="pagination.page = page; updatePaginatedDocuments()">
+              {{ page }}
+            </button>
+          }
+        }
+        <button mat-icon-button [disabled]="pagination.page === pagination.totalPages" (click)="pagination.page = pagination.page + 1; updatePaginatedDocuments()">
+          <mat-icon>chevron_right</mat-icon>
+        </button>
+        <button mat-icon-button [disabled]="pagination.page === pagination.totalPages" (click)="pagination.page = pagination.totalPages; updatePaginatedDocuments()">
+          <mat-icon>last_page</mat-icon>
+        </button>
+      </div>
     </div>
   }
 </div>

@@ -25,6 +25,7 @@ import { BuyerPreferencesComponent } from './pages/buyer-preferences/buyer-prefe
 import { PropertyMatcherComponent } from './pages/property-matcher/property-matcher';
 import { AiAssistantComponent } from './pages/ai-assistant/ai-assistant';
 import { DocumentSignPageComponent } from './pages/document-sign/document-sign';
+import { DocumentManagerPageComponent } from './pages/document-manager-page/document-manager-page';
 import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
@@ -42,6 +43,7 @@ export const routes: Routes = [
       { path: 'crm', component: CrmComponent },
       { path: 'deals', component: DealsComponent },
       { path: 'documents', component: DocumentsPageComponent },
+      { path: 'documents-manager', component: DocumentManagerPageComponent },
       { path: 'visits', component: VisitsComponent },
       { path: 'marketing', component: MarketingComponent, data: { feature: 'marketing_automation' } },
       { path: 'marketing-automation', component: MarketingAutomationComponent, data: { feature: 'marketing_automation' } },

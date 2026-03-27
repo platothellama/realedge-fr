@@ -56,7 +56,7 @@
         </mat-checkbox>
       </div>
 
-      @if (uploadForm.get('isDigitalSignatureEnabled')?.value) {
+        @if (uploadForm.get('isDigitalSignatureEnabled')?.value) {
         <div class="signature-section">
           <div class="form-row">
             <mat-label class="signers-label">Select Signers</mat-label>
@@ -66,6 +66,47 @@
               <mat-checkbox formControlName="signerOwner" color="primary">Owner</mat-checkbox>
             </div>
           </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Signing Order</mat-label>
+              <mat-select formControlName="signingOrder">
+                <mat-option value="sequential">Sequential (one after another)</mat-option>
+                <mat-option value="parallel">Parallel (any order)</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Legal Jurisdiction</mat-label>
+              <mat-select formControlName="legalJurisdiction">
+                <mat-option value="US">United States (ESIGN Act/UETA)</mat-option>
+                <mat-option value="EU">European Union (eIDAS)</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Data Retention (days)</mat-label>
+              <input matInput type="number" formControlName="retentionPeriodDays" placeholder="2555 (7 years)">
+            </mat-form-field>
+          </div>
+
+          <div class="form-row checkbox-row">
+            <mat-checkbox formControlName="esignCompliance" color="primary">
+              ESIGN Act Compliance
+            </mat-checkbox>
+          </div>
+
+          @if (uploadForm.get('legalJurisdiction')?.value === 'EU') {
+            <div class="form-row checkbox-row">
+              <mat-checkbox formControlName="eidasCompliance" color="primary">
+                eIDAS Compliance (EU)
+              </mat-checkbox>
+            </div>
+          }
 
           <div class="form-row">
             <mat-form-field appearance="outline" class="full-width">

@@ -604,7 +604,7 @@ p {
 }
 
 /* ========================
-   CHECKBOX STYLING  
+   CHECKBOX STYLING
    ======================== */
 
 .mat-mdc-checkbox,
@@ -667,10 +667,10 @@ p {
   pointer-events: all !important;
 }
 
-.cdk-overlay-pane:not(:has(> .mat-mdc-select-panel)):not(:has(> .mat-mdc-autocomplete-panel)) {
-  position: relative !important;
-  transform: none !important;
-}
+/*.cdk-overlay-pane:not(:has(> .mat-mdc-select-panel)):not(:has(> .mat-mdc-autocomplete-panel)) {*/
+/*  position: relative !important;*/
+/*  transform: none !important;*/
+/*}*/
 
 .cdk-overlay-pane:has(> .mat-mdc-select-panel),
 .cdk-overlay-pane:has(> .mat-mdc-autocomplete-panel) {
@@ -749,12 +749,13 @@ p {
 }
 
 /* Hide backdrop for menus - it blocks clicks */
-.cdk-overlay-backdrop:not(.mat-drawer-backdrop):not(.mat-dialog-backdrop):not(.mdc-dialog__scrim):not(.mat-mdc-dialog-backdrop) {
+/* Commented out to allow closing menus by clicking outside */
+/* .cdk-overlay-backdrop:not(.mat-drawer-backdrop):not(.mat-dialog-backdrop):not(.mdc-dialog__scrim):not(.mat-mdc-dialog-backdrop) {
   visibility: hidden !important;
   pointer-events: none !important;
   opacity: 0 !important;
   background: transparent !important;
-}
+} */
 
 /* Menu Items */
 .mat-mdc-menu-item {
@@ -794,10 +795,10 @@ p {
 }
 
 /* Menu panel connected position */
-.cdk-overlay-pane:has(> .mat-mdc-menu-panel) {
-  position: relative !important;
-  transform: none !important;
-}
+/*.cdk-overlay-pane:has(> .mat-mdc-menu-panel) {*/
+/*  position: relative !important;*/
+/*  transform: none !important;*/
+/*}*/
 
 .cdk-overlay-pane:has(> .mat-mdc-menu-panel) > .mat-mdc-menu-panel {
   position: relative !important;
@@ -1153,16 +1154,16 @@ button.loading mat-spinner {
   h2 { font-size: 1.5rem !important; }
   h3 { font-size: 1rem !important; }
   p { font-size: 0.95rem !important; }
-  
+
   .page-container {
     padding: 12px !important;
   }
-  
+
   .content-card {
     padding: 16px !important;
     border-radius: 12px !important;
   }
-  
+
   .mat-mdc-table {
     font-size: 0.875rem !important;
   }
@@ -1173,52 +1174,52 @@ button.loading mat-spinner {
   h2 { font-size: 1.25rem !important; }
   h3 { font-size: 0.95rem !important; }
   p { font-size: 0.875rem !important; }
-  
+
   .page-header {
     flex-direction: column !important;
     align-items: flex-start !important;
     gap: 12px !important;
   }
-  
+
   .page-header button {
     width: 100% !important;
   }
-  
+
   .form-row {
     flex-direction: column !important;
     gap: 0 !important;
   }
-  
+
   .form-row mat-form-field {
     width: 100% !important;
     margin-bottom: 8px !important;
   }
-  
+
   .modal-content {
     width: 95% !important;
     max-width: none !important;
     margin: 10px !important;
     max-height: 85vh !important;
   }
-  
+
   .search-options {
     flex-direction: column !important;
   }
-  
+
   .matches-grid {
     grid-template-columns: 1fr !important;
   }
-  
+
   .results-header {
     flex-direction: column !important;
     gap: 12px !important;
   }
-  
+
   .results-actions {
     width: 100% !important;
     justify-content: stretch !important;
   }
-  
+
   .results-actions button {
     flex: 1 !important;
   }
@@ -1232,11 +1233,11 @@ button.loading mat-spinner {
     min-height: 44px !important;
     min-width: 44px !important;
   }
-  
+
   .mat-mdc-form-field {
     --mdc-filled-textfield-container-shape: 8px !important;
   }
-  
+
   * {
     -webkit-tap-highlight-color: transparent !important;
   }
@@ -1362,7 +1363,7 @@ button.loading mat-spinner {
   html {
     zoom: 75%;
   }
-  
+
   body {
     transform: scale(0.75);
     transform-origin: top left;

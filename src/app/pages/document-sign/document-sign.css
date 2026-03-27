@@ -386,3 +386,67 @@
     gap: 12px;
   }
 }
+
+.legal-disclosure {
+  margin: 16px 0;
+  padding: 16px;
+  background: rgba(99, 102, 241, 0.1);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  border-radius: 12px;
+}
+
+.legal-disclosure h4 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px;
+  color: #6366f1;
+  font-size: 1rem;
+}
+
+.legal-disclosure h4 mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+.legal-disclosure p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.legal-disclosure.eidas {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.legal-disclosure.eidas h4 {
+  color: #10b981;
+}
+
+.terms-section.gdpr {
+  background: rgba(236, 72, 153, 0.1);
+  border: 1px solid rgba(236, 72, 153, 0.3);
+}
+
+.retention-notice {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0;
+  padding: 16px;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 12px;
+  color: #f59e0b;
+  font-size: 0.85rem;
+}
+
+.retention-notice mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}

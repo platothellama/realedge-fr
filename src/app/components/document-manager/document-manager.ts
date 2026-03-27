@@ -1,5 +1,6 @@
 import { Component, Input, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -7,6 +8,9 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { PageEvent } from '@angular/material/paginator';
 import { ApiService } from '../../services/api';
 import { DocumentUploadFormComponent } from '../document-upload-form/document-upload-form';
 
@@ -15,13 +19,16 @@ import { DocumentUploadFormComponent } from '../document-upload-form/document-up
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
     MatCardModule,
     MatButtonModule,
     MatIconModule,
     MatDialogModule,
     MatMenuModule,
     MatTooltipModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    MatInputModule,
+    MatFormFieldModule
   ],
   templateUrl: './document-manager.html',
   styleUrl: './document-manager.css'
@@ -37,7 +44,23 @@ export class DocumentManagerComponent implements OnInit {
   private snackBar = inject(MatSnackBar);
 
   documents: any[] = [];
+  filteredDocuments: any[] = [];
+  paginatedDocuments: any[] = [];
   loading = true;
+  searchQuery = '';
+
+  pageSize = 9;
+  pageIndex = 0;
+  totalDocuments = 0;
+
+  pagination = {
+    page: 1,
+    limit: 9,
+    totalItems: 0,
+    totalPages: 0
+  };
+
+  Math = Math;
 
   ngOnInit(): void {
     this.fetchDocuments();
@@ -53,7 +76,9 @@ export class DocumentManagerComponent implements OnInit {
     this.api.getDocuments(params).subscribe({
       next: (res: any) => {
         this.documents = Array.isArray(res) ? res : (res?.data || []);
+        this.filterDocuments();
         this.loading = false;
+        this.updatePaginatedDocuments();
       },
       error: (err) => {
         console.error('Failed to fetch documents', err);
@@ -114,7 +139,15 @@ export class DocumentManagerComponent implements OnInit {
     });
   }
 
-  copySigningUrl(doc: any) {
+  copySigningUrl(doc: any, signerEmail?: string, signerType?: string, signerRole?: string, requireEmailVerification = false) {
+    const signingData: any = {
+      signerEmail,
+      signerType,
+      signerRole,
+      requireEmailVerification,
+      signingOrder: doc.signingOrder || 'sequential'
+    };
+    
     if (doc.signingToken) {
       const baseUrl = window.location.origin;
       const url = `${baseUrl}/sign/${doc.id}/${doc.signingToken}`;
@@ -124,7 +157,7 @@ export class DocumentManagerComponent implements OnInit {
         this.snackBar.open('Signing URL: ' + url, 'Close', { duration: 5000 });
       });
     } else {
-      this.api.generateSigningLink(doc.id).subscribe({
+      this.api.generateSigningLink(doc.id, signingData).subscribe({
         next: (res) => {
           const url = res.signingLink;
           const token = url.split('/sign/')[1];
@@ -139,6 +172,20 @@ export class DocumentManagerComponent implements OnInit {
         error: (err) => this.snackBar.open('Failed to generate signing URL', 'Close', { duration: 3000 })
       });
     }
+  }
+
+  viewAuditTrail(doc: any) {
+    this.api.getDocumentAuditTrail(doc.id).subscribe({
+      next: (res) => {
+        const auditInfo = res.auditLogs.map((log: any) => 
+          `${new Date(log.createdAt).toLocaleString()} - ${log.action} - ${log.ipAddress || 'N/A'}`
+        ).join('\n');
+        alert(`Audit Trail for: ${doc.title}\n\n${auditInfo || 'No audit events recorded'}`);
+      },
+      error: () => {
+        this.snackBar.open('Failed to load audit trail', 'Close', { duration: 3000 });
+      }
+    });
   }
 
   deleteDocument(doc: any) {
@@ -161,5 +208,69 @@ export class DocumentManagerComponent implements OnInit {
       case 'Permit': return 'verified';
       default: return 'insert_drive_file';
     }
+  }
+
+  filterDocuments() {
+    if (!this.searchQuery.trim()) {
+      this.filteredDocuments = [...this.documents];
+    } else {
+      const query = this.searchQuery.toLowerCase();
+      this.filteredDocuments = this.documents.filter(doc => 
+        doc.title?.toLowerCase().includes(query) ||
+        doc.type?.toLowerCase().includes(query) ||
+        doc.status?.toLowerCase().includes(query) ||
+        doc.user?.name?.toLowerCase().includes(query) ||
+        doc.group?.name?.toLowerCase().includes(query)
+      );
+    }
+    this.totalDocuments = this.filteredDocuments.length;
+    this.pagination.totalItems = this.filteredDocuments.length;
+    this.pagination.totalPages = Math.ceil(this.filteredDocuments.length / this.pagination.limit);
+    this.pagination.page = 1;
+    this.pageIndex = 0;
+    this.updatePaginatedDocuments();
+  }
+
+  onSearchChange() {
+    this.filterDocuments();
+  }
+
+  updatePaginatedDocuments() {
+    const start = (this.pagination.page - 1) * this.pagination.limit;
+    const end = start + this.pagination.limit;
+    this.paginatedDocuments = this.filteredDocuments.slice(start, end);
+  }
+
+  onPageChange(event: PageEvent) {
+    this.pageIndex = event.pageIndex;
+    this.pageSize = event.pageSize;
+    this.updatePaginatedDocuments();
+  }
+
+  getPageNumbers(): number[] {
+    const pages: number[] = [];
+    const total = this.pagination.totalPages;
+    const current = this.pagination.page;
+    
+    if (total <= 7) {
+      for (let i = 1; i <= total; i++) pages.push(i);
+    } else {
+      if (current <= 4) {
+        for (let i = 1; i <= 5; i++) pages.push(i);
+        pages.push(-1);
+        pages.push(total);
+      } else if (current >= total - 3) {
+        pages.push(1);
+        pages.push(-1);
+        for (let i = total - 4; i <= total; i++) pages.push(i);
+      } else {
+        pages.push(1);
+        pages.push(-1);
+        for (let i = current - 1; i <= current + 1; i++) pages.push(i);
+        pages.push(-1);
+        pages.push(total);
+      }
+    }
+    return pages;
   }
 }

@@ -48,15 +48,46 @@ export class DocumentsPageComponent implements OnInit {
 
   documentTypes = ['All', 'Contract', 'Property Paper', 'Client ID', 'Permit', 'Other'];
 
+  pagination = {
+    page: 1,
+    limit: 12,
+    totalItems: 0,
+    totalPages: 0
+  };
+
+  Math = Math;
+
   ngOnInit() {
     this.fetchDocuments();
   }
 
   fetchDocuments() {
     this.loading = true;
-    this.api.getDocuments({}).subscribe({
+    
+    const params: any = {
+      page: this.pagination.page,
+      limit: this.pagination.limit,
+    };
+
+    if (this.searchQuery) {
+      params.search = this.searchQuery;
+    }
+    if (this.filterType && this.filterType !== 'All') {
+      params.type = this.filterType;
+    }
+
+    this.api.getDocuments(params).subscribe({
       next: (res: any) => {
-        this.documents = Array.isArray(res) ? res : (res?.data || []);
+        if (res?.data) {
+          this.documents = res.data;
+          if (res.pagination) {
+            this.pagination = { ...this.pagination, ...res.pagination };
+          }
+        } else if (Array.isArray(res)) {
+          this.documents = res;
+          this.pagination.totalItems = res.length;
+          this.pagination.totalPages = 1;
+        }
         this.loading = false;
       },
       error: (err) => {
@@ -65,6 +96,33 @@ export class DocumentsPageComponent implements OnInit {
         this.documents = [];
       }
     });
+  }
+
+  getPageNumbers(): number[] {
+    const pages: number[] = [];
+    const total = this.pagination.totalPages;
+    const current = this.pagination.page;
+    
+    if (total <= 7) {
+      for (let i = 1; i <= total; i++) pages.push(i);
+    } else {
+      if (current <= 4) {
+        for (let i = 1; i <= 5; i++) pages.push(i);
+        pages.push(-1);
+        pages.push(total);
+      } else if (current >= total - 3) {
+        pages.push(1);
+        pages.push(-1);
+        for (let i = total - 4; i <= total; i++) pages.push(i);
+      } else {
+        pages.push(1);
+        pages.push(-1);
+        for (let i = current - 1; i <= current + 1; i++) pages.push(i);
+        pages.push(-1);
+        pages.push(total);
+      }
+    }
+    return pages;
   }
 
   get filteredDocuments() {
@@ -131,6 +189,16 @@ export class DocumentsPageComponent implements OnInit {
         error: (err) => this.snackBar.open('Delete failed', 'Close', { duration: 3000 })
       });
     }
+  }
+
+  onSearchChange() {
+    this.pagination.page = 1;
+    this.fetchDocuments();
+  }
+
+  onFilterChange() {
+    this.pagination.page = 1;
+    this.fetchDocuments();
   }
 
   getIconForType(type: string): string {

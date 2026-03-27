@@ -201,8 +201,12 @@ export class ApiService {
     return this.http.post<any>(`${this.apiUrl}/documents/${id}/sign`, {});
   }
 
-  generateSigningLink(id: string): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/documents/${id}/generate-signing-link`, {});
+  generateSigningLink(id: string, data?: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/documents/${id}/generate-signing-link`, data || {});
+  }
+
+  getDocumentAuditTrail(documentId: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/documents/${documentId}/audit-trail`);
   }
 
   deleteDocument(id: string): Observable<any> {
@@ -648,14 +652,20 @@ export class ApiService {
 
   // Document Public Signing
   getPublicSigningData(documentId: string, token: string): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/documents/public/${documentId}/sign`, {
+    return this.http.get<any>(`${this.apiUrl}/sign/${documentId}/${token}`);
+  }
+
+  processPublicSignature(documentId: string, token: string, signatureData: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/sign/${documentId}/${token}`, signatureData, {
       headers: { 'X-Signing-Token': token }
     });
   }
 
-  processPublicSignature(documentId: string, token: string, signatureData: any): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/documents/public/${documentId}/sign`, signatureData, {
-      headers: { 'X-Signing-Token': token }
-    });
+  getComplianceDisclosures(documentId: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/sign/${documentId}/compliance-disclosures`);
+  }
+
+  verifySignerEmail(documentId: string, token: string): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/sign/${documentId}/${token}/verify-email`, {});
   }
 }

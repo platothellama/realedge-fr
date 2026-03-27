@@ -27,18 +27,19 @@ export class Sidebar {
     const items = [
       // Dashboard
       { label: 'Dashboard', icon: 'dashboard', link: '/dashboard' },
-      
+
       // Core Business
       { label: 'Properties', icon: 'home', link: '/properties' },
       { label: 'CRM / Leads', icon: 'people', link: '/crm' },
       { label: 'Visits Calendar', icon: 'calendar_today', link: '/visits' },
       { label: 'Deals & Contracts', icon: 'handshake', link: '/deals' },
-      { label: 'Documents', icon: 'description', link: '/documents' },
-      
+      // { label: 'Documents', icon: 'description', link: '/documents' },
+      { label: 'Documents Manager', icon: 'folder_copy', link: '/documents-manager' },
+
       // Marketing
       { label: 'Marketing Tools', icon: 'campaign', link: '/marketing', feature: 'marketing_automation' },
       { label: 'Marketing Automation', icon: 'autorenew', link: '/marketing-automation', feature: 'marketing_automation' },
-      
+
       // AI Tools
       { label: 'AI Assistant', icon: 'smart_toy', link: '/ai-assistant', feature: 'ai_assistant' },
       { label: 'Property Matcher', icon: 'auto_awesome', link: '/buyer-preferences', feature: 'ai_assistant' },

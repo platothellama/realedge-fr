@@ -57,7 +57,13 @@ export class DocumentUploadFormComponent implements OnInit {
       notes: [''],
       userId: [''],
       groupId: [''],
-      propertyId: [this.data?.propertyId || '']
+      propertyId: [this.data?.propertyId || ''],
+      retentionPeriodDays: [2555],
+      legalJurisdiction: ['US'],
+      esignCompliance: [true],
+      eidasCompliance: [false],
+      signingOrder: ['sequential'],
+      requiredSignerCount: [1]
     });
   }
 

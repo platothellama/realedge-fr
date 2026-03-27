@@ -49,10 +49,20 @@
         <span class="label">Signature Hash:</span>
         <span class="value hash">{{ signatureDetails?.signatureHash }}</span>
       </div>
+      <div class="detail-row">
+        <span class="label">Document Integrity:</span>
+        <span class="value" [style.color]="signatureDetails?.tamperCheckPassed ? '#34d399' : '#ef4444'">
+          <mat-icon>{{ signatureDetails?.tamperCheckPassed ? 'verified' : 'warning' }}</mat-icon>
+          {{ signatureDetails?.tamperCheckPassed ? 'Verified - Document tamper-free' : 'Warning - Document modified' }}
+        </span>
+      </div>
     </mat-card>
 
     <p class="legal-note">
       This signature is legally binding. The signature hash above serves as proof of authenticity.
+      @if (legalNotice) {
+        <br><strong>{{ legalNotice }}</strong>
+      }
     </p>
 
     <button mat-raised-button color="primary" (click)="goHome()">
@@ -130,6 +140,59 @@
             }
           </mat-form-field>
 
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Email Address</mat-label>
+            <input matInput formControlName="signerEmail" type="email" placeholder="your@email.com">
+            @if (signForm.get('signerEmail')?.hasError('required') && signForm.get('signerEmail')?.touched) {
+              <mat-error>Email is required</mat-error>
+            }
+            @if (signForm.get('signerEmail')?.hasError('email') && signForm.get('signerEmail')?.touched) {
+              <mat-error>Please enter a valid email</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Signer Role</mat-label>
+            <mat-select formControlName="signerRole">
+              <mat-option value="Client">Client</mat-option>
+              <mat-option value="Agent">Agent</mat-option>
+              <mat-option value="Owner">Property Owner</mat-option>
+              <mat-option value="Witness">Witness</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Reason for Signing (Optional)</mat-label>
+            <input matInput formControlName="signatureReason" placeholder="e.g., Agreement to terms">
+          </mat-form-field>
+
+          @if (complianceDisclosures?.esignAct?.required) {
+            <div class="legal-disclosure">
+              <h4><mat-icon> gavel</mat-icon> Electronic Signature Legal Notice</h4>
+              <p>{{ complianceDisclosures.esignAct.text }}</p>
+            </div>
+          }
+
+          @if (complianceDisclosures?.eidas?.required) {
+            <div class="legal-disclosure eidas">
+              <h4><mat-icon>public</mat-icon> eIDAS Compliance (EU)</h4>
+              <p>{{ complianceDisclosures.eidas.text }}</p>
+            </div>
+          }
+
+          <div class="terms-section">
+            <mat-checkbox formControlName="legalDisclosureAcknowledged" color="primary">
+              <span class="terms-text">
+                I acknowledge the legal disclosures and understand that my electronic signature is legally binding under 
+                @if (complianceDisclosures?.eidas?.required) {
+                  eIDAS Regulation (EU)
+                } @else {
+                  the ESIGN Act and UETA
+                }.
+              </span>
+            </mat-checkbox>
+          </div>
+
           <div class="terms-section">
             <mat-checkbox formControlName="agreedToTerms" color="primary">
               <span class="terms-text">
@@ -137,6 +200,32 @@
               </span>
             </mat-checkbox>
           </div>
+
+          <div class="terms-section">
+            <mat-checkbox formControlName="agreedToPrivacyPolicy" color="primary">
+              <span class="terms-text">
+                I have read and agree to the <a href="/privacy-policy" target="_blank">Privacy Policy</a> and consent to the processing of my personal data.
+              </span>
+            </mat-checkbox>
+          </div>
+
+          @if (complianceDisclosures?.gdpr?.required) {
+            <div class="terms-section gdpr">
+              <mat-checkbox formControlName="gdprConsent" color="primary">
+                <span class="terms-text">
+                  I consent to the processing of my personal data in accordance with GDPR. 
+                  {{ complianceDisclosures.gdpr.text }}
+                </span>
+              </mat-checkbox>
+            </div>
+          }
+
+          @if (complianceDisclosures?.dataRetention?.required) {
+            <div class="retention-notice">
+              <mat-icon>schedule</mat-icon>
+              <span>{{ complianceDisclosures.dataRetention.text }}</span>
+            </div>
+          }
 
           <button 
             mat-raised-button 

@@ -9,6 +9,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { ApiService } from '../../services/api';
 
@@ -25,7 +26,8 @@ import { ApiService } from '../../services/api';
     MatInputModule,
     MatCheckboxModule,
     MatProgressSpinnerModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    MatSelectModule
   ],
   templateUrl: './document-sign.html',
   styleUrl: './document-sign.css'
@@ -47,11 +49,22 @@ export class DocumentSignPageComponent implements OnInit {
   signing = false;
   signed = false;
   signatureDetails: any = null;
+  legalNotice = '';
 
   signForm: FormGroup = this.fb.group({
     signerName: ['', Validators.required],
-    agreedToTerms: [false, Validators.requiredTrue]
+    signerEmail: ['', [Validators.required, Validators.email]],
+    signerRole: ['Client'],
+    signatureReason: [''],
+    agreedToTerms: [false, Validators.requiredTrue],
+    agreedToPrivacyPolicy: [false, Validators.requiredTrue],
+    legalDisclosureAcknowledged: [false, Validators.requiredTrue],
+    gdprConsent: [false]
   });
+
+  complianceDisclosures: any = null;
+  showEmailVerification = false;
+  emailVerified = false;
 
   ngOnInit() {
     const documentId = this.route.snapshot.params['documentId'];
@@ -67,11 +80,31 @@ export class DocumentSignPageComponent implements OnInit {
         this.property = res.property;
         this.signerType = res.signerType;
         this.canSign = res.canSign;
+        
+        if (this.canSign) {
+          this.loadComplianceDisclosures(documentId);
+        }
+        
         this.loading = false;
       },
       error: (err: any) => {
         this.error = err.error?.message || 'Invalid or expired signing link';
         this.loading = false;
+      }
+    });
+  }
+
+  loadComplianceDisclosures(documentId: string) {
+    this.api.getComplianceDisclosures(documentId).subscribe({
+      next: (res: any) => {
+        this.complianceDisclosures = res.disclosures;
+        if (res.disclosures?.gdpr?.required) {
+          this.signForm.get('gdprConsent')?.setValidators([Validators.requiredTrue]);
+          this.signForm.get('gdprConsent')?.updateValueAndValidity();
+        }
+      },
+      error: () => {
+        console.warn('Could not load compliance disclosures');
       }
     });
   }
@@ -86,6 +119,7 @@ export class DocumentSignPageComponent implements OnInit {
         next: (res: any) => {
           this.signed = true;
           this.signatureDetails = res.signatureDetails;
+          this.legalNotice = res.legalNotice;
           this.signing = false;
         },
         error: (err: any) => {

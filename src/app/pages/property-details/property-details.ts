@@ -42,7 +42,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 export class PropertyDetailsComponent implements OnInit {
   property: any;
   loading = true;
-  performanceCollapsed = false;
+  performanceCollapsed = true;
 
   constructor(
     private route: ActivatedRoute,
