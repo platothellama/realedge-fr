@@ -43,6 +43,8 @@ export class PropertyDetailsComponent implements OnInit {
   property: any;
   loading = true;
   performanceCollapsed = true;
+  lightboxOpen = false;
+  lightboxIndex = 0;
 
   constructor(
     private route: ActivatedRoute,
@@ -210,5 +212,41 @@ export class PropertyDetailsComponent implements OnInit {
 
   goBack() {
     this.router.navigate(['/properties']);
+  }
+
+  openLightbox(index: number) {
+    this.lightboxIndex = index;
+    this.lightboxOpen = true;
+  }
+
+  closeLightbox() {
+    this.lightboxOpen = false;
+  }
+
+  prevImage(event: Event) {
+    event.stopPropagation();
+    if (this.property?.photos?.length) {
+      this.lightboxIndex = (this.lightboxIndex - 1 + this.property.photos.length) % this.property.photos.length;
+    }
+  }
+
+  nextImage(event: Event) {
+    event.stopPropagation();
+    if (this.property?.photos?.length) {
+      this.lightboxIndex = (this.lightboxIndex + 1) % this.property.photos.length;
+    }
+  }
+
+  getValuationWidth(): number {
+    if (!this.analytics?.valuationClass || this.analytics.valuationClass === 'unknown') return 50;
+    if (this.analytics.valuationClass === 'undervalued') return 30;
+    if (this.analytics.valuationClass === 'overvalued') return 80;
+    return 50;
+  }
+
+  getValuationIcon(): string {
+    if (this.analytics?.valuationClass === 'undervalued') return 'trending_down';
+    if (this.analytics?.valuationClass === 'overvalued') return 'trending_up';
+    return 'remove';
   }
 }

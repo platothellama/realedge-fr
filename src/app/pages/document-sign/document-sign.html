@@ -41,20 +41,10 @@
         <span class="label">Signed At:</span>
         <span class="value">{{ formatDate(signatureDetails?.signedAt) }}</span>
       </div>
-      <div class="detail-row">
-        <span class="label">IP Address:</span>
-        <span class="value ip">{{ signatureDetails?.ipAddress }}</span>
-      </div>
+
       <div class="detail-row signature-hash">
         <span class="label">Signature Hash:</span>
         <span class="value hash">{{ signatureDetails?.signatureHash }}</span>
-      </div>
-      <div class="detail-row">
-        <span class="label">Document Integrity:</span>
-        <span class="value" [style.color]="signatureDetails?.tamperCheckPassed ? '#34d399' : '#ef4444'">
-          <mat-icon>{{ signatureDetails?.tamperCheckPassed ? 'verified' : 'warning' }}</mat-icon>
-          {{ signatureDetails?.tamperCheckPassed ? 'Verified - Document tamper-free' : 'Warning - Document modified' }}
-        </span>
       </div>
     </mat-card>
 
@@ -183,7 +173,7 @@
           <div class="terms-section">
             <mat-checkbox formControlName="legalDisclosureAcknowledged" color="primary">
               <span class="terms-text">
-                I acknowledge the legal disclosures and understand that my electronic signature is legally binding under 
+                I acknowledge the legal disclosures and understand that my electronic signature is legally binding under
                 @if (complianceDisclosures?.eidas?.required) {
                   eIDAS Regulation (EU)
                 } @else {
@@ -213,7 +203,7 @@
             <div class="terms-section gdpr">
               <mat-checkbox formControlName="gdprConsent" color="primary">
                 <span class="terms-text">
-                  I consent to the processing of my personal data in accordance with GDPR. 
+                  I consent to the processing of my personal data in accordance with GDPR.
                   {{ complianceDisclosures.gdpr.text }}
                 </span>
               </mat-checkbox>
@@ -227,10 +217,10 @@
             </div>
           }
 
-          <button 
-            mat-raised-button 
-            color="primary" 
-            type="submit" 
+          <button
+            mat-raised-button
+            color="primary"
+            type="submit"
             class="sign-btn"
             [disabled]="!signForm.valid || signing">
             @if (signing) {

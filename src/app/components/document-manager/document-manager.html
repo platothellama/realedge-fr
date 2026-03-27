@@ -5,15 +5,6 @@
       <p>Secure version tracking and digital signatures</p>
     </div>
     <div class="header-actions">
-      <mat-form-field class="search-field" appearance="outline">
-        <mat-icon matPrefix>search</mat-icon>
-        <input matInput placeholder="Search documents..." [(ngModel)]="searchQuery" (ngModelChange)="onSearchChange()">
-        @if (searchQuery) {
-          <button matSuffix mat-icon-button (click)="searchQuery = ''; onSearchChange()">
-            <mat-icon>close</mat-icon>
-          </button>
-        }
-      </mat-form-field>
       <button mat-stroked-button color="primary" class="upload-btn" (click)="openUploadForm()">
         <mat-icon>cloud_upload</mat-icon>
         Upload
@@ -48,7 +39,7 @@
               <div class="doc-main">
                 <span class="doc-title">{{ doc.title }}</span>
                 <span class="doc-meta">
-                  v{{ doc.currentVersion }} • {{ doc.type }} • 
+                  v{{ doc.currentVersion }} • {{ doc.type }} •
                   {{ (doc.versions[0]?.fileSize / 1024).toFixed(1) }} KB
                 </span>
               </div>
@@ -93,7 +84,7 @@
               </mat-menu>
             </div>
           </div>
-          
+
           @if (doc.signingToken || doc.user || doc.group) {
             <div class="doc-card-footer">
               @if (doc.signingToken) {
@@ -117,7 +108,7 @@
       }
     </div>
 
-    <div class="pagination">
+    <div class="pagination" style="    flex-direction: column;">
       <span class="pagination-info">
         Showing {{ ((pagination.page - 1) * pagination.limit) + 1 }}-{{ Math.min(pagination.page * pagination.limit, pagination.totalItems) }} of {{ pagination.totalItems }} documents
       </span>

@@ -41,7 +41,22 @@ export class PropertiesComponent implements OnInit {
 
   searchQuery: string = '';
   selectedStatus: string = 'All';
+  selectedType: string = 'All';
   minBedrooms: number | null = null;
+  maxBedrooms: number | null = null;
+  minBathrooms: number | null = null;
+  minPrice: number | null = null;
+  maxPrice: number | null = null;
+  minArea: number | null = null;
+  maxArea: number | null = null;
+  selectedCity: string = 'All';
+
+  propertyTypes = ['Apartment', 'House', 'Villa', 'Office', 'Land', 'Commercial'];
+  statusOptions = ['Available', 'Sold', 'Reserved', 'Rented'];
+  cities = ['Beirut', 'Mount Lebanon', 'North Lebanon', 'South Lebanon', 'Bekaa', 'Nabatieh', 'Keserwan', 'Jbeil', 'Tripoli', 'Sidon', 'Tyre'];
+
+  showAdvancedFilters = false;
+  private searchDebounce: any;
 
   pagination = {
     page: 1,
@@ -78,6 +93,30 @@ export class PropertiesComponent implements OnInit {
     }
     if (this.minBedrooms) {
       params.minBedrooms = this.minBedrooms;
+    }
+    if (this.maxBedrooms) {
+      params.maxBedrooms = this.maxBedrooms;
+    }
+    if (this.minBathrooms) {
+      params.minBathrooms = this.minBathrooms;
+    }
+    if (this.minPrice) {
+      params.minPrice = this.minPrice;
+    }
+    if (this.maxPrice) {
+      params.maxPrice = this.maxPrice;
+    }
+    if (this.minArea) {
+      params.minArea = this.minArea;
+    }
+    if (this.maxArea) {
+      params.maxArea = this.maxArea;
+    }
+    if (this.selectedType && this.selectedType !== 'All') {
+      params.type = this.selectedType;
+    }
+    if (this.selectedCity && this.selectedCity !== 'All') {
+      params.city = this.selectedCity;
     }
 
     this.apiService.getProperties(params).subscribe({
@@ -135,9 +174,48 @@ export class PropertiesComponent implements OnInit {
 
   clearFilters() {
     this.selectedStatus = 'All';
+    this.selectedType = 'All';
+    this.selectedCity = 'All';
     this.minBedrooms = null;
+    this.maxBedrooms = null;
+    this.minBathrooms = null;
+    this.minPrice = null;
+    this.maxPrice = null;
+    this.minArea = null;
+    this.maxArea = null;
     this.searchQuery = '';
     this.applyFilters();
+  }
+
+  hasActiveFilters(): boolean {
+    return !!(this.searchQuery || 
+      this.selectedStatus !== 'All' || 
+      this.selectedType !== 'All' || 
+      this.selectedCity !== 'All' ||
+      this.minBedrooms || 
+      this.maxBedrooms ||
+      this.minBathrooms ||
+      this.minPrice || 
+      this.maxPrice ||
+      this.minArea ||
+      this.maxArea);
+  }
+
+  onSearchInput() {
+    clearTimeout(this.searchDebounce);
+    this.searchDebounce = setTimeout(() => {
+      this.applyFilters();
+    }, 400);
+  }
+
+  setPriceRange(min: number | null, max: number | null) {
+    this.minPrice = min;
+    this.maxPrice = max;
+  }
+
+  setAreaRange(min: number | null, max: number | null) {
+    this.minArea = min;
+    this.maxArea = max;
   }
 
   openPropertyForm(property?: any) {

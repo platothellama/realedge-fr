@@ -91,8 +91,8 @@ export class DocumentManagerComponent implements OnInit {
   openUploadForm(isNewVersion = false, docId?: string) {
     const dialogRef = this.dialog.open(DocumentUploadFormComponent, {
       width: '600px',
-      data: { 
-        propertyId: this.propertyId, 
+      data: {
+        propertyId: this.propertyId,
         dealId: this.dealId,
         isNewVersion,
         docId
@@ -125,7 +125,7 @@ export class DocumentManagerComponent implements OnInit {
   downloadDocument(doc: any) {
     const version = doc.versions[0]; // Latest version
     if (version) {
-      window.open(`https://realedge-frontend-production.up.railway.app/tend-production.up.railway.app//uploads/${version.fileUrl}`, '_blank');
+      window.open(`https://realedge-frontend-production.up.railway.app/uploads/${version.fileUrl}`, '_blank');
     }
   }
 
@@ -147,7 +147,7 @@ export class DocumentManagerComponent implements OnInit {
       requireEmailVerification,
       signingOrder: doc.signingOrder || 'sequential'
     };
-    
+
     if (doc.signingToken) {
       const baseUrl = window.location.origin;
       const url = `${baseUrl}/sign/${doc.id}/${doc.signingToken}`;
@@ -177,7 +177,7 @@ export class DocumentManagerComponent implements OnInit {
   viewAuditTrail(doc: any) {
     this.api.getDocumentAuditTrail(doc.id).subscribe({
       next: (res) => {
-        const auditInfo = res.auditLogs.map((log: any) => 
+        const auditInfo = res.auditLogs.map((log: any) =>
           `${new Date(log.createdAt).toLocaleString()} - ${log.action} - ${log.ipAddress || 'N/A'}`
         ).join('\n');
         alert(`Audit Trail for: ${doc.title}\n\n${auditInfo || 'No audit events recorded'}`);
@@ -215,7 +215,7 @@ export class DocumentManagerComponent implements OnInit {
       this.filteredDocuments = [...this.documents];
     } else {
       const query = this.searchQuery.toLowerCase();
-      this.filteredDocuments = this.documents.filter(doc => 
+      this.filteredDocuments = this.documents.filter(doc =>
         doc.title?.toLowerCase().includes(query) ||
         doc.type?.toLowerCase().includes(query) ||
         doc.status?.toLowerCase().includes(query) ||
@@ -251,7 +251,7 @@ export class DocumentManagerComponent implements OnInit {
     const pages: number[] = [];
     const total = this.pagination.totalPages;
     const current = this.pagination.page;
-    
+
     if (total <= 7) {
       for (let i = 1; i <= total; i++) pages.push(i);
     } else {

@@ -88,6 +88,7 @@ export class NotificationsComponent implements OnInit {
       case 'visit': return 'calendar_today';
       case 'document': return 'description';
       case 'reminder': return 'alarm';
+      case 'login': return 'login';
       default: return 'notifications';
     }
   }

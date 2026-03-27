@@ -1,331 +1,283 @@
 <div class="details-container" *ngIf="!loading && property">
-  <!-- Top Navigation & Actions -->
-  <div class="top-bar">
+  <!-- Header Section -->
+  <header class="page-header">
     <button mat-button class="back-btn" (click)="goBack()">
       <mat-icon>arrow_back</mat-icon>
-      Back to Listings
+      Back
     </button>
-    <div class="spacer"></div>
-    <button mat-stroked-button color="primary" class="deal-trigger-btn" (click)="startDeal()">
-      <mat-icon>handshake</mat-icon>
-      Start Deal
-    </button>
-    <button mat-stroked-button color="primary" class="visit-trigger-btn" (click)="scheduleVisit()">
-      <mat-icon>calendar_today</mat-icon>
-      Schedule Visit
-    </button>
-    <button mat-raised-button color="primary" class="edit-btn" (click)="openEditForm()">
-      <mat-icon>edit</mat-icon>
-      Edit Details
-    </button>
-  </div>
-
-  <!-- Property Analytics Dashboard -->
-  <div class="analytics-section">
-    <div class="section-header" (click)="performanceCollapsed = !performanceCollapsed">
-      <h2 class="section-title">
-        <mat-icon>analytics</mat-icon> Property Performance
-        <span class="status-badge" [style.background-color]="getStatusColor(analytics.status) + '20'" [style.color]="getStatusColor(analytics.status)">
-          {{ analytics.status }}
-        </span>
-      </h2>
-      <mat-icon class="collapse-icon" [class.collapsed]="performanceCollapsed">expand_more</mat-icon>
+    <div class="header-actions">
+      <button mat-stroked-button color="primary" (click)="scheduleVisit()">
+        <mat-icon>calendar_today</mat-icon>
+        Schedule Visit
+      </button>
+      <button mat-stroked-button color="primary" (click)="startDeal()">
+        <mat-icon>handshake</mat-icon>
+        Start Deal
+      </button>
+      <button mat-raised-button color="primary" (click)="openEditForm()">
+        <mat-icon>edit</mat-icon>
+        Edit
+      </button>
     </div>
+  </header>
 
-    <div class="analytics-grid" [class.hidden]="performanceCollapsed">
-      <!-- Price Analysis -->
-      <mat-card class="analytics-card">
-        <div class="card-header">
-          <mat-icon>price_change</mat-icon>
-          <h3>Price Analysis</h3>
+  <!-- Image Gallery -->
+  <section class="gallery-section">
+    <div class="gallery-grid">
+      <div class="gallery-main" [style.backgroundImage]="'url(' + (property.photos?.length ? property.photos[0] : 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=1200&q=80') + ')'" (click)="openLightbox(0)">
+        <span class="status-badge" [class]="property.status.toLowerCase()">{{ property.status }}</span>
+        <div class="view-all" *ngIf="property.photos?.length > 1">
+          <mat-icon>zoom_in</mat-icon> View all {{ property.photos.length }} photos
         </div>
-        <div class="stat-row">
-          <div class="stat-item">
-            <span class="label">Asking Price</span>
-            <span class="value">${{ property.price | number }}</span>
-          </div>
-          <div class="stat-item">
-            <span class="label">Market Value</span>
-            <span class="value">${{ analytics.marketValue | number }}</span>
-          </div>
-        </div>
-        <div class="stat-row">
-          <div class="stat-item">
-            <span class="label">Price/m²</span>
-            <span class="value">${{ analytics.pricePerSqm | number:'1.0-0' }}</span>
-          </div>
-          <div class="stat-item">
-            <span class="label">vs Market</span>
-            <span class="value" [class]="analytics.valuationClass">
-              {{ analytics.priceVsMarket > 0 ? '+' : '' }}{{ analytics.priceVsMarket | number:'1.1-1' }}%
-            </span>
-          </div>
-        </div>
-        <div class="valuation-bar">
-          <div class="bar-label">Valuation</div>
-          <div class="bar-track">
-            <div class="bar-fill" [style.width.%]="analytics.valuationClass === 'undervalued' ? 30 : analytics.valuationClass === 'overvalued' ? 90 : 60" [class]="analytics.valuationClass"></div>
-            <div class="bar-marker" [style.left.%]="analytics.priceVsMarket + 50"></div>
-          </div>
-          <div class="bar-labels">
-            <span>Undervalued</span>
-            <span>Fair</span>
-            <span>Overvalued</span>
-          </div>
-        </div>
-      </mat-card>
-
-      <!-- Traction Metrics -->
-      <mat-card class="analytics-card">
-        <div class="card-header">
-          <mat-icon>trending_up</mat-icon>
-          <h3>Traction Metrics</h3>
-        </div>
-        <div class="metric-grid">
-          <div class="metric-item">
-            <mat-icon>visibility</mat-icon>
-            <div class="metric-info">
-              <span class="value">{{ analytics.views }}</span>
-              <span class="label">Total Views</span>
-            </div>
-          </div>
-          <div class="metric-item">
-            <mat-icon>question_answer</mat-icon>
-            <div class="metric-info">
-              <span class="value">{{ analytics.inquiries }}</span>
-              <span class="label">Inquiries</span>
-            </div>
-          </div>
-          <div class="metric-item">
-            <mat-icon>calendar_month</mat-icon>
-            <div class="metric-info">
-              <span class="value">{{ analytics.daysOnMarket }}</span>
-              <span class="label">Days on Market</span>
-            </div>
-          </div>
-          <div class="metric-item">
-            <mat-icon>swap_horiz</mat-icon>
-            <div class="metric-info">
-              <span class="value">{{ analytics.visitsPerView }}%</span>
-              <span class="label">Inquiry Rate</span>
-            </div>
-          </div>
-        </div>
-        <div class="traction-bar">
-          <div class="bar-label">Listing Health</div>
-          <div class="bar-track">
-            <div class="bar-fill" [style.width.%]="analytics.daysClass === 'fresh' ? 90 : analytics.daysClass === 'aging' ? 50 : 20" [class]="analytics.daysClass"></div>
-          </div>
-          <div class="bar-labels">
-            <span>Stale</span>
-            <span>Aging</span>
-            <span>Fresh</span>
-          </div>
-        </div>
-      </mat-card>
-
-      <!-- Quick Stats -->
-      <mat-card class="analytics-card mini">
-        <div class="quick-stat" [class]="analytics.valuationClass">
-          <mat-icon>{{ analytics.valuationClass === 'undervalued' ? 'trending_down' : analytics.valuationClass === 'overvalued' ? 'trending_up' : 'remove' }}</mat-icon>
-          <span class="qs-value">{{ analytics.valuationClass === 'unknown' ? 'N/A' : (analytics.valuationClass | titlecase) }}</span>
-          <span class="qs-label">Valuation</span>
-        </div>
-      </mat-card>
-
-      <mat-card class="analytics-card mini">
-        <div class="quick-stat" [class]="analytics.daysClass">
-          <mat-icon>{{ analytics.daysClass === 'fresh' ? 'check_circle' : analytics.daysClass === 'aging' ? 'warning' : 'error' }}</mat-icon>
-          <span class="qs-value">{{ analytics.daysOnMarket }} days</span>
-          <span class="qs-label">Time on Market</span>
-        </div>
-      </mat-card>
-    </div>
-  </div>
-
-  <div class="main-layout">
-    <!-- Left Column: Visuals & Main Info -->
-    <div class="left-col">
-      <div class="gallery-hero" [style.backgroundImage]="'url(' + (property.photos?.length ? property.photos[0] : 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=1200&q=80') + ')'">
-        <span class="status-chip" [class]="property.status.toLowerCase()">{{ property.status }}</span>
       </div>
-
-      <div class="gallery-thumbs" *ngIf="property.photos?.length > 1">
-        @for (photo of property.photos.slice(1, 5); track photo) {
-          <div class="thumb" [style.backgroundImage]="'url(' + photo + ')'"></div>
+      <div class="gallery-side" *ngIf="property.photos?.length > 1">
+        @for (photo of property.photos.slice(1, 5); track photo; let idx = $index) {
+          <div class="gallery-thumb" [style.backgroundImage]="'url(' + photo + ')'" (click)="openLightbox(idx + 1)">
+            <span class="more-overlay" *ngIf="idx === 3 && property.photos.length > 5">+{{ property.photos.length - 5 }}</span>
+          </div>
         }
       </div>
+    </div>
+  </section>
 
-      <div class="info-card">
-        <div class="header">
+  <!-- Main Content -->
+  <div class="content-grid">
+    <!-- Left Column -->
+    <div class="main-col">
+      <!-- Property Title & Price -->
+      <mat-card class="info-card">
+        <div class="property-header">
           <div class="title-section">
-            <span class="type-tag">{{ property.type }}</span>
+            <span class="property-type">{{ property.type }}</span>
             <h1>{{ property.title }}</h1>
-            <p class="location-text">
+            <p class="location">
               <mat-icon>location_on</mat-icon>
               {{ property.address }}, {{ property.city }}, {{ property.country }}
             </p>
           </div>
           <div class="price-section">
+            <span class="price">${{ property.price | number }}</span>
             <span class="price-label">Asking Price</span>
-            <span class="price-value">${{ property.price | number }}</span>
           </div>
         </div>
 
-        <mat-divider></mat-divider>
-
+        <!-- Quick Stats -->
         <div class="quick-stats">
-          <div class="stat">
+          <div class="stat-item">
             <mat-icon>bed</mat-icon>
-            <div class="stat-info">
-              <span class="val">{{ property.bedrooms }}</span>
-              <span class="lab">Bedrooms</span>
+            <div class="stat-content">
+              <span class="stat-value">{{ property.bedrooms }}</span>
+              <span class="stat-label">Beds</span>
             </div>
           </div>
-          <div class="stat">
+          <div class="stat-item">
             <mat-icon>bathtub</mat-icon>
-            <div class="stat-info">
-              <span class="val">{{ property.bathrooms }}</span>
-              <span class="lab">Bathrooms</span>
+            <div class="stat-content">
+              <span class="stat-value">{{ property.bathrooms }}</span>
+              <span class="stat-label">Baths</span>
             </div>
           </div>
-          <div class="stat">
+          <div class="stat-item">
             <mat-icon>square_foot</mat-icon>
-            <div class="stat-info">
-              <span class="val">{{ property.area }}</span>
-              <span class="lab">SQM Area</span>
+            <div class="stat-content">
+              <span class="stat-value">{{ property.area }}</span>
+              <span class="stat-label">SQM</span>
             </div>
           </div>
-          <div class="stat">
+          <div class="stat-item">
             <mat-icon>directions_car</mat-icon>
-            <div class="stat-info">
-              <span class="val">{{ property.parkingSpaces }}</span>
-              <span class="lab">Parking</span>
+            <div class="stat-content">
+              <span class="stat-value">{{ property.parkingSpaces }}</span>
+              <span class="stat-label">Parking</span>
             </div>
           </div>
         </div>
+      </mat-card>
 
-        <div class="description-section">
-          <h3>Description</h3>
-          <p>{{ property.description || 'No description provided for this luxury property.' }}</p>
+      <!-- Description -->
+      <mat-card class="info-card">
+        <h2 class="section-heading">
+          <mat-icon>description</mat-icon>
+          Description
+        </h2>
+        <p class="description">{{ property.description || 'No description provided for this property.' }}</p>
+      </mat-card>
+
+      <!-- Features -->
+      <mat-card class="info-card" *ngIf="property.features?.length">
+        <h2 class="section-heading">
+          <mat-icon>checklist</mat-icon>
+          Features & Amenities
+        </h2>
+        <div class="features-grid">
+          @for (feature of property.features; track feature) {
+            <div class="feature-item">
+              <mat-icon>check_circle</mat-icon>
+              {{ feature }}
+            </div>
+          }
         </div>
+      </mat-card>
 
-        @if (property.features?.length) {
-          <div class="features-section">
-            <h3>Features</h3>
-            <div class="features-grid">
-              @for (feature of property.features; track feature) {
-                <span class="feature-badge">
-                  <mat-icon>check</mat-icon>
-                  {{ feature }}
+      <!-- Price History -->
+      <mat-card class="info-card" *ngIf="property.priceHistoryEntries?.length">
+        <h2 class="section-heading">
+          <mat-icon>history</mat-icon>
+          Price History
+        </h2>
+        <div class="price-timeline">
+          @for (entry of property.priceHistoryEntries; track entry.id) {
+            <div class="timeline-entry">
+              <div class="timeline-dot"></div>
+              <div class="timeline-content">
+                <div class="timeline-header">
+                  <span class="timeline-date">{{ entry.changeDate | date:'mediumDate' }}</span>
+                  <span class="timeline-price">${{ entry.price | number }}</span>
+                </div>
+                <p class="timeline-note">{{ entry.note }}</p>
+                <span class="timeline-lead" *ngIf="entry.lead">
+                  <mat-icon>person</mat-icon> {{ entry.lead.name }}
                 </span>
-              }
+              </div>
             </div>
-          </div>
-        }
-      </div>
+          }
+        </div>
+        <button mat-button color="primary" class="add-entry-btn" (click)="openNegotiationForm()">
+          <mat-icon>add</mat-icon> Add Price Entry
+        </button>
+      </mat-card>
     </div>
 
-    <!-- Right Column: Negotiation & Details -->
-    <div class="right-col">
-      <mat-card class="side-card history-card">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <div>
-            <h3>Negotiation & Price History</h3>
-            <p class="subtitle">Track price changes and offers</p>
-          </div>
-          <button mat-icon-button color="primary" (click)="openNegotiationForm()">
-            <mat-icon>add_circle</mat-icon>
-          </button>
+    <!-- Right Column -->
+    <div class="side-col">
+      <!-- Analytics Card -->
+      <mat-card class="analytics-card">
+        <div class="card-header" (click)="performanceCollapsed = !performanceCollapsed">
+          <h3>
+            <mat-icon>analytics</mat-icon>
+            Performance
+          </h3>
+          <mat-icon class="collapse-icon" [class.collapsed]="performanceCollapsed">expand_more</mat-icon>
         </div>
+        
+        <div class="analytics-content" [class.hidden]="performanceCollapsed">
+          <div class="status-indicator" [style.--status-color]="getStatusColor(analytics.status)">
+            <span class="status-dot"></span>
+            {{ analytics.status }}
+          </div>
 
-        <div class="timeline">
-          @for (entry of property.priceHistoryEntries; track entry.id) {
-            <div class="timeline-item">
-              <div class="marker"></div>
-              <div class="timeline-content">
-                <div class="time-header">
-                  <span class="date">{{ entry.changeDate | date:'mediumDate' }}</span>
-                  <span class="price">${{ entry.price | number }}</span>
-                </div>
-                <p class="note">
-                  {{ entry.note }}
-                </p>
-                @if (entry.lead) {
-                  <div class="lead-badge">
-                    <mat-icon>person</mat-icon>
-                    {{ entry.lead.name }}
-                  </div>
-                }
-              </div>
+          <div class="metrics-grid">
+            <div class="metric">
+              <span class="metric-value">{{ analytics.views }}</span>
+              <span class="metric-label">Views</span>
             </div>
-          }
-          @if (!property.priceHistoryEntries?.length) {
-            <div class="empty-state">No negotiation data yet.</div>
-          }
-        </div>
-      </mat-card>
+            <div class="metric">
+              <span class="metric-value">{{ analytics.inquiries }}</span>
+              <span class="metric-label">Inquiries</span>
+            </div>
+            <div class="metric">
+              <span class="metric-value">{{ analytics.daysOnMarket }}</span>
+              <span class="metric-label">Days Listed</span>
+            </div>
+            <div class="metric">
+              <span class="metric-value">${{ analytics.pricePerSqm | number:'1.0-0' }}</span>
+              <span class="metric-label">$/SQM</span>
+            </div>
+          </div>
 
-      <mat-card class="side-card spec-card">
-        <h3>Technical Specs</h3>
-        <div class="spec-list">
-          <div class="spec-item">
-            <span class="lab">Year Built</span>
-            <span class="val">{{ property.yearBuilt }}</span>
-          </div>
-          <div class="spec-item">
-            <span class="lab">Lot Size</span>
-            <span class="val">{{ property.lotSize }} sqm</span>
-          </div>
-          <div class="spec-item">
-            <span class="lab">Property ID</span>
-            <span class="val">{{ property.id.split('-')[0].toUpperCase() }}</span>
-          </div>
-          <div class="spec-item">
-            <span class="lab">Listed Date</span>
-            <span class="val">{{ property.createdAt | date:'mediumDate' }}</span>
+          <div class="valuation-section" *ngIf="analytics.marketValue">
+            <div class="valuation-header">
+              <span>Market Value</span>
+              <span class="valuation-value">${{ analytics.marketValue | number }}</span>
+            </div>
+            <div class="valuation-bar">
+              <div class="bar-fill" [style.width.%]="getValuationWidth()" [class]="analytics.valuationClass"></div>
+            </div>
+            <div class="valuation-comparison" [class]="analytics.valuationClass">
+              <mat-icon>{{ getValuationIcon() }}</mat-icon>
+              {{ analytics.priceVsMarket > 0 ? '+' : '' }}{{ analytics.priceVsMarket | number:'1.1-1' }}% vs Market
+            </div>
           </div>
         </div>
       </mat-card>
 
-      <mat-card class="side-card assign-card">
-        <h3>Assignment</h3>
-        <div class="assign-content">
-          @if (property.assignedUser) {
-            <div class="assign-item">
-              <mat-icon>person</mat-icon>
-              <div class="assign-info">
-                <span class="label">Primary Agent</span>
-                <span class="value">{{ property.assignedUser.name }}</span>
-              </div>
-            </div>
-          } @else if (property.assignedGroup) {
-            <div class="assign-item">
-              <mat-icon>groups</mat-icon>
-              <div class="assign-info">
-                <span class="label">Assigned Team</span>
-                <span class="value">{{ property.assignedGroup.name }}</span>
-              </div>
-            </div>
-          } @else {
-            <div class="unassigned-state">
-              <mat-icon>person_off</mat-icon>
-              <span>Currently Unassigned</span>
-            </div>
-          }
+      <!-- Specs Card -->
+      <mat-card class="specs-card">
+        <h3><mat-icon>settings</mat-icon> Property Details</h3>
+        <div class="specs-list">
+          <div class="spec-row">
+            <span class="spec-label">Year Built</span>
+            <span class="spec-value">{{ property.yearBuilt }}</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-label">Lot Size</span>
+            <span class="spec-value">{{ property.lotSize }} sqm</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-label">Property ID</span>
+            <span class="spec-value">{{ property.id.split('-')[0].toUpperCase() }}</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-label">Listed</span>
+            <span class="spec-value">{{ property.createdAt | date:'mediumDate' }}</span>
+          </div>
         </div>
       </mat-card>
 
-      <mat-card class="side-card media-card">
-        <h3>Associated Files</h3>
-        <div class="docs-tab-content">
-          <app-document-manager [propertyId]="property.id"></app-document-manager>
+      <!-- Assignment Card -->
+      <mat-card class="assignment-card">
+        <h3><mat-icon>assignment_ind</mat-icon> Assignment</h3>
+        <div class="assignment-content" *ngIf="property.assignedUser">
+          <div class="agent-avatar">
+            <mat-icon>person</mat-icon>
+          </div>
+          <div class="agent-info">
+            <span class="agent-label">Primary Agent</span>
+            <span class="agent-name">{{ property.assignedUser.name }}</span>
+          </div>
         </div>
+        <div class="assignment-content" *ngIf="property.assignedGroup">
+          <div class="agent-avatar">
+            <mat-icon>groups</mat-icon>
+          </div>
+          <div class="agent-info">
+            <span class="agent-label">Assigned Team</span>
+            <span class="agent-name">{{ property.assignedGroup.name }}</span>
+          </div>
+        </div>
+        <div class="unassigned" *ngIf="!property.assignedUser && !property.assignedGroup">
+          <mat-icon>person_off</mat-icon>
+          <span>Not assigned</span>
+        </div>
+      </mat-card>
+
+      <!-- Documents Card -->
+      <mat-card class="documents-card">
+        <h3><mat-icon>folder</mat-icon> Documents</h3>
+        <app-document-manager [propertyId]="property.id"></app-document-manager>
       </mat-card>
     </div>
   </div>
 </div>
 
+<!-- Loading -->
 <div class="loading-overlay" *ngIf="loading">
   <mat-spinner diameter="40"></mat-spinner>
 </div>
+
+<!-- Lightbox -->
+@if (lightboxOpen && property?.photos?.length) {
+  <div class="lightbox" (click)="closeLightbox()">
+    <button class="lightbox-close" (click)="closeLightbox()">
+      <mat-icon>close</mat-icon>
+    </button>
+    <button class="lightbox-nav prev" (click)="prevImage($event)" *ngIf="property.photos.length > 1">
+      <mat-icon>chevron_left</mat-icon>
+    </button>
+    <img [src]="property.photos[lightboxIndex]" (click)="$event.stopPropagation()" />
+    <button class="lightbox-nav next" (click)="nextImage($event)" *ngIf="property.photos.length > 1">
+      <mat-icon>chevron_right</mat-icon>
+    </button>
+    <div class="lightbox-counter">{{ lightboxIndex + 1 }} / {{ property.photos.length }}</div>
+  </div>
+}
