@@ -180,8 +180,15 @@ export class DocumentUploadFormComponent implements OnInit {
       
       const formValue = this.uploadForm.value;
       Object.keys(formValue).forEach(key => {
-        if (formValue[key]) {
-          formData.append(key, formValue[key]);
+        const value = formValue[key];
+        if (value) {
+          if (typeof value === 'object' && value !== null) {
+            if (value.id) {
+              formData.append(key, value.id);
+            }
+          } else {
+            formData.append(key, value);
+          }
         }
       });
 
@@ -195,8 +202,10 @@ export class DocumentUploadFormComponent implements OnInit {
         formData.append('signers', JSON.stringify(signers));
       }
 
-      if (this.data.propertyId) formData.append('propertyId', this.data.propertyId);
+      if (this.data.propertyId) formData.append('propertyId', typeof this.data.propertyId === 'object' ? this.data.propertyId.id : this.data.propertyId);
       if (this.data.dealId) formData.append('dealId', this.data.dealId);
+      if (formValue.sellerId && typeof formValue.sellerId === 'object' && formValue.sellerId.id) formData.set('sellerId', formValue.sellerId.id);
+      if (formValue.teamUserId && typeof formValue.teamUserId === 'object' && formValue.teamUserId.id) formData.set('teamUserId', formValue.teamUserId.id);
 
       this.dialogRef.close(formData);
     }
