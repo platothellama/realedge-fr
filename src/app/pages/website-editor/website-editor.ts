@@ -72,7 +72,7 @@ export class WebsiteEditorComponent implements OnInit {
   showSectionEditor = false;
   selectedSection: Section | null = null;
   componentTemplates: any[] = [];
-  categories = ['Header', 'Hero', 'Content', 'Properties', 'Forms', 'Team', 'Social', 'CTA', 'Footer', 'Maps'];
+  categories = ['Header', 'Hero', 'Content', 'Properties', 'Forms', 'Group', 'Social', 'CTA', 'Footer', 'Maps'];
   selectedCategory = 'Hero';
 
   ngOnInit() {
@@ -225,7 +225,7 @@ export class WebsiteEditorComponent implements OnInit {
       contactForm: 'contact_mail',
       newsletter: 'mark_email_read',
       leadCapture: 'person_add',
-      agentTeam: 'groups',
+      agentGroup: 'groups',
       testimonials: 'format_quote',
       cta: 'touch_app',
       footer: 'footer',

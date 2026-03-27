@@ -48,7 +48,7 @@
       @for (doc of filteredDocuments; track doc.id) {
         <mat-card class="document-card">
           <div class="doc-icon">
-            <mat-icon>{{ getIconForType(doc.type) }}</mat-icon>
+            <mat-icon>{{ getIconForType(doc.documentType) }}</mat-icon>
           </div>
           
           <div class="doc-info">
@@ -65,87 +65,25 @@
               <span class="status-badge signed">
                 <mat-icon>verified</mat-icon> Signed
               </span>
-            } @else if (doc.status === 'Pending Signature') {
-              <span class="status-badge pending">
-                <mat-icon>pending</mat-icon> Pending Signature
-              </span>
             } @else {
-              <span class="status-badge draft">
-                <mat-icon>description</mat-icon> {{ doc.status }}
+              <span class="status-badge pending">
+                <mat-icon>pending</mat-icon> {{ doc.status }}
               </span>
             }
           </div>
 
-          @if (doc.signers && doc.signers.length > 0) {
-            <div class="signers-row">
-              @for (signer of doc.signers; track $index) {
-                <span class="signer-badge" [class.signed]="signer.status === 'signed'">
-                  @if (signer.status === 'signed') {
-                    <mat-icon>check_circle</mat-icon>
-                  } @else {
-                    <mat-icon>pending</mat-icon>
-                  }
-                  {{ signer.type }}
-                </span>
-              }
-            </div>
-          }
-
           <div class="doc-actions">
-            <button mat-icon-button [matMenuTriggerFor]="docMenu" (click)="$event.stopPropagation()">
-              <mat-icon>more_vert</mat-icon>
+            <button mat-icon-button matTooltip="Download" (click)="downloadDocument(doc); $event.stopPropagation()">
+              <mat-icon>download</mat-icon>
             </button>
-            <mat-menu #docMenu="matMenu">
-              <button mat-menu-item (click)="downloadDocument(doc)">
-                <mat-icon>download</mat-icon>
-                <span>Download</span>
+            @if (doc.status !== 'Signed') {
+              <button mat-icon-button matTooltip="Sign" color="primary" (click)="signDocument(doc); $event.stopPropagation()">
+                <mat-icon>draw</mat-icon>
               </button>
-              @if (doc.isDigitalSignatureEnabled) {
-                @if (doc.signers && doc.signers.length > 0) {
-                  @for (signer of doc.signers; track $index) {
-                    @if (signer.status !== 'signed') {
-                      <button mat-menu-item (click)="signDocument(doc, signer.type)">
-                        <mat-icon>draw</mat-icon>
-                        <span>Sign as {{ signer.type }}</span>
-                      </button>
-                    }
-                  }
-                  <button mat-menu-item [matMenuTriggerFor]="signLinksMenu">
-                    <mat-icon>link</mat-icon>
-                    <span>Send Signature Link</span>
-                  </button>
-                  <mat-menu #signLinksMenu="matMenu">
-                    @for (signer of doc.signers; track $index) {
-                      @if (signer.status !== 'signed') {
-                        <button mat-menu-item (click)="generateSignatureLink(doc, signer)">
-                          <mat-icon>email</mat-icon>
-                          <span>{{ signer.type }}</span>
-                        </button>
-                      }
-                    }
-                  </mat-menu>
-                  <button mat-menu-item (click)="copySignatureLink(doc)">
-                    <mat-icon>content_copy</mat-icon>
-                    <span>Copy Link</span>
-                  </button>
-                } @else {
-                  <button mat-menu-item (click)="signDocument(doc)">
-                    <mat-icon color="primary">draw</mat-icon>
-                    <span>Sign Digitally</span>
-                  </button>
-                }
-                @if (doc.status === 'Signed') {
-                  <button mat-menu-item (click)="viewSignatureCertificate(doc)">
-                    <mat-icon>verified</mat-icon>
-                    <span>View Certificate</span>
-                  </button>
-                }
-              }
-              <button mat-menu-item (click)="deleteDocument(doc)" class="text-warn">
-                <mat-icon color="warn">delete_outline</mat-icon>
-                <span>Delete</span>
-              </button>
-            </mat-menu>
+            }
+            <button mat-icon-button matTooltip="Delete" color="warn" (click)="deleteDocument(doc); $event.stopPropagation()">
+              <mat-icon>delete_outline</mat-icon>
+            </button>
           </div>
         </mat-card>
       }

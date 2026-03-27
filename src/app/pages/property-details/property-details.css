@@ -194,11 +194,6 @@ mat-divider { margin: 32px 0; border-color: rgba(255,255,255,0.05); }
 
 .side-card h3 { font-size: 1.2rem; font-weight: 700; margin-bottom: 8px; }
 .subtitle { color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 24px; }
-.card-subtitle { color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 16px; margin-top: -4px; }
-
-.docs-tab-content {
-  margin-top: 8px;
-}
 
 /* Timeline */
 .timeline { display: flex; flex-direction: column; gap: 24px; }
@@ -256,6 +251,31 @@ mat-divider { margin: 32px 0; border-color: rgba(255,255,255,0.05); }
 
 .section-title mat-icon {
   color: var(--primary);
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+.section-header .section-title {
+  flex: 1;
+}
+
+.collapse-icon {
+  color: var(--text-secondary);
+  transition: transform 0.3s ease;
+  margin-left: 12px;
+}
+
+.collapse-icon.collapsed {
+  transform: rotate(-90deg);
+}
+
+.analytics-grid.hidden {
+  display: none;
 }
 
 .status-badge {

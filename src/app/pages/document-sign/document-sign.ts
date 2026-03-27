@@ -69,7 +69,7 @@ export class DocumentSignPageComponent implements OnInit {
         this.canSign = res.canSign;
         this.loading = false;
       },
-      error: (err) => {
+      error: (err: any) => {
         this.error = err.error?.message || 'Invalid or expired signing link';
         this.loading = false;
       }
@@ -88,7 +88,7 @@ export class DocumentSignPageComponent implements OnInit {
           this.signatureDetails = res.signatureDetails;
           this.signing = false;
         },
-        error: (err) => {
+        error: (err: any) => {
           this.snackBar.open(err.error?.message || 'Failed to sign document', 'Close', { duration: 5000 });
           this.signing = false;
         }

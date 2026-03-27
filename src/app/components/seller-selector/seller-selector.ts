@@ -91,7 +91,7 @@ export class SellerSelectorComponent implements OnInit {
           }
         }
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error('Error loading sellers', err);
         this.loading = false;
       }

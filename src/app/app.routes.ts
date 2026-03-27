@@ -24,12 +24,10 @@ import { PublicWebsiteComponent } from './pages/public-website/public-website';
 import { BuyerPreferencesComponent } from './pages/buyer-preferences/buyer-preferences';
 import { PropertyMatcherComponent } from './pages/property-matcher/property-matcher';
 import { AiAssistantComponent } from './pages/ai-assistant/ai-assistant';
-import { DocumentSignPageComponent } from './pages/document-sign/document-sign';
 import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
-  { path: 'sign/:documentId/:token', component: DocumentSignPageComponent },
   { path: 'website/:slug', component: PublicWebsiteComponent },
   {
     path: '',

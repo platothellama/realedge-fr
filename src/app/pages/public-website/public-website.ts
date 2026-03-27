@@ -319,11 +319,11 @@ interface Website {
                 </div>
               </section>
             }
-            @case ('agentTeam') {
+            @case ('agentGroup') {
               <section class="team-section">
                 <div class="container">
                   <div class="section-header">
-                    <h2>{{ section.content?.title || 'Our Team' }}</h2>
+                    <h2>{{ section.content?.title || 'Our Group' }}</h2>
                     <p>{{ section.content?.subtitle || '' }}</p>
                   </div>
                   <div class="team-grid" [class]="'cols-' + (section.config?.columns || 4)">

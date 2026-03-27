@@ -22,14 +22,17 @@
 
   <!-- Property Analytics Dashboard -->
   <div class="analytics-section">
-    <h2 class="section-title">
-      <mat-icon>analytics</mat-icon> Property Performance
-      <span class="status-badge" [style.background-color]="getStatusColor(analytics.status) + '20'" [style.color]="getStatusColor(analytics.status)">
-        {{ analytics.status }}
-      </span>
-    </h2>
+    <div class="section-header" (click)="performanceCollapsed = !performanceCollapsed">
+      <h2 class="section-title">
+        <mat-icon>analytics</mat-icon> Property Performance
+        <span class="status-badge" [style.background-color]="getStatusColor(analytics.status) + '20'" [style.color]="getStatusColor(analytics.status)">
+          {{ analytics.status }}
+        </span>
+      </h2>
+      <mat-icon class="collapse-icon" [class.collapsed]="performanceCollapsed">expand_more</mat-icon>
+    </div>
 
-    <div class="analytics-grid">
+    <div class="analytics-grid" [class.hidden]="performanceCollapsed">
       <!-- Price Analysis -->
       <mat-card class="analytics-card">
         <div class="card-header">
@@ -314,10 +317,9 @@
       </mat-card>
 
       <mat-card class="side-card media-card">
-        <h3>Key Documents</h3>
-        <p class="card-subtitle">Quick access to essential property documents</p>
+        <h3>Associated Files</h3>
         <div class="docs-tab-content">
-          <app-document-manager [propertyId]="property.id" [keyDocsOnly]="true"></app-document-manager>
+          <app-document-manager [propertyId]="property.id"></app-document-manager>
         </div>
       </mat-card>
     </div>

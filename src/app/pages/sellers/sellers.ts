@@ -76,7 +76,7 @@ export class SellersComponent implements OnInit {
         this.sellers = Array.isArray(res) ? res : (res.data || []);
         this.isLoading = false;
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error('Error fetching sellers', err);
         this.showError('Failed to load sellers');
         this.isLoading = false;
@@ -111,7 +111,7 @@ export class SellersComponent implements OnInit {
         this.showSuccess('Seller created successfully');
         this.fetchSellers();
       },
-      error: (err) => this.showError('Failed to create seller')
+      error: (err: any) => this.showError('Failed to create seller')
     });
   }
 
@@ -121,7 +121,7 @@ export class SellersComponent implements OnInit {
         this.showSuccess('Seller updated successfully');
         this.fetchSellers();
       },
-      error: (err) => this.showError('Failed to update seller')
+      error: (err: any) => this.showError('Failed to update seller')
     });
   }
 

@@ -107,6 +107,15 @@ export class ApiService {
     return this.http.get<any>(`https://realedge-frontend-production.up.railway.app/api/users`);
   }
 
+  // Groups
+  getGroupStats(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/groups/stats`);
+  }
+
+  addGroupMember(userId: string, groupId: string): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/groups/members`, { userId, groupId });
+  }
+
   createUser(data: any): Observable<any> {
     return this.http.post<any>(`https://realedge-frontend-production.up.railway.app/api/users`, data);
   }
@@ -188,54 +197,12 @@ export class ApiService {
     return this.http.post<any>(`${this.apiUrl}/documents/${id}/version`, data);
   }
 
-  signDocument(id: string, body: any = {}): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/documents/${id}/sign`, body);
-  }
-
-  generateSignatureLink(documentId: string, data: { signerType: string; signerEmail?: string; signerName?: string }): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/documents/${documentId}/signature-link`, data);
-  }
-
-  getSignatureCertificate(documentId: string): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/documents/${documentId}/certificate`);
-  }
-
-  getPublicSigningData(documentId: string, token: string): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/public/documents/sign/${documentId}/${token}`);
-  }
-
-  processPublicSignature(documentId: string, token: string, data: { signerName: string; agreedToTerms: boolean }): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/public/documents/sign/${documentId}/${token}`, data);
+  signDocument(id: string): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/documents/${id}/sign`, {});
   }
 
   deleteDocument(id: string): Observable<any> {
     return this.http.delete<any>(`${this.apiUrl}/documents/${id}`);
-  }
-
-  updateDocument(id: string, data: any): Observable<any> {
-    return this.http.put<any>(`${this.apiUrl}/documents/${id}`, data);
-  }
-
-  // Sellers
-  getSellers(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/sellers`);
-  }
-
-  getSellerById(id: string): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/sellers/${id}`);
-  }
-
-  createSeller(data: any): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/sellers`, data);
-  }
-
-  updateSeller(id: string, data: any): Observable<any> {
-    return this.http.put<any>(`${this.apiUrl}/sellers/${id}`, data);
-  }
-
-  // Teams
-  getTeams(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/teams`);
   }
 
   // Marketing
@@ -660,5 +627,31 @@ export class ApiService {
 
   deletePaymentPlan(id: string): Observable<any> {
     return this.http.delete<any>(`${this.apiUrl}/payments/payment-plans/${id}`);
+  }
+
+  // Sellers (alias for Users)
+  getSellers(): Observable<any> {
+    return this.getUsers();
+  }
+
+  createSeller(data: any): Observable<any> {
+    return this.createUser(data);
+  }
+
+  updateSeller(id: string, data: any): Observable<any> {
+    return this.updateUser(id, data);
+  }
+
+  // Document Public Signing
+  getPublicSigningData(documentId: string, token: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/documents/public/${documentId}/sign`, {
+      headers: { 'X-Signing-Token': token }
+    });
+  }
+
+  processPublicSignature(documentId: string, token: string, signatureData: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/documents/public/${documentId}/sign`, signatureData, {
+      headers: { 'X-Signing-Token': token }
+    });
   }
 }

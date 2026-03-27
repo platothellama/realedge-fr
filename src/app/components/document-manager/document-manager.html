@@ -1,50 +1,8 @@
 <div class="doc-manager-container">
-  @if (dealId && dealStage) {
-    <div class="deal-readiness" [class.ready]="isDealReady()" [class.not-ready]="!isDealReady()">
-      <div class="readiness-header">
-        @if (isDealReady()) {
-          <mat-icon>check_circle</mat-icon>
-          <span>Ready to close! All required documents are uploaded.</span>
-        } @else {
-          <mat-icon>warning</mat-icon>
-          <span>Missing required documents for {{ dealStage }} stage:</span>
-        }
-      </div>
-      @if (!isDealReady()) {
-        <div class="readiness-list">
-          @for (item of getDealReadiness(); track item.type) {
-            <div class="readiness-item" [class.missing]="item.status === 'missing'" [class.done]="item.status === 'uploaded'">
-              @if (item.status === 'uploaded') {
-                <mat-icon>check</mat-icon>
-              } @else {
-                <mat-icon>close</mat-icon>
-              }
-              <span>{{ item.type }}</span>
-              @if (item.status === 'missing') {
-                <button mat-stroked-button class="upload-missing-btn" (click)="openUploadForm()">
-                  <mat-icon>cloud_upload</mat-icon>
-                  Upload
-                </button>
-              }
-            </div>
-          }
-        </div>
-      }
-    </div>
-  }
-
   <div class="manager-header">
     <div class="header-info">
-      @if (propertyId && keyDocsOnly) {
-        <h3>Key Documents</h3>
-        <p>Quick access to essential property documents</p>
-      } @else if (dealId) {
-        <h3>Deal Documents</h3>
-        <p>Contracts, receipts, and agreements</p>
-      } @else {
-        <h3>Documents</h3>
-        <p>All documents and files</p>
-      }
+      <h3>Documents & Files</h3>
+      <p>Secure version tracking and digital signatures</p>
     </div>
     <button mat-stroked-button color="primary" class="upload-btn" (click)="openUploadForm()">
       <mat-icon>cloud_upload</mat-icon>
@@ -57,102 +15,74 @@
       <mat-icon class="spin">refresh</mat-icon>
       <span>Loading documents...</span>
     </div>
+  } @else if (documents.length === 0) {
+    <div class="empty-state">
+      <mat-icon>folder_open</mat-icon>
+      <p>No documents uploaded yet</p>
+    </div>
   } @else {
-    <ng-container *ngIf="(propertyId && keyDocsOnly ? getPropertyDocuments().length : getDealDocuments().length) === 0 && (dealId ? getLinkedPropertyDocuments().length === 0 : true); else hasDocuments">
-      <div class="empty-state">
-        <mat-icon>folder_open</mat-icon>
-        <p>No documents uploaded yet</p>
-      </div>
-    </ng-container>
-    <ng-template #hasDocuments>
-      @if (dealId && getLinkedPropertyDocuments().length > 0) {
-        <div class="doc-section">
-          <div class="section-header">
-            <mat-icon>home</mat-icon>
-            <span>Property Documents</span>
-            <span class="section-count">{{ getLinkedPropertyDocuments().length }}</span>
+    <div class="doc-list">
+      @for (doc of documents; track doc.id) {
+        <mat-card class="doc-card">
+          <div class="doc-icon-area" [attr.data-type]="doc.type">
+            <mat-icon>{{ getIconForType(doc.type) }}</mat-icon>
           </div>
-          <div class="doc-list">
-            @for (doc of getLinkedPropertyDocuments(); track doc.id) {
-              <mat-card class="doc-card property-doc">
-                <div class="doc-icon-area" [attr.data-type]="doc.type">
-                  <mat-icon>{{ getIconForType(doc.type) }}</mat-icon>
-                </div>
-                <div class="doc-info">
-                  <span class="doc-title">{{ doc.title }}</span>
-                  <span class="doc-meta">v{{ doc.currentVersion }} • {{ doc.type }}</span>
-                </div>
-                <div class="doc-actions">
-                  <button mat-icon-button (click)="downloadDocument(doc)">
-                    <mat-icon>download</mat-icon>
-                  </button>
-                </div>
-              </mat-card>
-            }
-          </div>
-        </div>
-      }
-      <div class="doc-section">
-        @if (dealId && getLinkedPropertyDocuments().length > 0) {
-          <div class="section-header">
-            <mat-icon>handshake</mat-icon>
-            <span>Deal Documents</span>
-          </div>
-        }
-        <div class="doc-list">
-          @for (doc of getDealDocuments(); track doc.id) {
-            <mat-card class="doc-card">
-              <div class="doc-icon-area" [attr.data-type]="doc.type">
-                <mat-icon>{{ getIconForType(doc.type) }}</mat-icon>
-              </div>
-              <div class="doc-info">
-                <span class="doc-title">{{ doc.title }}</span>
-                <span class="doc-meta">
-                  v{{ doc.currentVersion }} • {{ doc.type }}
+          
+          <div class="doc-info">
+            <div class="doc-main">
+              <span class="doc-title">{{ doc.title }}</span>
+              <span class="doc-meta">
+                v{{ doc.currentVersion }} • {{ doc.type }} • 
+                {{ (doc.versions[0]?.fileSize / 1024).toFixed(1) }} KB
+              </span>
+            </div>
+            <div class="doc-status-row">
+              <span class="status-badge" [attr.data-status]="doc.status">
+                {{ doc.status }}
+              </span>
+              @if (doc.status === 'Signed') {
+                <span class="sign-meta">Signed {{ doc.signedAt | date:'shortDate' }}</span>
+              }
+              @if (doc.user || doc.group) {
+                <span class="connect-meta">
+                  @if (doc.user) {
+                    <mat-icon>person</mat-icon>{{ doc.user.name }}
+                  }
+                  @if (doc.group) {
+                    <mat-icon>groups</mat-icon>{{ doc.group.name }}
+                  }
                 </span>
-                <div class="doc-status-row">
-                  <span class="status-badge" [attr.data-status]="doc.status">{{ doc.status }}</span>
-                  <span class="visibility-badge" [class.shareable]="doc.visibility === 'shareable'" [class.internal]="doc.visibility !== 'shareable'">
-                    <mat-icon>{{ doc.visibility === 'shareable' ? 'share' : 'lock' }}</mat-icon>
-                    {{ doc.visibility === 'shareable' ? 'Shareable' : 'Internal' }}
-                  </span>
-                </div>
-              </div>
-              <div class="doc-actions">
-                <button mat-icon-button [matMenuTriggerFor]="docMenu">
-                  <mat-icon>more_vert</mat-icon>
+              }
+            </div>
+          </div>
+
+          <div class="doc-actions">
+            <button mat-icon-button [matMenuTriggerFor]="docMenu">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #docMenu="matMenu">
+              <button mat-menu-item (click)="downloadDocument(doc)">
+                <mat-icon>download</mat-icon>
+                <span>Download Latest</span>
+              </button>
+              <button mat-menu-item (click)="openUploadForm(true, doc.id)">
+                <mat-icon>history</mat-icon>
+                <span>Upload New Version</span>
+              </button>
+              @if (doc.isDigitalSignatureEnabled && doc.status !== 'Signed') {
+                <button mat-menu-item (click)="signDocument(doc)">
+                  <mat-icon color="primary">draw</mat-icon>
+                  <span>Sign Digitally</span>
                 </button>
-                <mat-menu #docMenu="matMenu">
-                  <button mat-menu-item (click)="downloadDocument(doc)">
-                    <mat-icon>download</mat-icon>
-                    <span>Download</span>
-                  </button>
-                  <button mat-menu-item (click)="openUploadForm(true, doc.id)">
-                    <mat-icon>history</mat-icon>
-                    <span>New Version</span>
-                  </button>
-                  <button mat-menu-item (click)="signDocument(doc)">
-                    <mat-icon>draw</mat-icon>
-                    <span>Sign</span>
-                  </button>
-                  <button mat-menu-item (click)="copySignatureLink(doc)">
-                    <mat-icon>link</mat-icon>
-                    <span>Signature Link</span>
-                  </button>
-                  <button mat-menu-item (click)="viewSignatureCertificate(doc)">
-                    <mat-icon>verified</mat-icon>
-                    <span>Certificate</span>
-                  </button>
-                  <button mat-menu-item (click)="deleteDocument(doc)" class="text-warn">
-                    <mat-icon color="warn">delete</mat-icon>
-                    <span>Delete</span>
-                  </button>
-                </mat-menu>
-              </div>
-            </mat-card>
-          }
-        </div>
-      </div>
-    </ng-template>
+              }
+              <button mat-menu-item (click)="deleteDocument(doc)" class="text-warn">
+                <mat-icon color="warn">delete_outline</mat-icon>
+                <span>Delete</span>
+              </button>
+            </mat-menu>
+          </div>
+        </mat-card>
+      }
+    </div>
   }
 </div>

@@ -31,42 +31,12 @@ import { ApiService } from '../../services/api';
 })
 export class DocumentUploadFormComponent implements OnInit {
   uploadForm: FormGroup;
-  selectedFiles: File[] = [];
-  
-  propertyTypes = ['Title Deed', 'Floor Plan', 'Property Photos', 'Ownership Proof', 'Other'];
-  dealTypes = ['Reservation Form', 'Sales Agreement', 'Contract', 'Payment Receipt', 'ID / Passport', 'Proof of Funds', 'Other'];
-  allTypes = [
-    'Title Deed',
-    'Floor Plan',
-    'Property Photos',
-    'Ownership Proof',
-    'Reservation Form',
-    'Sales Agreement',
-    'Contract',
-    'Payment Receipt',
-    'ID / Passport',
-    'Proof of Funds',
-    'Other'
-  ];
-  
-  get filteredTypes(): string[] {
-    if (this.data?.dealId && !this.data?.propertyId) {
-      return this.dealTypes;
-    }
-    if (this.data?.propertyId && !this.data?.dealId) {
-      return this.propertyTypes;
-    }
-    return this.allTypes;
-  }
-  
-  signerTypes = ['Client', 'Agent', 'Owner'];
-  selectedSigners: string[] = [];
-  signerEmails: { [key: string]: string } = {};
+  selectedFile: File | null = null;
+  types = ['Contract', 'Property Paper', 'Client ID', 'Permit', 'Other'];
   isSubmitting = false;
-  sellers: any[] = [];
-  teams: any[] = [];
-  properties: any[] = [];
-  
+  users: any[] = [];
+  groups: any[] = [];
+
   private api = inject(ApiService);
 
   constructor(
@@ -74,138 +44,56 @@ export class DocumentUploadFormComponent implements OnInit {
     private dialogRef: MatDialogRef<DocumentUploadFormComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
-    const defaultType = this.getDefaultType();
     this.uploadForm = this.fb.group({
       title: ['', Validators.required],
-      type: [defaultType, Validators.required],
-      propertyId: [this.data?.propertyId || ''],
-      sellerId: [''],
-      teamUserId: [''],
-      visibility: ['internal'],
+      type: ['Contract', Validators.required],
       isDigitalSignatureEnabled: [false],
-      notes: ['']
+      notes: [''],
+      userId: [''],
+      groupId: ['']
     });
-  }
-
-  private getDefaultType(): string {
-    if (this.data?.suggestedType) {
-      return this.data.suggestedType;
-    }
-    if (this.data?.dealId && !this.data?.propertyId) {
-      return 'Contract';
-    }
-    if (this.data?.propertyId && !this.data?.dealId) {
-      return 'Title Deed';
-    }
-    return 'Contract';
   }
 
   ngOnInit(): void {
-    this.loadSellers();
-    this.loadTeams();
-    this.loadProperties();
+    this.loadUsersAndGroups();
   }
 
-  toggleSigner(signer: string) {
-    const index = this.selectedSigners.indexOf(signer);
-    if (index > -1) {
-      this.selectedSigners.splice(index, 1);
-      delete this.signerEmails[signer];
-    } else {
-      this.selectedSigners.push(signer);
-      this.signerEmails[signer] = '';
-    }
-  }
-
-  isSignerSelected(signer: string): boolean {
-    return this.selectedSigners.includes(signer);
-  }
-
-  getSignerEmail(signer: string): string {
-    return this.signerEmails[signer] || '';
-  }
-
-  setSignerEmail(signer: string, email: string) {
-    this.signerEmails[signer] = email;
-  }
-
-  loadSellers() {
-    this.api.getSellers().subscribe({
-      next: (res) => this.sellers = res || [],
-      error: () => this.sellers = []
+  loadUsersAndGroups() {
+    this.api.getUsers().subscribe({
+      next: (res: any) => this.users = Array.isArray(res) ? res : (res?.data || [])
     });
-  }
-
-  loadTeams() {
-    this.api.getTeams().subscribe({
-      next: (res) => this.teams = res || [],
-      error: () => this.teams = []
-    });
-  }
-
-  loadProperties() {
-    this.api.getProperties({}).subscribe({
-      next: (res: any) => this.properties = res?.data || res || [],
-      error: () => this.properties = []
+    this.api.getGroups().subscribe({
+      next: (res: any) => this.groups = Array.isArray(res) ? res : (res?.data || [])
     });
   }
 
   onFileSelected(event: any) {
-    const files = event.target.files;
-    if (files && files.length > 0) {
-      this.selectedFiles = Array.from(files);
+    const file = event.target.files[0];
+    if (file) {
+      this.selectedFile = file;
+      if (!this.uploadForm.get('title')?.value) {
+        this.uploadForm.get('title')?.setValue(file.name.split('.').slice(0, -1).join('.'));
+      }
     }
-  }
-
-  removeFile(index: number) {
-    this.selectedFiles.splice(index, 1);
-  }
-
-  getTotalSize(): string {
-    const total = this.selectedFiles.reduce((sum, file) => sum + file.size, 0);
-    if (total > 1024 * 1024) {
-      return (total / (1024 * 1024)).toFixed(1) + ' MB';
-    }
-    return (total / 1024).toFixed(1) + ' KB';
   }
 
   onSubmit() {
-    if (this.uploadForm.valid && (this.selectedFiles.length > 0 || this.data.isNewVersion) && !this.isSubmitting) {
+    if (this.uploadForm.valid && (this.selectedFile || this.data.isNewVersion) && !this.isSubmitting) {
       this.isSubmitting = true;
       const formData = new FormData();
-      
-      this.selectedFiles.forEach(file => {
-        formData.append('files', file);
-      });
+      if (this.selectedFile) {
+        formData.append('file', this.selectedFile);
+      }
       
       const formValue = this.uploadForm.value;
       Object.keys(formValue).forEach(key => {
-        const value = formValue[key];
-        if (value) {
-          if (typeof value === 'object' && value !== null) {
-            if (value.id) {
-              formData.append(key, value.id);
-            }
-          } else {
-            formData.append(key, value);
-          }
+        if (formValue[key]) {
+          formData.append(key, formValue[key]);
         }
       });
 
-      if (this.selectedSigners.length > 0) {
-        const signers = this.selectedSigners.map(type => ({
-          type,
-          email: this.signerEmails[type] || null,
-          name: null,
-          status: 'pending'
-        }));
-        formData.append('signers', JSON.stringify(signers));
-      }
-
-      if (this.data.propertyId) formData.append('propertyId', typeof this.data.propertyId === 'object' ? this.data.propertyId.id : this.data.propertyId);
+      if (this.data.propertyId) formData.append('propertyId', this.data.propertyId);
       if (this.data.dealId) formData.append('dealId', this.data.dealId);
-      if (formValue.sellerId && typeof formValue.sellerId === 'object' && formValue.sellerId.id) formData.set('sellerId', formValue.sellerId.id);
-      if (formValue.teamUserId && typeof formValue.teamUserId === 'object' && formValue.teamUserId.id) formData.set('teamUserId', formValue.teamUserId.id);
 
       this.dialogRef.close(formData);
     }
