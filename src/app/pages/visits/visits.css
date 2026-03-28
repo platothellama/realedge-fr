@@ -1,5 +1,5 @@
 .visits-container {
-  padding: 16px;
+  padding: 24px;
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -7,59 +7,10 @@
   min-height: 0;
 }
 
-.header-section {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-  gap: 16px;
-  flex-wrap: wrap;
-  flex-shrink: 0;
-}
-
-.title-area h1 {
-  font-size: 1.5rem;
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  margin: 0;
-  color: #fff;
-}
-
-.title-area p {
-  color: var(--text-muted);
-  font-size: 0.9rem;
-  margin-top: 4px;
-  font-weight: 500;
-}
-
-.action-area {
-  display: flex;
-  gap: 8px;
-}
-
-.schedule-btn, .google-sync-btn {
-  height: 40px !important;
-  border-radius: 8px !important;
-  font-weight: 700 !important;
-  font-size: 0.85rem !important;
-  padding: 0 12px !important;
-}
-
-.schedule-btn {
-  box-shadow: 0 4px 12px -2px var(--primary-glow) !important;
-}
-
-.schedule-btn mat-icon, .google-sync-btn mat-icon {
-  font-size: 18px !important;
-  width: 18px !important;
-  height: 18px !important;
-  margin: 0 !important;
-}
-
 .calendar-card {
   flex: 1;
   min-height: 0;
-  background: var(--bg-card) !important;
+  background: var(--bg-surface) !important;
   border: 1px solid var(--border) !important;
   border-radius: 16px !important;
   padding: 16px !important;
@@ -97,7 +48,7 @@
 
 ::ng-deep .fc .fc-toolbar-title {
   font-weight: 800 !important;
-  color: #fff !important;
+  color: var(--text-primary) !important;
   font-size: 1.25rem !important;
 }
 

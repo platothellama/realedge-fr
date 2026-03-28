@@ -6,30 +6,19 @@
     </div>
 
     <div class="header-actions">
-      <mat-form-field appearance="outline" class="search-field">
-        <mat-icon matPrefix>search</mat-icon>
-        <input matInput placeholder="Search documents..." [(ngModel)]="searchQuery" (keyup.enter)="onSearchChange()">
-        @if (searchQuery) {
-          <button mat-icon-button matSuffix (click)="searchQuery = ''; onSearchChange()">
-            <mat-icon>close</mat-icon>
-          </button>
-        }
-      </mat-form-field>
-
-      <mat-form-field appearance="outline" class="type-filter no-subscript">
-        <mat-label>Type</mat-label>
-        <mat-select [(ngModel)]="filterType" (selectionChange)="onFilterChange()">
-          @for (type of documentTypes; track type) {
-            <mat-option [value]="type">{{ type }}</mat-option>
-          }
-        </mat-select>
-      </mat-form-field>
-
       <button mat-raised-button color="primary" class="upload-btn" (click)="openUploadForm()">
         <mat-icon class="btn-icon">upload_file</mat-icon> Upload
       </button>
     </div>
   </div>
+
+  <app-property-search
+    [filters]="searchFilters"
+    [config]="searchConfig"
+    [typeOptions]="typeOptions"
+    (filtersChange)="onFiltersChange($event)"
+    (search)="fetchDocuments()"
+  ></app-property-search>
 
   @if (loading) {
     <div class="loading-state">
@@ -51,7 +40,7 @@
   @if (!loading && filteredDocuments.length > 0) {
     <div class="documents-grid custom-scrollbar">
       @for (doc of filteredDocuments; track doc.id) {
-        <mat-card class="document-card">
+        <mat-card class="document-card" [class.highlighted]="doc.id === highlightedDocId" [attr.data-doc-id]="doc.id">
           <div class="doc-icon">
             <mat-icon>{{ getIconForType(doc.documentType) }}</mat-icon>
           </div>
@@ -94,33 +83,13 @@
       }
     </div>
 
-    <div class="pagination">
-      <span class="pagination-info">
-        Showing {{ ((pagination.page - 1) * pagination.limit) + 1 }}-{{ Math.min(pagination.page * pagination.limit, pagination.totalItems) }} of {{ pagination.totalItems }} documents
-      </span>
-      <div class="pagination-controls">
-        <button mat-icon-button [disabled]="pagination.page === 1" (click)="pagination.page = 1; fetchDocuments()">
-          <mat-icon>first_page</mat-icon>
-        </button>
-        <button mat-icon-button [disabled]="pagination.page === 1" (click)="pagination.page = pagination.page - 1; fetchDocuments()">
-          <mat-icon>chevron_left</mat-icon>
-        </button>
-        @for (page of getPageNumbers(); track page) {
-          @if (page === -1) {
-            <span class="page-ellipsis">...</span>
-          } @else {
-            <button [class.active]="page === pagination.page" (click)="pagination.page = page; fetchDocuments()">
-              {{ page }}
-            </button>
-          }
-        }
-        <button mat-icon-button [disabled]="pagination.page === pagination.totalPages" (click)="pagination.page = pagination.page + 1; fetchDocuments()">
-          <mat-icon>chevron_right</mat-icon>
-        </button>
-        <button mat-icon-button [disabled]="pagination.page === pagination.totalPages" (click)="pagination.page = pagination.totalPages; fetchDocuments()">
-          <mat-icon>last_page</mat-icon>
-        </button>
-      </div>
-    </div>
+    <app-pagination
+      [page]="pagination.page"
+      [limit]="pagination.limit"
+      [totalItems]="pagination.totalItems"
+      [totalPages]="pagination.totalPages"
+      label="documents"
+      (pageChange)="onPageChange($event)"
+    ></app-pagination>
   }
 </div>

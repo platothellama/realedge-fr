@@ -5,25 +5,6 @@
       <p>Manage sales pipeline and track commission progress</p>
     </div>
 
-    <div class="filter-controls">
-      <div class="search-box">
-        <mat-icon>search</mat-icon>
-        <input type="text" placeholder="Search deals, buyers, sellers..." [(ngModel)]="searchQuery" (ngModelChange)="applyFilters()">
-      </div>
-
-      <mat-form-field appearance="outline" class="stage-filter no-subscript">
-        <mat-label>Stage</mat-label>
-        <mat-select [(ngModel)]="selectedStage" (selectionChange)="applyFilters()">
-          <mat-option value="All">All Stages</mat-option>
-          <mat-option value="Offer Made">Offer Made</mat-option>
-          <mat-option value="Negotiation">Negotiation</mat-option>
-          <mat-option value="Contract Signed">Contract Signed</mat-option>
-          <mat-option value="Payment">Payment</mat-option>
-          <mat-option value="Closed">Closed</mat-option>
-        </mat-select>
-      </mat-form-field>
-    </div>
-
     <div class="action-area">
       <button mat-stroked-button color="primary" [matMenuTriggerFor]="dataMenu" class="data-btn">
         <mat-icon>import_export</mat-icon>
@@ -42,6 +23,14 @@
       </button>
     </div>
   </div>
+
+  <app-property-search
+    [filters]="searchFilters"
+    [config]="searchConfig"
+    [statusOptions]="stageOptions"
+    (filtersChange)="onFiltersChange($event)"
+    (search)="applyFilters()"
+  ></app-property-search>
 
   <div class="pipeline-board">
     <mat-tab-group class="view-tabs" color="primary">

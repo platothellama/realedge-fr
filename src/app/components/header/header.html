@@ -5,7 +5,7 @@
 
   <button mat-button (click)="toggleProfileMenu()" class="profile-btn">
     <img [src]="user()?.photo || 'https://ui-avatars.com/api/?name=' + user()?.name + '&background=6366f1&color=fff'" 
-         style="width: 32px; height: 32px; border-radius: 8px; margin-right: 8px;" alt="Avatar">
+         class="profile-avatar" alt="Avatar">
     <span class="username">{{ user()?.name }}</span>
     <mat-icon iconPositionEnd>{{ showProfileMenu ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }}</mat-icon>
   </button>
@@ -14,7 +14,7 @@
     <div class="profile-dropdown" (click)="$event.stopPropagation()">
       <div class="dropdown-header">
         <img [src]="user()?.photo || 'https://ui-avatars.com/api/?name=' + user()?.name + '&background=6366f1&color=fff'" 
-             style="width: 48px; height: 48px; border-radius: 12px;" alt="Avatar">
+             class="dropdown-avatar" alt="Avatar">
         <div class="user-info">
           <strong>{{ user()?.name }}</strong>
           <span>{{ user()?.email }}</span>

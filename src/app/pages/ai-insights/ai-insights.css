@@ -4,31 +4,6 @@
   overflow-y: auto;
 }
 
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-}
-
-.header-content {
-  display: flex;
-  flex-direction: column;
-}
-
-.page-title {
-  font-size: 28px;
-  font-weight: 600;
-  color: var(--text-primary, #e5e7eb);
-  margin: 0;
-}
-
-.page-subtitle {
-  font-size: 14px;
-  color: var(--text-secondary, #9ca3af);
-  margin: 4px 0 0 0;
-}
-
 .summary-bar {
   display: flex;
   gap: 16px;
@@ -41,8 +16,8 @@
   align-items: center;
   gap: 12px;
   padding: 16px;
-  background: var(--card-bg, #1f2937);
-  border: 1px solid var(--border-color, #374151);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
   border-radius: 10px;
   flex: 1;
   min-width: 140px;
@@ -52,7 +27,7 @@
   font-size: 24px;
   width: 24px;
   height: 24px;
-  color: var(--primary-color, #3b82f6);
+  color: var(--primary);
 }
 
 .summary-item.hot mat-icon {
@@ -71,7 +46,7 @@
 .summary-value {
   font-size: 20px;
   font-weight: 700;
-  color: var(--text-primary, #e5e7eb);
+  color: var(--text-primary);
 }
 
 .summary-label {
@@ -117,8 +92,8 @@
 .valuations-card,
 .lead-scores-card,
 .quick-actions-card {
-  background: var(--card-bg, #1f2937) !important;
-  border: 1px solid var(--border-color, #374151);
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border);
   border-radius: 12px;
 }
 
@@ -127,7 +102,7 @@
 }
 
 :host ::ng-deep .mat-mdc-card-title {
-  color: var(--text-primary, #e5e7eb);
+  color: var(--text-primary);
   font-size: 18px;
   display: flex;
   align-items: center;
@@ -135,7 +110,7 @@
 }
 
 :host ::ng-deep .mat-mdc-card-title mat-icon {
-  color: var(--primary-color, #3b82f6);
+  color: var(--primary);
 }
 
 :host ::ng-deep .mat-mdc-card-content {
@@ -152,7 +127,7 @@
   background: var(--bg-primary, #111827);
   border-radius: 8px;
   padding: 16px;
-  border: 1px solid var(--border-color, #374151);
+  border: 1px solid var(--border);
 }
 
 .prediction-header {
@@ -185,7 +160,7 @@
 .prediction-value .value {
   font-size: 24px;
   font-weight: 700;
-  color: var(--text-primary, #e5e7eb);
+  color: var(--text-primary);
 }
 
 .prediction-value mat-icon {
@@ -222,7 +197,7 @@
   padding: 14px;
   background: var(--bg-primary, #111827);
   border-radius: 8px;
-  border: 1px solid var(--border-color, #374151);
+  border: 1px solid var(--border);
 }
 
 .valuation-info {
@@ -234,7 +209,7 @@
 
 .valuation-title {
   font-weight: 500;
-  color: var(--text-primary, #e5e7eb);
+  color: var(--text-primary);
   font-size: 14px;
 }
 
@@ -258,7 +233,7 @@
 .estimate-value {
   font-weight: 600;
   font-size: 16px;
-  color: var(--text-primary, #e5e7eb);
+  color: var(--text-primary);
 }
 
 .estimate-value.positive {
@@ -345,7 +320,7 @@
   padding: 12px;
   background: var(--bg-primary, #111827);
   border-radius: 8px;
-  border: 1px solid var(--border-color, #374151);
+  border: 1px solid var(--border);
 }
 
 .lead-score-ring {
@@ -372,7 +347,7 @@
   position: relative;
   font-size: 14px;
   font-weight: 700;
-  color: var(--text-primary, #e5e7eb);
+  color: var(--text-primary);
 }
 
 .lead-info {
@@ -384,7 +359,7 @@
 
 .lead-name {
   font-weight: 500;
-  color: var(--text-primary, #e5e7eb);
+  color: var(--text-primary);
   font-size: 14px;
 }
 
@@ -424,8 +399,8 @@
   padding: 12px;
   justify-content: flex-start;
   background: var(--bg-primary, #111827);
-  border-color: var(--border-color, #374151);
-  color: var(--text-primary, #e5e7eb);
+  border-color: var(--border);
+  color: var(--text-primary);
   height: auto;
 }
 
@@ -434,7 +409,7 @@
 }
 
 .action-btn mat-icon {
-  color: var(--primary-color, #3b82f6);
+  color: var(--primary);
 }
 
 .action-text {

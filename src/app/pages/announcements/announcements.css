@@ -4,39 +4,6 @@
   overflow-y: auto;
 }
 
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-  flex-wrap: wrap;
-  gap: 16px;
-}
-
-.header-content {
-  display: flex;
-  flex-direction: column;
-}
-
-.page-title {
-  font-size: 28px;
-  font-weight: 600;
-  color: var(--text-primary, #e5e7eb);
-  margin: 0;
-}
-
-.page-subtitle {
-  font-size: 14px;
-  color: var(--text-secondary, #9ca3af);
-  margin: 4px 0 0 0;
-}
-
-.header-actions {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-}
-
 .filter-select {
   width: 180px;
 }
@@ -55,15 +22,15 @@
 }
 
 .announcement-card {
-  background: var(--card-bg, #1f2937);
+  background: var(--bg-card);
   border-radius: 12px;
   padding: 20px;
-  border: 1px solid var(--border-color, #374151);
+  border: 1px solid var(--border);
   transition: all 0.2s ease;
 }
 
 .announcement-card:hover {
-  border-color: var(--primary-color, #3b82f6);
+  border-color: var(--primary);
 }
 
 .announcement-card.inactive {
@@ -91,15 +58,15 @@
   font-size: 18px;
   width: 18px;
   height: 18px;
-  color: var(--primary-color, #3b82f6);
+  color: var(--primary);
 }
 
-.announcement-meta mat.icon.general { color: #6b7280; }
-.announcement-meta mat.icon.update { color: #3b82f6; }
-.announcement-meta mat.icon.promotion { color: #10b981; }
-.announcement-meta mat.icon.policy { color: #8b5cf6; }
-.announcement-meta mat.icon.event { color: #f59e0b; }
-.announcement-meta mat.icon.alert { color: #ef4444; }
+.announcement-meta mat-icon.general { color: #6b7280; }
+.announcement-meta mat-icon.update { color: #3b82f6; }
+.announcement-meta mat-icon.promotion { color: #10b981; }
+.announcement-meta mat-icon.policy { color: #8b5cf6; }
+.announcement-meta mat-icon.event { color: #f59e0b; }
+.announcement-meta mat-icon.alert { color: #ef4444; }
 
 .category-badge {
   font-size: 12px;
@@ -126,13 +93,13 @@
 }
 
 .announcement-actions button:hover {
-  color: var(--text-primary, #e5e7eb);
+  color: var(--text-primary);
 }
 
 .announcement-title {
   font-size: 18px;
   font-weight: 600;
-  color: var(--text-primary, #e5e7eb);
+  color: var(--text-primary);
   margin: 0 0 8px 0;
 }
 
@@ -148,7 +115,7 @@
   justify-content: space-between;
   align-items: center;
   padding-top: 12px;
-  border-top: 1px solid var(--border-color, #374151);
+  border-top: 1px solid var(--border);
 }
 
 .footer-left {
@@ -206,7 +173,7 @@
 }
 
 .empty-state h3 {
-  color: var(--text-primary, #e5e7eb);
+  color: var(--text-primary);
   margin: 0 0 8px 0;
 }
 
@@ -229,7 +196,7 @@
 }
 
 .dialog-content {
-  background: var(--card-bg, #1f2937);
+  background: var(--bg-card);
   border-radius: 12px;
   width: 90%;
   max-width: 600px;
@@ -242,13 +209,13 @@
   justify-content: space-between;
   align-items: center;
   padding: 20px 24px;
-  border-bottom: 1px solid var(--border-color, #374151);
+  border-bottom: 1px solid var(--border);
 }
 
 .dialog-header h2 {
   margin: 0;
   font-size: 20px;
-  color: var(--text-primary, #e5e7eb);
+  color: var(--text-primary);
 }
 
 .dialog-body {
@@ -263,7 +230,7 @@
   justify-content: flex-end;
   gap: 12px;
   padding: 16px 24px;
-  border-top: 1px solid var(--border-color, #374151);
+  border-top: 1px solid var(--border);
 }
 
 .full-width {

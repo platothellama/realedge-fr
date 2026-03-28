@@ -43,6 +43,7 @@ export const routes: Routes = [
       { path: 'crm', component: CrmComponent },
       { path: 'deals', component: DealsComponent },
       { path: 'documents', component: DocumentsPageComponent },
+      { path: 'documents/:id', component: DocumentsPageComponent },
       { path: 'documents-manager', component: DocumentManagerPageComponent },
       { path: 'visits', component: VisitsComponent },
       { path: 'marketing', component: MarketingComponent, data: { feature: 'marketing_automation' } },

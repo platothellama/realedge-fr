@@ -182,3 +182,16 @@
     width: calc(100vw - 32px);
   }
 }
+
+.profile-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  margin-right: 8px;
+}
+
+.dropdown-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+}

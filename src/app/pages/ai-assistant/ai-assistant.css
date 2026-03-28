@@ -1,38 +1,17 @@
 .ai-container {
-  padding: 40px;
+  padding: 24px;
   height: 100%;
   display: flex;
   flex-direction: column;
 }
-.capabilities-holder{
+
+.capabilities-holder {
   display: flex;
   gap: 15px;
 }
 
-.header-section {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 24px;
-  max-width: 1400px;
-
-}
-
-.header-content h1 {
-  font-size: 32px;
-  font-weight: 800;
-  color: var(--text-primary);
-  margin: 0 0 8px 0;
-}
-
-.header-content p {
-  font-size: 14px;
-  color: var(--text-secondary);
-  margin: 0;
-}
-
 .clear-btn {
-  border-radius: 12px !important;
+  border-radius: 10px !important;
 }
 
 /* Capabilities Banner */

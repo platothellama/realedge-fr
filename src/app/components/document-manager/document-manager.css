@@ -1,7 +1,11 @@
 .doc-manager-container {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 20px;
+}
+
+app-property-search {
+  display: block;
 }
 
 .manager-header {
@@ -15,263 +19,461 @@
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
-.search-field {
-  width: 280px;
-}
+.text-warn { color: #ef4444 !important; }
 
-.search-field .mat-mdc-form-field-subscript-wrapper {
-  display: none;
-}
-
-.search-field mat-icon {
-  color: var(--text-muted);
-}
-
-.header-info h3 {
-  margin: 0;
-  font-size: 1.25rem;
-  font-weight: 800;
-  color: #fff;
-}
-
-.header-info p {
-  margin: 4px 0 0;
-  color: var(--text-muted);
-  font-size: 0.85rem;
-}
-
-.upload-btn {
-  border-radius: 12px !important;
-  font-weight: 700 !important;
-  height: 40px !important;
-}
-
-.doc-list {
+.doc-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 16px;
 }
 
 .doc-card {
-  background: rgba(255, 255, 255, 0.02) !important;
-  border: 1px solid var(--border) !important;
-  border-radius: 16px !important;
-  padding: 16px !important;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid #303040;
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.2s ease;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  transition: all 0.3s ease !important;
 }
 
 .doc-card:hover {
-  background: rgba(255, 255, 255, 0.04) !important;
-  border-color: rgba(255, 255, 255, 0.1) !important;
+  border-color: #6366f1;
   transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
 }
 
-.doc-card-header {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-}
-
-.doc-card-footer {
+.doc-card-preview {
+  height: 160px;
   display: flex;
   align-items: center;
-  gap: 16px;
-  padding-top: 8px;
-  border-top: 1px solid var(--border);
+  justify-content: center;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  overflow: hidden;
 }
 
-.doc-icon-area {
-  width: 48px;
-  height: 48px;
+.doc-card-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.doc-card-icon {
+  width: 64px;
+  height: 64px;
   border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.05);
-  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.08);
 }
 
-.doc-icon-area mat-icon {
-  font-size: 24px;
-  width: 24px;
-  height: 24px;
-}
-
-.doc-icon-area[data-type="Contract"] { color: #6366f1; background: rgba(99, 102, 241, 0.1); }
-.doc-icon-area[data-type="Property Paper"] { color: #10b981; background: rgba(16, 185, 129, 0.1); }
-.doc-icon-area[data-type="Client ID"] { color: #f59e0b; background: rgba(245, 158, 11, 0.1); }
-
-.doc-info {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  min-width: 0;
-}
-
-.doc-actions {
-  flex-shrink: 0;
-}
-
-.doc-title {
-  font-weight: 700;
-  color: #fff;
-  font-size: 0.95rem;
-}
-
-.doc-meta {
-  font-size: 0.75rem;
-  color: var(--text-muted);
-}
-
-.doc-status-row {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-top: 4px;
-}
-
-.status-badge {
-  font-size: 0.65rem;
-  font-weight: 800;
-  text-transform: uppercase;
-  padding: 2px 8px;
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--text-secondary);
-}
-
-.status-badge[data-status="Signed"] { color: #34d399; background: rgba(52, 211, 153, 0.1); }
-.status-badge[data-status="Pending Signature"] { color: #f59e0b; background: rgba(245, 158, 11, 0.1); }
-
-.sign-meta {
-  font-size: 0.7rem;
-  color: var(--text-muted);
-}
-
-.sign-link-meta {
-  font-size: 0.7rem;
-  color: var(--primary);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  text-decoration: underline;
-}
-
-.sign-link-meta:hover {
-  color: #818cf8;
-}
-
-.sign-link-meta mat-icon {
-  font-size: 14px;
-  width: 14px;
-  height: 14px;
-}
-
-.connect-meta {
-  font-size: 0.7rem;
-  color: var(--text-muted);
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.connect-meta mat-icon {
-  font-size: 14px;
-  width: 14px;
-  height: 14px;
-}
-
-.empty-state, .loading-state {
-  padding: 48px;
-  text-align: center;
-  color: var(--text-muted);
-  background: rgba(255, 255, 255, 0.01);
-  border-radius: 20px;
-  border: 1px dashed var(--border);
-}
-
-.empty-state mat-icon, .loading-state mat-icon {
+.doc-card-icon mat-icon {
   font-size: 32px;
   width: 32px;
   height: 32px;
+}
+
+.doc-card-icon[data-type="Contract"] { color: #818cf8; }
+.doc-card-icon[data-type="Property Paper"] { color: #34d399; }
+.doc-card-icon[data-type="Client ID"] { color: #fbbf24; }
+.doc-card-icon[data-type="Permit"] { color: #60a5fa; }
+
+.doc-card-content {
+  padding: 14px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.doc-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.doc-card-title {
+  font-weight: 600;
+  color: #e0e0e8;
+  font-size: 0.95rem;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.doc-card-status {
+  font-size: 0.6rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #909098;
+  flex-shrink: 0;
+  letter-spacing: 0.3px;
+}
+
+.doc-card-status[data-status="Signed"] { color: #34d399; background: rgba(52, 211, 153, 0.12); }
+.doc-card-status[data-status="Pending Signature"] { color: #f59e0b; background: rgba(245, 158, 11, 0.12); }
+
+.doc-card-meta {
+  display: flex;
+  gap: 12px;
+  font-size: 0.75rem;
+  color: #707080;
+}
+
+.doc-card-footer {
+  display: flex;
+  gap: 12px;
+  font-size: 0.7rem;
+  color: #808090;
+  padding-top: 8px;
+  border-top: 1px solid #303040;
+}
+
+.doc-card-footer span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.doc-card-footer mat-icon {
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
+}
+
+.doc-card-actions {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.doc-card {
+  position: relative;
+}
+
+.doc-card:hover .doc-card-actions {
+  opacity: 1;
+}
+
+.loading-state, .empty-state {
+  padding: 48px;
+  text-align: center;
+  color: #606070;
+  background: var(--bg-surface);
+  border-radius: 16px;
+  border: 1px dashed #404050;
+}
+
+.loading-state mat-icon, .empty-state mat-icon {
+  font-size: 40px;
+  width: 40px;
+  height: 40px;
   margin-bottom: 12px;
+  opacity: 0.5;
 }
 
 .spin { animation: rotation 2s infinite linear; }
 @keyframes rotation { from { transform: rotate(0deg); } to { transform: rotate(359deg); } }
 
-.text-warn { color: #ef4444 !important; }
-
-.pagination {
+.preview-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-top: 24px;
-  padding: 20px 24px;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.preview-modal {
   background: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 1100px;
+  max-height: 90vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative;
 }
 
-.pagination-info {
-  font-size: 0.9rem;
-  color: var(--text-muted);
-  font-weight: 500;
-  flex-shrink: 0;
-}
-
-.pagination-controls {
+.preview-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 10;
+  background: rgba(0, 0, 0, 0.5);
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: center;
+  cursor: pointer;
+  color: #fff;
+  transition: background 0.2s;
 }
 
-.pagination-controls button {
-  min-width: 40px;
-  height: 40px;
-  border-radius: var(--radius);
-  background: var(--bg-elevated);
-  border: 1px solid var(--border);
-  color: var(--text-secondary);
-  font-weight: 600;
-  transition: all 0.2s ease;
+.preview-close:hover {
+  background: rgba(0, 0, 0, 0.7);
 }
 
-.pagination-controls button:hover:not(:disabled) {
-  background: var(--primary-soft);
-  border-color: var(--primary);
-  color: var(--primary-bright);
-}
-
-.pagination-controls button.active {
-  background: var(--primary);
-  border-color: var(--primary);
-  color: white;
-  box-shadow: 0 4px 12px var(--primary-glow);
-}
-
-.pagination-controls button:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-.pagination-controls button mat-icon {
+.preview-close mat-icon {
   font-size: 20px;
   width: 20px;
   height: 20px;
 }
 
-.page-ellipsis {
-  color: var(--text-muted);
-  padding: 0 4px;
-  font-weight: 500;
+.preview-content {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  height: 100%;
+  max-height: 90vh;
+}
+
+.preview-file-section {
+  background: #1a1a2e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
+}
+
+.preview-image {
+  padding: 20px;
+}
+
+.preview-image img {
+  max-width: 100%;
+  max-height: 80vh;
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.preview-pdf {
+  width: 100%;
+  height: 80vh;
+}
+
+.preview-pdf iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.preview-generic {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 60px;
+}
+
+.preview-generic mat-icon {
+  font-size: 80px;
+  width: 80px;
+  height: 80px;
+  color: var(--primary);
+  opacity: 0.8;
+}
+
+.preview-generic span {
+  color: #a0a0b0;
+  font-size: 1rem;
+}
+
+.preview-details {
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  border-left: 1px solid #303040;
+}
+
+.preview-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #303040;
+}
+
+.preview-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+}
+
+.preview-icon mat-icon {
+  font-size: 22px;
+  width: 22px;
+  height: 22px;
+}
+
+.preview-icon[data-type="Contract"] { color: #818cf8; background: rgba(99, 102, 241, 0.15); }
+.preview-icon[data-type="Property Paper"] { color: #34d399; background: rgba(16, 185, 129, 0.15); }
+.preview-icon[data-type="Client ID"] { color: #fbbf24; background: rgba(245, 158, 11, 0.15); }
+.preview-icon[data-type="Permit"] { color: #60a5fa; background: rgba(59, 130, 246, 0.15); }
+
+.preview-header h2 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.preview-meta {
+  font-size: 0.75rem;
+  color: #808090;
+}
+
+.preview-actions-bar {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.preview-section {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid #303040;
+  border-radius: 10px;
+  padding: 14px;
+}
+
+.preview-section h4 {
+  margin: 0 0 12px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #707080;
+  letter-spacing: 0.5px;
+}
+
+.status-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.status-badge.large {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  color: #a0a0b0;
+}
+
+.status-badge.large[data-status="Signed"] { color: #34d399; background: rgba(52, 211, 153, 0.15); }
+.status-badge.large[data-status="Pending Signature"] { color: #f59e0b; background: rgba(245, 158, 11, 0.15); }
+
+.signed-date {
+  font-size: 0.8rem;
+  color: #808090;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.info-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.info-item.full-width {
+  grid-column: 1 / -1;
+}
+
+.info-item mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  color: #606070;
+  margin-top: 2px;
+}
+
+.info-item > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.info-label {
+  font-size: 0.65rem;
+  color: #707080;
+  text-transform: uppercase;
+}
+
+.info-value {
+  font-size: 0.85rem;
+  color: #e0e0e8;
+}
+
+.version-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.version-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 6px;
+  font-size: 0.8rem;
+}
+
+.version-number {
+  font-weight: 600;
+  color: #818cf8;
+}
+
+.version-date {
+  color: #808090;
+}
+
+.version-user {
+  color: #a0a0b0;
+}
+
+@media (max-width: 900px) {
+  .preview-content {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 1fr;
+  }
+  
+  .preview-file-section {
+    max-height: 40vh;
+  }
 }

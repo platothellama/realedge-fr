@@ -1,52 +1,22 @@
 .documents-container {
-  padding: 40px;
+  padding: 24px;
   height: 100vh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
 }
 
-.page-header {
-  margin-bottom: 40px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 32px;
-}
-
-.title-section h1 {
-  font-size: 2.5rem;
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  margin: 0;
-  color: #fff;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.title-section h1 mat-icon {
-  color: var(--primary);
-}
-
-.title-section p {
-  color: var(--text-muted);
-  font-size: 1.1rem;
-  margin-top: 8px;
-  font-weight: 500;
-}
-
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
   flex: 1;
   max-width: 600px;
 }
 
 .search-field {
   flex: 1;
-  height: 52px;
+  height: 44px;
 }
 
 .search-field mat-icon {
@@ -55,17 +25,16 @@
 
 .type-filter {
   width: 180px;
-  height: 52px;
+  height: 44px;
 }
 
 .upload-btn {
-  height: 52px !important;
-  padding: 0 24px !important;
-  border-radius: 14px !important;
-  font-weight: 800 !important;
-  font-size: 0.95rem !important;
-  letter-spacing: 0.01em !important;
-  box-shadow: 0 8px 20px -4px var(--primary-glow) !important;
+  height: 44px !important;
+  padding: 0 20px !important;
+  border-radius: 10px !important;
+  font-weight: 700 !important;
+  font-size: 0.85rem !important;
+  box-shadow: 0 4px 12px -2px var(--primary-glow) !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
@@ -76,7 +45,7 @@
   font-size: 18px !important;
   width: 18px !important;
   height: 18px !important;
-  color: #fff !important;
+  color: var(--text-primary) !important;
 }
 
 .loading-state {
@@ -145,6 +114,18 @@
   background: var(--bg-elevated) !important;
 }
 
+.document-card.highlighted {
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 2px var(--primary), var(--shadow-lg) !important;
+  animation: pulse 1s ease-in-out;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+  100% { transform: scale(1); }
+}
+
 .doc-icon {
   display: flex;
   align-items: center;
@@ -170,7 +151,7 @@
   margin: 0 0 6px 0;
   font-size: 1rem;
   font-weight: 700;
-  color: #fff;
+  color: var(--text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -263,71 +244,7 @@
 .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
 .custom-scrollbar::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 10px; }
 
-.pagination {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 24px;
-  padding: 20px 24px;
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
 
-.pagination-info {
-  font-size: 0.9rem;
-  color: var(--text-muted);
-  font-weight: 500;
-  flex-shrink: 0;
-}
-
-.pagination-controls {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.pagination-controls button {
-  min-width: 40px;
-  height: 40px;
-  border-radius: var(--radius);
-  background: var(--bg-elevated);
-  border: 1px solid var(--border);
-  color: var(--text-secondary);
-  font-weight: 600;
-  transition: all 0.2s ease;
-}
-
-.pagination-controls button:hover:not(:disabled) {
-  background: var(--primary-soft);
-  border-color: var(--primary);
-  color: var(--primary-bright);
-}
-
-.pagination-controls button.active {
-  background: var(--primary);
-  border-color: var(--primary);
-  color: white;
-  box-shadow: 0 4px 12px var(--primary-glow);
-}
-
-.pagination-controls button:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-}
-
-.pagination-controls button mat-icon {
-  font-size: 20px;
-  width: 20px;
-  height: 20px;
-}
-
-.page-ellipsis {
-  color: var(--text-muted);
-  padding: 0 4px;
-  font-weight: 500;
-}
 
 @media (max-width: 768px) {
   .page-header {
@@ -352,8 +269,8 @@
 
   .pagination {
     flex-direction: column;
-    gap: 16px;
-    padding: 16px;
+    gap: 20px;
+    padding: 20px;
   }
 
   .pagination-controls {

@@ -4,29 +4,8 @@
   margin: 0 auto;
 }
 
-.page-header {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 32px;
-}
-
 .back-button {
   margin-right: 8px;
-}
-
-.header-content h1 {
-  margin: 0;
-  font-size: 28px;
-  font-weight: 600;
-  color: var(--text-primary);
-  font-family: 'Urbanist', sans-serif;
-}
-
-.subtitle {
-  margin: 4px 0 0 0;
-  color: var(--text-secondary);
-  font-size: 14px;
 }
 
 .empty-state.full {

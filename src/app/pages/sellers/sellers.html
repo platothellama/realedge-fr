@@ -12,12 +12,12 @@
     </div>
   </div>
 
-  <div class="toolbar">
-    <div class="search-input">
-      <mat-icon>search</mat-icon>
-      <input type="text" placeholder="Search sellers..." [(ngModel)]="searchQuery">
-    </div>
-  </div>
+  <app-property-search
+    [filters]="searchFilters"
+    [config]="searchConfig"
+    (filtersChange)="onFiltersChange($event)"
+    (search)="fetchSellers()"
+  ></app-property-search>
 
   @if (isLoading) {
     <div class="loading-spinner">

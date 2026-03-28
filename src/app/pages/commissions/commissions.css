@@ -1,37 +1,8 @@
 .commissions-container {
-  padding: 16px;
+  padding: 24px;
   height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
-}
-
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-
-.header-content {
-  display: flex;
-  flex-direction: column;
-}
-
-.page-title {
-  font-size: 1.5rem;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  color: var(--text-primary);
-  margin: 0;
-}
-
-.page-subtitle {
-  font-size: 0.9rem;
-  color: var(--text-secondary);
-  margin: 4px 0 0 0;
-  font-weight: 400;
 }
 
 .loading-container {
@@ -44,34 +15,8 @@
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
-  margin-bottom: 16px;
-}
-
-.stat-card {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 14px;
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-}
-
-.stat-icon {
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--radius-sm);
-  flex-shrink: 0;
-}
-
-.stat-icon mat-icon {
-  font-size: 20px;
-  width: 20px;
-  height: 20px;
+  gap: 16px;
+  margin-bottom: 24px;
 }
 
 .stat-icon.pending {
@@ -172,7 +117,7 @@
 }
 
 .commissions-table td {
-  font-size: 0.85rem;
+  font-size: 0.875rem;
   color: var(--text-primary);
 }
 
@@ -203,8 +148,8 @@
 
 .status-badge {
   display: inline-block;
-  padding: 4px 10px;
-  border-radius: 12px;
+  padding: 5px 12px;
+  border-radius: 20px;
   font-size: 0.7rem;
   font-weight: 700;
   text-transform: capitalize;
@@ -212,7 +157,7 @@
 
 .status-paid { background: rgba(16, 185, 129, 0.12); color: var(--success); }
 .status-disbursed { background: rgba(99, 102, 241, 0.12); color: var(--primary); }
-.status-approved { background: rgba(59, 130, 246, 0.12); color: #3b82f6; }
+.status-approved { background: rgba(16, 185, 129, 0.12); color: var(--success); }
 .status-pending { background: rgba(245, 158, 11, 0.12); color: var(--warning); }
 
 .empty-state {

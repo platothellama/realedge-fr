@@ -12,6 +12,12 @@
     </div>
   </div>
 
+  <app-property-search
+    [config]="searchConfig"
+    [filters]="filters"
+    (filtersChange)="onFiltersChange($event)"
+  ></app-property-search>
+
   @if (loading) {
     <div class="loading-state">
       <mat-icon class="spin">refresh</mat-icon>
@@ -28,113 +34,276 @@
       <p>No documents match your search</p>
     </div>
   } @else {
-    <div class="doc-list">
+    <div class="doc-grid">
       @for (doc of paginatedDocuments; track doc.id) {
-        <mat-card class="doc-card">
-          <div class="doc-card-header">
-            <div class="doc-icon-area" [attr.data-type]="doc.type">
-              <mat-icon>{{ getIconForType(doc.type) }}</mat-icon>
-            </div>
-            <div class="doc-info">
-              <div class="doc-main">
-                <span class="doc-title">{{ doc.title }}</span>
-                <span class="doc-meta">
-                  v{{ doc.currentVersion }} • {{ doc.type }} •
-                  {{ (doc.versions[0]?.fileSize / 1024).toFixed(1) }} KB
-                </span>
+        <div class="doc-card" (click)="openPreview(doc)">
+          <div class="doc-card-preview">
+            @if (doc.versions && doc.versions[0]) {
+              @if (isImageFile(doc.versions[0].fileUrl)) {
+                <img [src]="getPreviewUrl(doc.versions[0].fileUrl)" alt="Preview">
+              } @else {
+                <div class="doc-card-icon" [attr.data-type]="doc.type">
+                  <mat-icon>{{ getIconForType(doc.type) }}</mat-icon>
+                </div>
+              }
+            } @else {
+              <div class="doc-card-icon" [attr.data-type]="doc.type">
+                <mat-icon>{{ getIconForType(doc.type) }}</mat-icon>
               </div>
-              <div class="doc-status-row">
-                <span class="status-badge" [attr.data-status]="doc.status">
-                  {{ doc.status }}
-                </span>
-                @if (doc.status === 'Signed') {
-                  <span class="sign-meta">Signed {{ doc.signedAt | date:'shortDate' }}</span>
+            }
+          </div>
+          <div class="doc-card-content">
+            <div class="doc-card-header">
+              <span class="doc-card-title">{{ doc.title }}</span>
+              <span class="doc-card-status" [attr.data-status]="doc.status">{{ doc.status }}</span>
+            </div>
+            <div class="doc-card-meta">
+              <span>{{ doc.type }}</span>
+              <span>v{{ doc.currentVersion }}</span>
+              @if (doc.versions && doc.versions[0]) {
+                <span>{{ (doc.versions[0].fileSize / 1024).toFixed(1) }} KB</span>
+              }
+            </div>
+            @if (doc.user || doc.group) {
+              <div class="doc-card-footer">
+                @if (doc.user) {
+                  <span><mat-icon>person</mat-icon>{{ doc.user.name }}</span>
+                }
+                @if (doc.group) {
+                  <span><mat-icon>groups</mat-icon>{{ doc.group.name }}</span>
                 }
               </div>
-            </div>
-            <div class="doc-actions">
-              <button mat-icon-button [matMenuTriggerFor]="docMenu">
-                <mat-icon>more_vert</mat-icon>
+            }
+          </div>
+          <div class="doc-card-actions" (click)="$event.stopPropagation()">
+            <button mat-icon-button [matMenuTriggerFor]="docMenu">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #docMenu="matMenu">
+              <button mat-menu-item (click)="openPreview(doc)">
+                <mat-icon>visibility</mat-icon>
+                <span>Preview</span>
               </button>
-              <mat-menu #docMenu="matMenu">
-                <button mat-menu-item (click)="downloadDocument(doc)">
-                  <mat-icon>download</mat-icon>
-                  <span>Download Latest</span>
-                </button>
-                <button mat-menu-item (click)="openUploadForm(true, doc.id)">
-                  <mat-icon>history</mat-icon>
-                  <span>Upload New Version</span>
-                </button>
-                @if (doc.isDigitalSignatureEnabled) {
-                  @if (doc.status !== 'Signed') {
-                    <button mat-menu-item (click)="signDocument(doc)">
-                      <mat-icon color="primary">draw</mat-icon>
-                      <span>Sign Digitally</span>
-                    </button>
-                  }
-                  <button mat-menu-item (click)="copySigningUrl(doc)">
-                    <mat-icon color="primary">link</mat-icon>
-                    <span>Copy Signing URL</span>
+              <button mat-menu-item (click)="downloadDocument(doc)">
+                <mat-icon>download</mat-icon>
+                <span>Download</span>
+              </button>
+              <button mat-menu-item (click)="openUploadForm(true, doc.id)">
+                <mat-icon>history</mat-icon>
+                <span>New Version</span>
+              </button>
+              @if (doc.isDigitalSignatureEnabled) {
+                @if (doc.status !== 'Signed') {
+                  <button mat-menu-item (click)="signDocument(doc)">
+                    <mat-icon color="primary">draw</mat-icon>
+                    <span>Sign</span>
                   </button>
                 }
-                <button mat-menu-item (click)="deleteDocument(doc)" class="text-warn">
-                  <mat-icon color="warn">delete_outline</mat-icon>
-                  <span>Delete</span>
+                <button mat-menu-item (click)="copySigningUrl(doc)">
+                  <mat-icon color="primary">link</mat-icon>
+                  <span>Copy Signing URL</span>
                 </button>
-              </mat-menu>
-            </div>
+              }
+              <button mat-menu-item (click)="viewAuditTrail(doc)">
+                <mat-icon>history</mat-icon>
+                <span>Audit Trail</span>
+              </button>
+              <button mat-menu-item (click)="deleteDocument(doc)" class="text-warn">
+                <mat-icon color="warn">delete_outline</mat-icon>
+                <span>Delete</span>
+              </button>
+            </mat-menu>
           </div>
-
-          @if (doc.signingToken || doc.user || doc.group) {
-            <div class="doc-card-footer">
-              @if (doc.signingToken) {
-                <span class="sign-link-meta" (click)="copySigningUrl(doc)">
-                  <mat-icon>link</mat-icon>Click to copy signing link
-                </span>
-              }
-              @if (doc.user || doc.group) {
-                <span class="connect-meta">
-                  @if (doc.user) {
-                    <mat-icon>person</mat-icon>{{ doc.user.name }}
-                  }
-                  @if (doc.group) {
-                    <mat-icon>groups</mat-icon>{{ doc.group.name }}
-                  }
-                </span>
-              }
-            </div>
-          }
-        </mat-card>
+        </div>
       }
     </div>
 
-    <div class="pagination" style="    flex-direction: column;">
-      <span class="pagination-info">
-        Showing {{ ((pagination.page - 1) * pagination.limit) + 1 }}-{{ Math.min(pagination.page * pagination.limit, pagination.totalItems) }} of {{ pagination.totalItems }} documents
-      </span>
-      <div class="pagination-controls">
-        <button mat-icon-button [disabled]="pagination.page === 1" (click)="pagination.page = 1; updatePaginatedDocuments()">
-          <mat-icon>first_page</mat-icon>
-        </button>
-        <button mat-icon-button [disabled]="pagination.page === 1" (click)="pagination.page = pagination.page - 1; updatePaginatedDocuments()">
-          <mat-icon>chevron_left</mat-icon>
-        </button>
-        @for (page of getPageNumbers(); track page) {
-          @if (page === -1) {
-            <span class="page-ellipsis">...</span>
-          } @else {
-            <button [class.active]="page === pagination.page" (click)="pagination.page = page; updatePaginatedDocuments()">
-              {{ page }}
-            </button>
-          }
-        }
-        <button mat-icon-button [disabled]="pagination.page === pagination.totalPages" (click)="pagination.page = pagination.page + 1; updatePaginatedDocuments()">
-          <mat-icon>chevron_right</mat-icon>
-        </button>
-        <button mat-icon-button [disabled]="pagination.page === pagination.totalPages" (click)="pagination.page = pagination.totalPages; updatePaginatedDocuments()">
-          <mat-icon>last_page</mat-icon>
-        </button>
-      </div>
-    </div>
+    <app-pagination
+      [page]="pagination.page"
+      [limit]="pagination.limit"
+      [totalItems]="pagination.totalItems"
+      [totalPages]="pagination.totalPages"
+      label="documents"
+      (pageChange)="onPaginationChange($event)"
+    ></app-pagination>
   }
 </div>
+
+@if (showPreview) {
+  <div class="preview-overlay" (click)="closePreview()">
+    <div class="preview-modal" (click)="$event.stopPropagation()">
+      <button class="preview-close" (click)="closePreview()">
+        <mat-icon>close</mat-icon>
+      </button>
+      
+      @if (previewDoc) {
+        <div class="preview-content">
+          <div class="preview-file-section">
+            @if (previewDoc.versions && previewDoc.versions[0]) {
+              @if (isImageFile(previewDoc.versions[0].fileUrl)) {
+                <div class="preview-image">
+                  <img [src]="getPreviewUrl(previewDoc.versions[0].fileUrl)" alt="Document preview">
+                </div>
+              } @else if (isPdfFile(previewDoc.versions[0].fileUrl)) {
+                <div class="preview-pdf">
+                  <iframe [src]="getPreviewUrl(previewDoc.versions[0].fileUrl)" type="application/pdf"></iframe>
+                </div>
+              } @else {
+                <div class="preview-generic">
+                  <mat-icon>{{ getIconForType(previewDoc.type) }}</mat-icon>
+                  <span>Preview not available</span>
+                </div>
+              }
+            }
+          </div>
+          
+          <div class="preview-details">
+            <div class="preview-header">
+              <div class="preview-icon" [attr.data-type]="previewDoc.type">
+                <mat-icon>{{ getIconForType(previewDoc.type) }}</mat-icon>
+              </div>
+              <div>
+                <h2>{{ previewDoc.title }}</h2>
+                <span class="preview-meta">{{ previewDoc.type }} • Version {{ previewDoc.currentVersion }}</span>
+              </div>
+            </div>
+
+            <div class="preview-actions-bar">
+              <button mat-stroked-button (click)="downloadDocument(previewDoc)">
+                <mat-icon>download</mat-icon>
+                Download
+              </button>
+              <button mat-stroked-button (click)="openUploadForm(true, previewDoc.id)">
+                <mat-icon>history</mat-icon>
+                New Version
+              </button>
+              @if (previewDoc.isDigitalSignatureEnabled && previewDoc.status !== 'Signed') {
+                <button mat-raised-button color="primary" (click)="signDocument(previewDoc)">
+                  <mat-icon>draw</mat-icon>
+                  Sign
+                </button>
+              }
+            </div>
+
+            <div class="preview-section">
+              <h4>Status</h4>
+              <div class="status-row">
+                <span class="status-badge large" [attr.data-status]="previewDoc.status">{{ previewDoc.status }}</span>
+                @if (previewDoc.status === 'Signed' && previewDoc.signedAt) {
+                  <span class="signed-date">Signed {{ previewDoc.signedAt | date:'mediumDate' }}</span>
+                }
+              </div>
+            </div>
+
+            <div class="preview-section">
+              <h4>File Info</h4>
+              <div class="info-grid">
+                @if (previewDoc.versions && previewDoc.versions[0]) {
+                  <div class="info-item">
+                    <mat-icon>storage</mat-icon>
+                    <div><span class="info-label">Size</span><span class="info-value">{{ (previewDoc.versions[0].fileSize / 1024).toFixed(1) }} KB</span></div>
+                  </div>
+                }
+                <div class="info-item">
+                  <mat-icon>calendar_today</mat-icon>
+                  <div><span class="info-label">Created</span><span class="info-value">{{ previewDoc.createdAt | date:'medium' }}</span></div>
+                </div>
+                <div class="info-item">
+                  <mat-icon>update</mat-icon>
+                  <div><span class="info-label">Updated</span><span class="info-value">{{ previewDoc.updatedAt | date:'medium' }}</span></div>
+                </div>
+                <div class="info-item">
+                  <mat-icon>history</mat-icon>
+                  <div><span class="info-label">Versions</span><span class="info-value">{{ previewDoc.versions?.length || 0 }}</span></div>
+                </div>
+              </div>
+            </div>
+
+            @if (previewDoc.property) {
+              <div class="preview-section">
+                <h4>Property</h4>
+                <div class="info-grid">
+                  <div class="info-item full-width">
+                    <mat-icon>home</mat-icon>
+                    <div><span class="info-label">Title</span><span class="info-value">{{ previewDoc.property.title }}</span></div>
+                  </div>
+                  @if (previewDoc.property.address) {
+                    <div class="info-item full-width">
+                      <mat-icon>location_on</mat-icon>
+                      <div><span class="info-label">Address</span><span class="info-value">{{ previewDoc.property.address }}</span></div>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+
+            @if (previewDoc.seller) {
+              <div class="preview-section">
+                <h4>Seller</h4>
+                <div class="info-grid">
+                  <div class="info-item">
+                    <mat-icon>storefront</mat-icon>
+                    <div><span class="info-label">Name</span><span class="info-value">{{ previewDoc.seller.name }}</span></div>
+                  </div>
+                  @if (previewDoc.seller.email) {
+                    <div class="info-item">
+                      <mat-icon>email</mat-icon>
+                      <div><span class="info-label">Email</span><span class="info-value">{{ previewDoc.seller.email }}</span></div>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+
+            @if (previewDoc.user) {
+              <div class="preview-section">
+                <h4>Uploaded By</h4>
+                <div class="info-grid">
+                  <div class="info-item">
+                    <mat-icon>person</mat-icon>
+                    <div><span class="info-label">Name</span><span class="info-value">{{ previewDoc.user.name }}</span></div>
+                  </div>
+                  @if (previewDoc.user.email) {
+                    <div class="info-item">
+                      <mat-icon>email</mat-icon>
+                      <div><span class="info-label">Email</span><span class="info-value">{{ previewDoc.user.email }}</span></div>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+
+            @if (previewDoc.group) {
+              <div class="preview-section">
+                <h4>Group</h4>
+                <div class="info-grid">
+                  <div class="info-item">
+                    <mat-icon>groups</mat-icon>
+                    <div><span class="info-label">Name</span><span class="info-value">{{ previewDoc.group.name }}</span></div>
+                  </div>
+                </div>
+              </div>
+            }
+
+            @if (previewDoc.versions && previewDoc.versions.length > 1) {
+              <div class="preview-section">
+                <h4>Version History</h4>
+                <div class="version-list">
+                  @for (version of previewDoc.versions; track version.id; let i = $index) {
+                    <div class="version-item">
+                      <span class="version-number">v{{ previewDoc.versions.length - i }}</span>
+                      <span class="version-date">{{ version.createdAt | date:'short' }}</span>
+                      @if (version.uploadedBy) {
+                        <span class="version-user">by {{ version.uploadedBy.name }}</span>
+                      }
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+}

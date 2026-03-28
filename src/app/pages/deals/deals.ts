@@ -14,6 +14,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatTabsModule } from '@angular/material/tabs';
+import { PropertySearchComponent, SearchFilters, SearchFilterConfig } from '../../components/property-search/property-search';
 
 @Component({
   selector: 'app-deals',
@@ -31,7 +32,8 @@ import { MatTabsModule } from '@angular/material/tabs';
     MatInputModule,
     MatSelectModule,
     MatMenuModule,
-    MatTabsModule
+    MatTabsModule,
+    PropertySearchComponent
   ],
   templateUrl: './deals.html',
   styleUrl: './deals.css',
@@ -41,6 +43,33 @@ export class DealsComponent implements OnInit {
   searchQuery: string = '';
   selectedStage: string = 'All';
   deletingId: string | null = null;
+
+  stageOptions = ['All', 'Offer Made', 'Negotiation', 'Contract Signed', 'Payment', 'Closed'];
+
+  searchFilters: SearchFilters = {
+    searchQuery: '',
+    selectedStatus: 'All',
+    selectedType: 'All',
+    selectedCity: 'All',
+    minBedrooms: null,
+    maxBedrooms: null,
+    minBathrooms: null,
+    minPrice: null,
+    maxPrice: null,
+    minArea: null,
+    maxArea: null
+  };
+
+  searchConfig: SearchFilterConfig = {
+    showSearch: true,
+    showStatus: true,
+    showType: false,
+    showCity: false,
+    showBedrooms: false,
+    showBathrooms: false,
+    showPrice: false,
+    showArea: false
+  };
 
   pipeline: any[] = [
     { name: 'Negotiation', status: 'Negotiation', deals: [] },
@@ -77,8 +106,8 @@ export class DealsComponent implements OnInit {
   applyFilters() {
     let filtered = [...this.allDeals];
 
-    if (this.searchQuery) {
-      const q = this.searchQuery.toLowerCase();
+    if (this.searchFilters.searchQuery) {
+      const q = this.searchFilters.searchQuery.toLowerCase();
       filtered = filtered.filter(d =>
         d.title?.toLowerCase().includes(q) ||
         d.buyerName?.toLowerCase().includes(q) ||
@@ -87,11 +116,16 @@ export class DealsComponent implements OnInit {
       );
     }
 
-    if (this.selectedStage !== 'All') {
-      filtered = filtered.filter(d => d.dealStage === this.selectedStage);
+    if (this.searchFilters.selectedStatus !== 'All') {
+      filtered = filtered.filter(d => d.dealStage === this.searchFilters.selectedStatus);
     }
 
     this.mapDealsToPipeline(filtered);
+  }
+
+  onFiltersChange(filters: SearchFilters) {
+    this.searchFilters = filters;
+    this.applyFilters();
   }
 
   exportDealsToCSV() {

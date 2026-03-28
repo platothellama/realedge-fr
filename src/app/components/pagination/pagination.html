@@ -1,0 +1,28 @@
+<div class="pagination">
+  <span class="pagination-info">
+    Showing {{ startItem }}-{{ endItem }} of {{ totalItems }} {{ label }}
+  </span>
+  <div class="pagination-controls">
+    <button mat-icon-button [disabled]="page === 1" (click)="goToPage(1)">
+      <mat-icon>first_page</mat-icon>
+    </button>
+    <button mat-icon-button [disabled]="page === 1" (click)="goToPage(page - 1)">
+      <mat-icon>chevron_left</mat-icon>
+    </button>
+    @for (p of getPageNumbers(); track p) {
+      @if (p === -1) {
+        <span class="page-ellipsis">...</span>
+      } @else {
+        <button mat-button [class.active]="p === page" (click)="goToPage(p)">
+          {{ p }}
+        </button>
+      }
+    }
+    <button mat-icon-button [disabled]="page === totalPages" (click)="goToPage(page + 1)">
+      <mat-icon>chevron_right</mat-icon>
+    </button>
+    <button mat-icon-button [disabled]="page === totalPages" (click)="goToPage(totalPages)">
+      <mat-icon>last_page</mat-icon>
+    </button>
+  </div>
+</div>

@@ -1,44 +1,256 @@
-.automation-container { padding: 24px; height: 100%; overflow-y: auto; }
-.page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
-.header-content { display: flex; flex-direction: column; }
-.page-title { font-size: 32px; font-weight: 800; color: var(--text-primary); margin: 0; }
-.page-subtitle { font-size: 15px; color: var(--text-secondary); margin: 6px 0 0 0; }
-.loading-container { display: flex; justify-content: center; align-items: center; min-height: 400px; }
-.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
-@media (max-width: 1200px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
-.stat-card { display: flex; align-items: center; gap: 16px; padding: 20px; background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-md); }
-.stat-icon { width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius-sm); }
-.stat-icon mat-icon { font-size: 24px; }
-.stat-icon.campaigns { background: rgba(99, 102, 241, 0.12); color: var(--primary); }
-.stat-icon.active { background: rgba(16, 185, 129, 0.12); color: var(--success); }
-.stat-icon.emails { background: rgba(59, 130, 246, 0.12); color: #3b82f6; }
-.stat-icon.rate { background: rgba(245, 158, 11, 0.12); color: var(--warning); }
-.stat-content { display: flex; flex-direction: column; }
-.stat-value { font-size: 22px; font-weight: 700; color: var(--text-primary); }
-.stat-label { font-size: 13px; color: var(--text-muted); }
-.table-card { background: var(--bg-surface) !important; border: 1px solid var(--border) !important; border-radius: var(--radius-lg) !important; }
-.table-header { display: flex; justify-content: space-between; align-items: center; padding: 20px 24px; border-bottom: 1px solid var(--border); }
-.table-header h3 { font-size: 18px; font-weight: 700; color: var(--text-primary); margin: 0; }
-.table-container { overflow-x: auto; }
-.campaigns-table { width: 100%; border-collapse: collapse; }
-.campaigns-table th, .campaigns-table td { padding: 16px; text-align: left; border-bottom: 1px solid var(--border); }
-.campaigns-table th { font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.1em; }
-.campaigns-table td { font-size: 14px; color: var(--text-primary); }
-.name-cell { font-weight: 600; }
-.type-badge { display: inline-block; padding: 4px 10px; background: var(--bg-elevated); border-radius: 12px; font-size: 12px; text-transform: capitalize; }
-.status-badge { display: inline-block; padding: 4px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; text-transform: capitalize; }
-.status-active { background: rgba(16, 185, 129, 0.12); color: var(--success); }
-.status-completed { background: rgba(99, 102, 241, 0.12); color: var(--primary); }
-.status-paused { background: rgba(245, 158, 11, 0.12); color: var(--warning); }
-.status-draft { background: rgba(100, 116, 139, 0.12); color: var(--text-muted); }
-.empty-state { display: flex; flex-direction: column; align-items: center; padding: 60px; color: var(--text-muted); }
-.empty-state mat-icon { font-size: 48px; margin-bottom: 16px; }
-.delete-option { color: var(--error) !important; }
-.dialog-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center; z-index: 1000; }
-.dialog-content { background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-lg); width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto; }
-.dialog-header { display: flex; justify-content: space-between; align-items: center; padding: 20px 24px; border-bottom: 1px solid var(--border); }
-.dialog-header h2 { font-size: 20px; font-weight: 700; color: var(--text-primary); margin: 0; }
-.dialog-body { padding: 24px; display: flex; flex-direction: column; gap: 16px; }
-.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.dialog-footer { display: flex; justify-content: flex-end; gap: 12px; padding: 16px 24px; border-top: 1px solid var(--border); }
-:host ::ng-deep .mat-mdc-form-field { width: 100%; }
+.automation-container {
+  padding: 24px;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 32px;
+}
+
+@media (max-width: 1200px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.stat-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.stat-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+}
+
+.stat-icon mat-icon {
+  font-size: 1.5rem;
+}
+
+.stat-icon.campaigns {
+  background: rgba(99, 102, 241, 0.12);
+  color: var(--primary);
+}
+
+.stat-icon.active {
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--success);
+}
+
+.stat-icon.emails {
+  background: rgba(59, 130, 246, 0.12);
+  color: #3b82f6;
+}
+
+.stat-icon.rate {
+  background: rgba(245, 158, 11, 0.12);
+  color: var(--warning);
+}
+
+.stat-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-value {
+  font-size: 1.375rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.stat-label {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+
+.table-card {
+  background: var(--bg-surface) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-lg) !important;
+}
+
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.table-header h3 {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+.campaigns-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.campaigns-table th,
+.campaigns-table td {
+  padding: 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.campaigns-table th {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 0.1em;
+}
+
+.campaigns-table td {
+  font-size: 0.875rem;
+  color: var(--text-primary);
+}
+
+.name-cell {
+  font-weight: 600;
+}
+
+.type-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  background: var(--bg-elevated);
+  border-radius: 12px;
+  font-size: 0.75rem;
+  text-transform: capitalize;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.status-active {
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--success);
+}
+
+.status-completed {
+  background: rgba(99, 102, 241, 0.12);
+  color: var(--primary);
+}
+
+.status-paused {
+  background: rgba(245, 158, 11, 0.12);
+  color: var(--warning);
+}
+
+.status-draft {
+  background: rgba(100, 116, 139, 0.12);
+  color: var(--text-muted);
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 60px;
+  color: var(--text-muted);
+}
+
+.empty-state mat-icon {
+  font-size: 3rem;
+  margin-bottom: 16px;
+}
+
+.delete-option {
+  color: var(--error) !important;
+}
+
+.dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.dialog-content {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  width: 100%;
+  max-width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.dialog-header h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.dialog-body {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 24px;
+  border-top: 1px solid var(--border);
+}
+
+:host ::ng-deep .mat-mdc-form-field {
+  width: 100%;
+}

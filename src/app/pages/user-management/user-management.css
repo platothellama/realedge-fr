@@ -1,31 +1,7 @@
 .user-mgmt-container {
-  padding: 60px 40px;
+  padding: 24px;
   max-width: 1300px;
   margin: 0 auto;
-}
-
-.header-section {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  margin-bottom: 48px;
-}
-
-.title-area h1 {
-  margin: 0;
-  color: var(--text-primary);
-}
-
-.title-area p {
-  margin-top: 12px;
-  font-size: 1.25rem;
-  color: var(--text-secondary);
-}
-
-.create-btn {
-  height: 56px !important;
-  font-family: 'Urbanist', sans-serif !important;
-  font-size: 1.1rem !important;
 }
 
 .table-card {
@@ -287,4 +263,46 @@
     width: 18px;
     height: 18px;
   }
+}
+
+.header-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.btn-icon {
+  margin-right: 8px;
+}
+
+.role-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.groups-list {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.group-tag {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-right: 4px;
+  margin-top: 2px;
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+}
+
+.group-name {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.group-description {
+  color: var(--text-muted);
+  font-size: 0.9rem;
 }

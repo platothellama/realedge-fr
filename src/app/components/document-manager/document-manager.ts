@@ -10,9 +10,10 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { PageEvent } from '@angular/material/paginator';
 import { ApiService } from '../../services/api';
 import { DocumentUploadFormComponent } from '../document-upload-form/document-upload-form';
+import { PaginationComponent } from '../pagination/pagination';
+import { PropertySearchComponent, SearchFilters, SearchFilterConfig } from '../property-search/property-search';
 
 @Component({
   selector: 'app-document-manager',
@@ -28,7 +29,9 @@ import { DocumentUploadFormComponent } from '../document-upload-form/document-up
     MatTooltipModule,
     MatSnackBarModule,
     MatInputModule,
-    MatFormFieldModule
+    MatFormFieldModule,
+    PaginationComponent,
+    PropertySearchComponent
   ],
   templateUrl: './document-manager.html',
   styleUrl: './document-manager.css'
@@ -47,20 +50,45 @@ export class DocumentManagerComponent implements OnInit {
   filteredDocuments: any[] = [];
   paginatedDocuments: any[] = [];
   loading = true;
-  searchQuery = '';
 
-  pageSize = 9;
+  filters: any = {
+    searchQuery: '',
+    groupFilter: '',
+    userFilter: '',
+    sellerFilter: '',
+    propertyFilter: ''
+  };
+
+  searchConfig: SearchFilterConfig = {
+    showSearch: true,
+    showStatus: false,
+    showType: false,
+    showCity: false,
+    showBedrooms: false,
+    showBathrooms: false,
+    showPrice: false,
+    showArea: false,
+    showGroup: true,
+    showUser: true,
+    showSeller: true,
+    showProperty: true
+  };
+  
+  expandedDocs: Set<string> = new Set();
+  showPreview = false;
+  previewDoc: any = null;
+  private searchDebounce: any;
+
+  pageSize = 12;
   pageIndex = 0;
   totalDocuments = 0;
 
   pagination = {
     page: 1,
-    limit: 9,
+    limit: 12,
     totalItems: 0,
     totalPages: 0
   };
-
-  Math = Math;
 
   ngOnInit(): void {
     this.fetchDocuments();
@@ -210,19 +238,67 @@ export class DocumentManagerComponent implements OnInit {
     }
   }
 
+  getPreviewUrl(fileUrl: string): string {
+    const baseUrl = 'https://realedge-frontend-production.up.railway.app/uploads/';
+    return baseUrl + fileUrl;
+  }
+
+  isImageFile(fileUrl: string): boolean {
+    if (!fileUrl) return false;
+    const ext = fileUrl.split('.').pop()?.toLowerCase();
+    return ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg'].includes(ext || '');
+  }
+
+  isPdfFile(fileUrl: string): boolean {
+    if (!fileUrl) return false;
+    const ext = fileUrl.split('.').pop()?.toLowerCase();
+    return ext === 'pdf';
+  }
+
   filterDocuments() {
-    if (!this.searchQuery.trim()) {
-      this.filteredDocuments = [...this.documents];
-    } else {
-      const query = this.searchQuery.toLowerCase();
-      this.filteredDocuments = this.documents.filter(doc =>
+    let results = [...this.documents];
+    
+    if (this.filters.searchQuery?.trim()) {
+      const query = this.filters.searchQuery.toLowerCase();
+      results = results.filter(doc =>
         doc.title?.toLowerCase().includes(query) ||
         doc.type?.toLowerCase().includes(query) ||
-        doc.status?.toLowerCase().includes(query) ||
-        doc.user?.name?.toLowerCase().includes(query) ||
+        doc.status?.toLowerCase().includes(query)
+      );
+    }
+    
+    if (this.filters.groupFilter?.trim()) {
+      const query = this.filters.groupFilter.toLowerCase();
+      results = results.filter(doc =>
         doc.group?.name?.toLowerCase().includes(query)
       );
     }
+    
+    if (this.filters.userFilter?.trim()) {
+      const query = this.filters.userFilter.toLowerCase();
+      results = results.filter(doc =>
+        doc.user?.name?.toLowerCase().includes(query)
+      );
+    }
+    
+    if (this.filters.sellerFilter?.trim()) {
+      const query = this.filters.sellerFilter.toLowerCase();
+      results = results.filter(doc =>
+        doc.seller?.name?.toLowerCase().includes(query) ||
+        doc.seller?.email?.toLowerCase().includes(query)
+      );
+    }
+    
+    if (this.filters.propertyFilter?.trim()) {
+      const query = this.filters.propertyFilter.toLowerCase();
+      results = results.filter(doc =>
+        doc.property?.title?.toLowerCase().includes(query) ||
+        doc.property?.address?.toLowerCase().includes(query) ||
+        doc.property?.id?.toLowerCase().includes(query)
+      );
+    }
+    
+    this.filteredDocuments = results;
     this.totalDocuments = this.filteredDocuments.length;
     this.pagination.totalItems = this.filteredDocuments.length;
     this.pagination.totalPages = Math.ceil(this.filteredDocuments.length / this.pagination.limit);
@@ -232,7 +308,48 @@ export class DocumentManagerComponent implements OnInit {
   }
 
   onSearchChange() {
+    clearTimeout(this.searchDebounce);
+    this.searchDebounce = setTimeout(() => {
+      this.filterDocuments();
+    }, 300);
+  }
+
+  onFiltersChange(filters: any) {
+    this.filters = filters;
     this.filterDocuments();
+  }
+
+  clearFilters() {
+    this.filters = {
+      searchQuery: '',
+      groupFilter: '',
+      userFilter: '',
+      sellerFilter: '',
+      propertyFilter: ''
+    };
+    this.filterDocuments();
+  }
+
+  toggleExpand(docId: string) {
+    if (this.expandedDocs.has(docId)) {
+      this.expandedDocs.delete(docId);
+    } else {
+      this.expandedDocs.add(docId);
+    }
+  }
+
+  isExpanded(docId: string): boolean {
+    return this.expandedDocs.has(docId);
+  }
+
+  openPreview(doc: any) {
+    this.previewDoc = doc;
+    this.showPreview = true;
+  }
+
+  closePreview() {
+    this.showPreview = false;
+    this.previewDoc = null;
   }
 
   updatePaginatedDocuments() {
@@ -241,36 +358,8 @@ export class DocumentManagerComponent implements OnInit {
     this.paginatedDocuments = this.filteredDocuments.slice(start, end);
   }
 
-  onPageChange(event: PageEvent) {
-    this.pageIndex = event.pageIndex;
-    this.pageSize = event.pageSize;
+  onPaginationChange(page: number) {
+    this.pagination.page = page;
     this.updatePaginatedDocuments();
-  }
-
-  getPageNumbers(): number[] {
-    const pages: number[] = [];
-    const total = this.pagination.totalPages;
-    const current = this.pagination.page;
-
-    if (total <= 7) {
-      for (let i = 1; i <= total; i++) pages.push(i);
-    } else {
-      if (current <= 4) {
-        for (let i = 1; i <= 5; i++) pages.push(i);
-        pages.push(-1);
-        pages.push(total);
-      } else if (current >= total - 3) {
-        pages.push(1);
-        pages.push(-1);
-        for (let i = total - 4; i <= total; i++) pages.push(i);
-      } else {
-        pages.push(1);
-        pages.push(-1);
-        for (let i = current - 1; i <= current + 1; i++) pages.push(i);
-        pages.push(-1);
-        pages.push(total);
-      }
-    }
-    return pages;
   }
 }

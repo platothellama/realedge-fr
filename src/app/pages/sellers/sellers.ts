@@ -16,6 +16,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ApiService } from '../../services/api';
 import { FormsModule } from '@angular/forms';
+import { PropertySearchComponent, SearchFilters, SearchFilterConfig } from '../../components/property-search/property-search';
 
 @Component({
   selector: 'app-sellers',
@@ -36,7 +37,8 @@ import { FormsModule } from '@angular/forms';
     MatExpansionModule,
     MatMenuModule,
     MatProgressSpinnerModule,
-    FormsModule
+    FormsModule,
+    PropertySearchComponent
   ],
   templateUrl: './sellers.html',
   styleUrl: './sellers.css'
@@ -47,6 +49,31 @@ export class SellersComponent implements OnInit {
   searchQuery = '';
 
   isLoading = false;
+
+  searchFilters: SearchFilters = {
+    searchQuery: '',
+    selectedStatus: 'All',
+    selectedType: 'All',
+    selectedCity: 'All',
+    minBedrooms: null,
+    maxBedrooms: null,
+    minBathrooms: null,
+    minPrice: null,
+    maxPrice: null,
+    minArea: null,
+    maxArea: null
+  };
+
+  searchConfig: SearchFilterConfig = {
+    showSearch: true,
+    showStatus: false,
+    showType: false,
+    showCity: false,
+    showBedrooms: false,
+    showBathrooms: false,
+    showPrice: false,
+    showArea: false
+  };
 
   constructor(
     private api: ApiService,
@@ -59,14 +86,18 @@ export class SellersComponent implements OnInit {
   }
 
   get filteredSellers(): any[] {
-    if (!this.searchQuery) return this.sellers;
-    const q = this.searchQuery.toLowerCase();
+    if (!this.searchFilters.searchQuery) return this.sellers;
+    const q = this.searchFilters.searchQuery.toLowerCase();
     return this.sellers.filter(s => 
       s.name?.toLowerCase().includes(q) ||
       s.email?.toLowerCase().includes(q) ||
       s.phone?.toLowerCase().includes(q) ||
       s.city?.toLowerCase().includes(q)
     );
+  }
+
+  onFiltersChange(filters: SearchFilters) {
+    this.searchFilters = filters;
   }
 
   fetchSellers() {

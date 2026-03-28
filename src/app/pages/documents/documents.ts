@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, AfterViewChecked } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -12,8 +12,11 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FormsModule } from '@angular/forms';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { ActivatedRoute } from '@angular/router';
 import { ApiService } from '../../services/api';
 import { DocumentUploadFormComponent } from '../../components/document-upload-form/document-upload-form';
+import { PaginationComponent } from '../../components/pagination/pagination';
+import { PropertySearchComponent, SearchFilters, SearchFilterConfig } from '../../components/property-search/property-search';
 
 @Component({
   selector: 'app-documents',
@@ -31,22 +34,54 @@ import { DocumentUploadFormComponent } from '../../components/document-upload-fo
     MatMenuModule,
     MatTooltipModule,
     FormsModule,
-    MatDialogModule
+    MatDialogModule,
+    PaginationComponent,
+    PropertySearchComponent
   ],
   templateUrl: './documents.html',
   styleUrl: './documents.css'
 })
-export class DocumentsPageComponent implements OnInit {
+export class DocumentsPageComponent implements OnInit, AfterViewChecked {
   private api = inject(ApiService);
   private dialog = inject(MatDialog);
   private snackBar = inject(MatSnackBar);
+  private route = inject(ActivatedRoute);
 
   documents: any[] = [];
+  highlightedDocId: string | null = null;
+  private hasScrolled = false;
   loading = true;
   searchQuery = '';
   filterType = 'All';
 
   documentTypes = ['All', 'Contract', 'Property Paper', 'Client ID', 'Permit', 'Other'];
+
+  searchFilters: SearchFilters = {
+    searchQuery: '',
+    selectedStatus: 'All',
+    selectedType: 'All',
+    selectedCity: 'All',
+    minBedrooms: null,
+    maxBedrooms: null,
+    minBathrooms: null,
+    minPrice: null,
+    maxPrice: null,
+    minArea: null,
+    maxArea: null
+  };
+
+  searchConfig: SearchFilterConfig = {
+    showSearch: true,
+    showStatus: false,
+    showType: true,
+    showCity: false,
+    showBedrooms: false,
+    showBathrooms: false,
+    showPrice: false,
+    showArea: false
+  };
+
+  typeOptions = ['All', 'Contract', 'Property Paper', 'Client ID', 'Permit', 'Other'];
 
   pagination = {
     page: 1,
@@ -55,10 +90,26 @@ export class DocumentsPageComponent implements OnInit {
     totalPages: 0
   };
 
-  Math = Math;
-
   ngOnInit() {
+    this.route.params.subscribe(params => {
+      if (params['id']) {
+        this.highlightedDocId = params['id'];
+      }
+    });
     this.fetchDocuments();
+  }
+
+  ngAfterViewChecked() {
+    if (this.highlightedDocId && !this.hasScrolled && this.documents.length > 0) {
+      const docIndex = this.documents.findIndex(d => d.id === this.highlightedDocId);
+      if (docIndex !== -1) {
+        const element = document.querySelector(`[data-doc-id="${this.highlightedDocId}"]`);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          this.hasScrolled = true;
+        }
+      }
+    }
   }
 
   fetchDocuments() {
@@ -69,11 +120,11 @@ export class DocumentsPageComponent implements OnInit {
       limit: this.pagination.limit,
     };
 
-    if (this.searchQuery) {
-      params.search = this.searchQuery;
+    if (this.searchFilters.searchQuery) {
+      params.search = this.searchFilters.searchQuery;
     }
-    if (this.filterType && this.filterType !== 'All') {
-      params.type = this.filterType;
+    if (this.searchFilters.selectedType && this.searchFilters.selectedType !== 'All') {
+      params.type = this.searchFilters.selectedType;
     }
 
     this.api.getDocuments(params).subscribe({
@@ -98,42 +149,20 @@ export class DocumentsPageComponent implements OnInit {
     });
   }
 
-  getPageNumbers(): number[] {
-    const pages: number[] = [];
-    const total = this.pagination.totalPages;
-    const current = this.pagination.page;
-    
-    if (total <= 7) {
-      for (let i = 1; i <= total; i++) pages.push(i);
-    } else {
-      if (current <= 4) {
-        for (let i = 1; i <= 5; i++) pages.push(i);
-        pages.push(-1);
-        pages.push(total);
-      } else if (current >= total - 3) {
-        pages.push(1);
-        pages.push(-1);
-        for (let i = total - 4; i <= total; i++) pages.push(i);
-      } else {
-        pages.push(1);
-        pages.push(-1);
-        for (let i = current - 1; i <= current + 1; i++) pages.push(i);
-        pages.push(-1);
-        pages.push(total);
-      }
-    }
-    return pages;
+  onPageChange(page: number) {
+    this.pagination.page = page;
+    this.fetchDocuments();
   }
 
   get filteredDocuments() {
     let result = this.documents;
 
-    if (this.filterType !== 'All') {
-      result = result.filter(d => d.type === this.filterType);
+    if (this.searchFilters.selectedType !== 'All') {
+      result = result.filter(d => d.type === this.searchFilters.selectedType);
     }
 
-    if (this.searchQuery) {
-      const q = this.searchQuery.toLowerCase();
+    if (this.searchFilters.searchQuery) {
+      const q = this.searchFilters.searchQuery.toLowerCase();
       result = result.filter(d => 
         d.title?.toLowerCase().includes(q) || 
         d.type?.toLowerCase().includes(q)
@@ -141,6 +170,12 @@ export class DocumentsPageComponent implements OnInit {
     }
 
     return result;
+  }
+
+  onFiltersChange(filters: SearchFilters) {
+    this.searchFilters = filters;
+    this.pagination.page = 1;
+    this.fetchDocuments();
   }
 
   openUploadForm() {

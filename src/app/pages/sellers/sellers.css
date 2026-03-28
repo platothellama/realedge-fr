@@ -5,73 +5,10 @@
   flex-direction: column;
 }
 
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-}
-
-.page-header h1 {
-  font-size: 1.5rem;
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  margin: 0;
-  color: var(--text-primary);
-}
-
-.page-header p {
-  color: var(--text-muted);
-  font-size: 0.9rem;
-  margin-top: 4px;
-}
-
-.header-actions {
-  display: flex;
-  gap: 12px;
-}
-
 .toolbar {
   display: flex;
   gap: 16px;
   margin-bottom: 20px;
-}
-
-.search-input {
-  background: var(--bg-elevated);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 0 12px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  height: 44px;
-  width: 300px;
-  transition: all 0.3s ease;
-}
-
-.search-input:focus-within {
-  border-color: var(--primary);
-  box-shadow: 0 0 0 2px var(--primary-glow);
-}
-
-.search-input mat-icon {
-  color: var(--text-muted);
-  font-size: 18px;
-  width: 18px;
-  height: 18px;
-}
-
-.search-input input {
-  background: transparent;
-  border: none;
-  color: var(--text-primary);
-  width: 100%;
-  height: 100%;
-  outline: none;
-  font-family: 'Urbanist', sans-serif;
-  font-weight: 600;
-  font-size: 0.85rem;
 }
 
 .loading-spinner {
@@ -81,40 +18,11 @@
   flex: 1;
 }
 
-.empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 60px 20px;
-  text-align: center;
-}
-
-.empty-state mat-icon {
-  font-size: 64px;
-  width: 64px;
-  height: 64px;
-  color: var(--text-muted);
-  margin-bottom: 16px;
-}
-
-.empty-state h3 {
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin: 0 0 8px;
-  color: var(--text-primary);
-}
-
-.empty-state p {
-  color: var(--text-muted);
-  margin: 0;
-}
-
 .table-container {
   flex: 1;
   overflow: auto;
-  background: var(--bg-elevated);
-  border-radius: 12px;
+  background: var(--bg-surface);
+  border-radius: 16px;
   border: 1px solid var(--border);
 }
 
@@ -124,24 +32,25 @@
 }
 
 .sellers-table th {
-  background: var(--bg-card);
+  background: rgba(255, 255, 255, 0.02);
   color: var(--text-muted);
-  font-weight: 600;
-  font-size: 0.75rem;
+  font-weight: 800;
+  font-size: 0.7rem;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  padding: 16px;
+  letter-spacing: 0.08em;
+  padding: 14px 16px;
   border-bottom: 1px solid var(--border);
 }
 
 .sellers-table td {
-  padding: 16px;
+  padding: 14px 16px;
   border-bottom: 1px solid var(--border);
   color: var(--text-primary);
+  font-size: 0.875rem;
 }
 
 .sellers-table tr:hover {
-  background: var(--bg-hover);
+  background: rgba(255, 255, 255, 0.02);
 }
 
 .seller-name {

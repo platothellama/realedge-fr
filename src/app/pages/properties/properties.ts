@@ -13,6 +13,8 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ApiService } from '../../services/api';
 import { PropertyFormComponent } from '../../components/property-form/property-form';
+import { PaginationComponent } from '../../components/pagination/pagination';
+import { PropertySearchComponent, SearchFilters } from '../../components/property-search/property-search';
 
 @Component({
   selector: 'app-properties',
@@ -28,7 +30,9 @@ import { PropertyFormComponent } from '../../components/property-form/property-f
     MatSelectModule,
     MatProgressSpinnerModule,
     MatMenuModule,
-    FormsModule
+    FormsModule,
+    PaginationComponent,
+    PropertySearchComponent
   ],
   templateUrl: './properties.html',
   styleUrl: './properties.css',
@@ -39,24 +43,19 @@ export class PropertiesComponent implements OnInit {
   deletingId: string | null = null;
   seeding = false;
 
-  searchQuery: string = '';
-  selectedStatus: string = 'All';
-  selectedType: string = 'All';
-  minBedrooms: number | null = null;
-  maxBedrooms: number | null = null;
-  minBathrooms: number | null = null;
-  minPrice: number | null = null;
-  maxPrice: number | null = null;
-  minArea: number | null = null;
-  maxArea: number | null = null;
-  selectedCity: string = 'All';
-
-  propertyTypes = ['Apartment', 'House', 'Villa', 'Office', 'Land', 'Commercial'];
-  statusOptions = ['Available', 'Sold', 'Reserved', 'Rented'];
-  cities = ['Beirut', 'Mount Lebanon', 'North Lebanon', 'South Lebanon', 'Bekaa', 'Nabatieh', 'Keserwan', 'Jbeil', 'Tripoli', 'Sidon', 'Tyre'];
-
-  showAdvancedFilters = false;
-  private searchDebounce: any;
+  filters: SearchFilters = {
+    searchQuery: '',
+    selectedStatus: 'All',
+    selectedType: 'All',
+    selectedCity: 'All',
+    minBedrooms: null,
+    maxBedrooms: null,
+    minBathrooms: null,
+    minPrice: null,
+    maxPrice: null,
+    minArea: null,
+    maxArea: null
+  };
 
   pagination = {
     page: 1,
@@ -64,8 +63,6 @@ export class PropertiesComponent implements OnInit {
     totalItems: 0,
     totalPages: 0
   };
-
-  Math = Math;
 
   constructor(
     private apiService: ApiService,
@@ -85,38 +82,38 @@ export class PropertiesComponent implements OnInit {
       limit: this.pagination.limit,
     };
 
-    if (this.searchQuery) {
-      params.search = this.searchQuery;
+    if (this.filters.searchQuery) {
+      params.search = this.filters.searchQuery;
     }
-    if (this.selectedStatus && this.selectedStatus !== 'All') {
-      params.status = this.selectedStatus;
+    if (this.filters.selectedStatus && this.filters.selectedStatus !== 'All') {
+      params.status = this.filters.selectedStatus;
     }
-    if (this.minBedrooms) {
-      params.minBedrooms = this.minBedrooms;
+    if (this.filters.minBedrooms) {
+      params.minBedrooms = this.filters.minBedrooms;
     }
-    if (this.maxBedrooms) {
-      params.maxBedrooms = this.maxBedrooms;
+    if (this.filters.maxBedrooms) {
+      params.maxBedrooms = this.filters.maxBedrooms;
     }
-    if (this.minBathrooms) {
-      params.minBathrooms = this.minBathrooms;
+    if (this.filters.minBathrooms) {
+      params.minBathrooms = this.filters.minBathrooms;
     }
-    if (this.minPrice) {
-      params.minPrice = this.minPrice;
+    if (this.filters.minPrice) {
+      params.minPrice = this.filters.minPrice;
     }
-    if (this.maxPrice) {
-      params.maxPrice = this.maxPrice;
+    if (this.filters.maxPrice) {
+      params.maxPrice = this.filters.maxPrice;
     }
-    if (this.minArea) {
-      params.minArea = this.minArea;
+    if (this.filters.minArea) {
+      params.minArea = this.filters.minArea;
     }
-    if (this.maxArea) {
-      params.maxArea = this.maxArea;
+    if (this.filters.maxArea) {
+      params.maxArea = this.filters.maxArea;
     }
-    if (this.selectedType && this.selectedType !== 'All') {
-      params.type = this.selectedType;
+    if (this.filters.selectedType && this.filters.selectedType !== 'All') {
+      params.type = this.filters.selectedType;
     }
-    if (this.selectedCity && this.selectedCity !== 'All') {
-      params.city = this.selectedCity;
+    if (this.filters.selectedCity && this.filters.selectedCity !== 'All') {
+      params.city = this.filters.selectedCity;
     }
 
     this.apiService.getProperties(params).subscribe({
@@ -140,31 +137,9 @@ export class PropertiesComponent implements OnInit {
     });
   }
 
-  getPageNumbers(): number[] {
-    const pages: number[] = [];
-    const total = this.pagination.totalPages;
-    const current = this.pagination.page;
-    
-    if (total <= 7) {
-      for (let i = 1; i <= total; i++) pages.push(i);
-    } else {
-      if (current <= 4) {
-        for (let i = 1; i <= 5; i++) pages.push(i);
-        pages.push(-1);
-        pages.push(total);
-      } else if (current >= total - 3) {
-        pages.push(1);
-        pages.push(-1);
-        for (let i = total - 4; i <= total; i++) pages.push(i);
-      } else {
-        pages.push(1);
-        pages.push(-1);
-        for (let i = current - 1; i <= current + 1; i++) pages.push(i);
-        pages.push(-1);
-        pages.push(total);
-      }
-    }
-    return pages;
+  onPageChange(page: number) {
+    this.pagination.page = page;
+    this.fetchProperties();
   }
 
   applyFilters() {
@@ -172,50 +147,9 @@ export class PropertiesComponent implements OnInit {
     this.fetchProperties();
   }
 
-  clearFilters() {
-    this.selectedStatus = 'All';
-    this.selectedType = 'All';
-    this.selectedCity = 'All';
-    this.minBedrooms = null;
-    this.maxBedrooms = null;
-    this.minBathrooms = null;
-    this.minPrice = null;
-    this.maxPrice = null;
-    this.minArea = null;
-    this.maxArea = null;
-    this.searchQuery = '';
+  onFiltersChange(filters: SearchFilters) {
+    this.filters = filters;
     this.applyFilters();
-  }
-
-  hasActiveFilters(): boolean {
-    return !!(this.searchQuery || 
-      this.selectedStatus !== 'All' || 
-      this.selectedType !== 'All' || 
-      this.selectedCity !== 'All' ||
-      this.minBedrooms || 
-      this.maxBedrooms ||
-      this.minBathrooms ||
-      this.minPrice || 
-      this.maxPrice ||
-      this.minArea ||
-      this.maxArea);
-  }
-
-  onSearchInput() {
-    clearTimeout(this.searchDebounce);
-    this.searchDebounce = setTimeout(() => {
-      this.applyFilters();
-    }, 400);
-  }
-
-  setPriceRange(min: number | null, max: number | null) {
-    this.minPrice = min;
-    this.maxPrice = max;
-  }
-
-  setAreaRange(min: number | null, max: number | null) {
-    this.minArea = min;
-    this.maxArea = max;
   }
 
   openPropertyForm(property?: any) {

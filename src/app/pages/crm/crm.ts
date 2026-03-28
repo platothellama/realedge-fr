@@ -16,6 +16,8 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatStepperModule } from '@angular/material/stepper';
+import { MatTabsModule } from '@angular/material/tabs';
+import { PropertySearchComponent, SearchFilters, SearchFilterConfig } from '../../components/property-search/property-search';
 
 @Component({
   selector: 'app-crm',
@@ -35,7 +37,9 @@ import { MatStepperModule } from '@angular/material/stepper';
     MatMenuModule,
     MatTooltipModule,
     MatExpansionModule,
-    MatStepperModule
+    MatStepperModule,
+    MatTabsModule,
+    PropertySearchComponent
   ],
   templateUrl: './crm.html',
   styleUrl: './crm.css',
@@ -45,10 +49,34 @@ export class CrmComponent implements OnInit {
   searchQuery: string = '';
   selectedStatus: string = 'All';
   deletingId: string | null = null;
-  viewMode: 'pipeline' | 'list' = 'list';
   expandedLeadId: string | null = null;
 
   statuses = ['All', 'New Lead', 'Contacted', 'Visit Scheduled', 'Negotiation', 'Closed Deal', 'Lost Lead'];
+
+  searchFilters: SearchFilters = {
+    searchQuery: '',
+    selectedStatus: 'All',
+    selectedType: 'All',
+    selectedCity: 'All',
+    minBedrooms: null,
+    maxBedrooms: null,
+    minBathrooms: null,
+    minPrice: null,
+    maxPrice: null,
+    minArea: null,
+    maxArea: null
+  };
+
+  searchConfig: SearchFilterConfig = {
+    showSearch: true,
+    showStatus: true,
+    showType: false,
+    showCity: false,
+    showBedrooms: false,
+    showBathrooms: false,
+    showPrice: false,
+    showArea: false
+  };
 
   pipeline: any[] = [
     { name: 'New Lead', status: 'New Lead', leads: [] },
@@ -86,8 +114,8 @@ export class CrmComponent implements OnInit {
   applyFilters() {
     let filtered = [...this.allLeads];
 
-    if (this.searchQuery) {
-      const q = this.searchQuery.toLowerCase();
+    if (this.searchFilters.searchQuery) {
+      const q = this.searchFilters.searchQuery.toLowerCase();
       filtered = filtered.filter(l =>
         l.name?.toLowerCase().includes(q) ||
         l.email?.toLowerCase().includes(q) ||
@@ -95,11 +123,16 @@ export class CrmComponent implements OnInit {
       );
     }
 
-    if (this.selectedStatus !== 'All') {
-      filtered = filtered.filter(l => l.status === this.selectedStatus);
+    if (this.searchFilters.selectedStatus !== 'All') {
+      filtered = filtered.filter(l => l.status === this.searchFilters.selectedStatus);
     }
 
     this.mapLeadsToPipeline(filtered);
+  }
+
+  onFiltersChange(filters: SearchFilters) {
+    this.searchFilters = filters;
+    this.applyFilters();
   }
 
   get filteredLeads(): any[] {
