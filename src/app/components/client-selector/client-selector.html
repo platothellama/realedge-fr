@@ -1,8 +1,8 @@
 <div class="client-selector">
   <div class="section-label">Client Information</div>
-  
+
   @if (!showNewClientForm) {
-    <div class="form-row">
+    <div class="">
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Select Existing Client</mat-label>
         <mat-select [value]="selectedLead?.id || ''" (selectionChange)="onLeadSelect($event.value)">

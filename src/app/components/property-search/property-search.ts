@@ -13,6 +13,7 @@ export interface SearchFilterConfig {
   showSearch?: boolean;
   showStatus?: boolean;
   showType?: boolean;
+  showListingType?: boolean;
   showCity?: boolean;
   showBedrooms?: boolean;
   showBathrooms?: boolean;
@@ -28,6 +29,7 @@ export interface SearchFilters {
   searchQuery: string;
   selectedStatus: string;
   selectedType: string;
+  selectedListingType: string;
   selectedCity: string;
   minBedrooms: number | null;
   maxBedrooms: number | null;
@@ -85,6 +87,7 @@ export class PropertySearchComponent implements OnInit {
     searchQuery: '',
     selectedStatus: 'All',
     selectedType: 'All',
+    selectedListingType: 'All',
     selectedCity: 'All',
     minBedrooms: null,
     maxBedrooms: null,
@@ -101,6 +104,7 @@ export class PropertySearchComponent implements OnInit {
 
   @Input() statusOptions: string[] = ['All', 'Available', 'Sold', 'Reserved', 'Rented'];
   @Input() typeOptions: string[] = ['All', 'Apartment', 'House', 'Villa', 'Office', 'Land', 'Commercial'];
+  @Input() listingTypeOptions: string[] = ['All', 'Sale', 'Rent'];
   @Input() cityOptions: string[] = ['All', 'Beirut', 'Mount Lebanon', 'North Lebanon', 'South Lebanon', 'Bekaa', 'Nabatieh', 'Keserwan', 'Jbeil', 'Tripoli', 'Sidon', 'Tyre'];
 
   @Output() filtersChange = new EventEmitter<SearchFilters>();
@@ -192,6 +196,7 @@ export class PropertySearchComponent implements OnInit {
       searchQuery: '',
       selectedStatus: 'All',
       selectedType: 'All',
+      selectedListingType: 'All',
       selectedCity: 'All',
       minBedrooms: null,
       maxBedrooms: null,

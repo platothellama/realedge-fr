@@ -197,6 +197,7 @@ interface Website {
                             <div class="no-image">No Image</div>
                           }
                           <span class="property-status">{{ property.status }}</span>
+                          <span class="property-listing-type" [class]="property.listingType?.toLowerCase()">{{ property.listingType }}</span>
                         </div>
                         <div class="property-info">
                           <h3>{{ property.title }}</h3>
@@ -204,9 +205,11 @@ interface Website {
                           <div class="property-details">
                             @if (property.bedrooms) { <span>{{ property.bedrooms }} BD</span> }
                             @if (property.bathrooms) { <span>{{ property.bathrooms }} BA</span> }
-                            @if (property.squareFeet) { <span>{{ property.squareFeet }} sqft</span> }
+                            @if (property.area) { <span>{{ property.area }} sqm</span> }
+                            @if (property.floor) { <span>Floor {{ property.floor }}</span> }
+                            @if (property.hasTerrace) { <span>Terrace</span> }
                           </div>
-                          <p class="property-price">\${{ property.price | number }}</p>
+                          <p class="property-price">\${{ property.price | number }}<span class="price-suffix">{{ property.listingType === 'Rent' ? '/mo' : '' }}</span></p>
                         </div>
                       </div>
                     }
@@ -482,11 +485,15 @@ interface Website {
     .property-image { position: relative; height: 200px; background: #e5e7eb; }
     .property-image img { width: 100%; height: 100%; object-fit: cover; }
     .property-status { position: absolute; top: 12px; left: 12px; background: var(--primary-color); color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; text-transform: capitalize; }
+    .property-listing-type { position: absolute; top: 12px; right: 12px; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; text-transform: uppercase; }
+    .property-listing-type.sale { background: #e8f5e9; color: #2e7d32; }
+    .property-listing-type.rent { background: #fff3e0; color: #ef6c00; }
     .property-info { padding: 16px; }
     .property-info h3 { margin: 0 0 4px; font-size: 18px; }
     .property-address { margin: 0 0 8px; color: #6b7280; font-size: 14px; }
     .property-details { display: flex; gap: 16px; color: #6b7280; font-size: 14px; margin-bottom: 12px; }
     .property-price { margin: 0; font-size: 20px; font-weight: 700; color: var(--primary-color); }
+    .property-price .price-suffix { font-size: 14px; font-weight: 400; color: #6b7280; }
     
     /* CTA */
     .cta-section { padding: 80px 0; background: var(--primary-color); text-align: center; }

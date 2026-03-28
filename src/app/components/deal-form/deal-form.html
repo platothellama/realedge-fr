@@ -45,14 +45,12 @@
       (clientSelected)="onClientSelected($event)">
     </app-client-selector>
 
-    <div class="form-row" style="margin-top: 16px;">
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Seller Name</mat-label>
-        <input matInput formControlName="sellerName">
-        <mat-icon matSuffix>person_outline</mat-icon>
-        <mat-error *ngIf="dealForm.get('sellerName')?.hasError('required')">Seller name is required</mat-error>
-      </mat-form-field>
-    </div>
+    <app-seller-selector
+      style="margin-top: 16px; display: block;"
+      [initialSellerId]="initialSellerId"
+      [initialSeller]="initialSeller"
+      (sellerSelected)="onSellerSelected($event)">
+    </app-seller-selector>
 
     <div class="form-row">
       <mat-form-field appearance="outline" class="full-width">

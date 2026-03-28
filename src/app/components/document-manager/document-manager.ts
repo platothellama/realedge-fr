@@ -42,6 +42,7 @@ export class DocumentManagerComponent implements OnInit {
   @Input() userId?: string;
   @Input() groupId?: string;
   @Input() documentId?: string;
+  @Input() hasSearch?: Boolean = true;
 
   private api = inject(ApiService);
   private dialog = inject(MatDialog);
@@ -57,24 +58,39 @@ export class DocumentManagerComponent implements OnInit {
     groupFilter: '',
     userFilter: '',
     sellerFilter: '',
-    propertyFilter: ''
+    propertyFilter: '',
+    propertyCity: '',
+    propertyType: '',
+    propertyListingType: '',
+    selectedStatus: 'All',
+    selectedType: 'All',
+    selectedListingType: 'All',
+    selectedCity: 'All',
+    minBedrooms: null as number | null,
+    maxBedrooms: null as number | null,
+    minBathrooms: null as number | null,
+    minPrice: null as number | null,
+    maxPrice: null as number | null,
+    minArea: null as number | null,
+    maxArea: null as number | null
   };
 
   searchConfig: SearchFilterConfig = {
     showSearch: true,
-    showStatus: false,
-    showType: false,
-    showCity: false,
-    showBedrooms: false,
-    showBathrooms: false,
-    showPrice: false,
-    showArea: false,
+    showStatus: true,
+    showType: true,
+    showCity: true,
+    showBedrooms: true,
+    showBathrooms: true,
+    showPrice: true,
+    showArea: true,
     showGroup: true,
     showUser: true,
     showSeller: true,
-    showProperty: true
+    showProperty: true,
+    showListingType: true
   };
-  
+
   expandedDocs: Set<string> = new Set();
   showPreview = false;
   previewDoc: any = null;
@@ -108,7 +124,7 @@ export class DocumentManagerComponent implements OnInit {
         this.filterDocuments();
         this.loading = false;
         this.updatePaginatedDocuments();
-        
+
         if (this.documentId) {
           const doc = this.documents.find(d => d.id === this.documentId);
           if (doc) {
@@ -278,30 +294,33 @@ export class DocumentManagerComponent implements OnInit {
 
   filterDocuments() {
     let results = [...this.documents];
-    
+
     if (this.filters.searchQuery?.trim()) {
       const query = this.filters.searchQuery.toLowerCase();
       results = results.filter(doc =>
         doc.title?.toLowerCase().includes(query) ||
         doc.type?.toLowerCase().includes(query) ||
-        doc.status?.toLowerCase().includes(query)
+        doc.status?.toLowerCase().includes(query) ||
+        doc.property?.title?.toLowerCase().includes(query) ||
+        doc.property?.address?.toLowerCase().includes(query) ||
+        doc.property?.city?.toLowerCase().includes(query)
       );
     }
-    
+
     if (this.filters.groupFilter?.trim()) {
       const query = this.filters.groupFilter.toLowerCase();
       results = results.filter(doc =>
         doc.group?.name?.toLowerCase().includes(query)
       );
     }
-    
+
     if (this.filters.userFilter?.trim()) {
       const query = this.filters.userFilter.toLowerCase();
       results = results.filter(doc =>
         doc.user?.name?.toLowerCase().includes(query)
       );
     }
-    
+
     if (this.filters.sellerFilter?.trim()) {
       const query = this.filters.sellerFilter.toLowerCase();
       results = results.filter(doc =>
@@ -309,7 +328,7 @@ export class DocumentManagerComponent implements OnInit {
         doc.seller?.email?.toLowerCase().includes(query)
       );
     }
-    
+
     if (this.filters.propertyFilter?.trim()) {
       const query = this.filters.propertyFilter.toLowerCase();
       results = results.filter(doc =>
@@ -318,7 +337,67 @@ export class DocumentManagerComponent implements OnInit {
         doc.property?.id?.toLowerCase().includes(query)
       );
     }
-    
+
+    if (this.filters.propertyCity && this.filters.propertyCity !== 'All') {
+      results = results.filter(doc =>
+        doc.property?.city === this.filters.propertyCity
+      );
+    }
+
+    if (this.filters.propertyType && this.filters.propertyType !== 'All') {
+      results = results.filter(doc =>
+        doc.property?.type === this.filters.propertyType
+      );
+    }
+
+    if (this.filters.propertyListingType && this.filters.propertyListingType !== 'All') {
+      results = results.filter(doc =>
+        doc.property?.listingType === this.filters.propertyListingType
+      );
+    }
+
+    if (this.filters.minBedrooms != null) {
+      results = results.filter(doc =>
+        doc.property?.bedrooms >= this.filters.minBedrooms
+      );
+    }
+
+    if (this.filters.maxBedrooms != null) {
+      results = results.filter(doc =>
+        doc.property?.bedrooms <= this.filters.maxBedrooms
+      );
+    }
+
+    if (this.filters.minBathrooms != null) {
+      results = results.filter(doc =>
+        doc.property?.bathrooms >= this.filters.minBathrooms
+      );
+    }
+
+    if (this.filters.minPrice != null) {
+      results = results.filter(doc =>
+        doc.property?.price >= this.filters.minPrice
+      );
+    }
+
+    if (this.filters.maxPrice != null) {
+      results = results.filter(doc =>
+        doc.property?.price <= this.filters.maxPrice
+      );
+    }
+
+    if (this.filters.minArea != null) {
+      results = results.filter(doc =>
+        doc.property?.area >= this.filters.minArea
+      );
+    }
+
+    if (this.filters.maxArea != null) {
+      results = results.filter(doc =>
+        doc.property?.area <= this.filters.maxArea
+      );
+    }
+
     this.filteredDocuments = results;
     this.totalDocuments = this.filteredDocuments.length;
     this.pagination.totalItems = this.filteredDocuments.length;
@@ -346,7 +425,21 @@ export class DocumentManagerComponent implements OnInit {
       groupFilter: '',
       userFilter: '',
       sellerFilter: '',
-      propertyFilter: ''
+      propertyFilter: '',
+      propertyCity: '',
+      propertyType: '',
+      propertyListingType: '',
+      selectedStatus: 'All',
+      selectedType: 'All',
+      selectedListingType: 'All',
+      selectedCity: 'All',
+      minBedrooms: null,
+      maxBedrooms: null,
+      minBathrooms: null,
+      minPrice: null,
+      maxPrice: null,
+      minArea: null,
+      maxArea: null
     };
     this.filterDocuments();
   }

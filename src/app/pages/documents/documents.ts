@@ -73,6 +73,7 @@ export class DocumentsPageComponent implements OnInit, AfterViewChecked {
     searchQuery: '',
     selectedStatus: 'All',
     selectedType: 'All',
+    selectedListingType: 'All',
     selectedCity: 'All',
     minBedrooms: null,
     maxBedrooms: null,

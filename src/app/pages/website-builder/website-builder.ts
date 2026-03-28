@@ -36,6 +36,7 @@ interface Property {
   price: number;
   city: string;
   type: string;
+  listingType: string;
   bedrooms: number;
   bathrooms: number;
   area: number;

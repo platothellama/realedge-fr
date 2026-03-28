@@ -76,7 +76,7 @@
                         </div>
                         <div class="party">
                           <span class="label">Seller</span>
-                          <span class="value">{{ deal.sellerName }}</span>
+                          <span class="value">{{ deal.seller?.name || deal.sellerName }}</span>
                         </div>
                       </div>
 
@@ -135,7 +135,7 @@
                     </div>
                   </td>
                   <td>{{ deal.buyerName }}</td>
-                  <td>{{ deal.sellerName }}</td>
+                  <td>{{ deal.seller?.name || deal.sellerName }}</td>
                   <td>{{ deal.property?.title }}</td>
                   <td>
                     <div class="broker-cell">

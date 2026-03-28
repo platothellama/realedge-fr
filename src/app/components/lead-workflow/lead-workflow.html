@@ -1,0 +1,353 @@
+<div class="lead-workflow-container">
+  <div class="modal-header">
+    <h2 mat-dialog-title>Lead Management</h2>
+    <p class="modal-subtitle">Manage leads, schedule visits, and create deals for this property</p>
+  </div>
+
+  <mat-dialog-content class="custom-scrollbar">
+    <!-- Step Indicator -->
+    <div class="stepper-header">
+      <div class="step-item" [class.active]="currentStep === 0" [class.completed]="currentStep > 0">
+        <div class="step-circle">
+          @if (currentStep > 0) {
+            <mat-icon>check</mat-icon>
+          } @else {
+            1
+          }
+        </div>
+        <span class="step-label">Leads</span>
+      </div>
+      <div class="step-line" [class.completed]="currentStep > 0"></div>
+      <div class="step-item" [class.active]="currentStep === 1" [class.completed]="currentStep > 1">
+        <div class="step-circle">
+          @if (currentStep > 1) {
+            <mat-icon>check</mat-icon>
+          } @else {
+            2
+          }
+        </div>
+        <span class="step-label">Schedule Visit</span>
+      </div>
+      <div class="step-line" [class.completed]="currentStep > 1"></div>
+      <div class="step-item" [class.active]="currentStep === 2">
+        <div class="step-circle">3</div>
+        <span class="step-label">Create Deal</span>
+      </div>
+    </div>
+
+    <!-- Step 1: Leads -->
+    @if (currentStep === 0) {
+      <div class="step-content">
+        <div class="section-header">
+          <h3>Select Lead</h3>
+        </div>
+
+        <!-- Toggle Between Add/Select -->
+        <div class="lead-mode-toggle">
+          <button mat-stroked-button [class.active]="leadMode === 'existing'" (click)="leadMode = 'existing'">
+            <mat-icon>list</mat-icon>
+            Select Existing
+          </button>
+          <button mat-stroked-button [class.active]="leadMode === 'new'" (click)="leadMode = 'new'">
+            <mat-icon>add</mat-icon>
+            Add New Lead
+          </button>
+        </div>
+
+        <!-- Add New Lead Form -->
+        @if (leadMode === 'new') {
+          <div class="add-lead-form">
+            <form [formGroup]="leadForm" class="lead-form-grid">
+              <mat-form-field appearance="outline">
+                <mat-label>Name</mat-label>
+                <input matInput formControlName="name" placeholder="Client name">
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Email</mat-label>
+                <input matInput formControlName="email" placeholder="client@email.com">
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Phone</mat-label>
+                <input matInput formControlName="phone" placeholder="+20 100 000 0000">
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Source</mat-label>
+                <mat-select formControlName="source">
+                  <mat-option value="Website">Website</mat-option>
+                  <mat-option value="Phone">Phone</mat-option>
+                  <mat-option value="Referral">Referral</mat-option>
+                  <mat-option value="Walk-in">Walk-in</mat-option>
+                  <mat-option value="Advertisement">Advertisement</mat-option>
+                  <mat-option value="Other">Other</mat-option>
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Status</mat-label>
+                <mat-select formControlName="status">
+                  <mat-option value="New Lead">New Lead</mat-option>
+                  <mat-option value="Contacted">Contacted</mat-option>
+                  <mat-option value="Qualified">Qualified</mat-option>
+                  <mat-option value="Negotiation">Negotiation</mat-option>
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Budget</mat-label>
+                <input matInput type="number" formControlName="budget">
+                <span matPrefix>$&nbsp;</span>
+              </mat-form-field>
+            </form>
+            <button mat-raised-button color="primary" (click)="addLead()" [disabled]="leadForm.invalid || isAddingLead">
+              @if (isAddingLead) {
+                <mat-spinner diameter="20"></mat-spinner>
+              } @else {
+                <mat-icon>add</mat-icon> Add & Continue
+              }
+            </button>
+          </div>
+        }
+
+        <!-- Existing Leads List -->
+        @if (leadMode === 'existing') {
+          @if (leads.length === 0) {
+            <div class="empty-state">
+              <mat-icon>person_search</mat-icon>
+              <p>No existing leads found</p>
+              <button mat-stroked-button color="primary" (click)="leadMode = 'new'">
+                Add New Lead Instead
+              </button>
+            </div>
+          } @else {
+            <div class="leads-list">
+              @for (lead of leads; track lead.id) {
+                <mat-checkbox 
+                  [checked]="lead.selected"
+                  (change)="toggleLeadSelection(lead, $event)"
+                  class="lead-item">
+                  <div class="lead-info">
+                    <span class="lead-name">{{ lead.name }}</span>
+                    <span class="lead-contact">{{ lead.email }} • {{ lead.phone }}</span>
+                    <span class="lead-status" [class]="lead.status?.toLowerCase().replace(' ', '-')">
+                      {{ lead.status }}
+                    </span>
+                  </div>
+                </mat-checkbox>
+              }
+            </div>
+
+            @if (getSelectedLeads().length > 0) {
+              <div class="selected-summary">
+                <mat-icon>info</mat-icon>
+                {{ getSelectedLeads().length }} lead(s) selected
+              </div>
+            }
+          }
+        }
+      </div>
+    }
+
+    <!-- Step 2: Schedule Visit -->
+    @if (currentStep === 1) {
+      <div class="step-content">
+        <div class="section-header">
+          <h3>Schedule Visit</h3>
+          <div class="selected-leads-badge">
+            <mat-icon>person</mat-icon>
+            {{ getSelectedLeads().length }} lead(s)
+          </div>
+        </div>
+
+        <form [formGroup]="visitForm" class="workflow-form">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Meeting Title</mat-label>
+            <input matInput formControlName="title" placeholder="e.g. Viewing for Downtown Penthouse">
+            <mat-icon matSuffix>event</mat-icon>
+          </mat-form-field>
+
+          <div class="form-row-group">
+            <mat-form-field appearance="outline">
+              <mat-label>Visit Date</mat-label>
+              <input matInput [matDatepicker]="picker" formControlName="visitDate">
+              <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+              <mat-datepicker #picker></mat-datepicker>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Time</mat-label>
+              <input matInput type="time" formControlName="visitTime">
+              <mat-icon matSuffix>schedule</mat-icon>
+            </mat-form-field>
+          </div>
+
+          <app-client-selector
+            [initialLeadId]="selectedClient?.leadId || null"
+            [initialClient]="selectedClient?.createNew === false ? selectedClient?.client : null"
+            (clientSelected)="onClientSelected($event)">
+          </app-client-selector>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Assigned Broker</mat-label>
+            <mat-select formControlName="brokerId">
+              @for (user of brokers; track user.id) {
+                <mat-option [value]="user.id">{{ user.name }} ({{ user.role }})</mat-option>
+              }
+            </mat-select>
+            <mat-icon matSuffix>badge</mat-icon>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Status</mat-label>
+            <mat-select formControlName="status">
+              <mat-option value="Scheduled">Scheduled</mat-option>
+              <mat-option value="Completed">Completed</mat-option>
+              <mat-option value="Cancelled">Cancelled</mat-option>
+              <mat-option value="No Show">No Show</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Internal Notes</mat-label>
+            <textarea matInput formControlName="notes" rows="2"></textarea>
+          </mat-form-field>
+        </form>
+
+        @if (visitScheduled) {
+          <div class="success-message">
+            <mat-icon>check_circle</mat-icon>
+            Visit scheduled successfully!
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Step 3: Create Deal -->
+    @if (currentStep === 2) {
+      <div class="step-content">
+        <div class="section-header">
+          <h3>Create Deal</h3>
+          <div class="selected-leads-badge">
+            <mat-icon>person</mat-icon>
+            {{ getSelectedLeads().length }} lead(s)
+          </div>
+        </div>
+
+        <form [formGroup]="dealForm" class="workflow-form">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Deal Title</mat-label>
+            <input matInput formControlName="title" placeholder="e.g. Sale of Downtown Penthouse">
+            <mat-icon matSuffix>handshake</mat-icon>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Property</mat-label>
+            <mat-select formControlName="propertyId">
+              <mat-option [value]="data?.propertyId" selected>{{ getPropertyTitle() }}</mat-option>
+            </mat-select>
+            <mat-icon matSuffix>home</mat-icon>
+          </mat-form-field>
+
+          <app-client-selector
+            [initialLeadId]="selectedClient?.leadId || null"
+            [initialClient]="selectedClient?.createNew === false ? selectedClient?.client : null"
+            (clientSelected)="onClientSelected($event)">
+          </app-client-selector>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Deal Stage</mat-label>
+            <mat-select formControlName="dealStage">
+              @for (stage of stages; track stage) {
+                <mat-option [value]="stage">{{ stage }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Assigned Broker</mat-label>
+            <mat-select formControlName="brokerId">
+              @for (user of brokers; track user.id) {
+                <mat-option [value]="user.id">{{ user.name }} ({{ user.role }})</mat-option>
+              }
+            </mat-select>
+            <mat-icon matSuffix>badge</mat-icon>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Commission</mat-label>
+            <input matInput type="number" formControlName="commission">
+            <span matPrefix>$&nbsp;</span>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Notes</mat-label>
+            <textarea matInput formControlName="notes" rows="2"></textarea>
+          </mat-form-field>
+        </form>
+
+        @if (dealCreated) {
+          <div class="success-message">
+            <mat-icon>check_circle</mat-icon>
+            Deal created successfully!
+          </div>
+        }
+      </div>
+    }
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    @if (currentStep > 0) {
+      <button mat-button (click)="previousStep()">
+        <mat-icon>arrow_back</mat-icon>
+        Back
+      </button>
+    }
+    
+    @if (currentStep === 0) {
+      <button mat-button (click)="close()">Cancel</button>
+      <button mat-raised-button color="primary" (click)="proceedToVisit()" [disabled]="getSelectedLeads().length === 0">
+        Proceed to Schedule Visit
+        <mat-icon>arrow_forward</mat-icon>
+      </button>
+    }
+    
+    @if (currentStep === 1) {
+      <button mat-raised-button color="primary" (click)="submitVisit()" [disabled]="!visitForm.valid || !selectedClient || isSubmitting">
+        @if (visitScheduled) {
+          Visit Scheduled
+        } @else {
+          Schedule Visit
+        }
+      </button>
+      <button mat-button (click)="skipVisit()" [disabled]="visitScheduled">
+        Skip Visit
+        <mat-icon>skip_next</mat-icon>
+      </button>
+    }
+    
+    @if (currentStep === 1 && visitScheduled) {
+      <button mat-raised-button color="primary" (click)="proceedToDeal()">
+        Proceed to Create Deal
+        <mat-icon>arrow_forward</mat-icon>
+      </button>
+    }
+    
+    @if (currentStep === 2) {
+      <button mat-raised-button color="primary" (click)="submitDeal()" [disabled]="!dealForm.valid || !selectedClient || isSubmitting">
+        @if (dealCreated) {
+          Deal Created
+        } @else {
+          Create Deal
+        }
+      </button>
+      <button mat-button (click)="skipDeal()">
+        Skip Deal
+        <mat-icon>skip_next</mat-icon>
+      </button>
+    }
+    
+    @if ((currentStep === 1 && visitScheduled) || (currentStep === 2 && dealCreated)) {
+      <button mat-raised-button color="primary" (click)="finishWorkflow()">
+        Finish
+        <mat-icon>check</mat-icon>
+      </button>
+    }
+  </mat-dialog-actions>
+</div>

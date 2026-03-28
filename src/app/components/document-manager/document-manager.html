@@ -11,13 +11,13 @@
       </button>
     </div>
   </div>
-
+  @if (hasSearch){
   <app-property-search
     [config]="searchConfig"
     [filters]="filters"
     (filtersChange)="onFiltersChange($event)"
   ></app-property-search>
-
+  }
   @if (loading) {
     <div class="loading-state">
       <mat-icon class="spin">refresh</mat-icon>
@@ -135,7 +135,7 @@
       <button class="preview-close" (click)="closePreview()">
         <mat-icon>close</mat-icon>
       </button>
-      
+
       @if (previewDoc) {
         <div class="preview-content">
           <div class="preview-file-section">
@@ -156,7 +156,7 @@
               }
             }
           </div>
-          
+
           <div class="preview-details">
             <div class="preview-header">
               <div class="preview-icon" [attr.data-type]="previewDoc.type">

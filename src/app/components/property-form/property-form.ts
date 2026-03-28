@@ -12,6 +12,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { GoogleMapsModule } from '@angular/google-maps';
 import { ApiService } from '../../services/api';
 import { AuthService } from '../../services/auth/auth.service';
+import { SellerSelectorComponent, SellerSelection } from '../seller-selector/seller-selector';
 
 @Component({
   selector: 'app-property-form',
@@ -27,7 +28,8 @@ import { AuthService } from '../../services/auth/auth.service';
     MatIconModule,
     MatTabsModule,
     MatProgressSpinnerModule,
-    GoogleMapsModule
+    GoogleMapsModule,
+    SellerSelectorComponent
   ],
   templateUrl: './property-form.html',
   styleUrl: './property-form.css'
@@ -38,6 +40,8 @@ export class PropertyFormComponent implements OnInit, AfterViewInit {
 
   propertyTypes = ['Apartment', 'House', 'Villa', 'Office', 'Land', 'Commercial'];
   statuses = ['Available', 'Sold', 'Rented', 'Reserved'];
+  listingTypes = ['Sale', 'Rent'];
+  conditions = ['Used', 'New'];
   users: any[] = [];
   groups: any[] = [];
 
@@ -63,6 +67,7 @@ export class PropertyFormComponent implements OnInit, AfterViewInit {
 
   isAdmin = false;
   isSubmitting = false;
+  sellerSelection: SellerSelection | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -80,6 +85,8 @@ export class PropertyFormComponent implements OnInit, AfterViewInit {
       price: [0, [Validators.required, Validators.min(0)]],
       status: ['Available', Validators.required],
       type: ['Apartment', Validators.required],
+      listingType: ['Sale', Validators.required],
+      condition: ['Used', Validators.required],
 
       // Details
       bedrooms: [0],
@@ -88,6 +95,9 @@ export class PropertyFormComponent implements OnInit, AfterViewInit {
       lotSize: [0],
       yearBuilt: [new Date().getFullYear()],
       parkingSpaces: [0],
+      floor: [null],
+      hasTerrace: [false],
+      terraceSize: [0],
 
       // Location
       address: ['', Validators.required],
@@ -99,6 +109,7 @@ export class PropertyFormComponent implements OnInit, AfterViewInit {
       // Assignments
       assignedToUserId: [null],
       assignedToGroupId: [null],
+      sellerId: [null],
       commissionPercentage: [{ value: 0, disabled: !this.isAdmin }, [Validators.required, Validators.min(0), Validators.max(100)]],
 
       // Media (Strings for now, split by comma for array)
@@ -248,7 +259,7 @@ export class PropertyFormComponent implements OnInit, AfterViewInit {
       const manualPhotos = val.photos ? val.photos.split(',').map((s: string) => s.trim()).filter((s: string) => s !== '') : [];
       const allPhotos = [...new Set([...this.uploadedPhotos, ...manualPhotos])];
 
-      const payload = {
+      const payload: any = {
         ...val,
         lat: val.lat ? Number(val.lat) : null,
         lng: val.lng ? Number(val.lng) : null,
@@ -259,11 +270,23 @@ export class PropertyFormComponent implements OnInit, AfterViewInit {
         features: val.features ? val.features.split(',').map((s: string) => s.trim()) : []
       };
 
+      if (this.sellerSelection) {
+        if (this.sellerSelection.createNew && this.sellerSelection.seller.name) {
+          payload.newSeller = this.sellerSelection.seller;
+        } else if (this.sellerSelection.sellerId) {
+          payload.sellerId = this.sellerSelection.sellerId;
+        }
+      }
+
       this.dialogRef.close(payload);
     }
   }
 
   onCancel(): void {
     this.dialogRef.close();
+  }
+
+  onSellerSelected(selection: SellerSelection): void {
+    this.sellerSelection = selection;
   }
 }

@@ -144,8 +144,8 @@
                     </div>
                     <div class="property-details">
                       <span class="property-title">{{ property.title }}</span>
-                      <span class="property-info">{{ property.type }} • {{ property.city }} • {{ property.bedrooms }} bed</span>
-                      <span class="property-price">{{ formatPrice(property.price) }}</span>
+                      <span class="property-info">{{ property.type }} • {{ property.listingType }} • {{ property.city }} • {{ property.bedrooms }} bed</span>
+                      <span class="property-price">{{ formatPrice(property.price) }}{{ property.listingType === 'Rent' ? '/mo' : '' }}</span>
                     </div>
                   </div>
                 }

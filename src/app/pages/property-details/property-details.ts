@@ -16,6 +16,7 @@ import { NegotiationFormComponent } from '../../components/negotiation-form/nego
 import { DealFormComponent } from '../../components/deal-form/deal-form';
 import { VisitFormComponent } from '../../components/visit-form/visit-form';
 import { DocumentManagerComponent } from '../../components/document-manager/document-manager';
+import { LeadWorkflowComponent, LeadWorkflowResult } from '../../components/lead-workflow/lead-workflow';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 @Component({
@@ -34,7 +35,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
     MatProgressSpinnerModule,
     MatTooltipModule,
     MatSnackBarModule,
-    DocumentManagerComponent
+    DocumentManagerComponent,
   ],
   templateUrl: './property-details.html',
   styleUrl: './property-details.css'
@@ -45,6 +46,9 @@ export class PropertyDetailsComponent implements OnInit {
   performanceCollapsed = true;
   lightboxOpen = false;
   lightboxIndex = 0;
+  propertyVisits: any[] = [];
+  propertyDeals: any[] = [];
+  propertyLeads: any[] = [];
 
   constructor(
     private route: ActivatedRoute,
@@ -72,11 +76,35 @@ export class PropertyDetailsComponent implements OnInit {
           priceHistoryEntries: Array.isArray(res.priceHistoryEntries) ? res.priceHistoryEntries : []
         };
         this.calculateAnalytics();
+        this.loadPropertyRelatedData(id);
         this.loading = false;
       },
       error: (err) => {
         console.error('Error fetching property Details:', err);
         this.loading = false;
+      }
+    });
+  }
+
+  loadPropertyRelatedData(propertyId: string) {
+    this.api.getVisits().subscribe({
+      next: (res: any) => {
+        const allVisits = Array.isArray(res) ? res : (res?.data || []);
+        this.propertyVisits = allVisits.filter((v: any) => v.propertyId === propertyId);
+      }
+    });
+
+    this.api.getDeals().subscribe({
+      next: (res: any) => {
+        const allDeals = Array.isArray(res) ? res : (res?.data || []);
+        this.propertyDeals = allDeals.filter((d: any) => d.propertyId === propertyId);
+      }
+    });
+
+    this.api.getLeads().subscribe({
+      next: (res: any) => {
+        const allLeads = Array.isArray(res) ? res : (res?.data || []);
+        this.propertyLeads = allLeads.filter((l: any) => l.propertyId === propertyId);
       }
     });
   }
@@ -171,9 +199,13 @@ export class PropertyDetailsComponent implements OnInit {
       width: '850px',
       data: {
         propertyId: this.property.id,
+        sellerId: this.property.sellerId || null,
+        seller: this.property.seller || null,
         deal: {
           propertyId: this.property.id,
-          title: `Sale of ${this.property.title}`
+          title: `Sale of ${this.property.title}`,
+          sellerId: this.property.sellerId || null,
+          sellerName: this.property.seller?.name || ''
         }
       }
     });
@@ -206,6 +238,36 @@ export class PropertyDetailsComponent implements OnInit {
           },
           error: (err) => console.error('Error scheduling visit', err)
         });
+      }
+    });
+  }
+
+  openLeadWorkflow() {
+    const dialogRef = this.dialog.open(LeadWorkflowComponent, {
+      width: '700px',
+      data: { propertyId: this.property.id, property: this.property }
+    });
+
+    dialogRef.afterClosed().subscribe((result: LeadWorkflowResult) => {
+      if (result) {
+        if (result.visit) {
+          this.api.createVisit(result.visit).subscribe({
+            next: () => {
+              this.snackBar.open('Visit scheduled successfully!', 'View Calendar', { duration: 5000 })
+                .onAction().subscribe(() => this.router.navigate(['/visits']));
+            },
+            error: (err) => console.error('Error scheduling visit', err)
+          });
+        }
+        if (result.deal) {
+          this.api.createDeal(result.deal).subscribe({
+            next: () => {
+              this.snackBar.open('Deal created successfully!', 'View Deals', { duration: 5000 })
+                .onAction().subscribe(() => this.router.navigate(['/deals']));
+            },
+            error: (err) => console.error('Error creating deal', err)
+          });
+        }
       }
     });
   }

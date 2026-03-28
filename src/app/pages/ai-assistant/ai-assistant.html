@@ -77,11 +77,12 @@
                         </div>
                         <div class="property-info">
                           <div class="property-title">{{ property.title }}</div>
-                          <div class="property-price">{{ property.price }}</div>
+                          <div class="property-price">{{ property.price }} <span class="listing-type">{{ property.listingType === 'Rent' ? '/mo' : '' }}</span></div>
                           <div class="property-details">
                             <span><mat-icon>bed</mat-icon> {{ property.bedrooms }}</span>
                             <span><mat-icon>bathtub</mat-icon> {{ property.bathrooms }}</span>
                             <span><mat-icon>square_foot</mat-icon> {{ property.area }}m²</span>
+                            <span>{{ property.condition }}</span>
                           </div>
                           <div class="property-location">
                             <mat-icon>location_on</mat-icon> {{ property.city }}

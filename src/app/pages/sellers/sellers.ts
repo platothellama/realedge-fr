@@ -54,6 +54,7 @@ export class SellersComponent implements OnInit {
     searchQuery: '',
     selectedStatus: 'All',
     selectedType: 'All',
+    selectedListingType: 'All',
     selectedCity: 'All',
     minBedrooms: null,
     maxBedrooms: null,

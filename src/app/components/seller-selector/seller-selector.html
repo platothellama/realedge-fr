@@ -1,8 +1,8 @@
 <div class="client-selector">
   <div class="section-label">Seller Information</div>
-  
+
   @if (!showNewSellerForm) {
-    <div class="form-row">
+    <div class="">
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Select Existing Seller</mat-label>
         <mat-select [value]="selectedSeller?.id || ''" (selectionChange)="onSellerSelect($event.value)" [disabled]="loading">

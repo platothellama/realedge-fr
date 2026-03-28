@@ -55,6 +55,24 @@
         </mat-menu>
       }
 
+      @if (config.showListingType) {
+        <button 
+          class="filter-pill" 
+          [class.active]="filters.selectedListingType !== 'All'"
+          [matMenuTriggerFor]="listingTypeMenu"
+        >
+          <span>Listing Type</span>
+          <mat-icon>expand_more</mat-icon>
+        </button>
+        <mat-menu #listingTypeMenu="matMenu" class="filter-menu">
+          @for (lt of listingTypeOptions; track lt) {
+            <button mat-menu-item (click)="filters.selectedListingType = lt; onFilterChange()">
+              <mat-icon>swap_horiz</mat-icon> {{ lt }}
+            </button>
+          }
+        </mat-menu>
+      }
+
       @if (config.showCity) {
         <button 
           class="filter-pill" 
