@@ -26,6 +26,7 @@ import { PropertyMatcherComponent } from './pages/property-matcher/property-matc
 import { AiAssistantComponent } from './pages/ai-assistant/ai-assistant';
 import { DocumentSignPageComponent } from './pages/document-sign/document-sign';
 import { DocumentManagerPageComponent } from './pages/document-manager-page/document-manager-page';
+import { SellersComponent } from './pages/sellers/sellers';
 import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
@@ -42,6 +43,7 @@ export const routes: Routes = [
       { path: 'properties/:id', component: PropertyDetailsComponent },
       { path: 'crm', component: CrmComponent },
       { path: 'deals', component: DealsComponent },
+      { path: 'sellers', component: SellersComponent },
       { path: 'documents', component: DocumentsPageComponent },
       { path: 'documents/:id', component: DocumentsPageComponent },
       { path: 'documents-manager', component: DocumentManagerPageComponent },

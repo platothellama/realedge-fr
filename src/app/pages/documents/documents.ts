@@ -54,7 +54,20 @@ export class DocumentsPageComponent implements OnInit, AfterViewChecked {
   searchQuery = '';
   filterType = 'All';
 
-  documentTypes = ['All', 'Contract', 'Property Paper', 'Client ID', 'Permit', 'Other'];
+  documentTypes = [
+    'All',
+    'Title Deed',
+    'Floor Plan',
+    'Property Photos',
+    'Ownership Proof',
+    'Reservation Form',
+    'Sales Agreement',
+    'Contract',
+    'Payment Receipt',
+    'ID / Passport',
+    'Proof of Funds',
+    'Custom'
+  ];
 
   searchFilters: SearchFilters = {
     searchQuery: '',
@@ -81,7 +94,20 @@ export class DocumentsPageComponent implements OnInit, AfterViewChecked {
     showArea: false
   };
 
-  typeOptions = ['All', 'Contract', 'Property Paper', 'Client ID', 'Permit', 'Other'];
+  typeOptions = [
+    'All',
+    'Title Deed',
+    'Floor Plan',
+    'Property Photos',
+    'Ownership Proof',
+    'Reservation Form',
+    'Sales Agreement',
+    'Contract',
+    'Payment Receipt',
+    'ID / Passport',
+    'Proof of Funds',
+    'Custom'
+  ];
 
   pagination = {
     page: 1,
@@ -238,10 +264,17 @@ export class DocumentsPageComponent implements OnInit, AfterViewChecked {
 
   getIconForType(type: string): string {
     switch (type) {
+      case 'Title Deed': return 'article';
+      case 'Floor Plan': return 'grid_view';
+      case 'Property Photos': return 'photo_library';
+      case 'Ownership Proof': return 'owner';
+      case 'Reservation Form': return 'event_available';
+      case 'Sales Agreement': return 'handshake';
       case 'Contract': return 'description';
-      case 'Property Paper': return 'home_work';
-      case 'Client ID': return 'badge';
-      case 'Permit': return 'verified';
+      case 'Payment Receipt': return 'receipt';
+      case 'ID / Passport': return 'badge';
+      case 'Proof of Funds': return 'account_balance';
+      case 'Custom': return 'folder';
       default: return 'insert_drive_file';
     }
   }
@@ -251,7 +284,7 @@ export class DocumentsPageComponent implements OnInit, AfterViewChecked {
       {
         id: '1',
         title: 'Sale Agreement - Villa A101',
-        documentType: 'Contract',
+        documentType: 'Sales Agreement',
         propertyId: '1',
         property: { title: 'Penthouse with Panoramic City View' },
         versions: [{ fileUrl: 'sample.pdf', version: 1, uploadedAt: new Date() }],
@@ -261,7 +294,7 @@ export class DocumentsPageComponent implements OnInit, AfterViewChecked {
       {
         id: '2',
         title: 'Property Title Deed',
-        documentType: 'Property Paper',
+        documentType: 'Title Deed',
         propertyId: '2',
         property: { title: 'Ultra Luxury Beachfront Villa' },
         versions: [{ fileUrl: 'deed.pdf', version: 2, uploadedAt: new Date() }],

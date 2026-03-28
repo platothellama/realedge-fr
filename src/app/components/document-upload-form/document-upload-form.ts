@@ -32,7 +32,25 @@ import { ApiService } from '../../services/api';
 export class DocumentUploadFormComponent implements OnInit {
   uploadForm: FormGroup;
   selectedFile: File | null = null;
-  types = ['Contract', 'Property Paper', 'Client ID', 'Permit', 'Other'];
+  documentCategories = [
+    { label: 'Property Documents', types: ['Title Deed', 'Floor Plan', 'Property Photos', 'Ownership Proof'] },
+    { label: 'Deal Documents', types: ['Reservation Form', 'Sales Agreement', 'Contract', 'Payment Receipt'] },
+    { label: 'Client Documents', types: ['ID / Passport', 'Proof of Funds'] },
+    { label: 'Custom', types: ['Custom'] }
+  ];
+  types = [
+    'Title Deed',
+    'Floor Plan',
+    'Property Photos',
+    'Ownership Proof',
+    'Reservation Form',
+    'Sales Agreement',
+    'Contract',
+    'Payment Receipt',
+    'ID / Passport',
+    'Proof of Funds',
+    'Custom'
+  ];
   isSubmitting = false;
   users: any[] = [];
   groups: any[] = [];
@@ -47,7 +65,7 @@ export class DocumentUploadFormComponent implements OnInit {
   ) {
     this.uploadForm = this.fb.group({
       title: ['', Validators.required],
-      type: ['Contract', Validators.required],
+      type: ['Custom', Validators.required],
       visibility: ['shareable'],
       isDigitalSignatureEnabled: [false],
       signerClient: [false],

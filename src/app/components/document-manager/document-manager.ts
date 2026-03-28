@@ -244,10 +244,17 @@ export class DocumentManagerComponent implements OnInit {
 
   getIconForType(type: string): string {
     switch (type) {
+      case 'Title Deed': return 'article';
+      case 'Floor Plan': return 'grid_view';
+      case 'Property Photos': return 'photo_library';
+      case 'Ownership Proof': return 'owner';
+      case 'Reservation Form': return 'event_available';
+      case 'Sales Agreement': return 'handshake';
       case 'Contract': return 'description';
-      case 'Property Paper': return 'home_work';
-      case 'Client ID': return 'badge';
-      case 'Permit': return 'verified';
+      case 'Payment Receipt': return 'receipt';
+      case 'ID / Passport': return 'badge';
+      case 'Proof of Funds': return 'account_balance';
+      case 'Custom': return 'folder';
       default: return 'insert_drive_file';
     }
   }
