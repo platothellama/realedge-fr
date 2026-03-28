@@ -45,6 +45,7 @@ export const routes: Routes = [
       { path: 'documents', component: DocumentsPageComponent },
       { path: 'documents/:id', component: DocumentsPageComponent },
       { path: 'documents-manager', component: DocumentManagerPageComponent },
+      { path: 'documents-manager/:id', component: DocumentManagerPageComponent },
       { path: 'visits', component: VisitsComponent },
       { path: 'marketing', component: MarketingComponent, data: { feature: 'marketing_automation' } },
       { path: 'marketing-automation', component: MarketingAutomationComponent, data: { feature: 'marketing_automation' } },

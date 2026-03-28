@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ActivatedRoute } from '@angular/router';
 import { DocumentManagerComponent } from '../../components/document-manager/document-manager';
 
 @Component({
@@ -8,7 +9,7 @@ import { DocumentManagerComponent } from '../../components/document-manager/docu
   imports: [CommonModule, DocumentManagerComponent],
   template: `
     <div class="page-container">
-      <app-document-manager></app-document-manager>
+      <app-document-manager [documentId]="documentId"></app-document-manager>
     </div>
   `,
   styles: [`
@@ -17,4 +18,13 @@ import { DocumentManagerComponent } from '../../components/document-manager/docu
     }
   `]
 })
-export class DocumentManagerPageComponent {}
+export class DocumentManagerPageComponent implements OnInit {
+  private route = inject(ActivatedRoute);
+  documentId?: string;
+
+  ngOnInit() {
+    this.route.params.subscribe(params => {
+      this.documentId = params['id'];
+    });
+  }
+}

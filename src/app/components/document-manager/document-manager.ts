@@ -41,6 +41,7 @@ export class DocumentManagerComponent implements OnInit {
   @Input() dealId?: string;
   @Input() userId?: string;
   @Input() groupId?: string;
+  @Input() documentId?: string;
 
   private api = inject(ApiService);
   private dialog = inject(MatDialog);
@@ -107,6 +108,19 @@ export class DocumentManagerComponent implements OnInit {
         this.filterDocuments();
         this.loading = false;
         this.updatePaginatedDocuments();
+        
+        if (this.documentId) {
+          const doc = this.documents.find(d => d.id === this.documentId);
+          if (doc) {
+            this.expandedDocs.add(this.documentId);
+            setTimeout(() => {
+              const element = document.querySelector(`[data-doc-id="${this.documentId}"]`);
+              if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              }
+            }, 100);
+          }
+        }
       },
       error: (err) => {
         console.error('Failed to fetch documents', err);

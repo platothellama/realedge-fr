@@ -52,7 +52,14 @@ export class NotificationsComponent implements OnInit {
     }
 
     if (notification.link) {
-      this.router.navigate([notification.link]);
+      let link = notification.link;
+      if (link.startsWith('/documents/')) {
+        const docId = link.replace('/documents/', '');
+        if (docId && docId !== 'documents') {
+          link = `/documents-manager/${docId}`;
+        }
+      }
+      this.router.navigate([link]);
     }
   }
 
