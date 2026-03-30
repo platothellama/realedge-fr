@@ -1,0 +1,219 @@
+<div class="commission-settings-container">
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">Commission Settings</h1>
+      <p class="page-subtitle">Configure commission splits and manage payouts</p>
+    </div>
+  </div>
+
+  @if (loading) {
+    <div class="loading-container">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+  } @else {
+    <mat-tab-group>
+      <!-- Commission Split Settings -->
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon>tune</mat-icon>
+          Commission Split
+        </ng-template>
+        
+        <div class="tab-content">
+          <div class="settings-grid">
+            <mat-card class="settings-card">
+              <h3>Company vs Team Split</h3>
+              <p class="card-description">Configure how commissions are split between the company and the team</p>
+              
+              <form [formGroup]="settingsForm">
+                <div class="slider-container">
+                  <div class="slider-labels">
+                    <span>Company: {{ settingsForm.get('company')?.value }}%</span>
+                    <span>Team: {{ settingsForm.get('team')?.value }}%</span>
+                  </div>
+                  <mat-slider min="0" max="100" step="5" discrete [displayWith]="formatPercent">
+                    <input matSliderThumb formControlName="company" (input)="onSliderChange()">
+                  </mat-slider>
+                </div>
+
+                <div class="split-preview">
+                  <div class="preview-bar">
+                    <div class="preview-company" [style.width.%]="settingsForm.get('company')?.value"></div>
+                    <div class="preview-team" [style.width.%]="settingsForm.get('team')?.value"></div>
+                  </div>
+                  <div class="preview-labels">
+                    <span class="company-label">
+                      <mat-icon>business</mat-icon>
+                      Company ({{ settingsForm.get('company')?.value }}%)
+                    </span>
+                    <span class="team-label">
+                      <mat-icon>groups</mat-icon>
+                      Team ({{ settingsForm.get('team')?.value }}%)
+                    </span>
+                  </div>
+                </div>
+
+                <button mat-raised-button color="primary" (click)="saveCommissionSplit()" [disabled]="saving || settingsForm.invalid">
+                  @if (saving) {
+                    <mat-spinner diameter="20"></mat-spinner>
+                  } @else {
+                    Save Split
+                  }
+                </button>
+              </form>
+            </mat-card>
+
+            <mat-card class="settings-card">
+              <h3>Default Role Splits</h3>
+              <p class="card-description">How team commission is distributed among members by role</p>
+              
+              <div class="role-splits">
+                @for (role of [
+                  { key: 'team_leader', label: 'Team Leader', icon: 'supervisor_account' },
+                  { key: 'senior_agent', label: 'Senior Agent', icon: 'person' },
+                  { key: 'agent', label: 'Agent', icon: 'person_outline' },
+                  { key: 'trainee', label: 'Trainee', icon: 'school' }
+                ]; track role.key) {
+                  <div class="role-item">
+                    <mat-icon>{{ role.icon }}</mat-icon>
+                    <span class="role-label">{{ role.label }}</span>
+                    <span class="role-value">{{ roleDefaults[role.key] }}%</span>
+                  </div>
+                }
+              </div>
+              
+              <div class="info-box">
+                <mat-icon>info</mat-icon>
+                <span>Role splits can be overridden per user in the Team Management section</span>
+              </div>
+            </mat-card>
+          </div>
+
+          <!-- Summary Cards -->
+          <div class="summary-grid">
+            <div class="summary-card">
+              <div class="summary-icon pending">
+                <mat-icon>pending_actions</mat-icon>
+              </div>
+              <div class="summary-content">
+                <span class="summary-value">{{ formatCurrency(summary.pendingAmount) }}</span>
+                <span class="summary-label">Pending Approval</span>
+              </div>
+            </div>
+            <div class="summary-card">
+              <div class="summary-icon approved">
+                <mat-icon>check_circle</mat-icon>
+              </div>
+              <div class="summary-content">
+                <span class="summary-value">{{ formatCurrency(summary.approvedAmount) }}</span>
+                <span class="summary-label">Approved</span>
+              </div>
+            </div>
+            <div class="summary-card">
+              <div class="summary-icon paid">
+                <mat-icon>payments</mat-icon>
+              </div>
+              <div class="summary-content">
+                <span class="summary-value">{{ formatCurrency(summary.paidAmount) }}</span>
+                <span class="summary-label">Paid Out</span>
+              </div>
+            </div>
+            <div class="summary-card">
+              <div class="summary-icon total">
+                <mat-icon>account_balance</mat-icon>
+              </div>
+              <div class="summary-content">
+                <span class="summary-value">{{ formatCurrency(summary.totalAmount) }}</span>
+                <span class="summary-label">Total Commission</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+
+      <!-- Commission Payouts -->
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon>receipt_long</mat-icon>
+          Payouts
+        </ng-template>
+        
+        <div class="tab-content">
+          <mat-card class="table-card">
+            <div class="table-header">
+              <h3>Commission Payouts</h3>
+              <mat-form-field appearance="outline">
+                <mat-select [(ngModel)]="statusFilter" (selectionChange)="loadCommissions()" placeholder="Filter by status">
+                  <mat-option value="">All Statuses</mat-option>
+                  @for (status of statusOptions; track status) {
+                    <mat-option [value]="status">{{ status | titlecase }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+            </div>
+
+            <div class="table-container">
+              <table class="commissions-table">
+                <thead>
+                  <tr>
+                    <th>Agent</th>
+                    <th>Deal</th>
+                    <th>Role</th>
+                    <th>Percentage</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (commission of commissions; track commission.id) {
+                    <tr>
+                      <td>
+                        <div class="agent-cell">
+                          <mat-icon>person</mat-icon>
+                          <span>{{ commission.user?.name || 'Unknown' }}</span>
+                        </div>
+                      </td>
+                      <td>{{ commission.deal?.title || 'N/A' }}</td>
+                      <td>
+                        <mat-chip [class]="'role-' + commission.roleInDeal">
+                          {{ commission.roleInDeal | titlecase }}
+                        </mat-chip>
+                      </td>
+                      <td>{{ commission.percentage }}%</td>
+                      <td class="amount">{{ formatCurrency(commission.amount) }}</td>
+                      <td>
+                        <span class="status-badge" [class]="getStatusClass(commission.status)">
+                          {{ commission.status }}
+                        </span>
+                      </td>
+                      <td>
+                        @if (commission.status === 'pending') {
+                          <button mat-stroked-button color="primary" (click)="approveCommission(commission)" [disabled]="isProcessing(commission.id)">
+                            Approve
+                          </button>
+                        }
+                        @if (commission.status === 'approved') {
+                          <button mat-stroked-button color="accent" (click)="markAsPaid(commission)" [disabled]="isProcessing(commission.id)">
+                            Mark Paid
+                          </button>
+                        }
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+              
+              @if (commissions.length === 0) {
+                <div class="empty-state">
+                  <mat-icon>receipt_long</mat-icon>
+                  <p>No commission payouts found</p>
+                </div>
+              }
+            </div>
+          </mat-card>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  }
+</div>

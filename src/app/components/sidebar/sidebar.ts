@@ -21,8 +21,8 @@ export class Sidebar {
   constructor() {}
 
   menuItems = computed(() => {
-    const role = this.user()?.role;
-    const isEnabled = (key: string) => this.features.isEnabled(key, role);
+    const role = this.user()?.role?.toLowerCase().replace(' ', '');
+    const isEnabled = (key: string) => this.features.isEnabled(key, this.user()?.role);
 
     const items = [
       // Dashboard
@@ -46,13 +46,18 @@ export class Sidebar {
       { label: 'Property Matcher', icon: 'auto_awesome', link: '/buyer-preferences', feature: 'ai_assistant' },
     ];
 
-    if (['Super Admin', 'Admin', 'Accountant'].includes(role || '')) {
+    if (['superadmin', 'admin', 'accountant'].includes(role || '')) {
       items.push({ label: 'Invoices', icon: 'receipt_long', link: '/invoices', feature: 'invoices' });
       items.push({ label: 'Expenses', icon: 'account_balance_wallet', link: '/expenses', feature: 'expenses' });
-      items.push({ label: 'Commissions', icon: 'percent', link: '/commissions', feature: 'commission_tracking' });
+      items.push({ label: 'Commissions', icon: 'percent', link: '/commissions' });
+      items.push({ label: 'Commission Settings', icon: 'tune', link: '/commission-settings' });
     }
 
-    if (['Super Admin', 'Admin'].includes(role || '')) {
+    if (['superadmin', 'admin', 'broker', 'officemanager'].includes(role || '')) {
+      items.push({ label: 'Team Management', icon: 'groups', link: '/groups', feature: 'user_management' });
+    }
+
+    if (['superadmin', 'admin'].includes(role || '')) {
       items.push({ label: 'Office Tasks', icon: 'task_alt', link: '/tasks', feature: 'tasks' });
       items.push({ label: 'Announcements', icon: 'campaign', link: '/announcements', feature: 'announcements' });
       items.push({ label: 'Organization', icon: 'admin_panel_settings', link: '/user-management', feature: 'user_management' });

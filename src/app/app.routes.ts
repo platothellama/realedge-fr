@@ -27,6 +27,8 @@ import { AiAssistantComponent } from './pages/ai-assistant/ai-assistant';
 import { DocumentSignPageComponent } from './pages/document-sign/document-sign';
 import { DocumentManagerPageComponent } from './pages/document-manager-page/document-manager-page';
 import { SellersComponent } from './pages/sellers/sellers';
+import { GroupsComponent } from './pages/groups/groups';
+import { CommissionSettingsComponent } from './pages/commission-settings/commission-settings';
 import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
@@ -85,7 +87,17 @@ export const routes: Routes = [
       {
         path: 'commissions',
         component: CommissionsComponent,
-        data: { roles: ['Super Admin', 'Admin', 'Accountant'], feature: 'commission_tracking' }
+        data: { roles: ['Super Admin', 'Admin', 'Accountant'] }
+      },
+      {
+        path: 'commission-settings',
+        component: CommissionSettingsComponent,
+        data: { roles: ['Super Admin', 'Admin', 'Accountant'] }
+      },
+      {
+        path: 'groups',
+        component: GroupsComponent,
+        data: { roles: ['Super Admin', 'Admin', 'Broker', 'Office Manager'], feature: 'user_management' }
       },
       {
         path: 'tasks',

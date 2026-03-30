@@ -1,0 +1,226 @@
+<div class="groups-container">
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">Team Management</h1>
+      <p class="page-subtitle">Manage teams, assign roles, and configure commission splits</p>
+    </div>
+    <button mat-raised-button color="primary" (click)="openNewGroupDialog()">
+      <mat-icon>add</mat-icon>
+      New Team
+    </button>
+  </div>
+
+  @if (loading) {
+    <div class="loading-container">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+  } @else {
+    <div class="groups-layout">
+      <!-- Groups List -->
+      <div class="groups-list">
+        <mat-card class="list-card">
+          <div class="list-header">
+            <h3>Teams ({{ groups.length }})</h3>
+          </div>
+          <div class="list-items">
+            @for (group of groups; track group.id) {
+              <div 
+                class="list-item" 
+                [class.selected]="selectedGroup?.id === group.id"
+                (click)="selectGroup(group)"
+              >
+                <div class="item-icon">
+                  <mat-icon>groups</mat-icon>
+                </div>
+                <div class="item-content">
+                  <span class="item-title">{{ group.name }}</span>
+                  <span class="item-subtitle">{{ group.memberCount || group.members?.length || 0 }} members</span>
+                </div>
+                <button mat-icon-button [matMenuTriggerFor]="groupMenu" (click)="$event.stopPropagation()">
+                  <mat-icon>more_vert</mat-icon>
+                </button>
+                <mat-menu #groupMenu="matMenu">
+                  <button mat-menu-item (click)="selectGroup(group); openEditGroupDialog()">
+                    <mat-icon>edit</mat-icon>
+                    Edit
+                  </button>
+                  <button mat-menu-item (click)="deleteGroup(group)" class="delete-option">
+                    <mat-icon>delete</mat-icon>
+                    Delete
+                  </button>
+                </mat-menu>
+              </div>
+            }
+            @if (groups.length === 0) {
+              <div class="empty-state">
+                <mat-icon>group_off</mat-icon>
+                <p>No teams yet</p>
+              </div>
+            }
+          </div>
+        </mat-card>
+      </div>
+
+      <!-- Group Details -->
+      <div class="group-details">
+        @if (selectedGroup) {
+          <mat-card class="details-card">
+            <div class="details-header">
+              <div class="header-info">
+                <h2>{{ selectedGroup.name }}</h2>
+                <p>{{ selectedGroup.description || 'No description' }}</p>
+              </div>
+              <button mat-raised-button color="accent" (click)="openAddMemberDialog()">
+                <mat-icon>person_add</mat-icon>
+                Add Member
+              </button>
+            </div>
+
+            <div class="members-section">
+              <h3>Team Members</h3>
+              <div class="members-grid">
+                @for (member of groupMembers; track member.id) {
+                  <div class="member-card">
+                    <div class="member-avatar">
+                      <mat-icon>person</mat-icon>
+                    </div>
+                    <div class="member-info">
+                      <span class="member-name">{{ member.user?.name || 'Unknown' }}</span>
+                      <span class="member-email">{{ member.user?.email || '' }}</span>
+                      <div class="member-role">
+                        <mat-chip [class]="getRoleClass(member.role)">
+                          {{ getRoleLabel(member.role) }}
+                        </mat-chip>
+                      </div>
+                      @if (member.commissionSplit) {
+                        <span class="member-split">{{ member.commissionSplit }}% split</span>
+                      }
+                    </div>
+                    <div class="member-actions">
+                      <button mat-icon-button [matMenuTriggerFor]="memberMenu" [disabled]="isProcessing(member.id)">
+                        <mat-icon>more_vert</mat-icon>
+                      </button>
+                      <mat-menu #memberMenu="matMenu">
+                        <button mat-menu-item [matMenuTriggerFor]="roleMenu">
+                          <mat-icon>swap_horiz</mat-icon>
+                          Change Role
+                        </button>
+                        <mat-menu #roleMenu="matMenu">
+                          @for (role of roleOptions; track role.value) {
+                            <button mat-menu-item (click)="updateMemberRole(member, role.value)" [disabled]="member.role === role.value">
+                              {{ role.label }}
+                            </button>
+                          }
+                        </mat-menu>
+                        <button mat-menu-item (click)="removeMember(member)" class="delete-option">
+                          <mat-icon>person_remove</mat-icon>
+                          Remove
+                        </button>
+                      </mat-menu>
+                    </div>
+                  </div>
+                }
+                @if (groupMembers.length === 0) {
+                  <div class="empty-members">
+                    <mat-icon>group_add</mat-icon>
+                    <p>No members in this team</p>
+                    <button mat-stroked-button color="primary" (click)="openAddMemberDialog()">
+                      Add First Member
+                    </button>
+                  </div>
+                }
+              </div>
+            </div>
+          </mat-card>
+        } @else {
+          <mat-card class="no-selection-card">
+            <mat-icon>touch_app</mat-icon>
+            <h3>Select a Team</h3>
+            <p>Choose a team from the list to view and manage its members</p>
+          </mat-card>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Group Dialog -->
+  @if (showGroupDialog) {
+    <div class="dialog-overlay" (click)="closeDialog()">
+      <div class="dialog-content" (click)="$event.stopPropagation()">
+        <div class="dialog-header">
+          <h2>{{ isEditMode ? 'Edit Team' : 'New Team' }}</h2>
+          <button mat-icon-button (click)="closeDialog()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+        <div class="dialog-body">
+          <form [formGroup]="groupForm" (ngSubmit)="saveGroup()">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Team Name</mat-label>
+              <input matInput formControlName="name" placeholder="e.g., Downtown Team">
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Description</mat-label>
+              <textarea matInput formControlName="description" rows="3" placeholder="Optional description"></textarea>
+            </mat-form-field>
+          </form>
+        </div>
+        <div class="dialog-footer">
+          <button mat-button (click)="closeDialog()">Cancel</button>
+          <button mat-raised-button color="primary" (click)="saveGroup()" [disabled]="groupForm.invalid">
+            {{ isEditMode ? 'Update' : 'Create' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Add Member Dialog -->
+  @if (showMemberDialog) {
+    <div class="dialog-overlay" (click)="closeDialog()">
+      <div class="dialog-content" (click)="$event.stopPropagation()">
+        <div class="dialog-header">
+          <h2>Add Member</h2>
+          <button mat-icon-button (click)="closeDialog()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+        <div class="dialog-body">
+          <form [formGroup]="memberForm">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Select User</mat-label>
+              <mat-select formControlName="userId" placeholder="Choose a user">
+                @for (user of users; track user.id) {
+                  <mat-option [value]="user.id">
+                    {{ user.name }} ({{ user.email }})
+                  </mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Role</mat-label>
+              <mat-select formControlName="role">
+                @for (role of roleOptions; track role.value) {
+                  <mat-option [value]="role.value">
+                    {{ role.label }}
+                  </mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Commission Split % (Optional)</mat-label>
+              <input matInput type="number" formControlName="commissionSplit" placeholder="Override default split">
+              <mat-hint>Leave empty to use role default</mat-hint>
+            </mat-form-field>
+          </form>
+        </div>
+        <div class="dialog-footer">
+          <button mat-button (click)="closeDialog()">Cancel</button>
+          <button mat-raised-button color="primary" (click)="addMember()" [disabled]="memberForm.invalid">
+            Add Member
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

@@ -107,12 +107,32 @@ export class ApiService {
     return this.http.get<any>(`https://realedge-frontend-production.up.railway.app/api/users`);
   }
 
-  // Groups
+  // Groups - Enhanced with roles
   getGroupStats(): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/groups/stats`);
   }
 
-  addGroupMember(userId: string, groupId: string): Observable<any> {
+  getGroupMembers(groupId: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/groups/${groupId}/members`);
+  }
+
+  addGroupMember(groupId: string, userId: string, role: string = 'agent', commissionSplit?: number): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/groups/${groupId}/add-user`, { 
+      userId, 
+      role, 
+      commissionSplit 
+    });
+  }
+
+  removeGroupMember(groupId: string, userId: string): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/groups/${groupId}/remove-user`, { userId });
+  }
+
+  updateGroupRoles(groupId: string, members: any[]): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/groups/${groupId}/roles`, { members });
+  }
+
+  addGroupMemberLegacy(userId: string, groupId: string): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/groups/members`, { userId, groupId });
   }
 
@@ -156,6 +176,44 @@ export class ApiService {
 
   deleteDeal(id: string): Observable<any> {
     return this.http.delete<any>(`${this.apiUrl}/deals/${id}`);
+  }
+
+  // Deal Commission - New
+  calculateDealCommission(dealId: string): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/deals/${dealId}/calculate-commission`, {});
+  }
+
+  generateDealCommission(dealId: string, finalPrice: number): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/deals/${dealId}/generate-commission`, { finalPrice });
+  }
+
+  getDealCommissions(dealId: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/deals/${dealId}/commissions`);
+  }
+
+  // Commission Settings
+  getCommissionSettings(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/commission-settings/settings`);
+  }
+
+  updateCommissionSettings(settings: { company: number; team: number }): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/commission-settings/settings`, settings);
+  }
+
+  getCommissionSettingsAll(): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/commission-settings`);
+  }
+
+  getCommissionsSummary(params?: any): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/commission-settings/summary`, { params });
+  }
+
+  approveDealCommission(commissionId: string): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/commission-settings/commissions/${commissionId}/approve`, {});
+  }
+
+  markCommissionAsPaid(commissionId: string): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/commission-settings/commissions/${commissionId}/paid`, {});
   }
 
   // Dashboard
