@@ -50,10 +50,10 @@ export class PropertyFormComponent implements OnInit, AfterViewInit {
   isUploading = false;
 
   // Map options
-  mapCenter: google.maps.LatLngLiteral = { lat: 25.2048, lng: 55.2708 }; // Default Dubai
+  mapCenter: any = { lat: 25.2048, lng: 55.2708 };
   mapZoom = 12;
-  markerPosition: google.maps.LatLngLiteral | null = null;
-  mapOptions: google.maps.MapOptions = {
+  markerPosition: any = null;
+  mapOptions: any = {
     mapTypeId: 'roadmap',
     zoomControl: true,
     scrollwheel: true,
@@ -124,6 +124,49 @@ export class PropertyFormComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
+    this.initForm();
+    this.loadUsers();
+    this.loadGroups();
+    this.handleEditMode();
+    this.subscribeToLocationChanges();
+  }
+
+  private initForm() {
+    this.propertyForm = this.fb.group({
+      title: ['', Validators.required],
+      description: [''],
+      price: [0, [Validators.required, Validators.min(0)]],
+      status: ['Available', Validators.required],
+      type: ['Apartment', Validators.required],
+      listingType: ['Sale', Validators.required],
+      condition: ['Used', Validators.required],
+      bedrooms: [0],
+      bathrooms: [0],
+      area: [0],
+      lotSize: [0],
+      yearBuilt: [new Date().getFullYear()],
+      parkingSpaces: [0],
+      floor: [null],
+      hasTerrace: [false],
+      terraceSize: [0],
+      address: ['', Validators.required],
+      city: ['', Validators.required],
+      country: ['', Validators.required],
+      lat: [null],
+      lng: [null],
+      assignedToUserId: [null],
+      assignedToGroupId: [null],
+      sellerId: [null],
+      commissionPercentage: [{ value: 0, disabled: !this.isAdmin }, [Validators.required, Validators.min(0), Validators.max(100)]],
+      photos: [''],
+      videos: [''],
+      tours360: [''],
+      documents: [''],
+      features: ['']
+    });
+  }
+
+  private loadUsers() {
     this.api.getUsers().subscribe({
       next: (res) => {
         this.users = Array.isArray(res) ? res : (res.data || []);
@@ -133,6 +176,9 @@ export class PropertyFormComponent implements OnInit, AfterViewInit {
         this.users = [];
       }
     });
+  }
+
+  private loadGroups() {
     this.api.getGroups().subscribe({
       next: (res: any) => {
         this.groups = Array.isArray(res) ? res : (res.data || []);
@@ -142,14 +188,15 @@ export class PropertyFormComponent implements OnInit, AfterViewInit {
         this.groups = [];
       }
     });
+  }
 
+  private handleEditMode() {
     if (this.data && this.data.property) {
       this.isEdit = true;
       const prop = this.data.property;
 
       this.uploadedPhotos = prop.photos || [];
 
-      // Patch values, converting arrays to strings for form
       this.propertyForm.patchValue({
         ...prop,
         photos: prop.photos?.join(', ') || '',
@@ -164,8 +211,9 @@ export class PropertyFormComponent implements OnInit, AfterViewInit {
         this.markerPosition = { lat: parseFloat(prop.lat), lng: parseFloat(prop.lng) };
       }
     }
+  }
 
-    // Subscribe to lat/long changes to update marker manually
+  private subscribeToLocationChanges() {
     this.propertyForm.get('lat')?.valueChanges.subscribe(lat => {
       if (lat && this.propertyForm.get('lng')?.value) {
         this.updateMarkerFromInputs(lat, this.propertyForm.get('lng')?.value);
@@ -188,7 +236,7 @@ export class PropertyFormComponent implements OnInit, AfterViewInit {
      this.mapCenter = this.markerPosition;
   }
 
-  onMapClick(event: google.maps.MapMouseEvent) {
+  onMapClick(event: any) {
     if (event.latLng) {
       this.markerPosition = {
         lat: event.latLng.lat(),

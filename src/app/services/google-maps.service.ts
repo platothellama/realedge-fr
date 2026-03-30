@@ -12,13 +12,13 @@ export class GoogleMapsService {
       return this.loadPromise;
     }
 
-    const apiKey = environment.googleMapsApiKey;
-    
+    const apiKey = environment.GOOGLE_MAPS_API_KEY;
+
     if (!apiKey) {
       return Promise.reject(new Error('Google Maps API key not configured'));
     }
 
-    if (typeof google !== 'undefined' && google.maps) {
+    if (typeof google !== 'undefined' && (google as any).maps) {
       return Promise.resolve();
     }
 

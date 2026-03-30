@@ -59,10 +59,10 @@
   letter-spacing: 0.5px;
 }
 
-.status-badge.available { background: #10b981; color: #022c22; }
-.status-badge.sold { background: #ef4444; color: #fff; }
-.status-badge.reserved { background: #f59e0b; color: #451a03; }
-.status-badge.rented { background: #3b82f6; color: #fff; }
+.status-badge.available { background: var(--success); color: #fff; }
+.status-badge.sold { background: var(--error); color: #fff; }
+.status-badge.reserved { background: var(--warning); color: #fff; }
+.status-badge.rented { background: var(--primary); color: #fff; }
 
 .view-all {
   position: absolute;
@@ -167,23 +167,23 @@
 }
 
 .listing-type-badge.sale {
-  background: #e8f5e9;
-  color: #2e7d32;
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--success);
 }
 
 .listing-type-badge.rent {
-  background: #fff3e0;
-  color: #ef6c00;
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--warning);
 }
 
 .condition-badge.used {
-  background: #e3f2fd;
-  color: #1565c0;
+  background: var(--primary-soft);
+  color: var(--primary-bright);
 }
 
 .condition-badge.new {
-  background: #f3e5f5;
-  color: #7b1fa2;
+  background: rgba(124, 58, 237, 0.15);
+  color: #8b5cf6;
 }
 
 .title-section h1 {
@@ -216,7 +216,7 @@
   display: block;
   font-size: 2rem;
   font-weight: 800;
-  color: var(--text);
+  color: var(--text-primary);
 }
 
 .price-label {
@@ -260,7 +260,7 @@
 .stat-value {
   font-size: 1.4rem;
   font-weight: 700;
-  color: var(--text);
+  color: var(--text-primary);
 }
 
 .stat-label {
@@ -276,7 +276,7 @@
   font-size: 1.3rem;
   font-weight: 700;
   margin-bottom: 20px;
-  color: var(--text);
+  color: var(--text-primary);
 }
 
 .section-heading mat-icon {
@@ -304,7 +304,7 @@
   background: var(--background);
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.05);
-  color: var(--text);
+  color: var(--text-primary);
   font-size: 0.95rem;
 }
 
@@ -334,7 +334,7 @@
   border-radius: 50%;
   margin-top: 6px;
   flex-shrink: 0;
-  box-shadow: 0 0 12px var(--primary);
+  box-shadow: 0 0 12px var(--primary-glow);
 }
 
 .timeline-content {
@@ -370,8 +370,8 @@
   align-items: center;
   gap: 6px;
   font-size: 0.85rem;
-  color: var(--primary);
-  background: rgba(99, 102, 241, 0.1);
+  color: var(--primary-bright);
+  background: var(--primary-soft);
   padding: 4px 12px;
   border-radius: 20px;
 }
@@ -474,7 +474,7 @@
   display: block;
   font-size: 1.3rem;
   font-weight: 700;
-  color: var(--text);
+  color: var(--text-primary);
 }
 
 .metric-label {
@@ -497,7 +497,7 @@
 
 .valuation-value {
   font-weight: 700;
-  color: var(--text);
+  color: var(--text-primary);
 }
 
 .valuation-bar {
@@ -514,22 +514,13 @@
   transition: width 0.5s ease;
 }
 
-.bar-fill.undervalued { background: linear-gradient(90deg, #10b981, #059669); }
-.bar-fill.fair { background: linear-gradient(90deg, #6366f1, #8b5cf6); }
-.bar-fill.overvalued { background: linear-gradient(90deg, #f59e0b, #ef4444); }
+.bar-fill.undervalued { background: linear-gradient(90deg, var(--success), #059669); }
+.bar-fill.fair { background: linear-gradient(90deg, var(--primary), var(--primary-bright)); }
+.bar-fill.overvalued { background: linear-gradient(90deg, var(--warning), var(--error)); }
 
-.valuation-comparison {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  font-weight: 600;
-  font-size: 0.95rem;
-}
-
-.valuation-comparison.undervalued { color: #10b981; }
-.valuation-comparison.fair { color: #6366f1; }
-.valuation-comparison.overvalued { color: #ef4444; }
+.valuation-comparison.undervalued { color: var(--success); }
+.valuation-comparison.fair { color: var(--primary); }
+.valuation-comparison.overvalued { color: var(--error); }
 
 .valuation-comparison mat-icon {
   font-size: 20px;
@@ -582,7 +573,7 @@
 
 .spec-value {
   font-weight: 600;
-  color: var(--text);
+  color: var(--text-primary);
 }
 
 /* Assignment Card */
@@ -599,7 +590,7 @@
   width: 50px;
   height: 50px;
   border-radius: 50%;
-  background: rgba(99, 102, 241, 0.15);
+  background: var(--primary-soft);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -625,7 +616,7 @@
 .agent-name {
   font-weight: 700;
   font-size: 1.1rem;
-  color: var(--text);
+  color: var(--text-primary);
 }
 
 .agent-contact {
@@ -883,33 +874,33 @@
 }
 
 .activity-icon.lead {
-  background: rgba(59, 130, 246, 0.15);
-  color: #3b82f6;
+  background: var(--primary-soft);
+  color: var(--primary-bright);
 }
 
 .activity-icon.visit {
   background: rgba(245, 158, 11, 0.15);
-  color: #f59e0b;
+  color: var(--warning);
 }
 
 .activity-icon.visit.completed {
   background: rgba(16, 185, 129, 0.15);
-  color: #10b981;
+  color: var(--success);
 }
 
 .activity-icon.visit.cancelled {
   background: rgba(239, 68, 68, 0.15);
-  color: #ef4444;
+  color: var(--error);
 }
 
 .activity-icon.deal {
-  background: rgba(124, 58, 237, 0.15);
-  color: #7c3aed;
+  background: var(--primary-soft);
+  color: var(--primary-bright);
 }
 
 .activity-icon.deal.closed {
   background: rgba(16, 185, 129, 0.15);
-  color: #10b981;
+  color: var(--success);
 }
 
 .activity-content {
@@ -923,7 +914,7 @@
 .activity-name {
   font-weight: 600;
   font-size: 0.95rem;
-  color: var(--text);
+  color: var(--text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -945,14 +936,16 @@
   margin-top: 4px;
 }
 
-.activity-status.new-lead { background: rgba(59, 130, 246, 0.15); color: #3b82f6; }
-.activity-status.contacted { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
-.activity-status.qualified { background: rgba(16, 185, 129, 0.15); color: #10b981; }
-.activity-status.negotiation { background: rgba(124, 58, 237, 0.15); color: #7c3aed; }
-.activity-status.closed { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+.activity-status.new-lead { background: var(--primary-soft); color: var(--primary-bright); }
+.activity-status.contacted { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
+.activity-status.qualified { background: rgba(16, 185, 129, 0.15); color: var(--success); }
+.activity-status.negotiation { background: var(--primary-soft); color: var(--primary-bright); }
+.activity-status.closed { background: rgba(16, 185, 129, 0.15); color: var(--success); }
+.activity-status.scheduled { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
+.activity-status.pending { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
 
-.activity-stage.negotiation { background: rgba(124, 58, 237, 0.15); color: #7c3aed; }
-.activity-stage.reserved { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
-.activity-stage.contract.signed { background: rgba(59, 130, 246, 0.15); color: #3b82f6; }
-.activity-stage.payment { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
-.activity-stage.closed { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+.activity-stage.negotiation { background: var(--primary-soft); color: var(--primary-bright); }
+.activity-stage.reserved { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
+.activity-stage.contract.signed { background: var(--primary-soft); color: var(--primary-bright); }
+.activity-stage.payment { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
+.activity-stage.closed { background: rgba(16, 185, 129, 0.15); color: var(--success); }
