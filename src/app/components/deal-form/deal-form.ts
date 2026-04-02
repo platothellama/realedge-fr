@@ -1,6 +1,6 @@
 import { Component, Inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
 import { MatDialogRef, MatDialogModule, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -8,6 +8,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { ApiService } from '../../services/api';
 import { ClientSelectorComponent, ClientSelection } from '../client-selector/client-selector';
 import { SellerSelectorComponent, SellerSelection } from '../seller-selector/seller-selector';
@@ -18,6 +19,7 @@ import { SellerSelectorComponent, SellerSelection } from '../seller-selector/sel
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    FormsModule,
     MatDialogModule,
     MatFormFieldModule,
     MatInputModule,
@@ -25,6 +27,7 @@ import { SellerSelectorComponent, SellerSelection } from '../seller-selector/sel
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
+    MatSlideToggleModule,
     ClientSelectorComponent,
     SellerSelectorComponent
   ],
@@ -37,6 +40,7 @@ export class DealFormComponent implements OnInit {
   properties: any[] = [];
   brokers: any[] = [];
   leads: any[] = [];
+  groups: any[] = [];
   currentUser: any = null;
   isAdmin = false;
   isSubmitting = false;
@@ -45,6 +49,8 @@ export class DealFormComponent implements OnInit {
   sellerSelection: SellerSelection | null = null;
   initialSellerId: string | null = null;
   initialSeller: any = null;
+  
+  assignToTeam = false;
 
   stages = ['Negotiation', 'Reserved', 'Contract Signed', 'Payment', 'Closed'];
 
@@ -58,10 +64,12 @@ export class DealFormComponent implements OnInit {
       title: ['', Validators.required],
       sellerName: [''],
       commission: [{ value: 0, disabled: true }, [Validators.required, Validators.min(0)]],
+      finalPrice: [null],
       dealStage: ['Offer Made', Validators.required],
       notes: [''],
       propertyId: ['', Validators.required],
-      brokerId: [null, Validators.required]
+      brokerId: [null],
+      groupId: [null]
     });
   }
 
@@ -72,12 +80,18 @@ export class DealFormComponent implements OnInit {
         title: this.data.deal.title,
         sellerName: this.data.deal.sellerName,
         commission: this.data.deal.commission,
+        finalPrice: this.data.deal.finalPrice || null,
         dealStage: this.data.deal.dealStage,
         notes: this.data.deal.notes,
         propertyId: this.data.deal.propertyId,
-        brokerId: this.data.deal.brokerId
+        brokerId: this.data.deal.brokerId,
+        groupId: this.data.deal.groupId || null
       });
       
+      if (this.data.deal.groupId) {
+        this.assignToTeam = true;
+      }
+
       this.selectedClient = {
         leadId: this.data.deal.buyerLeadId || null,
         createNew: !this.data.deal.buyerLeadId,
@@ -212,7 +226,7 @@ export class DealFormComponent implements OnInit {
       }
     });
 
-    this.api.getProperties().subscribe(res => {
+    this.api.getProperties().subscribe((res: any) => {
       this.properties = Array.isArray(res) ? res : (res.data || []);
       
       if (this.preSelectedPropertyId) {
@@ -227,11 +241,14 @@ export class DealFormComponent implements OnInit {
         }
       }
     });
-    this.api.getUsers().subscribe(res => {
+    this.api.getUsers().subscribe((res: any) => {
       this.brokers = Array.isArray(res) ? res : (res.data || []);
     });
     this.api.getLeads().subscribe((res: any) => {
       this.leads = Array.isArray(res) ? res : (res?.data || []);
+    });
+    this.api.getGroups().subscribe((res: any) => {
+      this.groups = Array.isArray(res) ? res : (res.data || []);
     });
 
     // Watch for property selection changes
@@ -239,8 +256,76 @@ export class DealFormComponent implements OnInit {
       if (id) {
         this.calculateCommission(id);
         this.autoPopulateSellerFromProperty(id);
+        this.autoPopulateTeamOrUserFromProperty(id);
       }
     });
+
+    // Watch for final price changes to recalculate commission
+    this.dealForm.get('finalPrice')?.valueChanges.subscribe(finalPrice => {
+      if (finalPrice && this.dealForm.get('propertyId')?.value) {
+        this.calculateCommissionFromFinalPrice();
+      }
+    });
+  }
+
+  private calculateCommissionFromFinalPrice() {
+    const property = this.properties.find(p => p.id === this.dealForm.get('propertyId')?.value);
+    const finalPrice = this.dealForm.get('finalPrice')?.value;
+    if (property && finalPrice && property.commissionPercentage > 0) {
+      const calculated = (Number(finalPrice) * property.commissionPercentage) / 100;
+      this.dealForm.get('commission')?.setValue(calculated);
+    }
+  }
+
+  private autoPopulateTeamOrUserFromProperty(propertyId: string) {
+    const property = this.properties.find(p => p.id === propertyId);
+    if (property) {
+      if (property.assignedToGroupId) {
+        this.assignToTeam = true;
+        this.dealForm.get('groupId')?.setValue(property.assignedToGroupId);
+        this.dealForm.get('brokerId')?.setValue(null);
+      } else if (property.assignedToUserId) {
+        this.assignToTeam = false;
+        this.dealForm.get('brokerId')?.setValue(property.assignedToUserId);
+        this.dealForm.get('groupId')?.setValue(null);
+      }
+      
+      if (!this.dealForm.get('finalPrice')?.value && property.price) {
+        this.dealForm.get('finalPrice')?.setValue(property.price);
+      }
+      
+      if (!this.sellerSelection || !this.sellerSelection.sellerId) {
+        if (property.sellerId) {
+          this.initialSellerId = property.sellerId;
+          this.sellerSelection = {
+            sellerId: property.sellerId,
+            createNew: false,
+            seller: {
+              name: property.seller?.name || '',
+              email: property.seller?.email || '',
+              phone: property.seller?.phone || '',
+              address: property.seller?.address || '',
+              city: property.seller?.city || '',
+              country: property.seller?.country || ''
+            }
+          };
+        } else if (property.seller && property.seller.name) {
+          this.initialSeller = property.seller;
+          this.sellerSelection = {
+            sellerId: null,
+            createNew: true,
+            seller: {
+              name: property.seller.name || '',
+              email: property.seller.email || '',
+              phone: property.seller.phone || '',
+              address: property.seller.address || '',
+              city: property.seller.city || '',
+              country: property.seller.country || ''
+            }
+          };
+        }
+      }
+    }
   }
 
   private autoPopulateSellerFromProperty(propertyId: string) {
@@ -288,13 +373,29 @@ export class DealFormComponent implements OnInit {
 
   onSubmit(): void {
     if (this.dealForm.valid && !this.isSubmitting && this.selectedClient && this.sellerSelection) {
-      this.isSubmitting = true;
       const val = this.dealForm.getRawValue();
+      
+      if (!this.assignToTeam && !val.brokerId) {
+        return;
+      }
+      if (this.assignToTeam && !val.groupId) {
+        return;
+      }
+      
+      this.isSubmitting = true;
       const payload: any = {
         ...val,
         buyerLeadId: this.selectedClient.leadId,
         buyerName: this.selectedClient.client.name
       };
+
+      if (!this.assignToTeam) {
+        payload.brokerId = val.brokerId;
+        payload.groupId = null;
+      } else {
+        payload.brokerId = null;
+        payload.groupId = val.groupId;
+      }
 
       if (this.sellerSelection.createNew && this.sellerSelection.seller.name) {
         payload.newSeller = this.sellerSelection.seller;
@@ -314,6 +415,14 @@ export class DealFormComponent implements OnInit {
 
   onSellerSelected(selection: SellerSelection): void {
     this.sellerSelection = selection;
+  }
+
+  onAssignToTeamChange(): void {
+    if (this.assignToTeam) {
+      this.dealForm.get('groupId')?.setValue(null);
+    } else {
+      this.dealForm.get('groupId')?.setValue(null);
+    }
   }
 
   onClientSelected(selection: ClientSelection): void {

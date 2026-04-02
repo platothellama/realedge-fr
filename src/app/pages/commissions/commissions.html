@@ -2,11 +2,11 @@
   <div class="page-header">
     <div class="header-content">
       <h1 class="page-title">Commissions</h1>
-      <p class="page-subtitle">Track agent commissions and payouts</p>
+      <p class="page-subtitle">Track and manage agent commission history</p>
     </div>
-    <button mat-raised-button color="primary" (click)="showAddDialog = true">
-      <mat-icon>add</mat-icon>
-      New Commission
+    <button mat-raised-button color="primary" (click)="loadCommissions()">
+      <mat-icon>refresh</mat-icon>
+      Refresh
     </button>
   </div>
 
@@ -17,11 +17,20 @@
   } @else {
     <div class="stats-grid">
       <div class="stat-card">
+        <div class="stat-icon total">
+          <mat-icon>account_balance_wallet</mat-icon>
+        </div>
+        <div class="stat-content">
+          <span class="stat-value">{{ formatCurrency(summary.totalAmount || 0) }}</span>
+          <span class="stat-label">Total Commission</span>
+        </div>
+      </div>
+      <div class="stat-card">
         <div class="stat-icon pending">
           <mat-icon>pending</mat-icon>
         </div>
         <div class="stat-content">
-          <span class="stat-value">{{ formatCurrency(stats.totalPending || 0) }}</span>
+          <span class="stat-value">{{ formatCurrency(summary.pendingAmount || 0) }}</span>
           <span class="stat-label">Pending</span>
         </div>
       </div>
@@ -30,7 +39,7 @@
           <mat-icon>check_circle</mat-icon>
         </div>
         <div class="stat-content">
-          <span class="stat-value">{{ formatCurrency(stats.totalApproved || 0) }}</span>
+          <span class="stat-value">{{ formatCurrency(summary.approvedAmount || 0) }}</span>
           <span class="stat-label">Approved</span>
         </div>
       </div>
@@ -39,67 +48,79 @@
           <mat-icon>payments</mat-icon>
         </div>
         <div class="stat-content">
-          <span class="stat-value">{{ formatCurrency(stats.totalPaid || 0) }}</span>
+          <span class="stat-value">{{ formatCurrency(summary.paidAmount || 0) }}</span>
           <span class="stat-label">Paid</span>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon this-month">
-          <mat-icon>calendar_today</mat-icon>
-        </div>
-        <div class="stat-content">
-          <span class="stat-value">{{ formatCurrency(stats.thisMonthPaid || 0) }}</span>
-          <span class="stat-label">This Month</span>
         </div>
       </div>
     </div>
 
     <mat-card class="table-card">
       <div class="table-header">
-        <h3>All Commissions</h3>
+        <h3>Commission History</h3>
         <div class="filters">
           <mat-form-field appearance="outline">
-            <mat-select [(ngModel)]="statusFilter" (selectionChange)="loadCommissions()" placeholder="Status">
-              <mat-option value="">All</mat-option>
+            <mat-label>Status</mat-label>
+            <mat-select [(ngModel)]="statusFilter" (selectionChange)="loadCommissions()">
+              <mat-option value="">All Statuses</mat-option>
               @for (status of statusOptions; track status) {
                 <mat-option [value]="status">{{ status | titlecase }}</mat-option>
               }
             </mat-select>
           </mat-form-field>
+          @if (statusFilter || roleFilter) {
+            <button mat-button (click)="clearFilters()">Clear Filters</button>
+          }
         </div>
       </div>
-      
+
       <div class="table-container">
         <table class="commissions-table">
           <thead>
             <tr>
-              <th>Property</th>
+              <th>Property / Deal</th>
               <th>Agent</th>
+              <th>Role</th>
               <th>Sale Price</th>
-              <th>Commission %</th>
-              <th>Agent Commission</th>
-              <th>Office Commission</th>
+              <th>Split %</th>
+              <th>Commission</th>
               <th>Status</th>
+              <th>Created</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
             @for (commission of commissions; track commission.id) {
               <tr>
-                <td class="property-cell">{{ commission.property?.title || commission.deal?.title || 'N/A' }}</td>
-                <td>
-                  <div class="agent-cell">
-                    <mat-icon>person</mat-icon>
-                    <span>{{ commission.agent?.name || 'Unknown' }}</span>
+                <td class="property-cell">
+                  <div class="property-info">
+                    <span class="property-title">{{ getPropertyTitle(commission) }}</span>
+                    <span class="deal-id">Deal #{{ commission.dealId }}</span>
                   </div>
                 </td>
-                <td class="amount">{{ formatCurrency(commission.salePrice) }}</td>
-                <td>{{ commission.commissionPercentage }}%</td>
-                <td class="amount agent-commission">{{ formatCurrency(commission.agentCommission) }}</td>
-                <td class="amount">{{ formatCurrency(commission.officeCommission) }}</td>
+                <td>
+                  <div class="agent-cell">
+                    @if (commission.user?.photo) {
+                      <img [src]="commission.user!.photo" class="agent-avatar" alt="">
+                    } @else {
+                      <mat-icon class="default-avatar">person</mat-icon>
+                    }
+                    <span>{{ getAgentName(commission) }}</span>
+                  </div>
+                </td>
+                <td>
+                  <span class="role-badge">{{ getRoleLabel(commission.roleInDeal) }}</span>
+                </td>
+                <td class="amount">{{ formatCurrency(getSalePrice(commission)) }}</td>
+                <td>{{ commission.percentage }}%</td>
+                <td class="amount commission-amount">{{ formatCurrency(commission.amount) }}</td>
                 <td>
                   <span class="status-badge" [class]="getStatusClass(commission.status)">
-                    {{ commission.status }}
+                    {{ getStatusLabel(commission.status) }}
+                  </span>
+                </td>
+                <td>
+                  <span class="date-cell" [matTooltip]="formatDateTime(commission.createdAt || '')">
+                    {{ formatDate(commission.createdAt || '') }}
                   </span>
                 </td>
                 <td>
@@ -119,10 +140,6 @@
                         Mark as Paid
                       </button>
                     }
-                    <button mat-menu-item (click)="deleteCommission(commission)" class="delete-option">
-                      <mat-icon>delete</mat-icon>
-                      Delete
-                    </button>
                   </mat-menu>
                 </td>
               </tr>
@@ -133,67 +150,10 @@
           <div class="empty-state">
             <mat-icon>account_balance</mat-icon>
             <p>No commissions found</p>
+            <span>Commissions will appear here when deals are closed</span>
           </div>
         }
       </div>
     </mat-card>
-  }
-
-  @if (showAddDialog) {
-    <div class="dialog-overlay" (click)="closeDialog()">
-      <div class="dialog-content" (click)="$event.stopPropagation()">
-        <div class="dialog-header">
-          <h2>New Commission</h2>
-          <button mat-icon-button (click)="closeDialog()">
-            <mat-icon>close</mat-icon>
-          </button>
-        </div>
-        <div class="dialog-body">
-          <mat-form-field appearance="outline">
-            <mat-label>Agent</mat-label>
-            <mat-select [(ngModel)]="newCommission.agentId" placeholder="Select agent">
-              <!-- Will be populated from users API if needed -->
-              <mat-option value="">Select agent</mat-option>
-            </mat-select>
-          </mat-form-field>
-          <mat-form-field appearance="outline">
-            <mat-label>Sale Price</mat-label>
-            <input matInput type="number" [(ngModel)]="newCommission.salePrice" placeholder="0">
-          </mat-form-field>
-          <div class="form-row">
-            <mat-form-field appearance="outline">
-              <mat-label>Commission %</mat-label>
-              <input matInput type="number" [(ngModel)]="newCommission.commissionPercentage" placeholder="2.5" step="0.1">
-            </mat-form-field>
-            <mat-form-field appearance="outline">
-              <mat-label>Agent Share %</mat-label>
-              <input matInput type="number" [(ngModel)]="newCommission.agentSharePercentage" placeholder="60" step="1">
-            </mat-form-field>
-          </div>
-          <div class="commission-preview" *ngIf="newCommission.salePrice">
-            <div class="preview-row">
-              <span>Gross Commission:</span>
-              <span>{{ formatCurrency((newCommission.salePrice || 0) * ((newCommission.commissionPercentage || 0) / 100)) }}</span>
-            </div>
-            <div class="preview-row">
-              <span>Agent Share:</span>
-              <span>{{ formatCurrency((newCommission.salePrice || 0) * ((newCommission.commissionPercentage || 0) / 100) * ((newCommission.agentSharePercentage || 0) / 100)) }}</span>
-            </div>
-            <div class="preview-row">
-              <span>Office Share:</span>
-              <span>{{ formatCurrency((newCommission.salePrice || 0) * ((newCommission.commissionPercentage || 0) / 100) * (1 - (newCommission.agentSharePercentage || 0) / 100)) }}</span>
-            </div>
-          </div>
-          <mat-form-field appearance="outline">
-            <mat-label>Notes</mat-label>
-            <textarea matInput [(ngModel)]="newCommission.notes" rows="3" placeholder="Optional notes"></textarea>
-          </mat-form-field>
-        </div>
-        <div class="dialog-footer">
-          <button mat-button (click)="closeDialog()">Cancel</button>
-          <button mat-raised-button color="primary" (click)="calculateAndCreate()">Create Commission</button>
-        </div>
-      </div>
-    </div>
   }
 </div>

@@ -55,15 +55,38 @@
     <div class="form-row">
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Assigned Broker</mat-label>
-        <mat-select formControlName="brokerId">
+        <mat-select formControlName="brokerId" [disabled]="assignToTeam">
           @for (user of brokers; track user.id) {
             <mat-option [value]="user.id">{{ user.name }} ({{ user.role }})</mat-option>
           }
         </mat-select>
         <mat-icon matSuffix>badge</mat-icon>
-        <mat-error *ngIf="dealForm.get('brokerId')?.hasError('required')">Please assign a broker</mat-error>
       </mat-form-field>
     </div>
+
+    <div class="form-row team-toggle">
+      <mat-slide-toggle 
+        color="primary" 
+        [(ngModel)]="assignToTeam"
+        [ngModelOptions]="{standalone: true}"
+        (change)="onAssignToTeamChange()">
+        Assign to Team instead of Individual
+      </mat-slide-toggle>
+    </div>
+
+    @if (assignToTeam) {
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Assigned Team</mat-label>
+          <mat-select formControlName="groupId">
+            @for (group of groups; track group.id) {
+              <mat-option [value]="group.id">{{ group.name }}</mat-option>
+            }
+          </mat-select>
+          <mat-icon matSuffix>groups</mat-icon>
+        </mat-form-field>
+      </div>
+    }
 
     <div class="section-label">Deal Progress</div>
 
@@ -77,6 +100,15 @@
         </mat-select>
         <mat-icon matSuffix>stacked_line_chart</mat-icon>
         <mat-error *ngIf="dealForm.get('dealStage')?.hasError('required')">Deal stage is required</mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="full-width budget-field">
+        <mat-label>Sale Price ($)</mat-label>
+        <input matInput type="number" formControlName="finalPrice">
+        <span matPrefix class="currency-prefix">$</span>
+        <mat-hint>Actual sale price (for commission calculation)</mat-hint>
       </mat-form-field>
     </div>
 

@@ -14,6 +14,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { Router } from '@angular/router';
 import { ApiService } from '../../services/api';
 import { FormsModule } from '@angular/forms';
 import { PropertySearchComponent, SearchFilters, SearchFilterConfig } from '../../components/property-search/property-search';
@@ -79,7 +80,8 @@ export class SellersComponent implements OnInit {
   constructor(
     private api: ApiService,
     private dialog: MatDialog,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -135,6 +137,10 @@ export class SellersComponent implements OnInit {
         }
       }
     });
+  }
+
+  openSellerDetails(seller: any) {
+    this.router.navigate(['/sellers', seller.id]);
   }
 
   createSeller(data: any) {

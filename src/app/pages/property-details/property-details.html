@@ -6,16 +6,58 @@
       Back
     </button>
     <div class="header-actions">
+      @if (canMarkSoldOrLost) {
+        <button mat-stroked-button color="warn" [matMenuTriggerFor]="statusMenu">
+          <mat-icon>flag</mat-icon>
+          Mark as Sold/Lost
+        </button>
+        <mat-menu #statusMenu="matMenu">
+          <button mat-menu-item (click)="showSoldDialog()">
+            <mat-icon>check_circle</mat-icon>
+            <span>Mark as Sold</span>
+          </button>
+          <button mat-menu-item (click)="showLostDialog()">
+            <mat-icon>cancel</mat-icon>
+            <span>Mark as Lost</span>
+          </button>
+        </mat-menu>
+      }
+      @if (canMarkSoldOrLost) {
       <button mat-stroked-button color="primary" (click)="openLeadWorkflow()">
         <mat-icon>people</mat-icon>
         Leads & Visits
       </button>
-      <button mat-raised-button color="primary" (click)="openEditForm()">
+      }
+      @if (canMarkSoldOrLost) {
+        <button mat-raised-button color="primary" (click)="openEditForm()">
         <mat-icon>edit</mat-icon>
         Edit
       </button>
+      }
     </div>
   </header>
+
+  @if (isSold && property.soldTo) {
+    <div class="sale-info-banner">
+      <mat-icon>check_circle</mat-icon>
+      <span>Sold to <strong>{{ property.soldTo }}</strong>
+        @if (property.soldAt) {
+          on {{ property.soldAt | date:'mediumDate' }}
+        }
+      </span>
+    </div>
+  }
+
+  @if (isLost && property.lostTo) {
+    <div class="lost-info-banner">
+      <mat-icon>cancel</mat-icon>
+      <span>Lost: {{ property.lostTo }}
+        @if (property.lostAt) {
+          on {{ property.lostAt | date:'mediumDate' }}
+        }
+      </span>
+    </div>
+  }
 
   <!-- Image Gallery -->
   <section class="gallery-section">

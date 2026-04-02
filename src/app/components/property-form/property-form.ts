@@ -37,9 +37,10 @@ import { SellerSelectorComponent, SellerSelection } from '../seller-selector/sel
 export class PropertyFormComponent implements OnInit, AfterViewInit {
   propertyForm: FormGroup;
   isEdit = false;
+  statusLocked = false;
 
   propertyTypes = ['Apartment', 'House', 'Villa', 'Office', 'Land', 'Commercial'];
-  statuses = ['Available', 'Sold', 'Rented', 'Reserved'];
+  statuses = ['Available', 'Sold', 'Rented', 'Reserved', 'Lost'];
   listingTypes = ['Sale', 'Rent'];
   conditions = ['Used', 'New'];
   users: any[] = [];
@@ -68,6 +69,106 @@ export class PropertyFormComponent implements OnInit, AfterViewInit {
   isAdmin = false;
   isSubmitting = false;
   sellerSelection: SellerSelection | null = null;
+
+  currentStep = 0;
+  totalSteps = 5;
+  wizardSteps = [
+    { label: 'Basic Info', icon: 'info', valid: false },
+    { label: 'Details', icon: 'format_list_bulleted', valid: false },
+    { label: 'Location', icon: 'location_on', valid: false },
+    { label: 'Media', icon: 'perm_media', valid: false },
+    { label: 'Review', icon: 'check_circle', valid: false }
+  ];
+  stepErrors: { [key: number]: string } = {};
+
+  get isLastStep(): boolean {
+    return this.currentStep === this.totalSteps - 1;
+  }
+
+  get isFirstStep(): boolean {
+    return this.currentStep === 0;
+  }
+
+  private validateStep(step: number): boolean {
+    this.stepErrors[step] = '';
+    const form = this.propertyForm;
+
+    switch (step) {
+      case 0: // Basic Info
+        const title = form.get('title')?.value;
+        const price = form.get('price')?.value;
+        const type = form.get('type')?.value;
+        if (!title || title.trim() === '') {
+          this.stepErrors[step] = 'Property title is required';
+          return false;
+        }
+        if (price === null || price === undefined || price < 0) {
+          this.stepErrors[step] = 'Valid price is required';
+          return false;
+        }
+        if (!type) {
+          this.stepErrors[step] = 'Property type is required';
+          return false;
+        }
+        return true;
+
+      case 1: // Details - no required fields, always valid
+        return true;
+
+      case 2: // Location
+        const address = form.get('address')?.value;
+        const city = form.get('city')?.value;
+        const country = form.get('country')?.value;
+        if (!address || address.trim() === '') {
+          this.stepErrors[step] = 'Street address is required';
+          return false;
+        }
+        if (!city || city.trim() === '') {
+          this.stepErrors[step] = 'City is required';
+          return false;
+        }
+        if (!country || country.trim() === '') {
+          this.stepErrors[step] = 'Country is required';
+          return false;
+        }
+        return true;
+
+      case 3: // Media - no required fields, always valid
+        return true;
+
+      case 4: // Review
+        return true;
+
+      default:
+        return true;
+    }
+  }
+
+  nextStep(): void {
+    if (this.validateStep(this.currentStep)) {
+      if (this.currentStep < this.totalSteps - 1) {
+        this.currentStep++;
+      }
+    }
+  }
+
+  prevStep(): void {
+    if (this.currentStep > 0) {
+      this.currentStep--;
+    }
+  }
+
+  goToStep(step: number): void {
+    if (step >= 0 && step < this.totalSteps) {
+      if (step > this.currentStep) {
+        if (this.validateStep(this.currentStep)) {
+          this.currentStep = step;
+        }
+      } else {
+        this.currentStep = step;
+      }
+    }
+  }
 
   constructor(
     private fb: FormBuilder,
@@ -112,11 +213,11 @@ export class PropertyFormComponent implements OnInit, AfterViewInit {
       sellerId: [null],
       commissionPercentage: [{ value: 0, disabled: !this.isAdmin }, [Validators.required, Validators.min(0), Validators.max(100)]],
 
-      // Media (Strings for now, split by comma for array)
-      photos: [''],
-      videos: [''],
-      tours360: [''],
-      documents: [''],
+      // Sold/Lost Info
+      soldTo: [''],
+      soldAt: [null],
+      lostTo: [''],
+      lostAt: [null],
 
       // Features
       features: ['']
@@ -194,6 +295,12 @@ export class PropertyFormComponent implements OnInit, AfterViewInit {
     if (this.data && this.data.property) {
       this.isEdit = true;
       const prop = this.data.property;
+
+      this.statusLocked = prop.status === 'Sold';
+
+      if (this.statusLocked) {
+        this.propertyForm.disable();
+      }
 
       this.uploadedPhotos = prop.photos || [];
 

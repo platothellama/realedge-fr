@@ -700,12 +700,24 @@ export class ApiService {
     return this.http.get<any>(`${this.apiUrl}/sellers`);
   }
 
+  getSeller(id: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/sellers/${id}`);
+  }
+
   createSeller(data: any): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/sellers`, data);
   }
 
   updateSeller(id: string, data: any): Observable<any> {
     return this.http.put<any>(`${this.apiUrl}/sellers/${id}`, data);
+  }
+
+  deleteSeller(id: string): Observable<any> {
+    return this.http.delete<any>(`${this.apiUrl}/sellers/${id}`);
+  }
+
+  getSellerStats(id: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/sellers/${id}/stats`);
   }
 
   // Document Public Signing

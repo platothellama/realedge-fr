@@ -66,3 +66,16 @@
   font-size: 0.8rem;
   font-weight: 600;
 }
+
+.clickable-row {
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.clickable-row:hover {
+  background: var(--primary-soft) !important;
+}
+
+.clickable-row td {
+  color: var(--text-primary) !important;
+}

@@ -1,6 +1,46 @@
 .header-actions {
   display: flex;
   gap: 12px;
+  align-items: center;
+}
+
+.status-filter-group {
+  display: flex;
+  gap: 8px;
+  padding: 4px;
+  background: var(--bg-elevated);
+  border-radius: 10px;
+  border: 1px solid var(--border);
+}
+
+.status-filter-btn {
+  height: 38px !important;
+  padding: 0 16px !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  font-size: 0.8rem !important;
+  color: var(--text-muted) !important;
+  border: none !important;
+  background: transparent !important;
+  transition: all 0.2s ease !important;
+}
+
+.status-filter-btn mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  margin-right: 6px;
+}
+
+.status-filter-btn:hover {
+  color: var(--text-primary) !important;
+  background: var(--bg-surface) !important;
+}
+
+.status-filter-btn.active {
+  background: var(--primary) !important;
+  color: white !important;
+  box-shadow: 0 2px 8px var(--primary-glow);
 }
 
 .filter-section {
@@ -546,6 +586,18 @@
   .header-actions {
     width: 100%;
     justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .status-filter-group {
+    width: 100%;
+    justify-content: flex-start;
+    order: 2;
+  }
+
+  .status-filter-btn {
+    flex: 1;
+    min-width: 90px;
   }
 
   .filter-section {

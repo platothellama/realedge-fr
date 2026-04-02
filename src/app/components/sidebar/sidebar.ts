@@ -34,6 +34,7 @@ export class Sidebar {
       { label: 'CRM / Leads', icon: 'people', link: '/crm' },
       { label: 'Visits Calendar', icon: 'calendar_today', link: '/visits' },
       { label: 'Deals & Contracts', icon: 'handshake', link: '/deals' },
+      { label: 'Commissions', icon: 'payments', link: '/commissions' },
       // { label: 'Documents', icon: 'description', link: '/documents' },
       { label: 'Documents Manager', icon: 'folder_copy', link: '/documents-manager' },
 
@@ -49,8 +50,6 @@ export class Sidebar {
     if (['superadmin', 'admin', 'accountant'].includes(role || '')) {
       items.push({ label: 'Invoices', icon: 'receipt_long', link: '/invoices', feature: 'invoices' });
       items.push({ label: 'Expenses', icon: 'account_balance_wallet', link: '/expenses', feature: 'expenses' });
-      items.push({ label: 'Commissions', icon: 'percent', link: '/commissions' });
-      items.push({ label: 'Commission Settings', icon: 'tune', link: '/commission-settings' });
     }
 
     if (['superadmin', 'admin', 'broker', 'officemanager'].includes(role || '')) {

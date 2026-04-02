@@ -13,11 +13,10 @@ import { VisitsComponent } from './pages/visits/visits';
 import { LoginComponent } from './pages/auth/login';
 import { UserManagementComponent } from './pages/user-management/user-management';
 import { MarketingComponent } from './pages/marketing/marketing';
+import { MarketingAutomationComponent } from './pages/marketing-automation/marketing-automation';
 import { DocumentsPageComponent } from './pages/documents/documents';
 import { InvoicesComponent } from './pages/invoices/invoices';
 import { ExpensesComponent } from './pages/expenses/expenses';
-import { CommissionsComponent } from './pages/commissions/commissions';
-import { MarketingAutomationComponent } from './pages/marketing-automation/marketing-automation';
 import { WebsiteBuilderComponent } from './pages/website-builder/website-builder';
 import { WebsiteEditorComponent } from './pages/website-editor/website-editor';
 import { PublicWebsiteComponent } from './pages/public-website/public-website';
@@ -27,8 +26,9 @@ import { AiAssistantComponent } from './pages/ai-assistant/ai-assistant';
 import { DocumentSignPageComponent } from './pages/document-sign/document-sign';
 import { DocumentManagerPageComponent } from './pages/document-manager-page/document-manager-page';
 import { SellersComponent } from './pages/sellers/sellers';
+import { SellerDetailsComponent } from './pages/sellers/seller-details';
 import { GroupsComponent } from './pages/groups/groups';
-import { CommissionSettingsComponent } from './pages/commission-settings/commission-settings';
+import { CommissionsComponent } from './pages/commissions/commissions';
 import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
@@ -45,7 +45,9 @@ export const routes: Routes = [
       { path: 'properties/:id', component: PropertyDetailsComponent },
       { path: 'crm', component: CrmComponent },
       { path: 'deals', component: DealsComponent },
+      { path: 'commissions', component: CommissionsComponent },
       { path: 'sellers', component: SellersComponent },
+      { path: 'sellers/:id', component: SellerDetailsComponent },
       { path: 'documents', component: DocumentsPageComponent },
       { path: 'documents/:id', component: DocumentsPageComponent },
       { path: 'documents-manager', component: DocumentManagerPageComponent },
@@ -83,16 +85,6 @@ export const routes: Routes = [
         path: 'expenses',
         component: ExpensesComponent,
         data: { roles: ['Super Admin', 'Admin', 'Accountant'], feature: 'expenses' }
-      },
-      {
-        path: 'commissions',
-        component: CommissionsComponent,
-        data: { roles: ['Super Admin', 'Admin', 'Accountant'] }
-      },
-      {
-        path: 'commission-settings',
-        component: CommissionSettingsComponent,
-        data: { roles: ['Super Admin', 'Admin', 'Accountant'] }
       },
       {
         path: 'groups',

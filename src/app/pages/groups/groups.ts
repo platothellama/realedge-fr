@@ -34,6 +34,7 @@ interface Group {
   id: string;
   name: string;
   description?: string;
+  companyCommission?: number;
   members?: GroupMember[];
   memberCount?: number;
 }
@@ -85,16 +86,24 @@ export class GroupsComponent implements OnInit {
   showGroupDialog = false;
   showMemberDialog = false;
   showRoleDialog = false;
+  showEditMemberDialog = false;
   isEditMode = false;
   processingId: string | null = null;
+  editingMember: GroupMember | null = null;
 
   groupForm: FormGroup = this.fb.group({
     name: ['', Validators.required],
-    description: ['']
+    description: [''],
+    companyCommission: [10, [Validators.required, Validators.min(0), Validators.max(100)]]
   });
 
   memberForm: FormGroup = this.fb.group({
     userId: ['', Validators.required],
+    role: ['agent', Validators.required],
+    commissionSplit: [null]
+  });
+
+  editMemberForm: FormGroup = this.fb.group({
     role: ['agent', Validators.required],
     commissionSplit: [null]
   });
@@ -161,7 +170,8 @@ export class GroupsComponent implements OnInit {
     this.isEditMode = true;
     this.groupForm.patchValue({
       name: this.selectedGroup.name,
-      description: this.selectedGroup.description || ''
+      description: this.selectedGroup.description || '',
+      companyCommission: (this.selectedGroup as any).companyCommission || 10
     });
     this.showGroupDialog = true;
   }
@@ -261,6 +271,44 @@ export class GroupsComponent implements OnInit {
     });
   }
 
+  openEditMemberDialog(member: GroupMember) {
+    this.editingMember = member;
+    this.editMemberForm.patchValue({
+      role: member.role,
+      commissionSplit: member.commissionSplit
+    });
+    this.showEditMemberDialog = true;
+  }
+
+  saveMemberEdit() {
+    if (!this.selectedGroup || !this.editingMember) return;
+
+    const { role, commissionSplit } = this.editMemberForm.value;
+    
+    this.processingId = this.editingMember.id;
+    this.api.updateGroupRoles(this.selectedGroup.id, [{
+      userId: this.editingMember.userId,
+      role,
+      commissionSplit
+    }]).subscribe({
+      next: (res: any) => {
+        const updated = res.data || this.groupMembers;
+        const idx = this.groupMembers.findIndex(m => m.userId === this.editingMember!.userId);
+        if (idx > -1 && updated[idx]) {
+          this.groupMembers[idx] = { ...this.groupMembers[idx], ...updated[idx] };
+        }
+        this.processingId = null;
+        this.showEditMemberDialog = false;
+        this.editingMember = null;
+        this.snackBar.open('Member updated', 'Close', { duration: 3000 });
+      },
+      error: (err) => {
+        this.processingId = null;
+        this.snackBar.open('Failed to update member', 'Close', { duration: 3000 });
+      }
+    });
+  }
+
   updateMemberRole(member: GroupMember, newRole: string) {
     if (!this.selectedGroup) return;
     
@@ -307,5 +355,7 @@ export class GroupsComponent implements OnInit {
     this.showGroupDialog = false;
     this.showMemberDialog = false;
     this.showRoleDialog = false;
+    this.showEditMemberDialog = false;
+    this.editingMember = null;
   }
 }

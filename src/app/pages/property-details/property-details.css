@@ -21,6 +21,51 @@
   gap: 12px;
 }
 
+/* Sale/Lost Info Banners */
+.sale-info-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+  border-radius: 12px;
+  margin-bottom: 24px;
+  border: 1px solid #86efac;
+}
+
+.sale-info-banner mat-icon {
+  color: #166534;
+}
+
+.sale-info-banner span {
+  color: #166534;
+  font-size: 1rem;
+}
+
+.sale-info-banner strong {
+  font-weight: 600;
+}
+
+.lost-info-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+  border-radius: 12px;
+  margin-bottom: 24px;
+  border: 1px solid #fca5a5;
+}
+
+.lost-info-banner mat-icon {
+  color: #991b1b;
+}
+
+.lost-info-banner span {
+  color: #991b1b;
+  font-size: 1rem;
+}
+
 /* Gallery */
 .gallery-section {
   margin-bottom: 32px;

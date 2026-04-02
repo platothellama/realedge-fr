@@ -5,14 +5,29 @@
       <p>{{ pagination.totalItems }} listings</p>
     </div>
     <div class="header-actions">
-<!--      <button mat-stroked-button class="btn-outline" (click)="seedProperties()" [disabled]="seeding">-->
-<!--        @if (seeding) {-->
-<!--          <mat-spinner diameter="16"></mat-spinner>-->
-<!--        } @else {-->
-<!--          <mat-icon>auto_awesome</mat-icon>-->
-<!--        }-->
-<!--        Seed Data-->
-<!--      </button>-->
+      <div class="status-filter-group">
+        <button mat-stroked-button 
+                class="status-filter-btn"
+                [class.active]="filters.selectedStatus === 'Available'"
+                (click)="filters.selectedStatus = 'Available'; applyFilters()">
+          <mat-icon>check_circle</mat-icon>
+          Available
+        </button>
+        <button mat-stroked-button 
+                class="status-filter-btn"
+                [class.active]="filters.selectedStatus === 'All'"
+                (click)="filters.selectedStatus = 'All'; applyFilters()">
+          <mat-icon>list</mat-icon>
+          All
+        </button>
+        <button mat-stroked-button 
+                class="status-filter-btn"
+                [class.active]="filters.selectedStatus === 'Non-Available'"
+                (click)="filters.selectedStatus = 'Non-Available'; applyFilters()">
+          <mat-icon>pending</mat-icon>
+          Non-Available
+        </button>
+      </div>
       <button mat-raised-button color="primary" (click)="openPropertyForm()">
         <mat-icon>add</mat-icon>
         Add Property

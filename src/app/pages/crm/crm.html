@@ -6,16 +6,7 @@
     </div>
 
     <div class="action-area">
-      <button mat-stroked-button color="primary" [matMenuTriggerFor]="dataMenu" class="data-btn">
-        <mat-icon>import_export</mat-icon>
-        Data
-      </button>
-      <mat-menu #dataMenu="matMenu">
-        <button mat-menu-item (click)="exportToCSV()">
-          <mat-icon>download</mat-icon>
-          <span>Export CSV</span>
-        </button>
-      </mat-menu>
+
 
       <button mat-raised-button color="primary" class="create-btn" (click)="openLeadForm()">
         <mat-icon>person_add</mat-icon>

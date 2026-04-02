@@ -10,6 +10,13 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatRadioModule } from '@angular/material/radio';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 import { ApiService } from '../../services/api';
 import { PropertyFormComponent } from '../../components/property-form/property-form';
 import { NegotiationFormComponent } from '../../components/negotiation-form/negotiation-form';
@@ -17,6 +24,7 @@ import { DealFormComponent } from '../../components/deal-form/deal-form';
 import { VisitFormComponent } from '../../components/visit-form/visit-form';
 import { DocumentManagerComponent } from '../../components/document-manager/document-manager';
 import { LeadWorkflowComponent, LeadWorkflowResult } from '../../components/lead-workflow/lead-workflow';
+import { SoldDialogComponent } from '../../components/sold-dialog/sold-dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 @Component({
@@ -35,6 +43,13 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
     MatProgressSpinnerModule,
     MatTooltipModule,
     MatSnackBarModule,
+    MatMenuModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatRadioModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
     DocumentManagerComponent,
   ],
   templateUrl: './property-details.html',
@@ -49,6 +64,8 @@ export class PropertyDetailsComponent implements OnInit {
   propertyVisits: any[] = [];
   propertyDeals: any[] = [];
   propertyLeads: any[] = [];
+  allLeads: any[] = [];
+  analytics: any = {};
 
   constructor(
     private route: ActivatedRoute,
@@ -77,11 +94,31 @@ export class PropertyDetailsComponent implements OnInit {
         };
         this.calculateAnalytics();
         this.loadPropertyRelatedData(id);
+
+        if (this.property.soldTo) {
+          const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(this.property.soldTo);
+          if (isUuid) {
+            this.resolveLeadName(this.property.soldTo, 'soldTo');
+          }
+        }
+
         this.loading = false;
       },
       error: (err) => {
         console.error('Error fetching property Details:', err);
         this.loading = false;
+      }
+    });
+  }
+
+  resolveLeadName(leadId: string, field: string) {
+    this.api.getLeads().subscribe({
+      next: (res: any) => {
+        const allLeads = Array.isArray(res) ? res : (res?.data || []);
+        const lead = allLeads.find((l: any) => l.id === leadId);
+        if (lead) {
+          this.property[field] = lead.name;
+        }
       }
     });
   }
@@ -109,8 +146,6 @@ export class PropertyDetailsComponent implements OnInit {
     });
   }
 
-  analytics: any = {};
-
   calculateAnalytics() {
     if (!this.property) return;
 
@@ -128,7 +163,7 @@ export class PropertyDetailsComponent implements OnInit {
       daysOnMarket,
       views,
       inquiries,
-      visitsPerView: views > 0 ? (inquiries / views * 100).toFixed(1) : 0,
+      visitsPerView: views > 0 ? (inquiries / views * 100).toFixed(1) : '0',
       status: this.getPropertyStatus(daysOnMarket, views, inquiries, marketValue, price),
       daysClass: daysOnMarket > 60 ? 'stale' : daysOnMarket > 30 ? 'aging' : 'fresh',
       valuationClass: marketValue > 0 ? (price > marketValue * 1.1 ? 'overvalued' : price < marketValue * 0.9 ? 'undervalued' : 'fair') : 'unknown'
@@ -156,124 +191,152 @@ export class PropertyDetailsComponent implements OnInit {
     }
   }
 
-  openEditForm() {
-    const dialogRef = this.dialog.open(PropertyFormComponent, {
-      width: '850px',
-      data: { property: this.property }
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.api.updateProperty(this.property.id, result).subscribe({
-          next: () => this.fetchProperty(this.property.id),
-          error: (err) => console.error('Error updating property', err)
-        });
+  loadAllLeads() {
+    this.api.getLeads().subscribe({
+      next: (res: any) => {
+        this.allLeads = Array.isArray(res) ? res : (res?.data || []);
       }
     });
   }
 
-  openNegotiationForm() {
-    const dialogRef = this.dialog.open(NegotiationFormComponent, {
-      width: '550px',
-      data: { propertyPrice: this.property.price }
-    });
+  showSoldDialog() {
+    this.api.getLeads().subscribe({
+      next: (res: any) => {
+        this.allLeads = Array.isArray(res) ? res : (res?.data || []);
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.api.addNegotiation(this.property.id, result).subscribe({
-          next: () => {
-            this.snackBar.open('Negotiation log added successfully!', 'Close', { duration: 3000 });
-            this.fetchProperty(this.property.id);
-          },
-          error: (err) => {
-            console.error('Error adding negotiation', err);
-            this.snackBar.open('Failed to add negotiation log', 'Close', { duration: 3000 });
+        const dialogRef = this.dialog.open(SoldDialogComponent, {
+          width: '500px',
+          data: {
+            leads: this.allLeads,
+            propertyId: this.property.id
           }
         });
-      }
-    });
-  }
 
-  startDeal() {
-    const dialogRef = this.dialog.open(DealFormComponent, {
-      width: '850px',
-      data: {
-        propertyId: this.property.id,
-        sellerId: this.property.sellerId || null,
-        seller: this.property.seller || null,
-        deal: {
-          propertyId: this.property.id,
-          title: `Sale of ${this.property.title}`,
-          sellerId: this.property.sellerId || null,
-          sellerName: this.property.seller?.name || ''
-        }
-      }
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.api.createDeal(result).subscribe({
-          next: () => {
-            this.snackBar.open('Deal started successfully!', 'View Deals', { duration: 5000 })
-              .onAction().subscribe(() => this.router.navigate(['/deals']));
-          },
-          error: (err) => console.error('Error creating deal', err)
+        dialogRef.afterClosed().subscribe((result: any) => {
+          if (result) {
+            if (result.createNewDeal) {
+              this.api.createDeal(result.newDeal).subscribe({
+                next: (deal: any) => {
+                  // this.markAsSold(deal.buyerName || deal.id, result.soldAt);
+                  this.loadPropertyRelatedData(this.property.id);
+                },
+                error: (err: any) => {
+                  console.error('Error creating deal', err);
+                  this.snackBar.open('Failed to create deal', 'Close', { duration: 3000 });
+                }
+              });
+            } else if (result.dealId) {
+              // this.api.updateDeal(result.dealId, { dealStage: 'Closed' }).subscribe({
+              //   next: () => {
+                  this.markAsSold(result.buyerName || result.dealTitle, result.soldAt);
+                  this.loadPropertyRelatedData(this.property.id);
+                // },
+                // error: (err: any) => {
+                //   console.error('Error updating deal', err);
+                //   this.snackBar.open('Failed to update deal', 'Close', { duration: 3000 });
+                // }
+              // });
+            } else if (result.createNewLead) {
+              this.api.createLead(result.newLead).subscribe({
+                next: (lead: any) => {
+                  this.markAsSold(lead.id || lead.name, result.soldAt);
+                },
+                error: (err: any) => {
+                  console.error('Error creating lead', err);
+                  this.snackBar.open('Failed to create lead', 'Close', { duration: 3000 });
+                }
+              });
+            } else if (result.leadId) {
+              this.markAsSold(result.leadName || result.leadId, result.soldAt);
+              this.api.updateLead(result.leadId, {
+                status: 'Closed',
+                propertyId: this.property.id
+              }).subscribe({
+                next: () => console.log('Lead updated to Closed'),
+                error: (err: any) => console.error('Error updating lead', err)
+              });
+            }
+          }
         });
+      },
+      error: (err: any) => {
+        console.error('Error loading leads', err);
+        this.snackBar.open('Failed to load leads', 'Close', { duration: 3000 });
       }
     });
   }
 
-  scheduleVisit() {
-    const dialogRef = this.dialog.open(VisitFormComponent, {
-      width: '600px',
-      data: { propertyId: this.property.id }
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.api.createVisit(result).subscribe({
-          next: () => {
-            this.snackBar.open('Visit scheduled successfully!', 'View Calendar', { duration: 5000 })
-              .onAction().subscribe(() => this.router.navigate(['/visits']));
-          },
-          error: (err) => console.error('Error scheduling visit', err)
-        });
+  markAsSold(leadIdOrName: string, date: string) {
+    this.api.updateProperty(this.property.id, {
+      status: 'Sold',
+      soldTo: leadIdOrName,
+      soldAt: date || new Date().toISOString()
+    }).subscribe({
+      next: () => {
+        this.snackBar.open('Property marked as sold!', 'Close', { duration: 3000 });
+        this.fetchProperty(this.property.id);
+      },
+      error: (err: any) => {
+        console.error('Error marking property as sold', err);
+        this.snackBar.open('Failed to update property', 'Close', { duration: 3000 });
       }
     });
   }
 
-  openLeadWorkflow() {
-    const dialogRef = this.dialog.open(LeadWorkflowComponent, {
-      width: '700px',
-      data: { propertyId: this.property.id, property: this.property }
-    });
-
-    dialogRef.afterClosed().subscribe((result: LeadWorkflowResult) => {
-      if (result) {
-        if (result.visit) {
-          this.api.createVisit(result.visit).subscribe({
-            next: () => {
-              this.snackBar.open('Visit scheduled successfully!', 'View Calendar', { duration: 5000 })
-                .onAction().subscribe(() => this.router.navigate(['/visits']));
-            },
-            error: (err) => console.error('Error scheduling visit', err)
-          });
-        }
-        if (result.deal) {
-          this.api.createDeal(result.deal).subscribe({
-            next: () => {
-              this.snackBar.open('Deal created successfully!', 'View Deals', { duration: 5000 })
-                .onAction().subscribe(() => this.router.navigate(['/deals']));
-            },
-            error: (err) => console.error('Error creating deal', err)
-          });
-        }
+  markAsLost(reason: string, date: string) {
+    this.api.updateProperty(this.property.id, {
+      status: 'Lost',
+      lostTo: reason,
+      lostAt: date || new Date().toISOString()
+    }).subscribe({
+      next: () => {
+        this.snackBar.open('Property marked as lost', 'Close', { duration: 3000 });
+        this.fetchProperty(this.property.id);
+      },
+      error: (err: any) => {
+        console.error('Error marking property as lost', err);
+        this.snackBar.open('Failed to update property', 'Close', { duration: 3000 });
       }
     });
   }
 
-  goBack() {
-    this.router.navigate(['/properties']);
+  reopenProperty() {
+    this.api.updateProperty(this.property.id, {
+      status: 'Available',
+      soldTo: null,
+      soldAt: null,
+      lostTo: null,
+      lostAt: null
+    }).subscribe({
+      next: () => {
+        this.snackBar.open('Property reopened as available', 'Close', { duration: 3000 });
+        this.fetchProperty(this.property.id);
+      },
+      error: (err: any) => {
+        console.error('Error reopening property', err);
+        this.snackBar.open('Failed to update property', 'Close', { duration: 3000 });
+      }
+    });
+  }
+
+  get canMarkSoldOrLost(): boolean {
+    return this.property?.status === 'Available' || this.property?.status === 'Reserved';
+  }
+
+  get isSold(): boolean {
+    return this.property?.status === 'Sold';
+  }
+
+  get isLost(): boolean {
+    return this.property?.status === 'Lost';
+  }
+
+  showLostDialog() {
+    const reason = prompt('Enter reason for losing (reason/competitor):', '');
+    if (reason !== null && reason.trim()) {
+      const date = prompt('Enter date (YYYY-MM-DD):', new Date().toISOString().split('T')[0]);
+      this.markAsLost(reason.trim(), date || '');
+    }
   }
 
   openLightbox(index: number) {
@@ -310,5 +373,73 @@ export class PropertyDetailsComponent implements OnInit {
     if (this.analytics?.valuationClass === 'undervalued') return 'trending_down';
     if (this.analytics?.valuationClass === 'overvalued') return 'trending_up';
     return 'remove';
+  }
+
+  goBack() {
+    this.router.navigate(['/properties']);
+  }
+
+  openLeadWorkflow() {
+    const dialogRef = this.dialog.open(LeadWorkflowComponent, {
+      width: '700px',
+      maxHeight: '90vh',
+      data: { propertyId: this.property.id }
+    });
+
+    dialogRef.afterClosed().subscribe((result: LeadWorkflowResult) => {
+      if (result) {
+        this.loadPropertyRelatedData(this.property.id);
+        this.snackBar.open('Workflow completed', 'Close', { duration: 3000 });
+      }
+    });
+  }
+
+  openEditForm() {
+    const dialogRef = this.dialog.open(PropertyFormComponent, {
+      width: '800px',
+      maxHeight: '90vh',
+      data: { property: this.property, isEdit: true }
+    });
+
+    dialogRef.afterClosed().subscribe((result: any) => {
+      if (result) {
+        this.api.updateProperty(this.property.id, result).subscribe({
+          next: () => {
+            this.fetchProperty(this.property.id);
+            this.snackBar.open('Property updated successfully', 'Close', { duration: 3000 });
+          },
+          error: (err) => {
+            console.error('Error updating property', err);
+            this.snackBar.open('Failed to update property', 'Close', { duration: 3000 });
+          }
+        });
+      }
+    });
+  }
+
+  openNegotiationForm() {
+    this.api.getLeads().subscribe({
+      next: (res: any) => {
+        this.allLeads = Array.isArray(res) ? res : (res?.data || []);
+
+        const dialogRef = this.dialog.open(NegotiationFormComponent, {
+          width: '500px',
+          data: {
+            propertyId: this.property.id,
+            leads: this.allLeads
+          }
+        });
+
+        dialogRef.afterClosed().subscribe((result: any) => {
+          if (result) {
+            this.fetchProperty(this.property.id);
+          }
+        });
+      },
+      error: (err: any) => {
+        console.error('Error loading leads', err);
+        this.snackBar.open('Failed to load leads', 'Close', { duration: 3000 });
+      }
+    });
   }
 }

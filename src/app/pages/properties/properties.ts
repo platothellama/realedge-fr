@@ -45,7 +45,7 @@ export class PropertiesComponent implements OnInit {
 
   filters: SearchFilters = {
     searchQuery: '',
-    selectedStatus: 'All',
+    selectedStatus: 'Available',
     selectedType: 'All',
     selectedListingType: 'All',
     selectedCity: 'All',
@@ -57,6 +57,8 @@ export class PropertiesComponent implements OnInit {
     minArea: null,
     maxArea: null
   };
+
+  statusOptions = ['Available', 'All', 'Sold', 'Rented', 'Reserved'];
 
   pagination = {
     page: 1,

@@ -24,8 +24,8 @@
           </div>
           <div class="list-items">
             @for (group of groups; track group.id) {
-              <div 
-                class="list-item" 
+              <div
+                class="list-item"
                 [class.selected]="selectedGroup?.id === group.id"
                 (click)="selectGroup(group)"
               >
@@ -69,6 +69,10 @@
               <div class="header-info">
                 <h2>{{ selectedGroup.name }}</h2>
                 <p>{{ selectedGroup.description || 'No description' }}</p>
+                <p class="company-commission">
+                  <mat-icon>percent</mat-icon>
+                  Company Commission: {{ selectedGroup?.companyCommission ??0 || 10 }}%
+                </p>
               </div>
               <button mat-raised-button color="accent" (click)="openAddMemberDialog()">
                 <mat-icon>person_add</mat-icon>
@@ -101,17 +105,10 @@
                         <mat-icon>more_vert</mat-icon>
                       </button>
                       <mat-menu #memberMenu="matMenu">
-                        <button mat-menu-item [matMenuTriggerFor]="roleMenu">
-                          <mat-icon>swap_horiz</mat-icon>
-                          Change Role
+                        <button mat-menu-item (click)="openEditMemberDialog(member)">
+                          <mat-icon>edit</mat-icon>
+                          Edit Role & Commission
                         </button>
-                        <mat-menu #roleMenu="matMenu">
-                          @for (role of roleOptions; track role.value) {
-                            <button mat-menu-item (click)="updateMemberRole(member, role.value)" [disabled]="member.role === role.value">
-                              {{ role.label }}
-                            </button>
-                          }
-                        </mat-menu>
                         <button mat-menu-item (click)="removeMember(member)" class="delete-option">
                           <mat-icon>person_remove</mat-icon>
                           Remove
@@ -162,6 +159,11 @@
             <mat-form-field appearance="outline" class="full-width">
               <mat-label>Description</mat-label>
               <textarea matInput formControlName="description" rows="3" placeholder="Optional description"></textarea>
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Company Commission %</mat-label>
+              <input matInput type="number" formControlName="companyCommission" placeholder="e.g., 10">
+              <mat-hint>Percentage of sale price the company takes from property commission</mat-hint>
             </mat-form-field>
           </form>
         </div>
@@ -218,6 +220,54 @@
           <button mat-button (click)="closeDialog()">Cancel</button>
           <button mat-raised-button color="primary" (click)="addMember()" [disabled]="memberForm.invalid">
             Add Member
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Edit Member Dialog -->
+  @if (showEditMemberDialog && editingMember) {
+    <div class="dialog-overlay" (click)="closeDialog()">
+      <div class="dialog-content" (click)="$event.stopPropagation()">
+        <div class="dialog-header">
+          <h2>Edit Member</h2>
+          <button mat-icon-button (click)="closeDialog()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+        <div class="dialog-body">
+          <div class="edit-member-header">
+            <div class="member-avatar-large">
+              <mat-icon>person</mat-icon>
+            </div>
+            <div class="member-details">
+              <span class="member-name">{{ editingMember.user?.name }}</span>
+              <span class="member-email">{{ editingMember.user?.email }}</span>
+            </div>
+          </div>
+          <form [formGroup]="editMemberForm">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Role</mat-label>
+              <mat-select formControlName="role">
+                @for (role of roleOptions; track role.value) {
+                  <mat-option [value]="role.value">
+                    {{ role.label }}
+                  </mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Commission Split % (Optional)</mat-label>
+              <input matInput type="number" formControlName="commissionSplit" placeholder="Override default split">
+              <mat-hint>Leave empty to use role default</mat-hint>
+            </mat-form-field>
+          </form>
+        </div>
+        <div class="dialog-footer">
+          <button mat-button (click)="closeDialog()">Cancel</button>
+          <button mat-raised-button color="primary" (click)="saveMemberEdit()" [disabled]="editMemberForm.invalid || isProcessing(editingMember.id)">
+            Save Changes
           </button>
         </div>
       </div>

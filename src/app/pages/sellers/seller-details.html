@@ -1,0 +1,308 @@
+<div class="page" *ngIf="!loading && seller">
+  <div class="page-header">
+    <div class="header-left">
+      <button mat-icon-button class="back-btn" (click)="goBack()">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div class="seller-info">
+        <h1>{{ seller.name }}</h1>
+        <p>{{ seller.email || 'No email' }} • {{ seller.phone || 'No phone' }}</p>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button mat-stroked-button (click)="goBack()">
+        <mat-icon>edit</mat-icon>
+        Edit
+      </button>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <mat-icon>home</mat-icon>
+      <div class="stat-content">
+        <span class="stat-value">{{ stats?.propertiesCount || 0 }}</span>
+        <span class="stat-label">Properties</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <mat-icon>handshake</mat-icon>
+      <div class="stat-content">
+        <span class="stat-value">{{ stats?.closedDealsCount || 0 }}</span>
+        <span class="stat-label">Closed Deals</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <mat-icon>receipt_long</mat-icon>
+      <div class="stat-content">
+        <span class="stat-value">{{ stats?.invoicesCount || 0 }}</span>
+        <span class="stat-label">Invoices</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <mat-icon>attach_money</mat-icon>
+      <div class="stat-content">
+        <span class="stat-value">{{ formatCurrency(stats?.totalDealValue || 0) }}</span>
+        <span class="stat-label">Total Sales</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <mat-icon>account_balance</mat-icon>
+      <div class="stat-content">
+        <span class="stat-value">{{ formatCurrency(stats?.totalCommission || 0) }}</span>
+        <span class="stat-label">Total Commission</span>
+      </div>
+    </div>
+    <div class="stat-card" [class.highlight]="stats?.outstandingAmount > 0">
+      <mat-icon>payment</mat-icon>
+      <div class="stat-content">
+        <span class="stat-value">{{ formatCurrency(stats?.outstandingAmount || 0) }}</span>
+        <span class="stat-label">Outstanding</span>
+      </div>
+    </div>
+  </div>
+
+  <mat-tab-group class="detail-tabs" animationDuration="300ms">
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon>home</mat-icon>
+        Properties ({{ seller.properties?.length || 0 }})
+      </ng-template>
+      
+      <div class="tab-content">
+        <div class="empty-state" *ngIf="!seller.properties?.length">
+          <mat-icon>apartment</mat-icon>
+          <h3>No properties</h3>
+          <p>This seller has no listed properties</p>
+        </div>
+        
+        <div class="properties-grid" *ngIf="seller.properties?.length">
+          <div class="property-card" *ngFor="let prop of seller.properties" (click)="openPropertyDetails(prop)">
+            <div class="card-image">
+              <img [src]="prop.photos?.length ? prop.photos[0] : 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80'" alt="">
+              <span class="badge-status" [class]="getStatusClass(prop.status)">{{ prop.status }}</span>
+            </div>
+            <div class="card-body">
+              <div class="card-price">${{ prop.price | number }}</div>
+              <h3 class="card-title">{{ prop.title }}</h3>
+              <p class="card-location">
+                <mat-icon>place</mat-icon>
+                {{ prop.city }}
+              </p>
+              <div class="card-meta">
+                <span><mat-icon>home</mat-icon> {{ prop.type }}</span>
+                <span><mat-icon>bed</mat-icon>{{ prop.bedrooms }}</span>
+                <span><mat-icon>square</mat-icon>{{ prop.area }}m²</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon>handshake</mat-icon>
+        Deals ({{ seller.deals?.length || 0 }})
+      </ng-template>
+      
+      <div class="tab-content">
+        <div class="empty-state" *ngIf="!seller.deals?.length">
+          <mat-icon>handshake</mat-icon>
+          <h3>No deals</h3>
+          <p>This seller has no associated deals</p>
+        </div>
+        
+        <div class="table-container" *ngIf="seller.deals?.length">
+          <table mat-table [dataSource]="seller.deals" class="deals-table">
+            <ng-container matColumnDef="title">
+              <th mat-header-cell *matHeaderCellDef>Deal</th>
+              <td mat-cell *matCellDef="let deal">
+                <div class="deal-title">{{ deal.title }}</div>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="property">
+              <th mat-header-cell *matHeaderCellDef>Property</th>
+              <td mat-cell *matCellDef="let deal">
+                <span *ngIf="deal.property">{{ deal.property.title }}</span>
+                <span *ngIf="!deal.property" class="text-muted">-</span>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="agent">
+              <th mat-header-cell *matHeaderCellDef>Agent</th>
+              <td mat-cell *matCellDef="let deal">
+                <span *ngIf="deal.agent">{{ deal.agent.name }}</span>
+                <span *ngIf="!deal.agent" class="text-muted">-</span>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="stage">
+              <th mat-header-cell *matHeaderCellDef>Stage</th>
+              <td mat-cell *matCellDef="let deal">
+                <span class="stage-badge" [class]="getStageClass(deal.dealStage)">{{ deal.dealStage }}</span>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="commission">
+              <th mat-header-cell *matHeaderCellDef>Commission</th>
+              <td mat-cell *matCellDef="let deal">{{ formatCurrency(deal.commission) }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="closedAt">
+              <th mat-header-cell *matHeaderCellDef>Closed</th>
+              <td mat-cell *matCellDef="let deal">{{ formatDate(deal.closedAt) }}</td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="dealColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: dealColumns;" (click)="openDealDetails(row)" class="clickable-row"></tr>
+          </table>
+        </div>
+      </div>
+    </mat-tab>
+
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon>receipt_long</mat-icon>
+        Invoices ({{ seller.invoices?.length || 0 }})
+      </ng-template>
+      
+      <div class="tab-content">
+        <div class="empty-state" *ngIf="!seller.invoices?.length">
+          <mat-icon>receipt_long</mat-icon>
+          <h3>No invoices</h3>
+          <p>This seller has no invoices</p>
+        </div>
+        
+        <div class="invoice-stats" *ngIf="seller.invoices?.length">
+          <div class="invoice-stat">
+            <span class="label">Total Invoiced</span>
+            <span class="value">{{ formatCurrency(stats?.totalInvoiced || 0) }}</span>
+          </div>
+          <div class="invoice-stat paid">
+            <span class="label">Paid</span>
+            <span class="value">{{ formatCurrency(stats?.totalPaid || 0) }}</span>
+          </div>
+          <div class="invoice-stat outstanding">
+            <span class="label">Outstanding</span>
+            <span class="value">{{ formatCurrency(stats?.outstandingAmount || 0) }}</span>
+          </div>
+        </div>
+
+        <div class="table-container" *ngIf="seller.invoices?.length">
+          <table mat-table [dataSource]="seller.invoices" class="invoices-table">
+            <ng-container matColumnDef="invoiceNumber">
+              <th mat-header-cell *matHeaderCellDef>Invoice #</th>
+              <td mat-cell *matCellDef="let inv">
+                <span class="invoice-number">{{ inv.invoiceNumber }}</span>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="type">
+              <th mat-header-cell *matHeaderCellDef>Type</th>
+              <td mat-cell *matCellDef="let inv">{{ inv.type }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="total">
+              <th mat-header-cell *matHeaderCellDef>Total</th>
+              <td mat-cell *matCellDef="let inv">
+                <span class="amount">{{ formatCurrency(inv.total) }}</span>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="status">
+              <th mat-header-cell *matHeaderCellDef>Status</th>
+              <td mat-cell *matCellDef="let inv">
+                <span class="status-badge" [class]="getStatusClass(inv.status)">{{ inv.status }}</span>
+              </td>
+            </ng-container>
+
+            <ng-container matColumnDef="issueDate">
+              <th mat-header-cell *matHeaderCellDef>Issued</th>
+              <td mat-cell *matCellDef="let inv">{{ formatDate(inv.issueDate) }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="dueDate">
+              <th mat-header-cell *matHeaderCellDef>Due</th>
+              <td mat-cell *matCellDef="let inv">{{ formatDate(inv.dueDate) }}</td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="invoiceColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: invoiceColumns;" (click)="openInvoiceDetails(row)" class="clickable-row"></tr>
+          </table>
+        </div>
+      </div>
+    </mat-tab>
+
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon>info</mat-icon>
+        Details
+      </ng-template>
+      
+      <div class="tab-content">
+        <div class="details-grid">
+          <div class="detail-section">
+            <h3>Contact Information</h3>
+            <div class="detail-row">
+              <span class="detail-label">Name</span>
+              <span class="detail-value">{{ seller.name }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Email</span>
+              <span class="detail-value">{{ seller.email || '-' }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Phone</span>
+              <span class="detail-value">{{ seller.phone || '-' }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Address</span>
+              <span class="detail-value">{{ seller.address || '-' }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">City</span>
+              <span class="detail-value">{{ seller.city || '-' }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Country</span>
+              <span class="detail-value">{{ seller.country || '-' }}</span>
+            </div>
+          </div>
+
+          <div class="detail-section">
+            <h3>Notes</h3>
+            <p class="notes-text">{{ seller.notes || 'No notes' }}</p>
+          </div>
+
+          <div class="detail-section">
+            <h3>System Information</h3>
+            <div class="detail-row">
+              <span class="detail-label">Created</span>
+              <span class="detail-value">{{ formatDate(seller.createdAt) }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Last Updated</span>
+              <span class="detail-value">{{ formatDate(seller.updatedAt) }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>
+
+<div class="loading-state" *ngIf="loading">
+  <mat-spinner diameter="40"></mat-spinner>
+  <p>Loading seller details...</p>
+</div>
+
+<div class="error-state" *ngIf="!loading && !seller">
+  <mat-icon>error</mat-icon>
+  <h3>Seller not found</h3>
+  <button mat-raised-button color="primary" (click)="goBack()">
+    <mat-icon>arrow_back</mat-icon>
+    Back to Sellers
+  </button>
+</div>

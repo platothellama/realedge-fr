@@ -32,9 +32,45 @@
       </mat-form-field>
 
       <mat-form-field appearance="outline">
+        <mat-label>Job Title</mat-label>
+        <input matInput formControlName="job" placeholder="e.g. CEO, Engineer">
+        <mat-icon matSuffix>work</mat-icon>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline">
         <mat-label>Nationality</mat-label>
         <input matInput formControlName="nationality" placeholder="e.g. British, Emirati">
         <mat-icon matSuffix>public</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" *ngIf="leadForm.get('referenceType')?.value === 'lead'">
+        <mat-label>Reference Lead</mat-label>
+        <mat-select formControlName="referenceId">
+          <mat-option [value]="null">-- None --</mat-option>
+          @for (lead of leads; track lead.id) {
+            <mat-option [value]="lead.id">{{ lead.name }} - {{ lead.email }}</mat-option>
+          }
+        </mat-select>
+        <mat-icon matSuffix>person</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" *ngIf="leadForm.get('referenceType')?.value === 'user'">
+        <mat-label>Reference User</mat-label>
+        <mat-select formControlName="referenceId">
+          <mat-option [value]="null">-- None --</mat-option>
+          @for (user of users; track user.id) {
+            <mat-option [value]="user.id">{{ user.name }}</mat-option>
+          }
+        </mat-select>
+        <mat-icon matSuffix>person</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" *ngIf="leadForm.get('referenceType')?.value === 'text'">
+        <mat-label>Reference Text</mat-label>
+        <input matInput formControlName="referenceText" placeholder="e.g. Referred by John Doe">
+        <mat-icon matSuffix>description</mat-icon>
       </mat-form-field>
     </div>
 

@@ -31,7 +31,13 @@ export class LeadFormComponent implements OnInit {
   leadForm: FormGroup;
   isEdit = false;
   users: any[] = [];
+  leads: any[] = [];
   isSubmitting = false;
+  referenceTypes = [
+    { value: 'text', label: 'Text' },
+    { value: 'lead', label: 'Lead Reference' },
+    { value: 'user', label: 'User Reference' }
+  ];
 
   constructor(
     private fb: FormBuilder,
@@ -50,12 +56,17 @@ export class LeadFormComponent implements OnInit {
       preferredAreas: [''],
       propertyPreferences: [''],
       notes: [''],
-      assignedToUserId: [null]
+      assignedToUserId: [null],
+      job: [''],
+      referenceType: ['text'],
+      referenceId: [null],
+      referenceText: ['']
     });
   }
 
   ngOnInit(): void {
     this.fetchUsers();
+    this.fetchLeads();
     if (this.data && this.data.lead) {
       this.isEdit = true;
       this.leadForm.patchValue(this.data.lead);
@@ -64,7 +75,7 @@ export class LeadFormComponent implements OnInit {
 
   fetchUsers() {
     this.api.getUsers().subscribe({
-      next: (res) => {
+      next: (res: any) => {
         this.users = Array.isArray(res) ? res : (res.data || []);
       },
       error: (err) => {
@@ -72,6 +83,25 @@ export class LeadFormComponent implements OnInit {
         this.users = [];
       }
     });
+  }
+
+  fetchLeads() {
+    this.api.getLeads().subscribe({
+      next: (res: any) => {
+        this.leads = Array.isArray(res) ? res : (res.data || []);
+      },
+      error: (err) => {
+        console.error('Error fetching leads', err);
+        this.leads = [];
+      }
+    });
+  }
+
+  onReferenceTypeChange(event: any) {
+    const refType = event.value;
+    if (refType === 'lead') {
+      this.fetchLeads();
+    }
   }
 
   onSubmit(): void {
