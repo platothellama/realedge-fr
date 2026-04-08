@@ -106,7 +106,7 @@ export class PropertyFormComponent implements OnInit, AfterViewInit {
           this.stepErrors[step] = 'Valid price is required';
           return false;
         }
-        if (!type) {
+        if (!this.isEdit && !type) {
           this.stepErrors[step] = 'Property type is required';
           return false;
         }

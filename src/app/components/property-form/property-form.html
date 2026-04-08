@@ -6,53 +6,50 @@
       </div>
       <div>
         <h2 mat-dialog-title>{{ isEdit ? 'Edit Property Listing' : 'List New Property' }}</h2>
-        <p class="modal-subtitle">{{ isEdit ? 'Update the details below to modify your listing' : 'Step ' + (currentStep + 1) + ' of ' + totalSteps + ' - ' + wizardSteps[currentStep].label }}</p>
+        <p class="modal-subtitle">Step {{ currentStep + 1 }} of {{ totalSteps }} - {{ wizardSteps[currentStep].label }}</p>
       </div>
     </div>
   </div>
 
-  @if (!isEdit) {
-    <div class="wizard-stepper">
-      <div class="stepper-container">
-        @for (step of wizardSteps; track step.label; let i = $index) {
-          <div class="step"
-               [class.active]="currentStep === i"
-               [class.completed]="currentStep > i"
-               [class.clickable]="currentStep >= i"
-               (click)="goToStep(i)">
-            <div class="step-indicator">
-              @if (currentStep > i) {
-                <mat-icon>check</mat-icon>
-              } @else {
-                <span>{{ i + 1 }}</span>
-              }
-            </div>
-            <span class="step-label">{{ step.label }}</span>
+  <div class="wizard-stepper">
+    <div class="stepper-container">
+      @for (step of wizardSteps; track step.label; let i = $index) {
+        <div class="step"
+             [class.active]="currentStep === i"
+             [class.completed]="currentStep > i"
+             [class.clickable]="currentStep >= i"
+             (click)="goToStep(i)">
+          <div class="step-indicator">
+            @if (currentStep > i) {
+              <mat-icon>check</mat-icon>
+            } @else {
+              <span>{{ i + 1 }}</span>
+            }
           </div>
-          @if (i < wizardSteps.length - 1) {
-            <div class="step-connector" [class.completed]="currentStep > i"></div>
-          }
-        }
-      </div>
-      @if (stepErrors[currentStep]) {
-        <div class="step-error">
-          <mat-icon>error</mat-icon>
-          {{ stepErrors[currentStep] }}
+          <span class="step-label">{{ step.label }}</span>
         </div>
+        @if (i < wizardSteps.length - 1) {
+          <div class="step-connector" [class.completed]="currentStep > i"></div>
+        }
       }
     </div>
-  }
+    @if (stepErrors[currentStep]) {
+      <div class="step-error">
+        <mat-icon>error</mat-icon>
+        {{ stepErrors[currentStep] }}
+      </div>
+    }
+  </div>
 
   <mat-dialog-content [formGroup]="propertyForm" class="custom-scrollbar">
 
-    @if (isEdit) {
-      <!-- Edit Mode: Show all sections at once -->
+    @if (currentStep === 0) {
       <div class="tab-content">
         <div class="info-card summary-card">
-          <mat-icon>edit</mat-icon>
+          <mat-icon>{{ isEdit ? 'edit' : 'lightbulb' }}</mat-icon>
           <div>
-            <strong>Edit Property</strong>
-            <p>Update the details below to modify your listing.</p>
+            <strong>{{ isEdit ? 'Edit Property' : 'Getting Started' }}</strong>
+            <p>{{ isEdit ? 'Update the basic details of your listing.' : 'Start with the basic details - title, price, type, and listing purpose.' }}</p>
           </div>
         </div>
 
@@ -126,6 +123,18 @@
           </div>
 
           <div class="form-row three-col">
+            @if (!isEdit) {
+              <mat-form-field appearance="outline">
+                <mat-label>Property Type</mat-label>
+                <mat-select formControlName="type">
+                  @for (t of propertyTypes; track t) {
+                    <mat-option [value]="t">{{t}}</mat-option>
+                  }
+                </mat-select>
+                <mat-error *ngIf="propertyForm.get('type')?.hasError('required')">Property type is required</mat-error>
+              </mat-form-field>
+            }
+
             <mat-form-field appearance="outline">
               <mat-label>Listing Type</mat-label>
               <mat-select formControlName="listingType">
@@ -151,287 +160,10 @@
             </mat-form-field>
           </div>
         </div>
-
-        <div class="form-section">
-          <div class="section-header">
-            <mat-icon>meeting_room</mat-icon>
-            <h3>Rooms & Capacity</h3>
-          </div>
-          <div class="form-row three-col">
-            <mat-form-field appearance="outline">
-              <mat-label>Bedrooms</mat-label>
-              <input matInput type="number" formControlName="bedrooms" min="0">
-              <mat-icon matPrefix>bed</mat-icon>
-            </mat-form-field>
-            <mat-form-field appearance="outline">
-              <mat-label>Bathrooms</mat-label>
-              <input matInput type="number" formControlName="bathrooms" min="0">
-              <mat-icon matPrefix>bathtub</mat-icon>
-            </mat-form-field>
-            <mat-form-field appearance="outline">
-              <mat-label>Parking Spaces</mat-label>
-              <input matInput type="number" formControlName="parkingSpaces" min="0">
-              <mat-icon matPrefix>directions_car</mat-icon>
-            </mat-form-field>
-          </div>
-        </div>
-
-        <div class="form-section">
-          <div class="section-header">
-            <mat-icon>square_foot</mat-icon>
-            <h3>Size & Dimensions</h3>
-          </div>
-          <div class="form-row three-col">
-            <mat-form-field appearance="outline">
-              <mat-label>Indoor Area</mat-label>
-              <input matInput type="number" formControlName="area" min="0">
-              <span matSuffix class="unit-suffix">sqm</span>
-              <mat-icon matPrefix>home</mat-icon>
-            </mat-form-field>
-            <mat-form-field appearance="outline">
-              <mat-label>Lot Size</mat-label>
-              <input matInput type="number" formControlName="lotSize" min="0">
-              <span matSuffix class="unit-suffix">sqm</span>
-              <mat-icon matPrefix>landscape</mat-icon>
-            </mat-form-field>
-            <mat-form-field appearance="outline">
-              <mat-label>Year Built</mat-label>
-              <input matInput type="number" formControlName="yearBuilt">
-              <mat-icon matPrefix>calendar_today</mat-icon>
-            </mat-form-field>
-          </div>
-        </div>
-
-        <div class="form-section">
-          <div class="section-header">
-            <mat-icon>layers</mat-icon>
-            <h3>Floor & Outdoor</h3>
-          </div>
-          <div class="form-row two-col">
-            <mat-form-field appearance="outline">
-              <mat-label>Floor Number</mat-label>
-              <input matInput type="number" formControlName="floor">
-              <mat-icon matPrefix>layers</mat-icon>
-              <mat-hint>Ground floor = 0, Basement = negative</mat-hint>
-            </mat-form-field>
-            <mat-form-field appearance="outline">
-              <mat-label>Has Terrace</mat-label>
-              <mat-select formControlName="hasTerrace">
-                <mat-option [value]="true">
-                  <mat-icon>check_circle</mat-icon> Yes
-                </mat-option>
-                <mat-option [value]="false">
-                  <mat-icon>cancel</mat-icon> No
-                </mat-option>
-              </mat-select>
-              <mat-icon matPrefix>deck</mat-icon>
-            </mat-form-field>
-          </div>
-          @if (propertyForm.get('hasTerrace')?.value) {
-            <div class="form-row one-col">
-              <mat-form-field appearance="outline">
-                <mat-label>Terrace Size</mat-label>
-                <input matInput type="number" formControlName="terraceSize" min="0">
-                <span matSuffix class="unit-suffix">sqm</span>
-                <mat-icon matPrefix>deck</mat-icon>
-              </mat-form-field>
-            </div>
-          }
-        </div>
-
-        <div class="form-section">
-          <div class="section-header">
-            <mat-icon>check_circle</mat-icon>
-            <h3>Features & Amenities</h3>
-          </div>
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Property Features</mat-label>
-            <input matInput formControlName="features" placeholder="Pool, Garden, Gym, Smart Home, Security System...">
-            <mat-icon matPrefix>list</mat-icon>
-            <mat-hint>Separate with commas</mat-hint>
-          </mat-form-field>
-        </div>
-
-        <div class="form-section">
-          <div class="section-header">
-            <mat-icon>place</mat-icon>
-            <h3>Address Details</h3>
-          </div>
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Street Address</mat-label>
-            <input matInput formControlName="address">
-            <mat-icon matSuffix>location_on</mat-icon>
-            <mat-error *ngIf="propertyForm.get('address')?.hasError('required')">Address is required</mat-error>
-          </mat-form-field>
-
-          <div class="form-row two-col">
-            <mat-form-field appearance="outline">
-              <mat-label>City</mat-label>
-              <input matInput formControlName="city">
-              <mat-icon matPrefix>location_city</mat-icon>
-              <mat-error *ngIf="propertyForm.get('city')?.hasError('required')">City is required</mat-error>
-            </mat-form-field>
-            <mat-form-field appearance="outline">
-              <mat-label>Country</mat-label>
-              <input matInput formControlName="country">
-              <mat-icon matPrefix>public</mat-icon>
-              <mat-error *ngIf="propertyForm.get('country')?.hasError('required')">Country is required</mat-error>
-            </mat-form-field>
-          </div>
-        </div>
-
-        <div class="form-section">
-          <div class="section-header">
-            <mat-icon>map</mat-icon>
-            <h3>Map Location</h3>
-          </div>
-          <div class="map-container">
-            <google-map
-              height="280px"
-              width="100%"
-              [center]="mapCenter"
-              [zoom]="mapZoom"
-              [options]="mapOptions"
-              (mapClick)="onMapClick($event)">
-              @if (markerPosition) {
-                <map-marker [position]="markerPosition"></map-marker>
-              }
-            </google-map>
-          </div>
-        </div>
-
-        <div class="form-section">
-          <div class="section-header">
-            <mat-icon>add_a_photo</mat-icon>
-            <h3>Photos</h3>
-          </div>
-          <div class="upload-section">
-            <div class="photo-grid">
-              @for (photo of uploadedPhotos; track photo; let i = $index) {
-                <div class="photo-item">
-                  <img [src]="photo" alt="Property photo">
-                  <button mat-icon-button color="warn" class="remove-btn" (click)="removePhoto(i)">
-                    <mat-icon>close</mat-icon>
-                  </button>
-                  @if (i === 0) {
-                    <div class="primary-badge">Primary</div>
-                  }
-                </div>
-              }
-              <div class="upload-btn-container" *ngIf="!isUploading">
-                <input type="file" #fileInput (change)="onFileSelected($event)" accept="image/*" style="display: none">
-                <button mat-stroked-button color="primary" class="upload-trigger" (click)="fileInput.click()">
-                  <mat-icon>cloud_upload</mat-icon>
-                  <span>Upload</span>
-                </button>
-              </div>
-              <div class="upload-loading" *ngIf="isUploading">
-                <mat-icon class="spin">refresh</mat-icon>
-                <span>Uploading...</span>
-              </div>
-            </div>
-            <p class="upload-hint">First photo will be the primary image. Click to upload more.</p>
-          </div>
-
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Additional Photo URLs</mat-label>
-            <textarea matInput formControlName="photos" rows="2" placeholder="https://example.com/photo1.jpg, https://example.com/photo2.jpg"></textarea>
-            <mat-icon matSuffix>link</mat-icon>
-            <mat-hint>Comma-separated URLs for additional photos</mat-hint>
-          </mat-form-field>
-        </div>
-
-        <div class="form-section">
-          <div class="section-header">
-            <mat-icon>videocam</mat-icon>
-            <h3>Videos & Tours</h3>
-          </div>
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Video URLs</mat-label>
-            <input matInput formControlName="videos" placeholder="YouTube or Vimeo links">
-            <mat-icon matSuffix>videocam</mat-icon>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>360° Tour Links</mat-label>
-            <input matInput formControlName="tours360" placeholder="Virtual tour or 360° view links">
-            <mat-icon matSuffix>360</mat-icon>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Document Links</mat-label>
-            <input matInput formControlName="documents" placeholder="Floor plans, brochures, deed...">
-            <mat-icon matSuffix>description</mat-icon>
-          </mat-form-field>
-        </div>
-
-        <div class="form-section">
-          <div class="section-header">
-            <mat-icon>person</mat-icon>
-            <h3>Property Owner</h3>
-          </div>
-          <div class="seller-section">
-            <app-seller-selector
-              [initialSellerId]="propertyForm.get('sellerId')?.value"
-              (sellerSelected)="onSellerSelected($event)">
-            </app-seller-selector>
-          </div>
-        </div>
-
-        <div class="form-section">
-          <div class="section-header">
-            <mat-icon>groups</mat-icon>
-            <h3>Team Assignment</h3>
-          </div>
-          <div class="form-row two-col">
-            <mat-form-field appearance="outline">
-              <mat-label>Assign to Agent</mat-label>
-              <mat-select formControlName="assignedToUserId">
-                <mat-option [value]="null">-- Unassigned --</mat-option>
-                @for (u of users; track u.id) {
-                  <mat-option [value]="u.id">
-                    <mat-icon>person</mat-icon> {{ u.name }} ({{ u.role }})
-                  </mat-option>
-                }
-              </mat-select>
-              <mat-icon matPrefix>person</mat-icon>
-            </mat-form-field>
-            <mat-form-field appearance="outline">
-              <mat-label>Assign to Team</mat-label>
-              <mat-select formControlName="assignedToGroupId">
-                <mat-option [value]="null">-- Unassigned --</mat-option>
-                @for (g of groups; track g.id) {
-                  <mat-option [value]="g.id">
-                    <mat-icon>groups</mat-icon> {{ g.name }}
-                  </mat-option>
-                }
-              </mat-select>
-              <mat-icon matPrefix>group</mat-icon>
-            </mat-form-field>
-          </div>
-        </div>
-
-        <div class="form-section">
-          <div class="section-header">
-            <mat-icon>percent</mat-icon>
-            <h3>Commission</h3>
-          </div>
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Commission Percentage</mat-label>
-            <input matInput type="number" formControlName="commissionPercentage" [disabled]="!isAdmin">
-            <span matSuffix class="percentage-suffix">%</span>
-            <mat-icon matPrefix>payments</mat-icon>
-            @if (!isAdmin) {
-              <mat-hint class="admin-hint">Only Admin/Super Admin can modify</mat-hint>
-            }
-            <mat-error *ngIf="propertyForm.get('commissionPercentage')?.hasError('min')">Cannot be negative</mat-error>
-            <mat-error *ngIf="propertyForm.get('commissionPercentage')?.hasError('max')">Cannot exceed 100%</mat-error>
-          </mat-form-field>
-        </div>
       </div>
-    } @else {
+    }
 
-    @if (currentStep === 0) {
+    @if (currentStep === 1) {
       <div class="tab-content">
         <div class="info-card summary-card">
           <mat-icon>lightbulb</mat-icon>
@@ -917,7 +649,6 @@
         </div>
       </div>
     }
-    }
 
   </mat-dialog-content>
 
@@ -927,38 +658,27 @@
       Discard
     </button>
 
-    @if (isEdit) {
+    @if (!isFirstStep) {
+      <button mat-stroked-button (click)="prevStep()" class="back-btn" [disabled]="isSubmitting">
+        <mat-icon>arrow_back</mat-icon>
+        Back
+      </button>
+    }
+
+    @if (!isLastStep) {
+      <button mat-raised-button color="primary" class="next-btn" (click)="nextStep()" [disabled]="isSubmitting">
+        Next
+        <mat-icon>arrow_forward</mat-icon>
+      </button>
+    } @else {
       <button mat-raised-button color="primary" class="publish-btn" (click)="onSubmit()" [disabled]="!propertyForm.valid || isSubmitting" [class.loading]="isSubmitting">
         @if (isSubmitting) {
           <mat-spinner diameter="20"></mat-spinner>
         } @else {
-          <mat-icon>save</mat-icon>
-          Save Changes
+          <mat-icon>{{ isEdit ? 'save' : 'publish' }}</mat-icon>
+          {{ isEdit ? 'Save Changes' : 'Publish Listing' }}
         }
       </button>
-    } @else {
-      @if (!isFirstStep) {
-        <button mat-stroked-button (click)="prevStep()" class="back-btn" [disabled]="isSubmitting">
-          <mat-icon>arrow_back</mat-icon>
-          Back
-        </button>
-      }
-
-      @if (!isLastStep) {
-        <button mat-raised-button color="primary" class="next-btn" (click)="nextStep()" [disabled]="isSubmitting">
-          Next
-          <mat-icon>arrow_forward</mat-icon>
-        </button>
-      } @else {
-        <button mat-raised-button color="primary" class="publish-btn" (click)="onSubmit()" [disabled]="!propertyForm.valid || isSubmitting" [class.loading]="isSubmitting">
-          @if (isSubmitting) {
-            <mat-spinner diameter="20"></mat-spinner>
-          } @else {
-            <mat-icon>publish</mat-icon>
-            Publish Listing
-          }
-        </button>
-      }
     }
   </mat-dialog-actions>
 </div>
