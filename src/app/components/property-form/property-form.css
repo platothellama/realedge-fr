@@ -227,6 +227,10 @@
   line-height: 1.4;
 }
 
+.info-map-card {
+  margin-bottom: 16px;
+}
+
 /* Form Sections */
 .form-section {
   background: var(--bg-elevated);
@@ -719,4 +723,21 @@
   .summary-grid {
     grid-template-columns: 1fr;
   }
+}
+
+.feature-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.feature-chips mat-chip-option {
+  background: var(--primary);
+  color: white;
+}
+
+.feature-chips mat-chip-option mat-icon {
+  color: white;
+  cursor: pointer;
 }

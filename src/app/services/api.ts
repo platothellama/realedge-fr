@@ -51,6 +51,10 @@ export class ApiService {
     return this.http.post<any>(`${this.apiUrl}/properties/upload`, formData);
   }
 
+  getUniqueFeatures(): Observable<string[]> {
+    return this.http.get<string[]>(`${this.apiUrl}/properties/features`);
+  }
+
   // Leads
   getLeads(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/leads`);

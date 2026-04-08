@@ -95,6 +95,16 @@
   filter: brightness(1.1);
 }
 
+::ng-deep .fc .fc-event.past-scheduled {
+  box-shadow: 0 0 8px 2px rgba(245, 158, 11, 0.6) !important;
+  animation: pulse-warning 2s infinite;
+}
+
+@keyframes pulse-warning {
+  0%, 100% { box-shadow: 0 0 8px 2px rgba(245, 158, 11, 0.4); }
+  50% { box-shadow: 0 0 12px 4px rgba(245, 158, 11, 0.7); }
+}
+
 ::ng-deep .fc-theme-standard td,
 ::ng-deep .fc-theme-standard th {
   border-color: var(--border) !important;

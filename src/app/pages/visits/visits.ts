@@ -67,8 +67,9 @@ export class VisitsComponent implements OnInit {
           title: `${v.clientName} - ${v.title}`,
           start: v.visitDate,
           extendedProps: { ...v },
-          backgroundColor: this.getEventColor(v.status),
-          borderColor: 'transparent'
+          backgroundColor: this.getEventColor(v.status, v.visitDate),
+          borderColor: this.isPastScheduled(v.status, v.visitDate) ? '#fbbf24' : 'transparent',
+          classNames: this.isPastScheduled(v.status, v.visitDate) ? ['past-scheduled'] : []
         }));
         
         this.calendarOptions.update(options => ({
@@ -80,7 +81,15 @@ export class VisitsComponent implements OnInit {
     });
   }
 
-  getEventColor(status: string): string {
+  getEventColor(status: string, visitDate?: string): string {
+    if (status === 'Scheduled' && visitDate) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const visitDateObj = new Date(visitDate);
+      if (visitDateObj < today) {
+        return '#f59e0b';
+      }
+    }
     switch (status) {
       case 'Scheduled': return '#6366f1';
       case 'Completed': return '#10b981';
@@ -88,6 +97,14 @@ export class VisitsComponent implements OnInit {
       case 'No Show': return '#f59e0b';
       default: return '#6366f1';
     }
+  }
+
+  isPastScheduled(status: string, visitDate?: string): boolean {
+    if (status !== 'Scheduled' || !visitDate) return false;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const visitDateObj = new Date(visitDate);
+    return visitDateObj < today;
   }
 
   handleEventClick(arg: EventClickArg) {

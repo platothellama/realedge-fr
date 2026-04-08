@@ -67,7 +67,7 @@
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Description</mat-label>
+            <mat-label>Notes</mat-label>
             <textarea matInput formControlName="description" rows="4" placeholder="Describe the property, its features, and what makes it special..."></textarea>
             <mat-hint>Be descriptive - mention renovations, upgrades, and unique features</mat-hint>
           </mat-form-field>
@@ -145,103 +145,6 @@
                   </mat-option>
                 }
               </mat-select>
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-              <mat-label>Condition</mat-label>
-              <mat-select formControlName="condition">
-                @for (c of conditions; track c) {
-                  <mat-option [value]="c">
-                    <mat-icon>{{ c === 'New' ? 'stars' : 'history' }}</mat-icon>
-                    {{c}}
-                  </mat-option>
-                }
-              </mat-select>
-            </mat-form-field>
-          </div>
-        </div>
-      </div>
-    }
-
-    @if (currentStep === 1) {
-      <div class="tab-content">
-        <div class="info-card summary-card">
-          <mat-icon>lightbulb</mat-icon>
-          <div>
-            <strong>Getting Started</strong>
-            <p>Start with the basic details - title, price, type, and listing purpose.</p>
-          </div>
-        </div>
-
-        <div class="form-section">
-          <div class="section-header">
-            <mat-icon>home</mat-icon>
-            <h3>Property Basics</h3>
-          </div>
-
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Property Title</mat-label>
-            <input matInput formControlName="title" placeholder="Ex: Modern Penthouse with Sea View in Downtown">
-            <mat-hint class="mb-5">A catchy title that highlights key features</mat-hint>
-            <mat-error *ngIf="propertyForm.get('title')?.hasError('required')">Property title is required</mat-error>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Description</mat-label>
-            <textarea matInput formControlName="description" rows="4" placeholder="Describe the property, its features, and what makes it special..."></textarea>
-            <mat-hint>Be descriptive - mention renovations, upgrades, and unique features</mat-hint>
-          </mat-form-field>
-        </div>
-
-        <div class="form-section">
-          <div class="section-header">
-            <mat-icon>sell</mat-icon>
-            <h3>Pricing & Status</h3>
-          </div>
-
-          <div class="form-row three-col">
-            <mat-form-field appearance="outline" class="price-field">
-              <mat-label>{{ propertyForm.get('listingType')?.value === 'Rent' ? 'Monthly Rent' : 'Asking Price' }}</mat-label>
-              <input matInput type="number" formControlName="price" placeholder="0">
-              <span matPrefix class="currency-prefix">$</span>
-              <mat-error *ngIf="propertyForm.get('price')?.hasError('required')">Price is required</mat-error>
-              <mat-error *ngIf="propertyForm.get('price')?.hasError('min')">Price must be 0 or greater</mat-error>
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-              <mat-label>Status</mat-label>
-              <mat-select formControlName="status">
-                @for (s of statuses; track s) {
-                  <mat-option [value]="s">
-                    <span class="status-option" [class]="'status-' + s.toLowerCase()">{{s}}</span>
-                  </mat-option>
-                }
-              </mat-select>
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-              <mat-label>Property Type</mat-label>
-              <mat-select formControlName="type">
-                @for (t of propertyTypes; track t) {
-                  <mat-option [value]="t">{{t}}</mat-option>
-                }
-              </mat-select>
-              <mat-error *ngIf="propertyForm.get('type')?.hasError('required')">Property type is required</mat-error>
-            </mat-form-field>
-          </div>
-
-          <div class="form-row three-col">
-            <mat-form-field appearance="outline">
-              <mat-label>Listing Type</mat-label>
-              <mat-select formControlName="listingType">
-                @for (lt of listingTypes; track lt) {
-                  <mat-option [value]="lt">
-                    <mat-icon>{{ lt === 'Sale' ? 'trending_up' : 'calendar_month' }}</mat-icon>
-                    {{lt}}
-                  </mat-option>
-                }
-              </mat-select>
-              <mat-hint>For sale or rent</mat-hint>
             </mat-form-field>
 
             <mat-form-field appearance="outline">
@@ -364,10 +267,27 @@
           </div>
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>Property Features</mat-label>
-            <input matInput formControlName="features" placeholder="Pool, Garden, Gym, Smart Home, Security System...">
+            <input matInput #featureInput class="feature-input" placeholder="Pool, Garden, Gym, Smart Home..." (keyup.enter)="addFeature($event)" [matAutocomplete]="featureAuto">
+            <input type="hidden" formControlName="features">
             <mat-icon matPrefix>list</mat-icon>
-            <mat-hint>Separate with commas</mat-hint>
+            <mat-hint>Type and press Enter to add</mat-hint>
+            <mat-autocomplete #featureAuto="matAutocomplete" [displayWith]="displayFeature" (optionSelected)="addFeature($event)">
+              @for (feature of filterFeatures(featureInput.value); track feature) {
+                <mat-option [value]="feature">{{ feature }}</mat-option>
+              }
+            </mat-autocomplete>
           </mat-form-field>
+
+          @if (featureList.length > 0) {
+            <div class="feature-chips">
+              @for (feature of featureList; track feature) {
+                <mat-chip-option (removed)="removeFeature(feature)">
+                  {{ feature }}
+                  <mat-icon matChipRemove>cancel</mat-icon>
+                </mat-chip-option>
+              }
+            </div>
+          }
         </div>
       </div>
     }
@@ -387,6 +307,33 @@
             <mat-icon>place</mat-icon>
             <h3>Address Details</h3>
           </div>
+          <div class="form-section">
+            <div class="section-header">
+              <mat-icon>map</mat-icon>
+              <h3>Map Location</h3>
+            </div>
+            <div class="info-card info-map-card">
+              <mat-icon>info</mat-icon>
+              <div>
+                <strong>How to set location</strong>
+                <p>Click on the map to place a marker. Drag the marker to adjust the exact location. Scroll is disabled - use mouse to drag/pan the map.</p>
+              </div>
+            </div>
+            <div class="map-container">
+              <google-map
+                height="280px"
+                width="100%"
+                [center]="mapCenter"
+                [zoom]="mapZoom"
+                [options]="mapOptions"
+                (mapClick)="onMapClick($event)">
+                @if (markerPosition) {
+                  <map-marker [position]="markerPosition"></map-marker>
+                }
+              </google-map>
+            </div>
+          </div>
+
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>Street Address</mat-label>
             <input matInput formControlName="address">
@@ -410,25 +357,6 @@
           </div>
         </div>
 
-        <div class="form-section">
-          <div class="section-header">
-            <mat-icon>map</mat-icon>
-            <h3>Map Location</h3>
-          </div>
-          <div class="map-container">
-            <google-map
-              height="280px"
-              width="100%"
-              [center]="mapCenter"
-              [zoom]="mapZoom"
-              [options]="mapOptions"
-              (mapClick)="onMapClick($event)">
-              @if (markerPosition) {
-                <map-marker [position]="markerPosition"></map-marker>
-              }
-            </google-map>
-          </div>
-        </div>
       </div>
     }
 

@@ -9,6 +9,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatAutocompleteModule } from '@angular/material/autocomplete';
+import { MatChipsModule } from '@angular/material/chips';
 import { GoogleMapsModule } from '@angular/google-maps';
 import { ApiService } from '../../services/api';
 import { AuthService } from '../../services/auth/auth.service';
@@ -28,6 +30,8 @@ import { SellerSelectorComponent, SellerSelection } from '../seller-selector/sel
     MatIconModule,
     MatTabsModule,
     MatProgressSpinnerModule,
+    MatAutocompleteModule,
+    MatChipsModule,
     GoogleMapsModule,
     SellerSelectorComponent
   ],
@@ -45,6 +49,8 @@ export class PropertyFormComponent implements OnInit, AfterViewInit {
   conditions = ['Used', 'New'];
   users: any[] = [];
   groups: any[] = [];
+  availableFeatures: string[] = [];
+  featureList: string[] = [];
 
   // Media Uploads
   uploadedPhotos: string[] = [];
@@ -57,7 +63,7 @@ export class PropertyFormComponent implements OnInit, AfterViewInit {
   mapOptions: any = {
     mapTypeId: 'roadmap',
     zoomControl: true,
-    scrollwheel: true,
+    scrollwheel: false,
     disableDoubleClickZoom: true,
     styles: [
       { elementType: "geometry", stylers: [{ color: "#242f3e" }] },
@@ -228,8 +234,58 @@ export class PropertyFormComponent implements OnInit, AfterViewInit {
     this.initForm();
     this.loadUsers();
     this.loadGroups();
+    this.loadFeatures();
     this.handleEditMode();
     this.subscribeToLocationChanges();
+  }
+
+  private loadFeatures() {
+    this.api.getUniqueFeatures().subscribe({
+      next: (res) => {
+        this.availableFeatures = res || [];
+      },
+      error: (err) => {
+        console.error('Error fetching features', err);
+        this.availableFeatures = [];
+      }
+    });
+  }
+
+  filterFeatures(value: string): string[] {
+    if (!value) return this.availableFeatures;
+    const filterValue = value.toLowerCase();
+    return this.availableFeatures.filter(f => f.toLowerCase().includes(filterValue));
+  }
+
+  displayFeature(feature: string): string {
+    return feature || '';
+  }
+
+  addFeature(event: any): void {
+    let value = '';
+    if (event.target && event.target.value) {
+      value = (event.target.value || '').trim();
+    } else if (event.option && event.option.value) {
+      value = (event.option.value || '').trim();
+    }
+    if (value && !this.featureList.includes(value)) {
+      this.featureList.push(value);
+      this.updateFeatureControl();
+    }
+    const input = document.querySelector('.feature-input') as HTMLInputElement;
+    if (input) input.value = '';
+  }
+
+  removeFeature(feature: string): void {
+    const index = this.featureList.indexOf(feature);
+    if (index >= 0) {
+      this.featureList.splice(index, 1);
+      this.updateFeatureControl();
+    }
+  }
+
+  private updateFeatureControl() {
+    this.propertyForm.get('features')?.setValue(this.featureList.join(', '));
   }
 
   private initForm() {
@@ -303,6 +359,7 @@ export class PropertyFormComponent implements OnInit, AfterViewInit {
       }
 
       this.uploadedPhotos = prop.photos || [];
+      this.featureList = prop.features || [];
 
       this.propertyForm.patchValue({
         ...prop,
@@ -422,7 +479,7 @@ export class PropertyFormComponent implements OnInit, AfterViewInit {
         videos: val.videos ? val.videos.split(',').map((s: string) => s.trim()) : [],
         tours360: val.tours360 ? val.tours360.split(',').map((s: string) => s.trim()) : [],
         documents: val.documents ? val.documents.split(',').map((s: string) => s.trim()) : [],
-        features: val.features ? val.features.split(',').map((s: string) => s.trim()) : []
+        features: this.featureList
       };
 
       if (this.sellerSelection) {
