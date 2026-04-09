@@ -867,6 +867,69 @@ span.mdc-button__label {
   background: var(--bg-surface) !important;
   border: 1px solid var(--border) !important;
   border-radius: 16px !important;
+  z-index: 10000 !important;
+}
+
+.mat-datepicker-toggle {
+  pointer-events: auto !important;
+  opacity: 1 !important;
+}
+
+/* Make date inputs fully clickable anywhere */
+.mat-mdc-form-field-type-mat-date-range-input .mat-mdc-form-field-infix {
+  cursor: pointer !important;
+}
+
+input[matDatepicker] {
+  cursor: pointer !important;
+  pointer-events: auto !important;
+}
+
+/* Ensure input element receives clicks */
+.mat-mdc-form-field-input-container {
+  cursor: pointer !important;
+}
+
+.mat-mdc-form-field-input-container input {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+}
+
+/* Fix datepicker toggle visibility and clickability */
+.mat-datepicker-toggle-default-icon {
+  pointer-events: auto !important;
+  fill: currentColor !important;
+}
+
+.mat-mdc-form-field .mat-mdc-form-field-icon-suffix {
+  pointer-events: auto !important;
+}
+
+/* Ensure datepicker opens on input click */
+.mat-mdc-form-field-type-mat-date-range-input {
+  pointer-events: auto !important;
+}
+
+.mat-mdc-form-field-type-mat-date-range-input .mat-mdc-form-field-icon-suffix {
+  z-index: 10001 !important;
+}
+
+/* Force click through to datepicker */
+.mat-datepicker-toggle {
+  pointer-events: auto !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+.mat-mdc-form-field-icon-suffix,
+.mat-mdc-form-field-flex {
+  pointer-events: auto !important;
+}
+
+/* Datepicker close button full width */
+.mat-datepicker-content .mat-datepicker-close-button {
+  width: 100% !important;
+  max-width: 100% !important;
+  display: block !important;
 }
 
 .mat-calendar {

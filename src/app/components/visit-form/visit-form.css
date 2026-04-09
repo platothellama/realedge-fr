@@ -117,3 +117,24 @@
 .property-info-badge mat-icon {
   color: var(--primary);
 }
+
+/* Ensure datepicker toggle is clickable */
+::ng-deep .visit-form-container .mat-datepicker-toggle {
+  pointer-events: auto !important;
+  opacity: 1 !important;
+}
+
+::ng-deep .visit-form-container .mat-datepicker-toggle button {
+  pointer-events: auto !important;
+  opacity: 1 !important;
+}
+
+/* Make date input fully clickable */
+::ng-deep .visit-form-container .mat-mdc-form-field-type-mat-date-range-input .mat-mdc-form-field-infix {
+  cursor: pointer !important;
+}
+
+::ng-deep .visit-form-container input[matDatepicker] {
+  cursor: pointer !important;
+  pointer-events: auto !important;
+}

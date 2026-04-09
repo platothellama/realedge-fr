@@ -2,6 +2,7 @@ import { ApplicationConfig, provideZoneChangeDetection, APP_INITIALIZER } from '
 import { provideRouter } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideAnimations } from '@angular/platform-browser/animations';
+import { provideNativeDateAdapter } from '@angular/material/core';
 import { MAT_DIALOG_DEFAULT_OPTIONS } from '@angular/material/dialog';
 import { MAT_SELECT_CONFIG, MatSelectConfig } from '@angular/material/select';
 import { MAT_MENU_DEFAULT_OPTIONS } from '@angular/material/menu';
@@ -23,6 +24,7 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideHttpClient(withInterceptors([authInterceptor])),
     provideAnimations(),
+    provideNativeDateAdapter(),
     { provide: MAT_DIALOG_DEFAULT_OPTIONS, useValue: { hasBackdrop: true, disableClose: false } },
     { provide: MAT_SELECT_CONFIG, useValue: { hideSingleSelectionIndicator: false } as MatSelectConfig },
     { provide: MAT_MENU_DEFAULT_OPTIONS, useValue: { hasBackdrop: true, closeOnNavigation: true } },
