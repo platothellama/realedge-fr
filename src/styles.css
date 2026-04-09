@@ -457,8 +457,11 @@ span.mdc-button__label {
 .mat-mdc-dialog-content mat-form-field {
   width: 100% !important;
   max-width: 100% !important;
+  margin-bottom: 15px;
 }
-
+mat-error {
+  font-family: "Urbanist", sans-serif !important;
+}
 /* ========================
    SCROLLBAR STYLING
    ======================== */
@@ -601,10 +604,6 @@ span.mdc-button__label {
 /* Select dropdown text in forms */
 .mat-mdc-form-field.mat-mdc-form-field-type-mat-select .mat-mdc-floating-label {
   color: var(--text-muted) !important;
-}
-
-.mat-mdc-form-field.mat-focused.mat-mdc-form-field-type-mat-select .mat-mdc-floating-label {
-  color: var(--primary-bright) !important;
 }
 
 /* ========================
