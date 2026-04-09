@@ -184,6 +184,7 @@
             (clientSelected)="onClientSelected($event)">
           </app-client-selector>
 
+          @if (showAssignmentDropdown) {
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>Assigned Broker</mat-label>
             <mat-select formControlName="brokerId">
@@ -193,6 +194,7 @@
             </mat-select>
             <mat-icon matSuffix>badge</mat-icon>
           </mat-form-field>
+          }
 
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>Status</mat-label>
@@ -260,6 +262,7 @@
             </mat-select>
           </mat-form-field>
 
+          @if (showAssignmentDropdown) {
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>Assigned Broker</mat-label>
             <mat-select formControlName="brokerId">
@@ -269,6 +272,7 @@
             </mat-select>
             <mat-icon matSuffix>badge</mat-icon>
           </mat-form-field>
+          }
 
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>Commission</mat-label>

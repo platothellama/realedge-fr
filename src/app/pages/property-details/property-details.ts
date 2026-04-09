@@ -18,6 +18,7 @@ import { MatRadioModule } from '@angular/material/radio';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { ApiService } from '../../services/api';
+import { AuthService } from '../../services/auth/auth.service';
 import { PropertyFormComponent } from '../../components/property-form/property-form';
 import { NegotiationFormComponent } from '../../components/negotiation-form/negotiation-form';
 import { DealFormComponent } from '../../components/deal-form/deal-form';
@@ -66,14 +67,18 @@ export class PropertyDetailsComponent implements OnInit {
   propertyLeads: any[] = [];
   allLeads: any[] = [];
   analytics: any = {};
+  currentUser: any = null;
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private api: ApiService,
+    private auth: AuthService,
     private dialog: MatDialog,
     private snackBar: MatSnackBar
-  ) {}
+  ) {
+    this.currentUser = this.auth.currentUser();
+  }
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
@@ -383,7 +388,7 @@ export class PropertyDetailsComponent implements OnInit {
     const dialogRef = this.dialog.open(LeadWorkflowComponent, {
       width: '700px',
       maxHeight: '90vh',
-      data: { propertyId: this.property.id }
+      data: { propertyId: this.property.id, currentUser: this.currentUser }
     });
 
     dialogRef.afterClosed().subscribe((result: LeadWorkflowResult) => {

@@ -52,6 +52,7 @@
       (sellerSelected)="onSellerSelected($event)">
     </app-seller-selector>
 
+    @if (showAssignmentDropdown) {
     <div class="form-row">
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Assigned Broker</mat-label>
@@ -86,6 +87,7 @@
           <mat-icon matSuffix>groups</mat-icon>
         </mat-form-field>
       </div>
+    }
     }
 
     <div class="section-label">Deal Progress</div>

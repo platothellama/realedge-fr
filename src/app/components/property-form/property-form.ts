@@ -42,6 +42,8 @@ export class PropertyFormComponent implements OnInit, AfterViewInit {
   propertyForm: FormGroup;
   isEdit = false;
   statusLocked = false;
+  currentUser: any = null;
+  showAssignmentDropdown = false;
 
   propertyTypes = ['Apartment', 'House', 'Villa', 'Office', 'Land', 'Commercial'];
   statuses = ['Available', 'Sold', 'Rented', 'Reserved', 'Lost'];
@@ -184,8 +186,17 @@ export class PropertyFormComponent implements OnInit, AfterViewInit {
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
     const user = this.auth.currentUser();
-    this.isAdmin = user?.role === 'Super Admin' || user?.role === 'Admin';
+    this.currentUser = user;
+    console.log('User ', user);
+    const userRole = user?.role || '';
+    this.isAdmin = userRole === 'Super Admin';
 
+    // Hide assignment dropdown - show only for Super Admin
+    this.showAssignmentDropdown = this.isAdmin;
+
+    // Default assignment to current user (already set - for Agent it auto-assigns to self)
+    const defaultAssignedToUserId = user?.id || null;
+console.log('defaultAssignedToUserId ', defaultAssignedToUserId)
     this.propertyForm = this.fb.group({
       title: ['', Validators.required],
       description: [''],
@@ -214,7 +225,7 @@ export class PropertyFormComponent implements OnInit, AfterViewInit {
       lng: [null],
 
       // Assignments
-      assignedToUserId: [null],
+      assignedToUserId: [defaultAssignedToUserId],
       assignedToGroupId: [null],
       sellerId: [null],
       commissionPercentage: [{ value: 0, disabled: !this.isAdmin }, [Validators.required, Validators.min(0), Validators.max(100)]],
@@ -289,6 +300,9 @@ export class PropertyFormComponent implements OnInit, AfterViewInit {
   }
 
   private initForm() {
+    const user = this.auth.currentUser();
+    const defaultAssignedToUserId = user?.id || null;
+    console.log('defaultAssignedToUserId ', defaultAssignedToUserId)
     this.propertyForm = this.fb.group({
       title: ['', Validators.required],
       description: [''],
@@ -311,7 +325,7 @@ export class PropertyFormComponent implements OnInit, AfterViewInit {
       country: ['', Validators.required],
       lat: [null],
       lng: [null],
-      assignedToUserId: [null],
+      assignedToUserId: [defaultAssignedToUserId],
       assignedToGroupId: [null],
       sellerId: [null],
       commissionPercentage: [{ value: 0, disabled: !this.isAdmin }, [Validators.required, Validators.min(0), Validators.max(100)]],
@@ -467,7 +481,7 @@ export class PropertyFormComponent implements OnInit, AfterViewInit {
     if (this.propertyForm.valid && !this.isSubmitting) {
       this.isSubmitting = true;
       const val = this.propertyForm.getRawValue();
-
+console.log('val ', val)
       const manualPhotos = val.photos ? val.photos.split(',').map((s: string) => s.trim()).filter((s: string) => s !== '') : [];
       const allPhotos = [...new Set([...this.uploadedPhotos, ...manualPhotos])];
 

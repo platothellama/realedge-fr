@@ -132,11 +132,11 @@
       <textarea matInput formControlName="notes" rows="3" placeholder="Additional details about the lead..."></textarea>
     </mat-form-field>
 
+    @if (showAssignmentDropdown) {
     <div class="section-label">Assignment</div>
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Assign to Agent</mat-label>
       <mat-select formControlName="assignedToUserId">
-        <mat-option [value]="null">-- Self Assigned --</mat-option>
         @for (user of users; track user.id) {
           <mat-option [value]="user.id">
             <div style="display: flex; align-items: center; gap: 8px;">
@@ -149,6 +149,7 @@
       </mat-select>
       <mat-icon matSuffix>assignment_ind</mat-icon>
     </mat-form-field>
+    }
   </mat-dialog-content>
 
   <mat-dialog-actions align="end">

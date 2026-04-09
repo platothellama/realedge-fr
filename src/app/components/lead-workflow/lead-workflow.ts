@@ -63,6 +63,7 @@ export class LeadWorkflowComponent implements OnInit {
   properties: any[] = [];
   currentUser: any = null;
   isAdmin = false;
+  showAssignmentDropdown = false;
   stages = ['Negotiation', 'Reserved', 'Contract Signed', 'Payment', 'Closed'];
 
   constructor(
@@ -73,13 +74,19 @@ export class LeadWorkflowComponent implements OnInit {
     private dialogRef: MatDialogRef<LeadWorkflowComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
+    const user = this.data?.currentUser;
+    this.currentUser = user;
+    const userRole = user?.role || '';
+    this.isAdmin = userRole === 'Super Admin';
+    this.showAssignmentDropdown = this.isAdmin;
+
     this.visitForm = this.fb.group({
       title: ['', Validators.required],
       visitDate: [new Date(), Validators.required],
       visitTime: ['10:00', Validators.required],
       status: ['Scheduled', Validators.required],
       propertyId: [data?.propertyId || null, Validators.required],
-      brokerId: [null, Validators.required],
+      brokerId: [user?.id || null, Validators.required],
       notes: ['']
     });
 
@@ -90,7 +97,7 @@ export class LeadWorkflowComponent implements OnInit {
       dealStage: ['Negotiation', Validators.required],
       notes: [''],
       propertyId: [data?.propertyId || '', Validators.required],
-      brokerId: [null, Validators.required]
+      brokerId: [user?.id || null, Validators.required]
     });
 
     this.leadForm = this.fb.group({
@@ -127,7 +134,7 @@ export class LeadWorkflowComponent implements OnInit {
 
     this.api.getMe().subscribe(user => {
       this.currentUser = user;
-      this.isAdmin = user.role === 'Super Admin' || user.role === 'Admin';
+      this.isAdmin = user.role === 'Super Admin';
       this.visitForm.get('brokerId')?.setValue(user.id);
       this.dealForm.get('brokerId')?.setValue(user.id);
     });

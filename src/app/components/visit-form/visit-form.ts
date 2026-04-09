@@ -11,6 +11,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ApiService } from '../../services/api';
+import { AuthService } from '../../services/auth/auth.service';
 import { ClientSelectorComponent, ClientSelection } from '../client-selector/client-selector';
 
 @Component({
@@ -41,20 +42,31 @@ export class VisitFormComponent implements OnInit {
   statuses = ['Scheduled', 'Completed', 'Cancelled', 'No Show'];
   isSubmitting = false;
   selectedClient: ClientSelection | null = null;
+  currentUser: any = null;
+  isAdmin = false;
+  showAssignmentDropdown = false;
 
   constructor(
     private fb: FormBuilder,
     private api: ApiService,
+    private auth: AuthService,
     private dialogRef: MatDialogRef<VisitFormComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
+    const user = this.auth.currentUser();
+    console.log('user user ', user )
+    this.currentUser = user;
+    const userRole = user?.role || '';
+    this.isAdmin = userRole === 'Super Admin';
+    this.showAssignmentDropdown = this.isAdmin;
+
     this.visitForm = this.fb.group({
       title: ['', Validators.required],
       visitDate: [new Date(), Validators.required],
       visitTime: ['10:00', Validators.required],
       status: ['Scheduled', Validators.required],
       propertyId: [null, Validators.required],
-      brokerId: [null, Validators.required],
+      brokerId: [user?.id || null, Validators.required],
       notes: ['']
     });
   }
@@ -65,7 +77,7 @@ export class VisitFormComponent implements OnInit {
       const v = this.data.visit;
       const date = new Date(v.visitDate);
       const time = `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
-      
+
       this.visitForm.patchValue({
         title: v.title,
         visitDate: date,
@@ -75,7 +87,7 @@ export class VisitFormComponent implements OnInit {
         brokerId: v.brokerId,
         notes: v.notes
       });
-      
+
       this.selectedClient = {
         leadId: v.leadId || null,
         createNew: !v.leadId,
@@ -88,7 +100,7 @@ export class VisitFormComponent implements OnInit {
     } else if (this.data && this.data.propertyId) {
       this.visitForm.get('propertyId')?.setValue(this.data.propertyId);
     }
-    
+
     this.loadInitialData();
   }
 
@@ -99,8 +111,13 @@ export class VisitFormComponent implements OnInit {
     this.api.getUsers().subscribe(res => {
       this.brokers = Array.isArray(res) ? res : (res.data || []);
     });
-    
+
     this.api.getMe().subscribe(user => {
+      this.currentUser = user;
+      const userRole = user.role || '';
+      this.isAdmin = userRole === 'Super Admin';
+      this.showAssignmentDropdown = this.isAdmin;
+
       if (!this.isEdit && !this.visitForm.get('brokerId')?.value) {
         this.visitForm.get('brokerId')?.setValue(user.id);
       }
@@ -114,7 +131,7 @@ export class VisitFormComponent implements OnInit {
       const date = new Date(val.visitDate);
       const [hours, minutes] = val.visitTime.split(':');
       date.setHours(parseInt(hours), parseInt(minutes));
-      
+
       const payload: any = {
         title: val.title,
         visitDate: date.toISOString(),
@@ -127,7 +144,7 @@ export class VisitFormComponent implements OnInit {
         clientEmail: this.selectedClient.client.email,
         clientPhone: this.selectedClient.client.phone
       };
-      
+
       this.dialogRef.close(payload);
     }
   }

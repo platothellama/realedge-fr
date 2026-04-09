@@ -8,6 +8,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ApiService } from '../../services/api';
+import { AuthService } from '../../services/auth/auth.service';
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({
@@ -30,6 +31,9 @@ import { MatIconModule } from '@angular/material/icon';
 export class LeadFormComponent implements OnInit {
   leadForm: FormGroup;
   isEdit = false;
+  currentUser: any = null;
+  isAdmin = false;
+  showAssignmentDropdown = false;
   users: any[] = [];
   leads: any[] = [];
   isSubmitting = false;
@@ -42,9 +46,18 @@ export class LeadFormComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private api: ApiService,
+    private auth: AuthService,
     private dialogRef: MatDialogRef<LeadFormComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
+    const user = this.auth.currentUser();
+    this.currentUser = user;
+    const userRole = user?.role || '';
+    this.isAdmin = userRole === 'Super Admin';
+    this.showAssignmentDropdown = this.isAdmin;
+    
+    const defaultAssignedToUserId = user?.id || null;
+
     this.leadForm = this.fb.group({
       name: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
@@ -56,7 +69,7 @@ export class LeadFormComponent implements OnInit {
       preferredAreas: [''],
       propertyPreferences: [''],
       notes: [''],
-      assignedToUserId: [null],
+      assignedToUserId: [defaultAssignedToUserId],
       job: [''],
       referenceType: ['text'],
       referenceId: [null],

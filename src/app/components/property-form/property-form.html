@@ -460,6 +460,7 @@
           </div>
         </div>
 
+        @if (showAssignmentDropdown) {
         <div class="form-section">
           <div class="section-header">
             <mat-icon>groups</mat-icon>
@@ -469,7 +470,6 @@
             <mat-form-field appearance="outline">
               <mat-label>Assign to Agent</mat-label>
               <mat-select formControlName="assignedToUserId">
-                <mat-option [value]="null">-- Unassigned --</mat-option>
                 @for (u of users; track u.id) {
                   <mat-option [value]="u.id">
                     <mat-icon>person</mat-icon> {{ u.name }} ({{ u.role }})
@@ -492,6 +492,7 @@
             </mat-form-field>
           </div>
         </div>
+        }
 
         <div class="form-section">
           <div class="section-header">

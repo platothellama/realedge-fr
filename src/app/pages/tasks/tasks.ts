@@ -80,10 +80,17 @@ export class TasksComponent implements OnInit {
 
   loading = true;
   currentUserName = '';
+  currentUser: any = null;
+  isAdmin = false;
+  showAssignmentDropdown = false;
 
   constructor() {
     const user = this.auth.currentUser();
+    this.currentUser = user;
     this.currentUserName = user?.name || 'Unassigned';
+    const userRole = user?.role || '';
+    this.isAdmin = userRole === 'Super Admin';
+    this.showAssignmentDropdown = this.isAdmin;
   }
 
   columns = [
@@ -112,6 +119,11 @@ export class TasksComponent implements OnInit {
   };
 
   ngOnInit() {
+    const user = this.auth.currentUser();
+    if (!this.newTask.assignedToUserId && user?.id) {
+      this.newTask.assignedToUserId = user.id;
+    }
+    
     this.fetchTasks();
     this.fetchUsers();
   }

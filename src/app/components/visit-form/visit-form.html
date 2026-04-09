@@ -6,7 +6,7 @@
 
   <mat-dialog-content [formGroup]="visitForm" class="custom-scrollbar">
     <div class="section-label">General Info</div>
-    
+
     <div class="form-row">
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Meeting Title</mat-label>
@@ -29,7 +29,7 @@
         <mat-error *ngIf="visitForm.get('propertyId')?.hasError('required')">Please select a property</mat-error>
       </mat-form-field>
     </div>
-    
+
     <div class="form-row" *ngIf="data?.propertyId">
       <div class="property-info-badge">
         <mat-icon>home</mat-icon>
@@ -62,20 +62,7 @@
       (clientSelected)="onClientSelected($event)">
     </app-client-selector>
 
-    <div class="section-label">Assignment & Status</div>
-
-    <div class="form-row">
-      <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Assigned Broker</mat-label>
-        <mat-select formControlName="brokerId">
-          @for (user of brokers; track user.id) {
-            <mat-option [value]="user.id">{{ user.name }} ({{ user.role }})</mat-option>
-          }
-        </mat-select>
-        <mat-icon matSuffix>badge</mat-icon>
-        <mat-error *ngIf="visitForm.get('brokerId')?.hasError('required')">Please assign a broker</mat-error>
-      </mat-form-field>
-    </div>
+    <div class="section-label">Status</div>
 
     <div class="form-row">
       <mat-form-field appearance="outline" class="full-width">

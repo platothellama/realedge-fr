@@ -10,6 +10,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { ApiService } from '../../services/api';
+import { AuthService } from '../../services/auth/auth.service';
 import { ClientSelectorComponent, ClientSelection } from '../client-selector/client-selector';
 import { SellerSelectorComponent, SellerSelection } from '../seller-selector/seller-selector';
 
@@ -43,6 +44,7 @@ export class DealFormComponent implements OnInit {
   groups: any[] = [];
   currentUser: any = null;
   isAdmin = false;
+  showAssignmentDropdown = false;
   isSubmitting = false;
   preSelectedPropertyId: string | null = null;
   selectedClient: ClientSelection | null = null;
@@ -57,9 +59,16 @@ export class DealFormComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private api: ApiService,
+    private auth: AuthService,
     private dialogRef: MatDialogRef<DealFormComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
+    const user = this.auth.currentUser();
+    this.currentUser = user;
+    const userRole = user?.role || '';
+    this.isAdmin = userRole === 'Super Admin';
+    this.showAssignmentDropdown = this.isAdmin;
+
     this.dealForm = this.fb.group({
       title: ['', Validators.required],
       sellerName: [''],
@@ -68,7 +77,7 @@ export class DealFormComponent implements OnInit {
       dealStage: ['Offer Made', Validators.required],
       notes: [''],
       propertyId: ['', Validators.required],
-      brokerId: [null],
+      brokerId: [user?.id || null],
       groupId: [null]
     });
   }
@@ -214,7 +223,9 @@ export class DealFormComponent implements OnInit {
     // Check user role for commission editing
     this.api.getMe().subscribe(user => {
       this.currentUser = user;
-      this.isAdmin = user.role === 'Super Admin' || user.role === 'Admin';
+      const userRole = user.role || '';
+      this.isAdmin = userRole === 'Super Admin';
+      this.showAssignmentDropdown = this.isAdmin;
 
       if (this.isAdmin) {
         this.dealForm.get('commission')?.enable();
