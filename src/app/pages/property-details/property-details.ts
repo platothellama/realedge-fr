@@ -227,7 +227,8 @@ export class PropertyDetailsComponent implements OnInit {
                 },
                 error: (err: any) => {
                   console.error('Error creating deal', err);
-                  this.snackBar.open('Failed to create deal', 'Close', { duration: 3000 });
+                  const errorMsg = err?.error?.message || 'Failed to create deal';
+                  this.snackBar.open(errorMsg, 'Close', { duration: 5000 });
                 }
               });
             } else if (result.dealId) {

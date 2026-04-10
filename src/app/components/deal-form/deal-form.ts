@@ -74,7 +74,7 @@ export class DealFormComponent implements OnInit {
       sellerName: [''],
       commission: [{ value: 0, disabled: true }, [Validators.required, Validators.min(0)]],
       finalPrice: [null],
-      dealStage: ['Offer Made', Validators.required],
+      dealStage: ['Negotiation', Validators.required],
       notes: [''],
       propertyId: ['', Validators.required],
       brokerId: [user?.id || null],
