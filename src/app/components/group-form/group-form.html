@@ -1,6 +1,6 @@
 <div class="group-form-container">
   <h2 mat-dialog-title>{{ isEdit ? 'Edit Group' : 'Create New Group' }}</h2>
- 
+
   <mat-dialog-content [formGroup]="groupForm">
     <div class="form-row">
       <mat-form-field appearance="outline" class="full-width">
@@ -10,14 +10,14 @@
         <mat-error *ngIf="groupForm.get('name')?.hasError('required')">Group name is required</mat-error>
       </mat-form-field>
     </div>
- 
+
     <div class="form-row">
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Description</mat-label>
         <textarea matInput formControlName="description" rows="3" placeholder="Describe the purpose of this group"></textarea>
       </mat-form-field>
     </div>
- 
+
     <div class="form-row">
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Assign Members</mat-label>
@@ -37,7 +37,7 @@
       </mat-form-field>
     </div>
   </mat-dialog-content>
- 
+
   <mat-dialog-actions align="end">
     <button mat-button mat-dialog-close class="cancel-btn" [disabled]="isSubmitting">Cancel</button>
     <button mat-raised-button color="primary" class="submit-btn" (click)="onSubmit()" [disabled]="!groupForm.valid || isSubmitting" [class.loading]="isSubmitting">

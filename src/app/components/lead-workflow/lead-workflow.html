@@ -119,7 +119,7 @@
           } @else {
             <div class="leads-list">
               @for (lead of leads; track lead.id) {
-                <mat-checkbox 
+                <mat-checkbox
                   [checked]="lead.selected"
                   (change)="toggleLeadSelection(lead, $event)"
                   class="lead-item">
@@ -303,7 +303,7 @@
         Back
       </button>
     }
-    
+
     @if (currentStep === 0) {
       <button mat-button (click)="close()">Cancel</button>
       <button mat-raised-button color="primary" (click)="proceedToVisit()" [disabled]="getSelectedLeads().length === 0">
@@ -311,7 +311,7 @@
         <mat-icon>arrow_forward</mat-icon>
       </button>
     }
-    
+
     @if (currentStep === 1) {
       <button mat-raised-button color="primary" (click)="submitVisit()" [disabled]="!visitForm.valid || !selectedClient || isSubmitting">
         @if (visitScheduled) {
@@ -325,14 +325,14 @@
         <mat-icon>skip_next</mat-icon>
       </button>
     }
-    
+
     @if (currentStep === 1 && visitScheduled) {
       <button mat-raised-button color="primary" (click)="proceedToDeal()">
         Proceed to Create Deal
         <mat-icon>arrow_forward</mat-icon>
       </button>
     }
-    
+
     @if (currentStep === 2) {
       <button mat-raised-button color="primary" (click)="submitDeal()" [disabled]="!dealForm.valid || !selectedClient || isSubmitting">
         @if (dealCreated) {
@@ -346,7 +346,7 @@
         <mat-icon>skip_next</mat-icon>
       </button>
     }
-    
+
     @if ((currentStep === 1 && visitScheduled) || (currentStep === 2 && dealCreated)) {
       <button mat-raised-button color="primary" (click)="finishWorkflow()">
         Finish

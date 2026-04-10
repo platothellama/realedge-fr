@@ -3,9 +3,9 @@
     <h2 mat-dialog-title>Add Negotiation / Price Log</h2>
     <p class="modal-subtitle">Track price changes and negotiation events</p>
   </div>
-  
+
   <mat-dialog-content [formGroup]="negotiationForm" class="custom-scrollbar">
-    
+
     <div class="form-row">
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Proposed Price / Current Value ($)</mat-label>
@@ -15,13 +15,13 @@
         <mat-error *ngIf="negotiationForm.get('price')?.hasError('min')">Price must be 0 or greater</mat-error>
       </mat-form-field>
     </div>
- 
+
     <div class="form-row">
       <mat-checkbox formControlName="updatePropertyPrice" color="primary" class="mb-15">
         Also update the listing's asking price to this amount
       </mat-checkbox>
     </div>
- 
+
     <div class="form-row">
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Associated Lead / Client (Optional)</mat-label>
@@ -34,7 +34,7 @@
         <mat-icon matSuffix>person</mat-icon>
       </mat-form-field>
     </div>
- 
+
     <div class="form-row">
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Event Note / Discussion</mat-label>
@@ -42,9 +42,9 @@
         <mat-error *ngIf="negotiationForm.get('note')?.hasError('required')">Note is required</mat-error>
       </mat-form-field>
     </div>
- 
+
   </mat-dialog-content>
-  
+
   <mat-dialog-actions align="end">
     <button mat-button (click)="onCancel()" class="cancel-btn" [disabled]="isSubmitting">Cancel</button>
     <button mat-raised-button color="primary" class="submit-btn" (click)="onSubmit()" [disabled]="!negotiationForm.valid || isSubmitting" [class.loading]="isSubmitting">

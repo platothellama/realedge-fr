@@ -62,15 +62,15 @@
   <!-- Image Gallery -->
   <section class="gallery-section">
     <div class="gallery-grid">
-      <div class="gallery-main" [style.backgroundImage]="'url(' + (property.photos?.length ? property.photos[0] : 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=1200&q=80') + ')'" (click)="openLightbox(0)">
+      <div class="gallery-main" [style.backgroundImage]="'url(' + (property.photos?.length ? property.photos[property.primaryPhotoIndex || 0] : 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=1200&q=80') + ')'" (click)="openLightbox(property.primaryPhotoIndex || 0)">
         <span class="status-badge" [class]="property.status.toLowerCase()">{{ property.status }}</span>
         <div class="view-all" *ngIf="property.photos?.length > 1">
           <mat-icon>zoom_in</mat-icon> View all {{ property.photos.length }} photos
         </div>
       </div>
       <div class="gallery-side" *ngIf="property.photos?.length > 1">
-        @for (photo of property.photos.slice(1, 5); track photo; let idx = $index) {
-          <div class="gallery-thumb" [style.backgroundImage]="'url(' + photo + ')'" (click)="openLightbox(idx + 1)">
+        @for (photo of getSecondaryPhotos(); track photo; let idx = $index) {
+          <div class="gallery-thumb" [style.backgroundImage]="'url(' + photo + ')'" (click)="openLightbox(getSecondaryPhotoIndex(idx))">
             <span class="more-overlay" *ngIf="idx === 3 && property.photos.length > 5">+{{ property.photos.length - 5 }}</span>
           </div>
         }

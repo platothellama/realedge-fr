@@ -176,14 +176,14 @@ interface WizardFilters {
       display: flex;
       flex-direction: column;
     }
-    
+
     .dialog-header {
       text-align: center;
       padding: 24px;
       background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(99, 102, 241, 0.1));
       border-bottom: 1px solid var(--border);
     }
-    
+
     .header-icon {
       width: 64px;
       height: 64px;
@@ -194,48 +194,48 @@ interface WizardFilters {
       justify-content: center;
       margin: 0 auto 16px;
     }
-    
+
     .header-icon mat-icon {
       font-size: 32px;
       width: 32px;
       height: 32px;
       color: #3b82f6;
     }
-    
+
     .dialog-header h2 {
       margin: 0 0 4px 0;
       font-size: 24px;
       font-weight: 700;
       color: var(--text-primary);
     }
-    
+
     .dialog-header p {
       margin: 0;
       color: var(--text-secondary);
       font-size: 14px;
     }
-    
+
     .dialog-content {
       padding: 24px;
       overflow-y: auto;
       flex: 1;
     }
-    
+
     .filters-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 20px;
     }
-    
+
     .filter-group {
       display: flex;
       flex-direction: column;
     }
-    
+
     .filter-group.full-width {
       grid-column: 1 / -1;
     }
-    
+
     .filter-group label {
       font-size: 12px;
       text-transform: uppercase;
@@ -244,42 +244,42 @@ interface WizardFilters {
       margin-bottom: 8px;
       font-weight: 600;
     }
-    
+
     .range-inputs {
       display: flex;
       align-items: center;
       gap: 8px;
     }
-    
+
     .range-inputs mat-form-field {
       flex: 1;
     }
-    
+
     .range-separator {
       color: var(--text-muted);
       font-size: 14px;
     }
-    
+
     .full-width {
       width: 100%;
     }
-    
+
     .checkbox-group {
       display: flex;
       gap: 24px;
       flex-wrap: wrap;
     }
-    
+
     .checkbox-group mat-checkbox {
       margin-bottom: 8px;
     }
-    
+
     .active-filters {
       margin-top: 20px;
       padding-top: 16px;
       border-top: 1px solid var(--border);
     }
-    
+
     .filters-label {
       font-size: 12px;
       text-transform: uppercase;
@@ -289,18 +289,18 @@ interface WizardFilters {
       display: block;
       margin-bottom: 8px;
     }
-    
+
     .active-filters mat-chip {
       margin: 4px;
     }
-    
+
     .active-filters mat-icon {
       font-size: 16px;
       width: 16px;
       height: 16px;
       margin-right: 4px;
     }
-    
+
     .dialog-actions {
       display: flex;
       justify-content: flex-end;
@@ -309,11 +309,11 @@ interface WizardFilters {
       border-top: 1px solid var(--border);
       background: var(--bg-surface);
     }
-    
+
     .dialog-actions button mat-icon {
       margin-right: 8px;
     }
-    
+
     .dialog-actions button mat-spinner {
       margin-right: 8px;
     }
@@ -323,7 +323,7 @@ export class WizardSearchDialogComponent implements OnInit {
   preference: any;
   savedFilters: any;
   loading = false;
-  
+
   filters: WizardFilters = {
     budgetMin: null,
     budgetMax: null,
@@ -335,11 +335,11 @@ export class WizardSearchDialogComponent implements OnInit {
     balconyRequired: false,
     furnishedRequired: false
   };
-  
+
   propertyTypes = ['Apartment', 'House', 'Villa', 'Office', 'Land', 'Commercial'];
   bedroomOptions = [1, 2, 3, 4, 5, 6];
   bathroomOptions = [1, 2, 3, 4, 5];
-  
+
   constructor(
     public dialogRef: MatDialogRef<WizardSearchDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
@@ -348,19 +348,19 @@ export class WizardSearchDialogComponent implements OnInit {
     this.preference = data?.preference;
     this.savedFilters = data?.savedFilters || null;
   }
-  
+
   ngOnInit() {
     const sourceFilters = this.savedFilters || this.preference;
-    
+
     if (sourceFilters) {
       this.filters.budgetMin = sourceFilters.budgetMin || null;
       this.filters.budgetMax = sourceFilters.budgetMax || null;
       this.filters.propertyType = sourceFilters.propertyType || '';
       this.filters.bedrooms = sourceFilters.bedrooms || null;
       this.filters.bathrooms = sourceFilters.bathrooms || null;
-      this.filters.preferredLocations = sourceFilters.preferredLocations 
-        ? (Array.isArray(sourceFilters.preferredLocations) 
-          ? sourceFilters.preferredLocations.join(', ') 
+      this.filters.preferredLocations = sourceFilters.preferredLocations
+        ? (Array.isArray(sourceFilters.preferredLocations)
+          ? sourceFilters.preferredLocations.join(', ')
           : sourceFilters.preferredLocations)
         : '';
       this.filters.parkingRequired = sourceFilters.parkingRequired || false;
@@ -368,11 +368,11 @@ export class WizardSearchDialogComponent implements OnInit {
       this.filters.furnishedRequired = sourceFilters.furnishedRequired || false;
     }
   }
-  
+
   get hasActiveFilters(): boolean {
     return !!(
-      this.filters.budgetMin || 
-      this.filters.budgetMax || 
+      this.filters.budgetMin ||
+      this.filters.budgetMax ||
       this.filters.propertyType ||
       this.filters.bedrooms ||
       this.filters.bathrooms ||
@@ -382,24 +382,24 @@ export class WizardSearchDialogComponent implements OnInit {
       this.filters.furnishedRequired
     );
   }
-  
+
   search() {
     this.loading = true;
-    
+
     const data: any = {
       budgetMin: this.filters.budgetMin,
       budgetMax: this.filters.budgetMax,
       propertyType: this.filters.propertyType || null,
       bedrooms: this.filters.bedrooms,
       bathrooms: this.filters.bathrooms,
-      preferredLocations: this.filters.preferredLocations 
+      preferredLocations: this.filters.preferredLocations
         ? this.filters.preferredLocations.split(',').map((l: string) => l.trim()).filter((l: string) => l)
         : [],
       parkingRequired: this.filters.parkingRequired,
       balconyRequired: this.filters.balconyRequired,
       furnishedRequired: this.filters.furnishedRequired
     };
-    
+
     this.apiService.wizardSearch(this.preference.id, data).subscribe({
       next: (result) => {
         this.loading = false;
@@ -416,7 +416,7 @@ export class WizardSearchDialogComponent implements OnInit {
       }
     });
   }
-  
+
   close() {
     this.dialogRef.close(null);
   }

@@ -3,10 +3,10 @@
     @if (config.showSearch) {
       <div class="search-wrapper">
         <mat-icon>search</mat-icon>
-        <input 
-          type="text" 
-          placeholder="Search by title, address, city..." 
-          [(ngModel)]="filters.searchQuery" 
+        <input
+          type="text"
+          placeholder="Search by title, address, city..."
+          [(ngModel)]="filters.searchQuery"
           (keyup.enter)="search.emit()"
           (input)="onSearchInput()"
         >
@@ -17,11 +17,11 @@
         }
       </div>
     }
-    
+
     <div class="quick-filters">
       @if (config.showStatus) {
-        <button 
-          class="filter-pill" 
+        <button
+          class="filter-pill"
           [class.active]="filters.selectedStatus !== 'All'"
           [matMenuTriggerFor]="statusMenu"
         >
@@ -38,8 +38,8 @@
       }
 
       @if (config.showType) {
-        <button 
-          class="filter-pill" 
+        <button
+          class="filter-pill"
           [class.active]="filters.selectedType !== 'All'"
           [matMenuTriggerFor]="typeMenu"
         >
@@ -56,8 +56,8 @@
       }
 
       @if (config.showListingType) {
-        <button 
-          class="filter-pill" 
+        <button
+          class="filter-pill"
           [class.active]="filters.selectedListingType !== 'All'"
           [matMenuTriggerFor]="listingTypeMenu"
         >
@@ -74,8 +74,8 @@
       }
 
       @if (config.showCity) {
-        <button 
-          class="filter-pill" 
+        <button
+          class="filter-pill"
           [class.active]="filters.selectedCity !== 'All'"
           [matMenuTriggerFor]="cityMenu"
         >
@@ -92,8 +92,8 @@
       }
 
       @if (config.showBedrooms || config.showBathrooms || config.showPrice || config.showArea) {
-        <button 
-          class="filter-pill filter-pill-icon" 
+        <button
+          class="filter-pill filter-pill-icon"
           [class.active]="showAdvancedFilters"
           (click)="showAdvancedFilters = !showAdvancedFilters"
         >
@@ -103,8 +103,8 @@
       }
 
       @if (config.showGroup) {
-        <button 
-          class="filter-pill" 
+        <button
+          class="filter-pill"
           [class.active]="!!filters.groupFilter"
           [matMenuTriggerFor]="groupMenu"
         >
@@ -136,8 +136,8 @@
       }
 
       @if (config.showUser) {
-        <button 
-          class="filter-pill" 
+        <button
+          class="filter-pill"
           [class.active]="!!filters.userFilter"
           [matMenuTriggerFor]="userMenu"
         >
@@ -169,8 +169,8 @@
       }
 
       @if (config.showSeller) {
-        <button 
-          class="filter-pill" 
+        <button
+          class="filter-pill"
           [class.active]="!!filters.sellerFilter"
           [matMenuTriggerFor]="sellerMenu"
         >
@@ -202,8 +202,8 @@
       }
 
       @if (config.showProperty) {
-        <button 
-          class="filter-pill" 
+        <button
+          class="filter-pill"
           [class.active]="!!filters.propertyFilter"
           [matMenuTriggerFor]="propertyMenu"
         >
@@ -373,14 +373,14 @@
             </div>
             <div class="quick-btn-group">
               @for (num of [1,2,3,4,5]; track num) {
-                <button 
-                  class="quick-btn" 
+                <button
+                  class="quick-btn"
                   [class.active]="filters.minBedrooms === num && !filters.maxBedrooms"
                   (click)="filters.minBedrooms = num; filters.maxBedrooms = null; onFilterChange()"
                 >{{ num }}+</button>
               }
-              <button 
-                class="quick-btn" 
+              <button
+                class="quick-btn"
                 [class.active]="!filters.minBedrooms && !filters.maxBedrooms"
                 (click)="filters.minBedrooms = null; filters.maxBedrooms = null; onFilterChange()"
               >Any</button>
@@ -393,14 +393,14 @@
         <div class="filter-group">
           <label><mat-icon>bathtub</mat-icon> Bathrooms</label>
           <div class="quick-btn-group">
-            <button 
-              class="quick-btn" 
+            <button
+              class="quick-btn"
               [class.active]="!filters.minBathrooms"
               (click)="filters.minBathrooms = null; onFilterChange()"
             >Any</button>
             @for (num of [1,2,3,4]; track num) {
-              <button 
-                class="quick-btn" 
+              <button
+                class="quick-btn"
                 [class.active]="filters.minBathrooms === num"
                 (click)="filters.minBathrooms = num; onFilterChange()"
               >{{ num }}+</button>

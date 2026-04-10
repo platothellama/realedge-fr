@@ -378,18 +378,34 @@
           <div class="upload-section">
             <div class="photo-grid">
               @for (photo of uploadedPhotos; track photo; let i = $index) {
-                <div class="photo-item">
+                <div class="photo-item"
+                     [class.dragging]="draggedIndex === i"
+                     [class.primary]="primaryPhotoIndex === i"
+                     draggable="true"
+                     (dragstart)="onPhotoDragStart(i)"
+                     (dragover)="onPhotoDragOver($event, i)"
+                     (drop)="onPhotoDrop($event, i)"
+                     (dragend)="onPhotoDragEnd()"
+                     (click)="setPrimaryPhoto(i)">
                   <img [src]="photo" alt="Property photo">
-                  <button mat-icon-button color="warn" class="remove-btn" (click)="removePhoto(i)">
+                  <button mat-icon-button color="warn" class="remove-btn" (click)="removePhoto(i); $event.stopPropagation()">
                     <mat-icon>close</mat-icon>
                   </button>
-                  @if (i === 0) {
-                    <div class="primary-badge">Primary</div>
+                  <div class="drag-handle">
+                    <mat-icon>drag_indicator</mat-icon>
+                  </div>
+                  @if (primaryPhotoIndex === i) {
+                    <div class="primary-badge">
+                      <mat-icon>star</mat-icon>
+                      Primary
+                    </div>
+                  } @else {
+                    <div class="set-primary-hint">Click to set as primary</div>
                   }
                 </div>
               }
               <div class="upload-btn-container" *ngIf="!isUploading">
-                <input type="file" #fileInput (change)="onFileSelected($event)" accept="image/*" style="display: none">
+                <input type="file" #fileInput (change)="onFilesSelected($event)" accept="image/*" multiple style="display: none">
                 <button mat-stroked-button color="primary" class="upload-trigger" (click)="fileInput.click()">
                   <mat-icon>cloud_upload</mat-icon>
                   <span>Upload</span>
@@ -397,10 +413,13 @@
               </div>
               <div class="upload-loading" *ngIf="isUploading">
                 <mat-icon class="spin">refresh</mat-icon>
-                <span>Uploading...</span>
+                <span>Uploading {{ uploadingCount }} of {{ totalUploading }}...</span>
               </div>
             </div>
-            <p class="upload-hint">First photo will be the primary image. Click to upload more.</p>
+            <p class="upload-hint">
+              <mat-icon style="font-size: 14px; height: 14px; width: 14px; vertical-align: middle;">info</mat-icon>
+              Select multiple photos at once. Drag to reorder. Click to set primary.
+            </p>
           </div>
 
           <mat-form-field appearance="outline" class="full-width">

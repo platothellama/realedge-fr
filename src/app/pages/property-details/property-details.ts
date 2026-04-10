@@ -344,6 +344,24 @@ export class PropertyDetailsComponent implements OnInit {
     }
   }
 
+  getPrimaryPhotoIndex(): number {
+    return this.property?.primaryPhotoIndex || 0;
+  }
+
+  getSecondaryPhotos(): string[] {
+    const primaryIdx = this.getPrimaryPhotoIndex();
+    const photos = this.property?.photos || [];
+    if (photos.length <= 1) return [];
+    const secondary = [...photos];
+    secondary.splice(primaryIdx, 1);
+    return secondary.slice(0, 4);
+  }
+
+  getSecondaryPhotoIndex(secondaryIdx: number): number {
+    const primaryIdx = this.getPrimaryPhotoIndex();
+    return (primaryIdx + secondaryIdx + 1) % (this.property?.photos?.length || 1);
+  }
+
   openLightbox(index: number) {
     this.lightboxIndex = index;
     this.lightboxOpen = true;

@@ -36,7 +36,7 @@ import { ApiService } from '../../services/api';
         <div class="search-input-section">
           <mat-form-field appearance="outline" class="search-field">
             <mat-label>Describe your ideal property</mat-label>
-            <input matInput [(ngModel)]="query" (keyup.enter)="search()" 
+            <input matInput [(ngModel)]="query" (keyup.enter)="search()"
               placeholder="e.g., modern apartment under $500k in Beirut with parking">
             <mat-icon matPrefix>search</mat-icon>
           </mat-form-field>
@@ -80,14 +80,14 @@ import { ApiService } from '../../services/api';
       padding: 0;
       min-width: 550px;
     }
-    
+
     .dialog-header {
       text-align: center;
       padding: 24px;
       background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(99, 102, 241, 0.1));
       border-bottom: 1px solid var(--border);
     }
-    
+
     .header-icon {
       width: 64px;
       height: 64px;
@@ -98,45 +98,45 @@ import { ApiService } from '../../services/api';
       justify-content: center;
       margin: 0 auto 16px;
     }
-    
+
     .header-icon mat-icon {
       font-size: 32px;
       width: 32px;
       height: 32px;
       color: #8b5cf6;
     }
-    
+
     .dialog-header h2 {
       margin: 0 0 4px 0;
       font-size: 24px;
       font-weight: 700;
       color: var(--text-primary);
     }
-    
+
     .dialog-header p {
       margin: 0;
       color: var(--text-secondary);
       font-size: 14px;
     }
-    
+
     .dialog-content {
       padding: 24px;
     }
-    
+
     .search-input-section {
       margin-bottom: 20px;
     }
-    
+
     .search-field {
       width: 100%;
     }
-    
+
     .suggestions-section {
       padding: 16px;
       background: var(--bg-elevated);
       border-radius: 12px;
     }
-    
+
     .suggestions-label {
       display: block;
       font-size: 12px;
@@ -145,13 +145,13 @@ import { ApiService } from '../../services/api';
       letter-spacing: 0.5px;
       margin-bottom: 12px;
     }
-    
+
     .suggestion-chips {
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
     }
-    
+
     .suggestion-chip {
       padding: 8px 14px;
       border: 1px dashed var(--border-strong);
@@ -162,13 +162,13 @@ import { ApiService } from '../../services/api';
       cursor: pointer;
       transition: all 0.2s;
     }
-    
+
     .suggestion-chip:hover {
       border-color: #8b5cf6;
       color: #8b5cf6;
       background: rgba(139, 92, 246, 0.1);
     }
-    
+
     .dialog-actions {
       display: flex;
       justify-content: flex-end;
@@ -177,11 +177,11 @@ import { ApiService } from '../../services/api';
       border-top: 1px solid var(--border);
       background: var(--bg-surface);
     }
-    
+
     .dialog-actions button mat-icon {
       margin-right: 8px;
     }
-    
+
     .dialog-actions button mat-spinner {
       margin-right: 8px;
     }

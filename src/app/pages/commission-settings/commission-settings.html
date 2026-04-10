@@ -18,13 +18,13 @@
           <mat-icon>tune</mat-icon>
           Commission Split
         </ng-template>
-        
+
         <div class="tab-content">
           <div class="settings-grid">
             <mat-card class="settings-card">
               <h3>Company vs Team Split</h3>
               <p class="card-description">Configure how commissions are split between the company and the team</p>
-              
+
               <form [formGroup]="settingsForm">
                 <div class="slider-container">
                   <div class="slider-labels">
@@ -66,7 +66,7 @@
             <mat-card class="settings-card">
               <h3>Default Role Splits</h3>
               <p class="card-description">How team commission is distributed among members by role</p>
-              
+
               <div class="role-splits">
                 @for (role of [
                   { key: 'team_leader', label: 'Team Leader', icon: 'supervisor_account' },
@@ -81,7 +81,7 @@
                   </div>
                 }
               </div>
-              
+
               <div class="info-box">
                 <mat-icon>info</mat-icon>
                 <span>Role splits can be overridden per user in the Team Management section</span>
@@ -137,7 +137,7 @@
           <mat-icon>receipt_long</mat-icon>
           Payouts
         </ng-template>
-        
+
         <div class="tab-content">
           <mat-card class="table-card">
             <div class="table-header">
@@ -203,7 +203,7 @@
                   }
                 </tbody>
               </table>
-              
+
               @if (commissions.length === 0) {
                 <div class="empty-state">
                   <mat-icon>receipt_long</mat-icon>

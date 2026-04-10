@@ -91,7 +91,7 @@ export class SellersComponent implements OnInit {
   get filteredSellers(): any[] {
     if (!this.searchFilters.searchQuery) return this.sellers;
     const q = this.searchFilters.searchQuery.toLowerCase();
-    return this.sellers.filter(s => 
+    return this.sellers.filter(s =>
       s.name?.toLowerCase().includes(q) ||
       s.email?.toLowerCase().includes(q) ||
       s.phone?.toLowerCase().includes(q) ||

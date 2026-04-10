@@ -56,7 +56,11 @@ export class PropertyFormComponent implements OnInit, AfterViewInit {
 
   // Media Uploads
   uploadedPhotos: string[] = [];
+  primaryPhotoIndex = 0;
   isUploading = false;
+  uploadingCount = 0;
+  totalUploading = 0;
+  draggedIndex: number | null = null;
 
   // Map options
   mapCenter: any = { lat: 25.2048, lng: 55.2708 };
@@ -373,6 +377,7 @@ console.log('defaultAssignedToUserId ', defaultAssignedToUserId)
       }
 
       this.uploadedPhotos = prop.photos || [];
+      this.primaryPhotoIndex = prop.primaryPhotoIndex || 0;
       this.featureList = prop.features || [];
 
       this.propertyForm.patchValue({
@@ -459,22 +464,89 @@ console.log('defaultAssignedToUserId ', defaultAssignedToUserId)
   onFileSelected(event: any) {
     const file = event.target.files[0];
     if (file) {
-      this.isUploading = true;
+      this.uploadFiles([file]);
+    }
+  }
+
+  onFilesSelected(event: any) {
+    const files: File[] = Array.from(event.target.files as FileList);
+    if (files.length > 0) {
+      this.uploadFiles(files);
+    }
+    event.target.value = '';
+  }
+
+  uploadFiles(files: File[]) {
+    this.isUploading = true;
+    this.totalUploading = files.length;
+    this.uploadingCount = 0;
+
+    let completed = 0;
+    files.forEach((file) => {
       this.api.uploadImage(file).subscribe({
         next: (res) => {
           this.uploadedPhotos.push(res.url);
-          this.isUploading = false;
+          completed++;
+          this.uploadingCount = completed;
+          if (completed === files.length) {
+            this.isUploading = false;
+          }
         },
         error: (err) => {
           console.error('Upload failed', err);
-          this.isUploading = false;
+          completed++;
+          this.uploadingCount = completed;
+          if (completed === files.length) {
+            this.isUploading = false;
+          }
         }
       });
-    }
+    });
   }
 
   removePhoto(index: number) {
     this.uploadedPhotos.splice(index, 1);
+    if (this.primaryPhotoIndex >= this.uploadedPhotos.length) {
+      this.primaryPhotoIndex = Math.max(0, this.uploadedPhotos.length - 1);
+    } else if (index < this.primaryPhotoIndex) {
+      this.primaryPhotoIndex--;
+    }
+  }
+
+  onPhotoDragStart(index: number) {
+    this.draggedIndex = index;
+  }
+
+  onPhotoDragOver(event: DragEvent, index: number) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
+  onPhotoDrop(event: DragEvent, dropIndex: number) {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    if (this.draggedIndex !== null && this.draggedIndex !== dropIndex) {
+      const photo = this.uploadedPhotos.splice(this.draggedIndex, 1)[0];
+      this.uploadedPhotos.splice(dropIndex, 0, photo);
+      
+      if (this.primaryPhotoIndex === this.draggedIndex) {
+        this.primaryPhotoIndex = dropIndex;
+      } else if (this.draggedIndex < this.primaryPhotoIndex && dropIndex >= this.primaryPhotoIndex) {
+        this.primaryPhotoIndex--;
+      } else if (this.draggedIndex > this.primaryPhotoIndex && dropIndex <= this.primaryPhotoIndex) {
+        this.primaryPhotoIndex++;
+      }
+    }
+    this.draggedIndex = null;
+  }
+
+  onPhotoDragEnd() {
+    this.draggedIndex = null;
+  }
+
+  setPrimaryPhoto(index: number) {
+    this.primaryPhotoIndex = index;
   }
 
   onSubmit(): void {
@@ -490,6 +562,7 @@ console.log('val ', val)
         lat: val.lat ? Number(val.lat) : null,
         lng: val.lng ? Number(val.lng) : null,
         photos: allPhotos,
+        primaryPhotoIndex: this.primaryPhotoIndex,
         videos: val.videos ? val.videos.split(',').map((s: string) => s.trim()) : [],
         tours360: val.tours360 ? val.tours360.split(',').map((s: string) => s.trim()) : [],
         documents: val.documents ? val.documents.split(',').map((s: string) => s.trim()) : [],
