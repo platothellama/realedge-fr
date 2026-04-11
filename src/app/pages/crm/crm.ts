@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -48,6 +49,7 @@ export class CrmComponent implements OnInit {
   allLeads: any[] = [];
   searchQuery: string = '';
   selectedStatus: string = 'All';
+  selectedSource: string = 'All';
   deletingId: string | null = null;
   expandedLeadId: string | null = null;
 
@@ -91,11 +93,16 @@ export class CrmComponent implements OnInit {
   constructor(
     private apiService: ApiService,
     private dialog: MatDialog,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private router: Router
   ) {}
 
   ngOnInit() {
     this.fetchLeads();
+  }
+
+  openLeadDetails(leadId: string) {
+    this.router.navigate(['/leads', leadId]);
   }
 
   fetchLeads() {
@@ -152,6 +159,10 @@ export class CrmComponent implements OnInit {
       filtered = filtered.filter(l => l.status === this.selectedStatus);
     }
 
+    if (this.selectedSource !== 'All') {
+      filtered = filtered.filter(l => l.source === this.selectedSource);
+    }
+
     return filtered;
   }
 
@@ -169,6 +180,85 @@ export class CrmComponent implements OnInit {
 
   getAllVisits(lead: any): any[] {
     return lead.visits || [];
+  }
+
+  getLeadTimeline(lead: any): any[] {
+    const timeline: any[] = [];
+    
+    timeline.push({
+      type: 'created',
+      icon: 'person_add',
+      title: 'Lead Created',
+      description: `Lead added from ${lead.source} source`,
+      date: lead.createdAt
+    });
+
+    if (lead.status !== 'New Lead') {
+      timeline.push({
+        type: 'status',
+        icon: 'swap_horiz',
+        title: 'Status Changed',
+        description: `Status updated to ${lead.status}`,
+        date: lead.updatedAt || lead.createdAt
+      });
+    }
+
+    const visits = lead.visits || [];
+    visits.forEach((visit: any) => {
+      timeline.push({
+        type: 'visit',
+        icon: visit.status === 'Completed' ? 'check_circle' : 'event',
+        title: visit.status === 'Completed' ? 'Visit Completed' : 'Visit Scheduled',
+        description: visit.property ? `${visit.property.title} - ${visit.property.address}` : visit.title,
+        date: visit.visitDate
+      });
+    });
+
+    if (lead.deals && lead.deals.length > 0) {
+      lead.deals.forEach((deal: any) => {
+        timeline.push({
+          type: 'deal',
+          icon: 'handshake',
+          title: 'Deal Created',
+          description: `Deal for ${deal.property?.title || 'property'}`,
+          date: deal.createdAt
+        });
+        
+        if (deal.status === 'Closed') {
+          timeline.push({
+            type: 'closed',
+            icon: 'celebration',
+            title: 'Deal Closed',
+            description: `Sale completed`,
+            date: deal.closedAt || deal.updatedAt
+          });
+        }
+      });
+    }
+
+    if (lead.tasks && lead.tasks.length > 0) {
+      lead.tasks.forEach((task: any) => {
+        timeline.push({
+          type: 'task',
+          icon: task.status === 'done' ? 'task_alt' : 'radio_button_unchecked',
+          title: task.title,
+          description: task.description || `Priority: ${task.priority}`,
+          date: task.dueDate || task.createdAt
+        });
+      });
+    }
+
+    if (lead.notes) {
+      timeline.push({
+        type: 'note',
+        icon: 'note',
+        title: 'Note Added',
+        description: lead.notes,
+        date: lead.updatedAt || lead.createdAt
+      });
+    }
+
+    return timeline.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   }
 
   private mapLeadsToPipeline(leads: any[]) {

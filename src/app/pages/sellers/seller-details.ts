@@ -7,7 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatTableModule } from '@angular/material/table';
 import { MatChipsModule } from '@angular/material/chips';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
@@ -135,5 +135,106 @@ export class SellerDetailsComponent implements OnInit {
 
   showError(msg: string) {
     this.snackBar.open(msg, 'Close', { duration: 3000 });
+  }
+
+  editSeller() {
+    const dialogRef = this.dialog.open(SellerFormDialogComponent, {
+      width: '500px',
+      data: { seller: this.seller }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.api.updateSeller(this.sellerId, result).subscribe({
+          next: () => {
+            this.snackBar.open('Seller updated successfully', 'Close', { duration: 3000 });
+            this.loadSeller();
+          },
+          error: (err) => {
+            console.error('Error updating seller', err);
+            this.showError('Failed to update seller');
+          }
+        });
+      }
+    });
+  }
+}
+
+@Component({
+  selector: 'seller-form-dialog',
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatDialogModule
+  ],
+  template: `
+    <h2 mat-dialog-title>Edit Seller</h2>
+    <mat-dialog-content>
+      <div class="form-grid">
+        <mat-form-field appearance="outline">
+          <mat-label>Name</mat-label>
+          <input matInput [(ngModel)]="formData.name" required>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Email</mat-label>
+          <input matInput type="email" [(ngModel)]="formData.email">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Phone</mat-label>
+          <input matInput [(ngModel)]="formData.phone">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Address</mat-label>
+          <input matInput [(ngModel)]="formData.address">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>City</mat-label>
+          <input matInput [(ngModel)]="formData.city">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Country</mat-label>
+          <input matInput [(ngModel)]="formData.country">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Notes</mat-label>
+          <textarea matInput [(ngModel)]="formData.notes" rows="3"></textarea>
+        </mat-form-field>
+      </div>
+    </mat-dialog-content>
+    <mat-dialog-actions align="end">
+      <button mat-button mat-dialog-close>Cancel</button>
+      <button mat-flat-button color="primary" (click)="save()" [disabled]="!formData.name">Save</button>
+    </mat-dialog-actions>
+  `,
+  styles: [`
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .full-width { grid-column: 1 / -1; }
+    mat-form-field { width: 100%; }
+  `]
+})
+export class SellerFormDialogComponent {
+  formData: any = {};
+
+  constructor(
+    public dialogRef: MatDialogRef<SellerFormDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: any
+  ) {
+    if (data?.seller) {
+      this.formData = { ...data.seller };
+    }
+  }
+
+  save() {
+    this.dialogRef.close(this.formData);
   }
 }

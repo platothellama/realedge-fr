@@ -717,6 +717,111 @@
   color: var(--text-primary);
 }
 
+/* Lead Timeline Section */
+.lead-timeline {
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.2);
+  border-top: 1px solid var(--border);
+}
+
+.lead-timeline .timeline-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.lead-timeline .timeline-header h4 {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.timeline-events {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+.timeline-event {
+  display: flex;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  border-left: 3px solid var(--primary);
+}
+
+.timeline-event.created { border-left-color: #4CAF50; }
+.timeline-event.status { border-left-color: #2196F3; }
+.timeline-event.visit { border-left-color: #9C27B0; }
+.timeline-event.deal { border-left-color: #FF9800; }
+.timeline-event.closed { border-left-color: #4CAF50; }
+.timeline-event.task { border-left-color: #00BCD4; }
+.timeline-event.note { border-left-color: #607D8B; }
+
+.timeline-event .event-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  flex-shrink: 0;
+}
+
+.timeline-event .event-icon mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+.timeline-event .event-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.timeline-event .event-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.timeline-event .event-description {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.timeline-event .event-date {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.no-timeline {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px;
+  color: var(--text-muted);
+  opacity: 0.6;
+}
+
+.no-timeline mat-icon {
+  font-size: 32px;
+  width: 32px;
+  height: 32px;
+  margin-bottom: 8px;
+}
+
 .no-visits {
   display: flex;
   flex-direction: column;

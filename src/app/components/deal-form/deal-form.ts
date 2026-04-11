@@ -72,7 +72,7 @@ export class DealFormComponent implements OnInit {
     this.dealForm = this.fb.group({
       title: ['', Validators.required],
       sellerName: [''],
-      commission: [{ value: 0, disabled: true }, [Validators.required, Validators.min(0)]],
+      
       finalPrice: [null],
       dealStage: ['Negotiation', Validators.required],
       notes: [''],
@@ -88,7 +88,6 @@ export class DealFormComponent implements OnInit {
       this.dealForm.patchValue({
         title: this.data.deal.title,
         sellerName: this.data.deal.sellerName,
-        commission: this.data.deal.commission,
         finalPrice: this.data.deal.finalPrice || null,
         dealStage: this.data.deal.dealStage,
         notes: this.data.deal.notes,
@@ -220,16 +219,11 @@ export class DealFormComponent implements OnInit {
   }
 
   private loadInitialData() {
-    // Check user role for commission editing
     this.api.getMe().subscribe(user => {
       this.currentUser = user;
       const userRole = user.role || '';
       this.isAdmin = userRole === 'Super Admin';
       this.showAssignmentDropdown = this.isAdmin;
-
-      if (this.isAdmin) {
-        this.dealForm.get('commission')?.enable();
-      }
 
       // Default broker to current user if not editing
       if (!this.isEdit) {
@@ -242,12 +236,10 @@ export class DealFormComponent implements OnInit {
       
       if (this.preSelectedPropertyId) {
         this.dealForm.get('propertyId')?.setValue(this.preSelectedPropertyId);
-        this.calculateCommission(this.preSelectedPropertyId);
         this.autoPopulateSellerFromProperty(this.preSelectedPropertyId);
       } else {
         const selectedId = this.dealForm.get('propertyId')?.value;
         if (selectedId) {
-          this.calculateCommission(selectedId);
           this.autoPopulateSellerFromProperty(selectedId);
         }
       }
@@ -265,27 +257,24 @@ export class DealFormComponent implements OnInit {
     // Watch for property selection changes
     this.dealForm.get('propertyId')?.valueChanges.subscribe(id => {
       if (id) {
-        this.calculateCommission(id);
         this.autoPopulateSellerFromProperty(id);
         this.autoPopulateTeamOrUserFromProperty(id);
       }
     });
 
-    // Watch for final price changes to recalculate commission
+    // Watch for final price changes
     this.dealForm.get('finalPrice')?.valueChanges.subscribe(finalPrice => {
-      if (finalPrice && this.dealForm.get('propertyId')?.value) {
-        this.calculateCommissionFromFinalPrice();
-      }
+      // Commission is calculated on-the-fly in the template
     });
   }
 
-  private calculateCommissionFromFinalPrice() {
+  getCommissionAmount(): number {
     const property = this.properties.find(p => p.id === this.dealForm.get('propertyId')?.value);
-    const finalPrice = this.dealForm.get('finalPrice')?.value;
-    if (property && finalPrice && property.commissionPercentage > 0) {
-      const calculated = (Number(finalPrice) * property.commissionPercentage) / 100;
-      this.dealForm.get('commission')?.setValue(calculated);
+    const finalPrice = this.dealForm.get('finalPrice')?.value || property?.price || 0;
+    if (property && property.commissionPercentage > 0) {
+      return (Number(finalPrice) * property.commissionPercentage) / 100;
     }
+    return 0;
   }
 
   private autoPopulateTeamOrUserFromProperty(propertyId: string) {
@@ -374,13 +363,7 @@ export class DealFormComponent implements OnInit {
     }
   }
 
-  private calculateCommission(propertyId: string) {
-    const property = this.properties.find(p => p.id === propertyId);
-    if (property && property.commissionPercentage > 0) {
-      const calculated = (Number(property.price) * property.commissionPercentage) / 100;
-      this.dealForm.get('commission')?.setValue(calculated);
-    }
-  }
+  
 
   onSubmit(): void {
     if (this.dealForm.valid && !this.isSubmitting && this.selectedClient && this.sellerSelection) {

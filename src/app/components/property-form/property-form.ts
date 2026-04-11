@@ -232,7 +232,7 @@ console.log('defaultAssignedToUserId ', defaultAssignedToUserId)
       assignedToUserId: [defaultAssignedToUserId],
       assignedToGroupId: [null],
       sellerId: [null],
-      commissionPercentage: [{ value: 0, disabled: !this.isAdmin }, [Validators.required, Validators.min(0), Validators.max(100)]],
+      
 
       // Sold/Lost Info
       soldTo: [''],
@@ -332,7 +332,7 @@ console.log('defaultAssignedToUserId ', defaultAssignedToUserId)
       assignedToUserId: [defaultAssignedToUserId],
       assignedToGroupId: [null],
       sellerId: [null],
-      commissionPercentage: [{ value: 0, disabled: !this.isAdmin }, [Validators.required, Validators.min(0), Validators.max(100)]],
+      
       photos: [''],
       videos: [''],
       tours360: [''],
@@ -587,5 +587,11 @@ console.log('val ', val)
 
   onSellerSelected(selection: SellerSelection): void {
     this.sellerSelection = selection;
+  }
+
+  getCalculatedCommission(): number {
+    const price = this.propertyForm.get('price')?.value || 0;
+    const percentage = this.propertyForm.get('commissionPercentage')?.value || 0;
+    return (Number(price) * Number(percentage)) / 100;
   }
 }

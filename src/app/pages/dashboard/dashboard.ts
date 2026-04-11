@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, computed, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -31,6 +31,7 @@ export class DashboardComponent implements OnInit {
 
   loading = true;
   chartLoading = true;
+  isSuperAdmin = signal(true);
 
   overview = {
     totalProperties: 0,
@@ -43,6 +44,21 @@ export class DashboardComponent implements OnInit {
     thisMonthRevenue: 0,
     totalExpenses: 0,
     netProfit: 0
+  };
+
+  userDashboard = {
+    todayVisits: [] as any[],
+    missedVisits: 0,
+    upcomingVisits: [] as any[],
+    contactedLeads: 0,
+    uncontactedLeads: 0,
+    propertiesOnHold: 0,
+    propertiesNotHandled: 0,
+    dealsOnHold: 0,
+    dealsNotClosed: 0,
+    totalCommissionEarned: 0,
+    myHotLeads: 0,
+    completedVisitsThisWeek: 0
   };
 
   propertyStatusData: { label: string; value: number; color: string }[] = [];
@@ -71,6 +87,7 @@ export class DashboardComponent implements OnInit {
     this.api.getDashboardStats().subscribe({
       next: (data: any) => {
         if (data) {
+          this.isSuperAdmin.set(data.isSuperAdmin === true);
           this.overview = data.overview || this.overview;
           this.propertyStatusData = data.charts?.propertyByStatus || [];
           this.propertyTypeData = data.charts?.propertyByType || [];
@@ -88,6 +105,23 @@ export class DashboardComponent implements OnInit {
           this.recentLeads = data.recent?.leads || [];
           this.recentDeals = data.recent?.deals || [];
           this.topAgents = data.topAgents || [];
+
+          if (data.userDashboard) {
+            this.userDashboard = {
+              todayVisits: data.userDashboard.todayVisits || [],
+              missedVisits: data.userDashboard.missedVisits || 0,
+              upcomingVisits: data.userDashboard.upcomingVisits || [],
+              contactedLeads: data.userDashboard.contactedLeads || 0,
+              uncontactedLeads: data.userDashboard.uncontactedLeads || 0,
+              propertiesOnHold: data.userDashboard.propertiesOnHold || 0,
+              propertiesNotHandled: data.userDashboard.propertiesNotHandled || 0,
+              dealsOnHold: data.userDashboard.dealsOnHold || 0,
+              dealsNotClosed: data.userDashboard.dealsNotClosed || 0,
+              totalCommissionEarned: data.userDashboard.totalCommissionEarned || 0,
+              myHotLeads: data.userDashboard.myHotLeads || 0,
+              completedVisitsThisWeek: data.userDashboard.completedVisitsThisWeek || 0
+            };
+          }
 
           this.buildRecentActivities();
         }
@@ -181,13 +215,35 @@ export class DashboardComponent implements OnInit {
       'Reserved': 'badge-warning',
       'Sold': 'badge-danger',
       'Rented': 'badge-info',
-      'New': 'badge-primary',
+      'New Lead': 'badge-primary',
       'Contacted': 'badge-primary',
       'Qualified': 'badge-success',
       'Hot': 'badge-danger',
       'Negotiation': 'badge-warning',
-      'Closed': 'badge-success'
+      'Closed': 'badge-success',
+      'Scheduled': 'badge-primary',
+      'Completed': 'badge-success',
+      'Cancelled': 'badge-muted',
+      'No Show': 'badge-danger',
+      'Visit Scheduled': 'badge-info',
+      'Contract Signed': 'badge-warning'
     };
     return classes[status] || 'badge-primary';
+  }
+
+  formatVisitTime(dateString: string): string {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  getWelcomeMessage(): string {
+    const role = this.user()?.role;
+    if (role === 'Broker') return 'Broker Dashboard';
+    if (role === 'Agent') return 'Agent Dashboard';
+    if (role === 'Office Manager') return 'Office Manager Dashboard';
+    if (role === 'Accountant') return 'Accountant Dashboard';
+    if (role === 'Marketing') return 'Marketing Dashboard';
+    return 'Business Overview';
   }
 }

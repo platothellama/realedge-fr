@@ -98,7 +98,7 @@ export class PropertyDetailsComponent implements OnInit {
           priceHistoryEntries: Array.isArray(res.priceHistoryEntries) ? res.priceHistoryEntries : []
         };
         this.calculateAnalytics();
-        this.loadPropertyRelatedData(id);
+        this.fetchPropertyRelatedData(id);
 
         if (this.property.soldTo) {
           const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(this.property.soldTo);
@@ -128,7 +128,7 @@ export class PropertyDetailsComponent implements OnInit {
     });
   }
 
-  loadPropertyRelatedData(propertyId: string) {
+  fetchPropertyRelatedData(propertyId: string) {
     this.api.getVisits().subscribe({
       next: (res: any) => {
         const allVisits = Array.isArray(res) ? res : (res?.data || []);
@@ -222,8 +222,7 @@ export class PropertyDetailsComponent implements OnInit {
             if (result.createNewDeal) {
               this.api.createDeal(result.newDeal).subscribe({
                 next: (deal: any) => {
-                  // this.markAsSold(deal.buyerName || deal.id, result.soldAt);
-                  this.loadPropertyRelatedData(this.property.id);
+                  this.fetchProperty(this.property.id);
                 },
                 error: (err: any) => {
                   console.error('Error creating deal', err);
@@ -232,20 +231,20 @@ export class PropertyDetailsComponent implements OnInit {
                 }
               });
             } else if (result.dealId) {
-              // this.api.updateDeal(result.dealId, { dealStage: 'Closed' }).subscribe({
-              //   next: () => {
-                  this.markAsSold(result.buyerName || result.dealTitle, result.soldAt);
-                  this.loadPropertyRelatedData(this.property.id);
-                // },
-                // error: (err: any) => {
-                //   console.error('Error updating deal', err);
-                //   this.snackBar.open('Failed to update deal', 'Close', { duration: 3000 });
-                // }
-              // });
+              this.api.updateDeal(result.dealId, { dealStage: 'Closed' }).subscribe({
+                next: () => {
+                  this.fetchProperty(this.property.id);
+                },
+                error: (err: any) => {
+                  console.error('Error updating deal', err);
+                  this.snackBar.open('Failed to update deal', 'Close', { duration: 3000 });
+                }
+              });
             } else if (result.createNewLead) {
               this.api.createLead(result.newLead).subscribe({
                 next: (lead: any) => {
                   this.markAsSold(lead.id || lead.name, result.soldAt);
+                  this.fetchProperty(this.property.id);
                 },
                 error: (err: any) => {
                   console.error('Error creating lead', err);
@@ -258,7 +257,7 @@ export class PropertyDetailsComponent implements OnInit {
                 status: 'Closed',
                 propertyId: this.property.id
               }).subscribe({
-                next: () => console.log('Lead updated to Closed'),
+                next: () => this.fetchProperty(this.property.id),
                 error: (err: any) => console.error('Error updating lead', err)
               });
             }
@@ -412,7 +411,7 @@ export class PropertyDetailsComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((result: LeadWorkflowResult) => {
       if (result) {
-        this.loadPropertyRelatedData(this.property.id);
+        this.fetchPropertyRelatedData(this.property.id);
         this.snackBar.open('Workflow completed', 'Close', { duration: 3000 });
       }
     });

@@ -2,7 +2,7 @@
   <div class="page-header">
     <div>
       <h1>Welcome back, {{ user()?.name }}</h1>
-      <p class="subtitle">Here's your business overview</p>
+      <p class="subtitle">Here's your {{ getWelcomeMessage() }}</p>
     </div>
   </div>
 
@@ -12,226 +12,561 @@
         <mat-spinner diameter="40"></mat-spinner>
       </div>
     } @else {
-      <div class="row g-4">
-        <div class="col-md-6 col-xl-4">
-          <div class="stat-card">
-            <div class="stat-icon-wrap" style="background: rgba(99, 102, 241, 0.1);">
-              <mat-icon style="color: #6366f1;">home</mat-icon>
-            </div>
-            <div class="stat-content">
-              <span class="stat-label">Properties</span>
-              <span class="stat-value">{{ overview.totalProperties }}</span>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-6 col-xl-4">
-          <div class="stat-card">
-            <div class="stat-icon-wrap" style="background: rgba(16, 185, 129, 0.1);">
-              <mat-icon style="color: #10b981;">people</mat-icon>
-            </div>
-            <div class="stat-content">
-              <span class="stat-label">Leads</span>
-              <span class="stat-value">{{ overview.totalLeads }}</span>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-6 col-xl-4">
-          <div class="stat-card">
-            <div class="stat-icon-wrap" style="background: rgba(139, 92, 246, 0.1);">
-              <mat-icon style="color: #8b5cf6;">handshake</mat-icon>
-            </div>
-            <div class="stat-content">
-              <span class="stat-label">Deals</span>
-              <span class="stat-value">{{ overview.totalDeals }}</span>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-6 col-xl-4">
-          <div class="stat-card">
-            <div class="stat-icon-wrap" style="background: rgba(16, 185, 129, 0.1);">
-              <mat-icon style="color: #10b981;">payments</mat-icon>
-            </div>
-            <div class="stat-content">
-              <span class="stat-label">Revenue</span>
-              <span class="stat-value">{{ formatCurrency(overview.totalRevenue) }}</span>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-6 col-xl-4">
-          <div class="stat-card">
-            <div class="stat-icon-wrap" style="background: rgba(245, 158, 11, 0.1);">
-              <mat-icon style="color: #f59e0b;">pending</mat-icon>
-            </div>
-            <div class="stat-content">
-              <span class="stat-label">Pending Commission</span>
-              <span class="stat-value">{{ formatCurrency(overview.pendingCommissions) }}</span>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-6 col-xl-4">
-          <div class="stat-card">
-            <div class="stat-icon-wrap" style="background: rgba(239, 68, 68, 0.1);">
-              <mat-icon style="color: #ef4444;">trending_down</mat-icon>
-            </div>
-            <div class="stat-content">
-              <span class="stat-label">Expenses</span>
-              <span class="stat-value">{{ formatCurrency(overview.totalExpenses) }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="row g-4 mt-2">
-        <div class="col-12">
-          <div class="card">
-            <div class="card-header">
-              <div class="d-flex align-items-center justify-content-between">
-                <h3 class="mb-0">Revenue Trend</h3>
-                <span class="badge badge-primary">Last 6 Months</span>
+      
+      @if (isSuperAdmin()) {
+        <div class="row g-4">
+          <div class="col-md-6 col-xl-4">
+            <div class="stat-card">
+              <div class="stat-icon-wrap" style="background: rgba(99, 102, 241, 0.1);">
+                <mat-icon style="color: #6366f1;">home</mat-icon>
+              </div>
+              <div class="stat-content">
+                <span class="stat-label">Properties</span>
+                <span class="stat-value">{{ overview.totalProperties }}</span>
               </div>
             </div>
-            <div class="card-body">
-              @if (chartLoading) {
-                <div class="d-flex align-items-center justify-content-center" style="height: 250px;">
-                  <mat-spinner diameter="30"></mat-spinner>
-                </div>
-              } @else {
-                <app-line-chart [data]="monthlyValues" [labels]="monthlyLabels"></app-line-chart>
-              }
+          </div>
+          <div class="col-md-6 col-xl-4">
+            <div class="stat-card">
+              <div class="stat-icon-wrap" style="background: rgba(16, 185, 129, 0.1);">
+                <mat-icon style="color: #10b981;">people</mat-icon>
+              </div>
+              <div class="stat-content">
+                <span class="stat-label">Leads</span>
+                <span class="stat-value">{{ overview.totalLeads }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 col-xl-4">
+            <div class="stat-card">
+              <div class="stat-icon-wrap" style="background: rgba(139, 92, 246, 0.1);">
+                <mat-icon style="color: #8b5cf6;">handshake</mat-icon>
+              </div>
+              <div class="stat-content">
+                <span class="stat-label">Deals</span>
+                <span class="stat-value">{{ overview.totalDeals }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 col-xl-4">
+            <div class="stat-card">
+              <div class="stat-icon-wrap" style="background: rgba(16, 185, 129, 0.1);">
+                <mat-icon style="color: #10b981;">payments</mat-icon>
+              </div>
+              <div class="stat-content">
+                <span class="stat-label">Revenue</span>
+                <span class="stat-value">{{ formatCurrency(overview.totalRevenue) }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 col-xl-4">
+            <div class="stat-card">
+              <div class="stat-icon-wrap" style="background: rgba(245, 158, 11, 0.1);">
+                <mat-icon style="color: #f59e0b;">pending</mat-icon>
+              </div>
+              <div class="stat-content">
+                <span class="stat-label">Pending Commission</span>
+                <span class="stat-value">{{ formatCurrency(overview.pendingCommissions) }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 col-xl-4">
+            <div class="stat-card">
+              <div class="stat-icon-wrap" style="background: rgba(239, 68, 68, 0.1);">
+                <mat-icon style="color: #ef4444;">trending_down</mat-icon>
+              </div>
+              <div class="stat-content">
+                <span class="stat-label">Expenses</span>
+                <span class="stat-value">{{ formatCurrency(overview.totalExpenses) }}</span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div class="row g-4 mt-2">
-        <div class="col-md-6 col-lg-3">
-          <div class="card">
-            <div class="card-header">
-              <h3 class="mb-0">Property Status</h3>
-            </div>
-            <div class="card-body d-flex align-items-center justify-content-center">
-              <app-donut-chart [data]="propertyStatusData" label="Props" [loading]="chartLoading"></app-donut-chart>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-6 col-lg-3">
-          <div class="card">
-            <div class="card-header">
-              <h3 class="mb-0">Lead Sources</h3>
-            </div>
-            <div class="card-body d-flex align-items-center justify-content-center">
-              <app-donut-chart [data]="leadSourcesData" label="Leads" [loading]="chartLoading"></app-donut-chart>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-6 col-lg-3">
-          <div class="card">
-            <div class="card-header">
-              <h3 class="mb-0">Hot Leads</h3>
-            </div>
-            <div class="card-body d-flex flex-column align-items-center justify-content-center">
-              <div class="hot-count">{{ overview.hotLeads }}</div>
-              <div class="text-muted fs-sm">Active</div>
+        <div class="row g-4 mt-2">
+          <div class="col-12">
+            <div class="card">
+              <div class="card-header">
+                <div class="d-flex align-items-center justify-content-between">
+                  <h3 class="mb-0">Revenue Trend</h3>
+                  <span class="badge badge-primary">Last 6 Months</span>
+                </div>
+              </div>
+              <div class="card-body">
+                @if (chartLoading) {
+                  <div class="d-flex align-items-center justify-content-center" style="height: 250px;">
+                    <mat-spinner diameter="30"></mat-spinner>
+                  </div>
+                } @else {
+                  <app-line-chart [data]="monthlyValues" [labels]="monthlyLabels"></app-line-chart>
+                }
+              </div>
             </div>
           </div>
         </div>
-        <div class="col-md-6 col-lg-3">
-          <div class="card">
-            <div class="card-header">
-              <h3 class="mb-0">This Month</h3>
-            </div>
-            <div class="card-body d-flex flex-column align-items-center justify-content-center">
-              <div class="revenue-month">{{ formatCurrency(overview.thisMonthRevenue) }}</div>
-              <div class="text-muted fs-sm">Revenue</div>
-            </div>
-          </div>
-        </div>
-      </div>
 
-      <div class="row g-4 mt-2">
-        <div class="col-lg-6">
-          <div class="card">
-            <div class="card-header">
-              <h3 class="mb-0">Recent Activity</h3>
+        <div class="row g-4 mt-2">
+          <div class="col-md-6 col-lg-3">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="mb-0">Property Status</h3>
+              </div>
+              <div class="card-body d-flex align-items-center justify-content-center">
+                <app-donut-chart [data]="propertyStatusData" label="Props" [loading]="chartLoading"></app-donut-chart>
+              </div>
             </div>
-            <div class="card-body p-0">
-              @if (loading) {
-                <div class="p-3">
-                  @for (i of [1,2,3,4,5]; track i) {
-                    <div class="d-flex align-items-center gap-3 mb-3">
-                      <div class="skeleton" style="width: 44px; height: 44px; border-radius: 12px;"></div>
-                      <div class="flex-1">
-                        <div class="skeleton mb-2" style="height: 14px; width: 70%;"></div>
-                        <div class="skeleton" style="height: 12px; width: 40%;"></div>
-                      </div>
-                    </div>
-                  }
-                </div>
-              } @else if (recentActivities.length === 0) {
-                <div class="text-center text-muted p-4">
-                  <mat-icon style="font-size: 48px; width: 48px; height: 48px; opacity: 0.5;">inbox</mat-icon>
-                  <p class="mt-2 mb-0">No recent activity</p>
-                </div>
-              } @else {
-                <div class="activity-list">
-                  @for (activity of recentActivities; track $index) {
-                    <div class="activity-item">
-                      <div class="activity-icon" [ngClass]="'icon-' + activity.type">
-                        <mat-icon>{{ activity.icon }}</mat-icon>
-                      </div>
-                      <div class="flex-1">
-                        <div class="fw-medium">{{ activity.title }}</div>
-                        <div class="fs-sm text-muted">{{ getTimeAgo(activity.time) }}</div>
-                      </div>
-                    </div>
-                  }
-                </div>
-              }
+          </div>
+          <div class="col-md-6 col-lg-3">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="mb-0">Lead Sources</h3>
+              </div>
+              <div class="card-body d-flex align-items-center justify-content-center">
+                <app-donut-chart [data]="leadSourcesData" label="Leads" [loading]="chartLoading"></app-donut-chart>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-3">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="mb-0">Hot Leads</h3>
+              </div>
+              <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                <div class="hot-count">{{ overview.hotLeads }}</div>
+                <div class="text-muted fs-sm">Active</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 col-lg-3">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="mb-0">This Month</h3>
+              </div>
+              <div class="card-body d-flex flex-column align-items-center justify-content-center">
+                <div class="revenue-month">{{ formatCurrency(overview.thisMonthRevenue) }}</div>
+                <div class="text-muted fs-sm">Revenue</div>
+              </div>
             </div>
           </div>
         </div>
-        <div class="col-lg-6">
-          <div class="card">
-            <div class="card-header">
-              <h3 class="mb-0">Team Members</h3>
+
+        <div class="row g-4 mt-2">
+          <div class="col-lg-6">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="mb-0">Recent Activity</h3>
+              </div>
+              <div class="card-body p-0">
+                @if (loading) {
+                  <div class="p-3">
+                    @for (i of [1,2,3,4,5]; track i) {
+                      <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="skeleton" style="width: 44px; height: 44px; border-radius: 12px;"></div>
+                        <div class="flex-1">
+                          <div class="skeleton mb-2" style="height: 14px; width: 70%;"></div>
+                          <div class="skeleton" style="height: 12px; width: 40%;"></div>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                } @else if (recentActivities.length === 0) {
+                  <div class="text-center text-muted p-4">
+                    <mat-icon style="font-size: 48px; width: 48px; height: 48px; opacity: 0.5;">inbox</mat-icon>
+                    <p class="mt-2 mb-0">No recent activity</p>
+                  </div>
+                } @else {
+                  <div class="activity-list">
+                    @for (activity of recentActivities; track $index) {
+                      <div class="activity-item">
+                        <div class="activity-icon" [ngClass]="'icon-' + activity.type">
+                          <mat-icon>{{ activity.icon }}</mat-icon>
+                        </div>
+                        <div class="flex-1">
+                          <div class="fw-medium">{{ activity.title }}</div>
+                          <div class="fs-sm text-muted">{{ getTimeAgo(activity.time) }}</div>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
             </div>
-            <div class="card-body p-0">
-              @if (loading) {
-                <div class="p-3">
-                  @for (i of [1,2,3,4]; track i) {
-                    <div class="d-flex align-items-center gap-3 mb-3">
-                      <div class="skeleton" style="width: 44px; height: 44px; border-radius: 50%;"></div>
-                      <div class="flex-1">
-                        <div class="skeleton mb-2" style="height: 14px; width: 60%;"></div>
-                        <div class="skeleton" style="height: 12px; width: 30%;"></div>
+          </div>
+          <div class="col-lg-6">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="mb-0">Team Members</h3>
+              </div>
+              <div class="card-body p-0">
+                @if (loading) {
+                  <div class="p-3">
+                    @for (i of [1,2,3,4]; track i) {
+                      <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="skeleton" style="width: 44px; height: 44px; border-radius: 50%;"></div>
+                        <div class="flex-1">
+                          <div class="skeleton mb-2" style="height: 14px; width: 60%;"></div>
+                          <div class="skeleton" style="height: 12px; width: 30%;"></div>
+                        </div>
                       </div>
-                    </div>
-                  }
-                </div>
-              } @else if (topAgents.length === 0) {
-                <div class="text-center text-muted p-4">
-                  <mat-icon style="font-size: 48px; width: 48px; height: 48px; opacity: 0.5;">people_outline</mat-icon>
-                  <p class="mt-2 mb-0">No team members</p>
-                </div>
-              } @else {
-                <div class="activity-list">
-                  @for (agent of topAgents; track agent.id) {
-                    <div class="activity-item">
-                      <img [src]="agent.photo || 'https://ui-avatars.com/api/?name=' + agent.name + '&background=6366f1&color=fff&rounded=true'" 
-                           class="rounded-circle" style="width: 44px; height: 44px; object-fit: cover;">
-                      <div class="flex-1">
-                        <div class="fw-medium">{{ agent.name }}</div>
-                        <div class="fs-sm text-muted">{{ agent.role }}</div>
+                    }
+                  </div>
+                } @else if (topAgents.length === 0) {
+                  <div class="text-center text-muted p-4">
+                    <mat-icon style="font-size: 48px; width: 48px; height: 48px; opacity: 0.5;">people_outline</mat-icon>
+                    <p class="mt-2 mb-0">No team members</p>
+                  </div>
+                } @else {
+                  <div class="activity-list">
+                    @for (agent of topAgents; track agent.id) {
+                      <div class="activity-item">
+                        <img [src]="agent.photo || 'https://ui-avatars.com/api/?name=' + agent.name + '&background=6366f1&color=fff&rounded=true'" 
+                             class="rounded-circle" style="width: 44px; height: 44px; object-fit: cover;">
+                        <div class="flex-1">
+                          <div class="fw-medium">{{ agent.name }}</div>
+                          <div class="fs-sm text-muted">{{ agent.role }}</div>
+                        </div>
+                        <div class="status-indicator active"></div>
                       </div>
-                      <div class="status-indicator active"></div>
-                    </div>
-                  }
-                </div>
-              }
+                    }
+                  </div>
+                }
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      } @else {
+        <div class="row g-4">
+          <div class="col-md-6 col-xl-3">
+            <div class="stat-card">
+              <div class="stat-icon-wrap" style="background: rgba(16, 185, 129, 0.1);">
+                <mat-icon style="color: #10b981;">event_available</mat-icon>
+              </div>
+              <div class="stat-content">
+                <span class="stat-label">Today's Visits</span>
+                <span class="stat-value">{{ userDashboard.todayVisits.length }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 col-xl-3">
+            <div class="stat-card">
+              <div class="stat-icon-wrap" style="background: rgba(239, 68, 68, 0.1);">
+                <mat-icon style="color: #ef4444;">event_busy</mat-icon>
+              </div>
+              <div class="stat-content">
+                <span class="stat-label">Missed Visits</span>
+                <span class="stat-value">{{ userDashboard.missedVisits }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 col-xl-3">
+            <div class="stat-card">
+              <div class="stat-icon-wrap" style="background: rgba(99, 102, 241, 0.1);">
+                <mat-icon style="color: #6366f1;">people</mat-icon>
+              </div>
+              <div class="stat-content">
+                <span class="stat-label">Contacted Leads</span>
+                <span class="stat-value">{{ userDashboard.contactedLeads }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 col-xl-3">
+            <div class="stat-card">
+              <div class="stat-icon-wrap" style="background: rgba(245, 158, 11, 0.1);">
+                <mat-icon style="color: #f59e0b;">person_add</mat-icon>
+              </div>
+              <div class="stat-content">
+                <span class="stat-label">New Leads</span>
+                <span class="stat-value">{{ userDashboard.uncontactedLeads }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 col-xl-3">
+            <div class="stat-card">
+              <div class="stat-icon-wrap" style="background: rgba(139, 92, 246, 0.1);">
+                <mat-icon style="color: #8b5cf6;">handshake</mat-icon>
+              </div>
+              <div class="stat-content">
+                <span class="stat-label">Deals On Hold</span>
+                <span class="stat-value">{{ userDashboard.dealsOnHold }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 col-xl-3">
+            <div class="stat-card">
+              <div class="stat-icon-wrap" style="background: rgba(59, 130, 246, 0.1);">
+                <mat-icon style="color: #3b82f6;">home</mat-icon>
+              </div>
+              <div class="stat-content">
+                <span class="stat-label">Properties On Hold</span>
+                <span class="stat-value">{{ userDashboard.propertiesOnHold }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 col-xl-3">
+            <div class="stat-card">
+              <div class="stat-icon-wrap" style="background: rgba(239, 68, 68, 0.1);">
+                <mat-icon style="color: #ef4444;">home_work</mat-icon>
+              </div>
+              <div class="stat-content">
+                <span class="stat-label">Not Handled (30d+)</span>
+                <span class="stat-value">{{ userDashboard.propertiesNotHandled }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 col-xl-3">
+            <div class="stat-card">
+              <div class="stat-icon-wrap" style="background: rgba(16, 185, 129, 0.1);">
+                <mat-icon style="color: #10b981;">payments</mat-icon>
+              </div>
+              <div class="stat-content">
+                <span class="stat-label">Total Earned</span>
+                <span class="stat-value">{{ formatCurrency(userDashboard.totalCommissionEarned) }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row g-4 mt-2">
+          <div class="col-xl-6">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="mb-0">Today's Schedule</h3>
+              </div>
+              <div class="card-body p-0">
+                @if (loading) {
+                  <div class="p-3">
+                    @for (i of [1,2,3]; track i) {
+                      <div class="d-flex align-items-center gap-3 mb-3">
+                        <div class="skeleton" style="width: 44px; height: 44px; border-radius: 12px;"></div>
+                        <div class="flex-1">
+                          <div class="skeleton mb-2" style="height: 14px; width: 70%;"></div>
+                          <div class="skeleton" style="height: 12px; width: 40%;"></div>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                } @else if (userDashboard.todayVisits.length === 0) {
+                  <div class="text-center text-muted p-4">
+                    <mat-icon style="font-size: 48px; width: 48px; height: 48px; opacity: 0.5;">event_available</mat-icon>
+                    <p class="mt-2 mb-0">No visits scheduled for today</p>
+                  </div>
+                } @else {
+                  <div class="activity-list">
+                    @for (visit of userDashboard.todayVisits; track visit.id) {
+                      <div class="activity-item">
+                        <div class="activity-icon icon-property">
+                          <mat-icon>event</mat-icon>
+                        </div>
+                        <div class="flex-1">
+                          <div class="fw-medium">{{ visit.title }}</div>
+                          <div class="fs-sm text-muted">
+                            {{ visit.clientName }} | {{ formatVisitTime(visit.visitDate) }}
+                            @if (visit.property) {
+                              | {{ visit.property.title }}
+                            }
+                          </div>
+                        </div>
+                        <span class="badge" [ngClass]="getStatusClass(visit.status)">{{ visit.status }}</span>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+          <div class="col-xl-6">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="mb-0">Quick Stats</h3>
+              </div>
+              <div class="card-body p-0">
+                <div class="quick-stats-grid">
+                  <div class="quick-stat-card">
+                    <div class="quick-stat-icon danger">
+                      <mat-icon>whatshot</mat-icon>
+                    </div>
+                    <div class="quick-stat-info">
+                      <span class="quick-stat-value text-danger">{{ userDashboard.myHotLeads }}</span>
+                      <span class="quick-stat-label">Hot Leads</span>
+                    </div>
+                  </div>
+                  <div class="quick-stat-card">
+                    <div class="quick-stat-icon success">
+                      <mat-icon>event_available</mat-icon>
+                    </div>
+                    <div class="quick-stat-info">
+                      <span class="quick-stat-value text-success">{{ userDashboard.completedVisitsThisWeek }}</span>
+                      <span class="quick-stat-label">Visits This Week</span>
+                    </div>
+                  </div>
+                  <div class="quick-stat-card">
+                    <div class="quick-stat-icon warning">
+                      <mat-icon>pending_actions</mat-icon>
+                    </div>
+                    <div class="quick-stat-info">
+                      <span class="quick-stat-value text-warning">{{ userDashboard.dealsNotClosed }}</span>
+                      <span class="quick-stat-label">Deals Not Closed</span>
+                    </div>
+                  </div>
+                  <div class="quick-stat-card">
+                    <div class="quick-stat-icon primary">
+                      <mat-icon>home</mat-icon>
+                    </div>
+                    <div class="quick-stat-info">
+                      <span class="quick-stat-value">{{ overview.totalProperties }}</span>
+                      <span class="quick-stat-label">My Properties</span>
+                    </div>
+                  </div>
+                  <div class="quick-stat-card">
+                    <div class="quick-stat-icon info">
+                      <mat-icon>people</mat-icon>
+                    </div>
+                    <div class="quick-stat-info">
+                      <span class="quick-stat-value">{{ overview.totalLeads }}</span>
+                      <span class="quick-stat-label">My Leads</span>
+                    </div>
+                  </div>
+                  <div class="quick-stat-card">
+                    <div class="quick-stat-icon purple">
+                      <mat-icon>handshake</mat-icon>
+                    </div>
+                    <div class="quick-stat-info">
+                      <span class="quick-stat-value">{{ overview.totalDeals }}</span>
+                      <span class="quick-stat-label">My Deals</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row g-4 mt-2">
+          <div class="col-lg-6">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="mb-0">Upcoming Visits</h3>
+              </div>
+              <div class="card-body p-0">
+                @if (userDashboard.upcomingVisits.length === 0) {
+                  <div class="text-center text-muted p-4">
+                    <mat-icon style="font-size: 48px; width: 48px; height: 48px; opacity: 0.5;">event</mat-icon>
+                    <p class="mt-2 mb-0">No upcoming visits</p>
+                  </div>
+                } @else {
+                  <div class="activity-list">
+                    @for (visit of userDashboard.upcomingVisits; track visit.id) {
+                      <div class="activity-item">
+                        <div class="activity-icon icon-lead">
+                          <mat-icon>schedule</mat-icon>
+                        </div>
+                        <div class="flex-1">
+                          <div class="fw-medium">{{ visit.title }}</div>
+                          <div class="fs-sm text-muted">
+                            {{ visit.clientName }} | {{ visit.visitDate | date:'MMM d, h:mm a' }}
+                          </div>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="mb-0">Recent Leads</h3>
+              </div>
+              <div class="card-body p-0">
+                @if (recentLeads.length === 0) {
+                  <div class="text-center text-muted p-4">
+                    <mat-icon style="font-size: 48px; width: 48px; height: 48px; opacity: 0.5;">people_outline</mat-icon>
+                    <p class="mt-2 mb-0">No recent leads</p>
+                  </div>
+                } @else {
+                  <div class="activity-list">
+                    @for (lead of recentLeads; track lead.id) {
+                      <div class="activity-item">
+                        <img [src]="'https://ui-avatars.com/api/?name=' + lead.name + '&background=10b981&color=fff&rounded=true'" 
+                             class="rounded-circle" style="width: 44px; height: 44px; object-fit: cover;">
+                        <div class="flex-1">
+                          <div class="fw-medium">{{ lead.name }}</div>
+                          <div class="fs-sm text-muted">{{ lead.source }} | {{ lead.phone }}</div>
+                        </div>
+                        <span class="badge badge-primary">{{ getTimeAgo(lead.createdAt) }}</span>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row g-4 mt-2">
+          <div class="col-lg-6">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="mb-0">My Deals</h3>
+              </div>
+              <div class="card-body p-0">
+                @if (recentDeals.length === 0) {
+                  <div class="text-center text-muted p-4">
+                    <mat-icon style="font-size: 48px; width: 48px; height: 48px; opacity: 0.5;">handshake</mat-icon>
+                    <p class="mt-2 mb-0">No deals yet</p>
+                  </div>
+                } @else {
+                  <div class="activity-list">
+                    @for (deal of recentDeals; track deal.id) {
+                      <div class="activity-item">
+                        <div class="activity-icon icon-deal">
+                          <mat-icon>handshake</mat-icon>
+                        </div>
+                        <div class="flex-1">
+                          <div class="fw-medium">{{ deal.title }}</div>
+                          <div class="fs-sm text-muted">{{ formatCurrency(deal.commission) }}</div>
+                        </div>
+                        <span class="badge" [ngClass]="getStatusClass(deal.dealStage)">{{ deal.dealStage }}</span>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="mb-0">My Properties</h3>
+              </div>
+              <div class="card-body p-0">
+                @if (recentProperties.length === 0) {
+                  <div class="text-center text-muted p-4">
+                    <mat-icon style="font-size: 48px; width: 48px; height: 48px; opacity: 0.5;">home</mat-icon>
+                    <p class="mt-2 mb-0">No properties assigned</p>
+                  </div>
+                } @else {
+                  <div class="activity-list">
+                    @for (property of recentProperties; track property.id) {
+                      <div class="activity-item">
+                        <div class="activity-icon icon-property">
+                          <mat-icon>home</mat-icon>
+                        </div>
+                        <div class="flex-1">
+                          <div class="fw-medium">{{ property.title }}</div>
+                          <div class="fs-sm text-muted">{{ property.city }} | {{ property.type }}</div>
+                        </div>
+                        <span class="badge badge-success">{{ formatCurrency(property.price) }}</span>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      }
     }
   </div>
 </div>

@@ -93,7 +93,6 @@ export class LeadWorkflowComponent implements OnInit {
     this.dealForm = this.fb.group({
       title: ['', Validators.required],
       sellerName: [''],
-      commission: [0],
       dealStage: ['Negotiation', Validators.required],
       notes: [''],
       propertyId: [data?.propertyId || '', Validators.required],

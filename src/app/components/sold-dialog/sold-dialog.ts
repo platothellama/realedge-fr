@@ -68,11 +68,6 @@ import { ApiService } from '../../services/api';
                 <mat-label>Buyer Name</mat-label>
                 <input matInput formControlName="buyerName" placeholder="Buyer name">
               </mat-form-field>
-
-              <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Commission</mat-label>
-                <input matInput type="number" formControlName="commission" placeholder="0">
-              </mat-form-field>
             </div>
           }
 
@@ -183,7 +178,6 @@ export class SoldDialogComponent implements OnInit {
       dealId: [null],
       dealTitle: [''],
       buyerName: [''],
-      commission: [0],
       leadId: [null],
       name: [''],
       email: [''],
@@ -209,7 +203,6 @@ export class SoldDialogComponent implements OnInit {
       this.soldForm.get('dealId')?.clearValidators();
       this.soldForm.get('dealTitle')?.clearValidators();
       this.soldForm.get('buyerName')?.clearValidators();
-      this.soldForm.get('commission')?.clearValidators();
       this.soldForm.get('leadId')?.clearValidators();
       this.soldForm.get('name')?.clearValidators();
       this.soldForm.get('email')?.clearValidators();
@@ -220,7 +213,6 @@ export class SoldDialogComponent implements OnInit {
       } else if (value === 'newDeal') {
         this.soldForm.get('dealTitle')?.setValidators([Validators.required]);
         this.soldForm.get('buyerName')?.setValidators([Validators.required]);
-        this.soldForm.get('commission')?.setValidators([Validators.required]);
       } else if (value === 'existing') {
         this.soldForm.get('leadId')?.setValidators([Validators.required]);
       } else if (value === 'new') {
@@ -232,7 +224,6 @@ export class SoldDialogComponent implements OnInit {
       this.soldForm.get('dealId')?.updateValueAndValidity();
       this.soldForm.get('dealTitle')?.updateValueAndValidity();
       this.soldForm.get('buyerName')?.updateValueAndValidity();
-      this.soldForm.get('commission')?.updateValueAndValidity();
       this.soldForm.get('leadId')?.updateValueAndValidity();
       this.soldForm.get('name')?.updateValueAndValidity();
       this.soldForm.get('email')?.updateValueAndValidity();
@@ -259,7 +250,6 @@ export class SoldDialogComponent implements OnInit {
           newDeal: {
             title: formValue.dealTitle,
             buyerName: formValue.buyerName,
-            commission: formValue.commission,
             dealStage: 'Closed',
             propertyId: this.data.propertyId,
             brokerId: this.currentUser?.id

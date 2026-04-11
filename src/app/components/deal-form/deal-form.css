@@ -133,3 +133,31 @@
   font-weight: 600;
   color: var(--text-secondary);
 }
+
+.commission-display {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: linear-gradient(135deg, rgba(34, 197, 94, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  border-radius: 8px;
+}
+
+.commission-display .label {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.commission-display .amount {
+  color: #22c55e;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.commission-display .note {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  margin-left: auto;
+}

@@ -27,6 +27,7 @@ import { DocumentSignPageComponent } from './pages/document-sign/document-sign';
 import { DocumentManagerPageComponent } from './pages/document-manager-page/document-manager-page';
 import { SellersComponent } from './pages/sellers/sellers';
 import { SellerDetailsComponent } from './pages/sellers/seller-details';
+import { LeadDetailsComponent } from './pages/lead-details/lead-details';
 import { GroupsComponent } from './pages/groups/groups';
 import { CommissionsComponent } from './pages/commissions/commissions';
 import { authGuard } from './guards/auth.guard';
@@ -44,6 +45,7 @@ export const routes: Routes = [
       { path: 'properties', component: PropertiesComponent },
       { path: 'properties/:id', component: PropertyDetailsComponent },
       { path: 'crm', component: CrmComponent },
+      { path: 'leads/:id', component: LeadDetailsComponent },
       { path: 'deals', component: DealsComponent },
       { path: 'commissions', component: CommissionsComponent },
       { path: 'sellers', component: SellersComponent },

@@ -5,26 +5,185 @@
       <p>Manage your client journey and track deal progress</p>
     </div>
 
-    <div class="action-area">
+    <div class="filter-controls">
+      <div class="search-box">
+        <mat-icon>search</mat-icon>
+        <input type="text" placeholder="Search leads..." [(ngModel)]="searchQuery" (ngModelChange)="applyFilters()">
+      </div>
 
+      <mat-form-field appearance="outline" class="source-filter no-subscript">
+        <mat-label>Source</mat-label>
+        <mat-select [(ngModel)]="selectedSource" (selectionChange)="applyFilters()">
+          <mat-option value="All">All Sources</mat-option>
+          <mat-option value="Website">Website</mat-option>
+          <mat-option value="Facebook">Facebook</mat-option>
+          <mat-option value="Google Ads">Google Ads</mat-option>
+          <mat-option value="Referral">Referral</mat-option>
+          <mat-option value="Walk-in">Walk-in</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="action-area">
+      <button mat-stroked-button color="primary" [matMenuTriggerFor]="dataMenu" class="data-btn">
+        <mat-icon>import_export</mat-icon>
+        Data
+      </button>
+      <mat-menu #dataMenu="matMenu">
+        <button mat-menu-item (click)="triggerImport()">
+          <mat-icon>upload</mat-icon>
+          <span>Import CSV</span>
+        </button>
+        <button mat-menu-item (click)="exportToCSV()">
+          <mat-icon>download</mat-icon>
+          <span>Export CSV</span>
+        </button>
+      </mat-menu>
 
       <button mat-raised-button color="primary" class="create-btn" (click)="openLeadForm()">
         <mat-icon>person_add</mat-icon>
-         New
+        Capture New Lead
       </button>
     </div>
   </div>
 
-  <app-property-search
-    [filters]="searchFilters"
-    [config]="searchConfig"
-    [statusOptions]="statuses"
-    (filtersChange)="onFiltersChange($event)"
-    (search)="applyFilters()"
-  ></app-property-search>
-
   <div class="pipeline-board">
     <mat-tab-group class="view-tabs" color="primary">
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon>table_rows</mat-icon> List View
+        </ng-template>
+
+        <div class="list-view-wrapper">
+          <mat-card class="table-card">
+            <div class="list-view">
+              <div class="list-header">
+                <div class="col-client">Client</div>
+                <div class="col-source">Source</div>
+                <div class="col-status">Status</div>
+                <div class="col-budget">Budget</div>
+                <div class="col-visits">Visits</div>
+                <div class="col-scheduled">Scheduled</div>
+                <div class="col-completed">Completed</div>
+                <div class="col-actions">Actions</div>
+              </div>
+
+              @for (lead of filteredLeads; track lead.id) {
+                <div class="list-item" [class.expanded]="expandedLeadId === lead.id">
+                  <div class="list-item-main" (click)="toggleExpand(lead.id)">
+                    <div class="col-client">
+                      <div class="client-info clickable" (click)="$event.stopPropagation(); openLeadDetails(lead.id)">
+                        <span class="client-name">{{ lead.name }}</span>
+                        <span class="client-email">{{ lead.email }}</span>
+                        <span class="client-phone">{{ lead.phone || 'No phone' }}</span>
+                      </div>
+                    </div>
+                    <div class="col-source">
+                      <span class="lead-source-badge" [attr.data-source]="lead.source">{{ lead.source }}</span>
+                    </div>
+                    <div class="col-status">
+                      <span class="status-badge" [attr.data-status]="lead.status">{{ lead.status }}</span>
+                    </div>
+                    <div class="col-budget">
+                      {{ lead.budget ? (lead.budget | currency:'USD':'symbol':'1.0-0') : '-' }}
+                    </div>
+                    <div class="col-visits">
+                      <span class="visit-count">{{ getAllVisits(lead).length }}</span>
+                    </div>
+                    <div class="col-scheduled">
+                      <span class="visit-count scheduled">{{ getScheduledVisits(lead).length }}</span>
+                    </div>
+                    <div class="col-completed">
+                      <span class="visit-count completed">{{ getCompletedVisits(lead).length }}</span>
+                    </div>
+                    <div class="col-actions">
+                      <button mat-icon-button (click)="$event.stopPropagation(); convertToDeal(lead)" matTooltip="Convert to Deal">
+                        <mat-icon>trending_up</mat-icon>
+                      </button>
+                      <button mat-icon-button (click)="$event.stopPropagation(); openLeadForm(lead)" matTooltip="Edit">
+                        <mat-icon>edit</mat-icon>
+                      </button>
+                      <button mat-icon-button (click)="$event.stopPropagation(); deleteLead(lead.id)" matTooltip="Delete" [class.deleting]="isDeleting(lead.id)">
+                        <mat-icon>delete</mat-icon>
+                      </button>
+                      <mat-icon class="expand-icon">{{ expandedLeadId === lead.id ? 'expand_less' : 'expand_more' }}</mat-icon>
+                    </div>
+                  </div>
+
+                  @if (expandedLeadId === lead.id) {
+                    <div class="lead-timeline">
+                      <div class="timeline-header">
+                        <h4>Activity Timeline</h4>
+                        <button mat-button color="primary" (click)="$event.stopPropagation(); scheduleVisit(lead)">
+                          <mat-icon>add</mat-icon> Add Activity
+                        </button>
+                      </div>
+
+                      <div class="timeline-events">
+                        @for (event of getLeadTimeline(lead); track $index) {
+                          <div class="timeline-event" [class]="event.type">
+                            <div class="event-icon">
+                              <mat-icon>{{ event.icon }}</mat-icon>
+                            </div>
+                            <div class="event-content">
+                              <div class="event-title">{{ event.title }}</div>
+                              <div class="event-description">{{ event.description }}</div>
+                              <div class="event-date">{{ event.date | date:'MMM d, yyyy h:mm a' }}</div>
+                            </div>
+                          </div>
+                        } @empty {
+                          <div class="no-timeline">
+                            <mat-icon>history</mat-icon>
+                            <p>No activity recorded yet</p>
+                          </div>
+                        }
+                      </div>
+
+                      <div class="lead-details-grid">
+                        <div class="detail-group">
+                          <label>Budget</label>
+                          <span>{{ lead.budget ? (lead.budget | currency:'USD':'symbol':'1.0-0') : 'Not specified' }}</span>
+                        </div>
+                        <div class="detail-group">
+                          <label>Preferred Areas</label>
+                          <span>{{ lead.preferredAreas || 'Not specified' }}</span>
+                        </div>
+                        <div class="detail-group">
+                          <label>Property Preferences</label>
+                          <span>{{ lead.propertyPreferences || 'Not specified' }}</span>
+                        </div>
+                        <div class="detail-group">
+                          <label>Nationality</label>
+                          <span>{{ lead.nationality || 'Not specified' }}</span>
+                        </div>
+                        <div class="detail-group">
+                          <label>Assigned To</label>
+                          <span>{{ lead.assignedUser?.name || 'Unassigned' }}</span>
+                        </div>
+                        <div class="detail-group full-width">
+                          <label>Notes</label>
+                          <span>{{ lead.notes || 'No notes' }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
+
+              @if (filteredLeads.length === 0) {
+                <div class="empty-list">
+                  <mat-icon>people_outline</mat-icon>
+                  <p>No leads found</p>
+                  <button mat-raised-button color="primary" (click)="openLeadForm()">
+                    <mat-icon>add</mat-icon> Add First Lead
+                  </button>
+                </div>
+              }
+            </div>
+          </mat-card>
+        </div>
+      </mat-tab>
+
       <mat-tab>
         <ng-template mat-tab-label>
           <mat-icon>view_kanban</mat-icon> Pipeline View
@@ -54,9 +213,6 @@
                         <span class="lead-name">{{ lead.name }}</span>
                         <span class="lead-source-badge" [attr.data-source]="lead.source">{{ lead.source }}</span>
                       </div>
-                      <button mat-icon-button (click)="$event.stopPropagation(); convertToDeal(lead)" matTooltip="Convert to Deal">
-                        <mat-icon>trending_up</mat-icon>
-                      </button>
                       <button mat-icon-button class="edit-btn" (click)="$event.stopPropagation(); openLeadForm(lead)">
                         <mat-icon>edit</mat-icon>
                       </button>
@@ -102,152 +258,6 @@
               </button>
             </div>
           }
-        </div>
-      </mat-tab>
-
-      <mat-tab>
-        <ng-template mat-tab-label>
-          <mat-icon>table_rows</mat-icon> List View
-        </ng-template>
-
-        <div class="list-view-wrapper">
-          <mat-card class="table-card">
-            <div class="list-view">
-              <div class="list-header">
-                <div class="col-client">Client</div>
-                <div class="col-source">Source</div>
-                <div class="col-status">Status</div>
-                <div class="col-budget">Budget</div>
-                <div class="col-visits">Visits</div>
-                <div class="col-scheduled">Scheduled</div>
-                <div class="col-completed">Completed</div>
-                <div class="col-actions">Actions</div>
-              </div>
-
-              @for (lead of filteredLeads; track lead.id) {
-                <div class="list-item" [class.expanded]="expandedLeadId === lead.id">
-                  <div class="list-item-main" (click)="toggleExpand(lead.id)">
-                    <div class="col-client">
-                      <div class="client-info">
-                        <span class="client-name">{{ lead.name }}</span>
-                        <span class="client-email">{{ lead.email }}</span>
-                        <span class="client-phone">{{ lead.phone || 'No phone' }}</span>
-                      </div>
-                    </div>
-                    <div class="col-source">
-                      <span class="lead-source-badge" [attr.data-source]="lead.source">{{ lead.source }}</span>
-                    </div>
-                    <div class="col-status">
-                      <span class="status-badge" [attr.data-status]="lead.status">{{ lead.status }}</span>
-                    </div>
-                    <div class="col-budget">
-                      {{ lead.budget ? (lead.budget | currency:'USD':'symbol':'1.0-0') : '-' }}
-                    </div>
-                    <div class="col-visits">
-                      <span class="visit-count">{{ getAllVisits(lead).length }}</span>
-                    </div>
-                    <div class="col-scheduled">
-                      <span class="visit-count scheduled">{{ getScheduledVisits(lead).length }}</span>
-                    </div>
-                    <div class="col-completed">
-                      <span class="visit-count completed">{{ getCompletedVisits(lead).length }}</span>
-                    </div>
-                    <div class="col-actions">
-                      <button mat-icon-button (click)="$event.stopPropagation(); convertToDeal(lead)" matTooltip="Convert to Deal">
-                        <mat-icon>trending_up</mat-icon>
-                      </button>
-                      <button mat-icon-button (click)="$event.stopPropagation(); openLeadForm(lead)" matTooltip="Edit">
-                        <mat-icon>edit</mat-icon>
-                      </button>
-                      <button mat-icon-button (click)="$event.stopPropagation(); deleteLead(lead.id)" matTooltip="Delete" [class.deleting]="isDeleting(lead.id)">
-                        <mat-icon>delete</mat-icon>
-                      </button>
-                      <mat-icon class="expand-icon">{{ expandedLeadId === lead.id ? 'expand_less' : 'expand_more' }}</mat-icon>
-                    </div>
-                  </div>
-
-                  @if (expandedLeadId === lead.id) {
-                    <div class="visit-history">
-                      <div class="history-header">
-                        <h4>Visit History</h4>
-                        <button mat-button color="primary" (click)="$event.stopPropagation(); scheduleVisit(lead)">
-                          <mat-icon>add</mat-icon> Schedule Visit
-                        </button>
-                      </div>
-
-                      @if (getAllVisits(lead).length === 0) {
-                        <div class="no-visits">
-                          <mat-icon>event_busy</mat-icon>
-                          <p>No visits recorded yet</p>
-                        </div>
-                      } @else {
-                        <div class="visits-timeline">
-                          @for (visit of getAllVisits(lead); track visit.id) {
-                            <div class="visit-item" [class]="visit.status.toLowerCase()">
-                              <div class="visit-date">
-                                <span class="date">{{ visit.visitDate | date:'MMM d, yyyy' }}</span>
-                                <span class="time">{{ visit.visitDate | date:'h:mm a' }}</span>
-                              </div>
-                              <div class="visit-status">
-                                <span class="status-indicator">{{ visit.status }}</span>
-                              </div>
-                              <div class="visit-property">
-                                @if (visit.property) {
-                                  <mat-icon>home</mat-icon>
-                                  <div class="property-details">
-                                    <span class="property-title">{{ visit.property.title }}</span>
-                                    <span class="property-address">{{ visit.property.address }}, {{ visit.property.city }}</span>
-                                  </div>
-                                } @else {
-                                  <span class="no-property">Property not specified</span>
-                                }
-                              </div>
-                              <div class="visit-notes">
-                                {{ visit.notes || 'No notes' }}
-                              </div>
-                            </div>
-                          }
-                        </div>
-                      }
-
-                      <div class="lead-details-grid">
-                        <div class="detail-group">
-                          <label>Preferred Areas</label>
-                          <span>{{ lead.preferredAreas || 'Not specified' }}</span>
-                        </div>
-                        <div class="detail-group">
-                          <label>Property Preferences</label>
-                          <span>{{ lead.propertyPreferences || 'Not specified' }}</span>
-                        </div>
-                        <div class="detail-group">
-                          <label>Nationality</label>
-                          <span>{{ lead.nationality || 'Not specified' }}</span>
-                        </div>
-                        <div class="detail-group">
-                          <label>Assigned To</label>
-                          <span>{{ lead.assignedUser?.name || 'Unassigned' }}</span>
-                        </div>
-                        <div class="detail-group full-width">
-                          <label>Notes</label>
-                          <span>{{ lead.notes || 'No notes' }}</span>
-                        </div>
-                      </div>
-                    </div>
-                  }
-                </div>
-              }
-
-              @if (filteredLeads.length === 0) {
-                <div class="empty-list">
-                  <mat-icon>people_outline</mat-icon>
-                  <p>No leads found</p>
-                  <button mat-raised-button color="primary" (click)="openLeadForm()">
-                    <mat-icon>add</mat-icon> Add First Lead
-                  </button>
-                </div>
-              }
-            </div>
-          </mat-card>
         </div>
       </mat-tab>
     </mat-tab-group>
