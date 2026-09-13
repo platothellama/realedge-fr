@@ -15,7 +15,7 @@ export interface User {
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'hhttps://realedge-frontend-t9d6.vercel.app/api/auth';
+  private apiUrl = 'https://realedge-frontend-t9d6.vercel.app/api/auth';
   
   // Real-time user state using Angular Signals
   currentUser = signal<User | null>(null);
