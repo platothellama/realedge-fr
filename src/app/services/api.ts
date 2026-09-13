@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class ApiService {
-  private apiUrl = 'https://realedge-frontend-production.up.railway.app/api';
+  private apiUrl = 'https://realedge-frontend-t9d6.vercel.app/api';
 
   constructor(private http: HttpClient) {}
 
