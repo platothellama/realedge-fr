@@ -13,7 +13,7 @@ export interface FeatureFlags {
   providedIn: 'root'
 })
 export class FeatureService {
-  private apiUrl = 'https://realedge-frontend-t9d6.vercel.app/api/features';
+  private apiUrl = 'https://realedge-frontend.onrender.com/api/features';
   
   features = signal<FeatureFlags>({});
 
