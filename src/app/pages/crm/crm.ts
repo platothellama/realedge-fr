@@ -18,7 +18,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatStepperModule } from '@angular/material/stepper';
 import { MatTabsModule } from '@angular/material/tabs';
-import { PropertySearchComponent, SearchFilters, SearchFilterConfig } from '../../components/property-search/property-search';
+import { SearchFilters, SearchFilterConfig } from '../../components/property-search/property-search';
+import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog';
 
 @Component({
   selector: 'app-crm',
@@ -39,8 +40,7 @@ import { PropertySearchComponent, SearchFilters, SearchFilterConfig } from '../.
     MatTooltipModule,
     MatExpansionModule,
     MatStepperModule,
-    MatTabsModule,
-    PropertySearchComponent
+    MatTabsModule
   ],
   templateUrl: './crm.html',
   styleUrl: './crm.css',
@@ -429,7 +429,19 @@ export class CrmComponent implements OnInit {
   }
 
   deleteLead(id: string) {
-    if (confirm('Are you sure you want to delete this lead?')) {
+    const lead = this.allLeads.find(l => l.id === id);
+    const ref = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      maxWidth: '95vw',
+      data: {
+        title: 'Delete lead?',
+        message: `${lead?.name || 'This lead'} will be permanently deleted. This cannot be undone.`,
+        confirmLabel: 'Delete',
+        destructive: true
+      }
+    });
+    ref.afterClosed().subscribe(confirmed => {
+      if (!confirmed) return;
       this.deletingId = id;
       this.apiService.deleteLead(id).subscribe({
         next: () => {
@@ -442,7 +454,7 @@ export class CrmComponent implements OnInit {
           this.deletingId = null;
         }
       });
-    }
+    });
   }
 
   isDeleting(id: string): boolean {

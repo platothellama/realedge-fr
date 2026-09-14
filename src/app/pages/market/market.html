@@ -33,9 +33,15 @@
           </div>
           <div class="metric-value">{{ metric.value }}</div>
           <div class="metric-change" [class.positive]="metric.trend === 'up'" [class.negative]="metric.trend === 'down'">
-            <mat-icon>{{ getTrendIcon(metric.trend) }}</mat-icon>
+            <mat-icon aria-hidden="true">{{ getTrendIcon(metric.trend) }}</mat-icon>
             <span>{{ metric.change > 0 ? '+' : '' }}{{ metric.change }}%</span>
           </div>
+        </div>
+      } @empty {
+        <div class="empty-state">
+          <mat-icon aria-hidden="true">analytics</mat-icon>
+          <h3>No market data</h3>
+          <p>Try a different period or refresh the data.</p>
         </div>
       }
     </div>

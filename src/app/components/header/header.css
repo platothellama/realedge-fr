@@ -1,5 +1,5 @@
 .header-toolbar {
-  background: var(--bg-header) !important;
+  background: var(--bg-header, rgba(5, 5, 5, 0.85)) !important;
   backdrop-filter: blur(24px) saturate(180%);
   border-bottom: 1px solid var(--border);
   height: 72px !important;
@@ -177,7 +177,38 @@
 }
 
 @media (max-width: 768px) {
-  .profile-dropdown {
+/* Accessible profile menu (Angular Material mat-menu).
+   Legacy hand-rolled .profile-dropdown rules retained below for
+   reference but no longer used by header.html. */
+::ng-deep .profile-menu {
+  min-width: 280px !important;
+}
+
+.dropdown-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  opacity: 1 !important;
+  cursor: default;
+}
+
+.logout-item {
+  color: var(--error) !important;
+}
+
+.logout-item mat-icon {
+  color: var(--error) !important;
+}
+
+.role-line {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.profile-dropdown {
     right: 16px;
     width: calc(100vw - 32px);
   }

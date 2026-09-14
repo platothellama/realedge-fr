@@ -35,8 +35,8 @@
                   <span class="task-priority" [style.background-color]="priorityColors[task.priority]">
                     {{ task.priority }}
                   </span>
-                  <button mat-icon-button [matMenuTriggerFor]="taskMenu" class="task-menu-btn">
-                    <mat-icon>more_vert</mat-icon>
+                  <button mat-icon-button [matMenuTriggerFor]="taskMenu" class="task-menu-btn" [attr.aria-label]="'Actions for ' + task.title">
+                    <mat-icon aria-hidden="true">more_vert</mat-icon>
                   </button>
                   <mat-menu #taskMenu="matMenu">
                     <button mat-menu-item [matMenuTriggerFor]="assignMenu">
@@ -71,16 +71,24 @@
                 }
                 <div class="task-footer">
                   @if (task.assignedTo) {
-                    <div class="task-assignee" (click)="openAssignDialog(task)">
-                      <mat-icon>person</mat-icon>
+                    <button class="task-assignee" [matMenuTriggerFor]="assigneeMenu" [attr.aria-label]="'Reassign ' + task.title">
+                      <mat-icon aria-hidden="true">person</mat-icon>
                       <span>{{ task.assignedTo.name }}</span>
-                    </div>
+                    </button>
                   } @else {
-                    <div class="task-assignee unassigned" (click)="openAssignDialog(task)">
-                      <mat-icon>person_add</mat-icon>
+                    <button class="task-assignee unassigned" [matMenuTriggerFor]="assigneeMenu" [attr.aria-label]="'Assign ' + task.title">
+                      <mat-icon aria-hidden="true">person_add</mat-icon>
                       <span>Assign</span>
-                    </div>
+                    </button>
                   }
+                  <mat-menu #assigneeMenu="matMenu">
+                    @for (user of users; track user.id) {
+                      <button mat-menu-item (click)="assignTask(task, user.id)">
+                        <mat-icon aria-hidden="true">person</mat-icon>
+                        {{ user.name }}
+                      </button>
+                    }
+                  </mat-menu>
                   @if (task.dueDate) {
                     <div class="task-due" [class.overdue]="isOverdue(task.dueDate)">
                       <mat-icon>schedule</mat-icon>
@@ -103,12 +111,12 @@
 </div>
 
 @if (showAddDialog) {
-  <div class="dialog-overlay" (click)="closeDialog()">
-    <div class="dialog-content" (click)="$event.stopPropagation()">
+  <div class="dialog-overlay" (click)="closeDialog()" (keydown.escape)="closeDialog()">
+    <div class="dialog-content" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="create-task-title">
       <div class="dialog-header">
-        <h2>Create New Task</h2>
-        <button mat-icon-button (click)="closeDialog()">
-          <mat-icon>close</mat-icon>
+        <h2 id="create-task-title">Create New Task</h2>
+        <button mat-icon-button (click)="closeDialog()" aria-label="Close dialog">
+          <mat-icon aria-hidden="true">close</mat-icon>
         </button>
       </div>
       <div class="dialog-body">

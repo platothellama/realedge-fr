@@ -13,6 +13,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
+import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatBadgeModule } from '@angular/material/badge';
 import { ApiService } from '../../services/api';
@@ -211,23 +212,34 @@ export class GroupsComponent implements OnInit {
   }
 
   deleteGroup(group: Group) {
-    if (!confirm(`Are you sure you want to delete "${group.name}"?`)) return;
-    
-    this.processingId = group.id;
-    this.api.deleteGroup(group.id).subscribe({
-      next: () => {
-        this.groups = this.groups.filter(g => g.id !== group.id);
-        if (this.selectedGroup?.id === group.id) {
-          this.selectedGroup = null;
-          this.groupMembers = [];
-        }
-        this.processingId = null;
-        this.snackBar.open('Group deleted', 'Close', { duration: 3000 });
-      },
-      error: (err) => {
-        this.processingId = null;
-        this.snackBar.open('Failed to delete group', 'Close', { duration: 3000 });
+    const ref = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      maxWidth: '95vw',
+      data: {
+        title: 'Delete group?',
+        message: `"${group.name}" and its memberships will be removed. This cannot be undone.`,
+        confirmLabel: 'Delete',
+        destructive: true
       }
+    });
+    ref.afterClosed().subscribe(confirmed => {
+      if (!confirmed) return;
+      this.processingId = group.id;
+      this.api.deleteGroup(group.id).subscribe({
+        next: () => {
+          this.groups = this.groups.filter(g => g.id !== group.id);
+          if (this.selectedGroup?.id === group.id) {
+            this.selectedGroup = null;
+            this.groupMembers = [];
+          }
+          this.processingId = null;
+          this.snackBar.open('Group deleted', 'Close', { duration: 3000 });
+        },
+        error: (err) => {
+          this.processingId = null;
+          this.snackBar.open('Failed to delete group', 'Close', { duration: 3000 });
+        }
+      });
     });
   }
 
@@ -255,10 +267,20 @@ export class GroupsComponent implements OnInit {
 
   removeMember(member: GroupMember) {
     if (!this.selectedGroup) return;
-    if (!confirm(`Remove ${member.user?.name || 'this user'} from the group?`)) return;
-    
-    this.processingId = member.id;
-    this.api.removeGroupMember(this.selectedGroup.id, member.userId).subscribe({
+    const ref = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      maxWidth: '95vw',
+      data: {
+        title: 'Remove member?',
+        message: `${member.user?.name || 'This user'} will be removed from the group.`,
+        confirmLabel: 'Remove',
+        destructive: true
+      }
+    });
+    ref.afterClosed().subscribe(confirmed => {
+      if (!confirmed) return;
+      this.processingId = member.id;
+      this.api.removeGroupMember(this.selectedGroup!.id, member.userId).subscribe({
       next: () => {
         this.groupMembers = this.groupMembers.filter(m => m.id !== member.id);
         this.processingId = null;
@@ -268,6 +290,7 @@ export class GroupsComponent implements OnInit {
         this.processingId = null;
         this.snackBar.open('Failed to remove member', 'Close', { duration: 3000 });
       }
+      });
     });
   }
 

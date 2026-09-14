@@ -1,6 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 export interface FeatureFlags {
   [key: string]: {
@@ -13,7 +14,7 @@ export interface FeatureFlags {
   providedIn: 'root'
 })
 export class FeatureService {
-  private apiUrl = 'https://realedge-frontend.onrender.com/api/features';
+  private apiUrl = `${environment.apiUrl}/features`;
   
   features = signal<FeatureFlags>({});
 

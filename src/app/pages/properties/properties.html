@@ -42,7 +42,7 @@
   ></app-property-search>
 
   @if (loading) {
-    <div class="loading-grid">
+    <div class="loading-grid" role="status" aria-label="Loading properties">
       @for (i of [1,2,3,4,5,6]; track i) {
         <div class="skeleton-card">
           <div class="skeleton-image"></div>
@@ -54,6 +54,12 @@
         </div>
       }
     </div>
+  } @else if (loadError) {
+    <app-error-state
+      title="Couldn't load properties"
+      message="Check your connection and try again."
+      (retry)="fetchProperties()">
+    </app-error-state>
   } @else if (properties.length === 0) {
     <div class="empty-state">
       <mat-icon>apartment</mat-icon>
@@ -65,17 +71,17 @@
       @for (prop of properties; track prop.id) {
         <div class="property-card" (click)="openPropertyDetails(prop)">
           <div class="card-image">
-            <img [src]="prop.photos?.length ? prop.photos[0] : 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80'" alt="">
+            <img [src]="prop.photos?.length ? prop.photos[0] : 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80'" [alt]="prop.title || 'Property photo'">
             <div class="card-badges">
               <span class="badge-status" [class]="prop.status?.toLowerCase()">{{ prop.status }}</span>
               <span class="badge-type">{{ prop.type }}</span>
             </div>
             <div class="card-overlay">
-              <button mat-icon-button (click)="openPropertyForm(prop); $event.stopPropagation()">
-                <mat-icon>edit</mat-icon>
+              <button mat-icon-button (click)="openPropertyForm(prop); $event.stopPropagation()" [attr.aria-label]="'Edit ' + prop.title">
+                <mat-icon aria-hidden="true">edit</mat-icon>
               </button>
-              <button mat-icon-button (click)="deleteProperty(prop.id); $event.stopPropagation()">
-                <mat-icon>delete</mat-icon>
+              <button mat-icon-button (click)="deleteProperty(prop.id); $event.stopPropagation()" [attr.aria-label]="'Delete ' + prop.title">
+                <mat-icon aria-hidden="true">delete</mat-icon>
               </button>
             </div>
           </div>

@@ -37,8 +37,8 @@
             <button mat-button [routerLink]="['/website-editor', website.id]">
               <mat-icon>edit</mat-icon> Edit
             </button>
-            <button mat-icon-button [matMenuTriggerFor]="menu">
-              <mat-icon>more_vert</mat-icon>
+            <button mat-icon-button [matMenuTriggerFor]="menu" [attr.aria-label]="'Actions for ' + website.name">
+              <mat-icon aria-hidden="true">more_vert</mat-icon>
             </button>
             <mat-menu #menu="matMenu">
               @if (website.status !== 'published') {
@@ -69,11 +69,11 @@
 
   <!-- Create Website Dialog -->
   @if (showAddDialog) {
-    <div class="dialog-overlay" (click)="showAddDialog = false">
-      <div class="dialog-content" (click)="$event.stopPropagation()">
+    <div class="dialog-overlay" (click)="showAddDialog = false" (keydown.escape)="showAddDialog = false">
+      <div class="dialog-content" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="create-website-title">
         <div class="dialog-header">
-          <h2>Create New Website</h2>
-          <button mat-icon-button (click)="showAddDialog = false"><mat-icon>close</mat-icon></button>
+          <h2 id="create-website-title">Create New Website</h2>
+          <button mat-icon-button (click)="showAddDialog = false" aria-label="Close dialog"><mat-icon aria-hidden="true">close</mat-icon></button>
         </div>
         <div class="dialog-body">
           <mat-form-field appearance="outline">
@@ -112,11 +112,11 @@
 
   <!-- AI Generate Dialog -->
   @if (showGenerateDialog) {
-    <div class="dialog-overlay" (click)="showGenerateDialog = false">
-      <div class="dialog-content dialog-large" (click)="$event.stopPropagation()">
+    <div class="dialog-overlay" (click)="showGenerateDialog = false" (keydown.escape)="showGenerateDialog = false">
+      <div class="dialog-content dialog-large" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="ai-generator-title">
         <div class="dialog-header">
-          <h2><mat-icon>auto_awesome</mat-icon> AI Website Generator</h2>
-          <button mat-icon-button (click)="showGenerateDialog = false"><mat-icon>close</mat-icon></button>
+          <h2 id="ai-generator-title"><mat-icon aria-hidden="true">auto_awesome</mat-icon> AI Website Generator</h2>
+          <button mat-icon-button (click)="showGenerateDialog = false" aria-label="Close dialog"><mat-icon aria-hidden="true">close</mat-icon></button>
         </div>
         <div class="dialog-body">
           <div class="generate-options">
@@ -137,7 +137,7 @@
                     <mat-checkbox [checked]="selectedProperties.includes(property.id)" (click)="$event.stopPropagation()"></mat-checkbox>
                     <div class="property-thumb">
                       @if (property.photos && property.photos.length > 0) {
-                        <img [src]="property.photos[0]" alt="">
+                        <img [src]="property.photos[0]" [alt]="property.title || 'Property photo'">
                       } @else {
                         <mat-icon>home</mat-icon>
                       }

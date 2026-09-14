@@ -146,8 +146,17 @@
   flex-shrink: 0;
 }
 
-.notification-item:hover .delete-btn {
+.notification-item:hover .delete-btn,
+.notification-item:focus-within .delete-btn {
   opacity: 1;
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .delete-btn {
+    opacity: 1;
+    width: 44px !important;
+    height: 44px !important;
+  }
 }
 
 .delete-btn mat-icon {

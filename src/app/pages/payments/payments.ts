@@ -9,6 +9,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
+import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
@@ -251,36 +252,58 @@ export class PaymentsComponent implements OnInit {
   }
 
   deletePayment(payment: Payment) {
-    if (!confirm('Are you sure you want to delete this payment?')) return;
-
-    this.processingId = payment.id;
-    this.api.deletePayment(payment.id).subscribe({
-      next: () => {
-        this.payments = this.payments.filter(p => p.id !== payment.id);
-        this.processingId = null;
-        this.snackBar.open('Payment deleted', 'Close', { duration: 2000 });
-      },
-      error: (err) => {
-        this.snackBar.open('Failed to delete payment', 'Close', { duration: 3000 });
-        this.processingId = null;
+    const ref = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      maxWidth: '95vw',
+      data: {
+        title: 'Delete payment?',
+        message: 'This payment record will be permanently deleted. This cannot be undone.',
+        confirmLabel: 'Delete',
+        destructive: true
       }
+    });
+    ref.afterClosed().subscribe(confirmed => {
+      if (!confirmed) return;
+      this.processingId = payment.id;
+      this.api.deletePayment(payment.id).subscribe({
+        next: () => {
+          this.payments = this.payments.filter(p => p.id !== payment.id);
+          this.processingId = null;
+          this.snackBar.open('Payment deleted', 'Close', { duration: 2000 });
+        },
+        error: (err) => {
+          this.snackBar.open('Failed to delete payment', 'Close', { duration: 3000 });
+          this.processingId = null;
+        }
+      });
     });
   }
 
   deletePaymentPlan(plan: PaymentPlan) {
-    if (!confirm('Are you sure you want to delete this payment plan?')) return;
-
-    this.processingId = plan.id;
-    this.api.deletePaymentPlan(plan.id).subscribe({
-      next: () => {
-        this.paymentPlans = this.paymentPlans.filter(p => p.id !== plan.id);
-        this.processingId = null;
-        this.snackBar.open('Payment plan deleted', 'Close', { duration: 2000 });
-      },
-      error: (err) => {
-        this.snackBar.open('Failed to delete payment plan', 'Close', { duration: 3000 });
-        this.processingId = null;
+    const ref = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      maxWidth: '95vw',
+      data: {
+        title: 'Delete payment plan?',
+        message: `"${plan.planName || 'This payment plan'}" will be permanently deleted. This cannot be undone.`,
+        confirmLabel: 'Delete',
+        destructive: true
       }
+    });
+    ref.afterClosed().subscribe(confirmed => {
+      if (!confirmed) return;
+      this.processingId = plan.id;
+      this.api.deletePaymentPlan(plan.id).subscribe({
+        next: () => {
+          this.paymentPlans = this.paymentPlans.filter(p => p.id !== plan.id);
+          this.processingId = null;
+          this.snackBar.open('Payment plan deleted', 'Close', { duration: 2000 });
+        },
+        error: (err) => {
+          this.snackBar.open('Failed to delete payment plan', 'Close', { duration: 3000 });
+          this.processingId = null;
+        }
+      });
     });
   }
 

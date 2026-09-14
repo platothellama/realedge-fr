@@ -211,10 +211,10 @@
       <div class="chat-input-area">
         <div class="input-wrapper">
           <mat-form-field appearance="outline" class="full-width">
-            <input matInput [(ngModel)]="userInput" (keyup.enter)="onSendMessage()"
+            <input matInput [(ngModel)]="userInput" (keyup.enter)="onSendMessage()" aria-label="Ask the AI assistant"
               placeholder="Try: '120 sqm apartment in Baadba' or '3 bedroom villas in Mount Lebanon'">
-            <button mat-icon-button matSuffix (click)="onSendMessage()" [disabled]="!userInput.trim() || loading">
-              <mat-icon>send</mat-icon>
+            <button mat-icon-button matSuffix (click)="onSendMessage()" [disabled]="!userInput.trim() || loading" aria-label="Send message">
+              <mat-icon aria-hidden="true">send</mat-icon>
             </button>
           </mat-form-field>
         </div>

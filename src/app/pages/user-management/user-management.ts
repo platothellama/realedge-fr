@@ -7,12 +7,14 @@ import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog';
 import { ApiService } from '../../services/api';
 import { AuthService } from '../../services/auth/auth.service';
 import { UserFormComponent } from '../../components/user-form/user-form.component';
 import { GroupFormComponent } from '../../components/group-form/group-form';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-user-management',
@@ -27,7 +29,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
     MatDialogModule,
     MatSnackBarModule,
     MatTooltipModule,
-    MatTabsModule
+    MatTabsModule,
+    MatProgressSpinnerModule
   ],
   templateUrl: './user-management.html',
   styleUrl: './user-management.css'
@@ -37,6 +40,8 @@ export class UserManagementComponent implements OnInit {
   groupsDataSource = new MatTableDataSource<any>([]);
   displayedColumns: string[] = ['name', 'email', 'role', 'status', 'actions'];
   groupColumns: string[] = ['name', 'description', 'members', 'actions'];
+  loadingUsers = true;
+  loadingGroups = true;
 
   private auth = inject(AuthService);
 
@@ -57,24 +62,32 @@ export class UserManagementComponent implements OnInit {
   }
 
   fetchUsers() {
+    this.loadingUsers = true;
     this.api.getUsers().subscribe({
       next: (res) => {
         this.users = Array.isArray(res) ? res : (res.data || []);
+        this.loadingUsers = false;
       },
       error: (err) => {
         this.showError('Failed to fetch users');
         this.users = [];
+        this.loadingUsers = false;
       }
     });
   }
 
   fetchGroups() {
+    this.loadingGroups = true;
     this.api.getGroups().subscribe({
       next: (res: any) => {
         const groupData = res.data || (Array.isArray(res) ? res : []);
         this.groupsDataSource.data = groupData;
+        this.loadingGroups = false;
       },
-      error: (err) => this.showError('Failed to fetch groups')
+      error: (err) => {
+        this.showError('Failed to fetch groups');
+        this.loadingGroups = false;
+      }
     });
   }
 
@@ -127,7 +140,18 @@ export class UserManagementComponent implements OnInit {
   }
 
   deleteGroup(group: any) {
-    if (confirm(`Are you sure you want to delete the group "${group.name}"?`)) {
+    const ref = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      maxWidth: '95vw',
+      data: {
+        title: 'Delete group?',
+        message: `The group "${group.name}" will be permanently deleted. This cannot be undone.`,
+        confirmLabel: 'Delete',
+        destructive: true
+      }
+    });
+    ref.afterClosed().subscribe(confirmed => {
+      if (!confirmed) return;
       this.api.deleteGroup(group.id).subscribe({
         next: () => {
           this.fetchGroups();
@@ -135,7 +159,7 @@ export class UserManagementComponent implements OnInit {
         },
         error: (err) => this.showError(err.error?.message || 'Error deleting group')
       });
-    }
+    });
   }
 
   createUser(data: any) {
@@ -159,7 +183,18 @@ export class UserManagementComponent implements OnInit {
   }
 
   deleteUser(user: any) {
-    if (confirm(`Are you sure you want to delete ${user.name}?`)) {
+    const ref = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      maxWidth: '95vw',
+      data: {
+        title: 'Delete user?',
+        message: `${user.name} will be permanently removed. This cannot be undone.`,
+        confirmLabel: 'Delete',
+        destructive: true
+      }
+    });
+    ref.afterClosed().subscribe(confirmed => {
+      if (!confirmed) return;
       this.api.deleteUser(user.id).subscribe({
         next: () => {
           this.fetchUsers();
@@ -167,7 +202,7 @@ export class UserManagementComponent implements OnInit {
         },
         error: (err) => this.showError('Error deleting user')
       });
-    }
+    });
   }
 
   toggleStatus(user: any) {

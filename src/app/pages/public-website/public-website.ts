@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { environment } from '../../../environments/environment';
 
 interface Section {
   id: string;
@@ -576,7 +577,7 @@ export class PublicWebsiteComponent implements OnInit {
   agents: any[] = [];
   currentYear = new Date().getFullYear();
   
-  private apiUrl = 'https://realedge-frontend-production.up.railway.app/api';
+  private apiUrl = environment.apiUrl;
 
   ngOnInit() {
     this.route.paramMap.subscribe(params => {

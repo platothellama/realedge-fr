@@ -21,12 +21,20 @@
   ></app-property-search>
 
   @if (loading) {
-    <div class="loading-state">
+    <div class="loading-state" role="status">
       <mat-spinner diameter="40"></mat-spinner>
     </div>
   }
 
-  @if (!loading && filteredDocuments.length === 0) {
+  @if (!loading && loadError) {
+    <app-error-state
+      title="Couldn't load documents"
+      message="Check your connection and try again."
+      (retry)="fetchDocuments()">
+    </app-error-state>
+  }
+
+  @if (!loading && !loadError && filteredDocuments.length === 0) {
     <div class="empty-state">
       <mat-icon>folder_open</mat-icon>
       <h3>No documents found</h3>
@@ -37,7 +45,7 @@
     </div>
   }
 
-  @if (!loading && filteredDocuments.length > 0) {
+  @if (!loading && !loadError && filteredDocuments.length > 0) {
     <div class="documents-grid custom-scrollbar">
       @for (doc of filteredDocuments; track doc.id) {
         <mat-card class="document-card" [class.highlighted]="doc.id === highlightedDocId" [attr.data-doc-id]="doc.id">
@@ -67,16 +75,16 @@
           </div>
 
           <div class="doc-actions">
-            <button mat-icon-button matTooltip="Download" (click)="downloadDocument(doc); $event.stopPropagation()">
-              <mat-icon>download</mat-icon>
+            <button mat-icon-button matTooltip="Download" [attr.aria-label]="'Download ' + doc.title" (click)="downloadDocument(doc); $event.stopPropagation()">
+              <mat-icon aria-hidden="true">download</mat-icon>
             </button>
             @if (doc.status !== 'Signed') {
-              <button mat-icon-button matTooltip="Sign" color="primary" (click)="signDocument(doc); $event.stopPropagation()">
-                <mat-icon>draw</mat-icon>
+              <button mat-icon-button matTooltip="Sign" [attr.aria-label]="'Sign ' + doc.title" color="primary" (click)="signDocument(doc); $event.stopPropagation()">
+                <mat-icon aria-hidden="true">draw</mat-icon>
               </button>
             }
-            <button mat-icon-button matTooltip="Delete" color="warn" (click)="deleteDocument(doc); $event.stopPropagation()">
-              <mat-icon>delete_outline</mat-icon>
+            <button mat-icon-button matTooltip="Delete" [attr.aria-label]="'Delete ' + doc.title" color="warn" (click)="deleteDocument(doc); $event.stopPropagation()">
+              <mat-icon aria-hidden="true">delete_outline</mat-icon>
             </button>
           </div>
         </mat-card>

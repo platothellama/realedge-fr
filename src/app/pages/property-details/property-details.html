@@ -1,8 +1,9 @@
 <div class="details-container" *ngIf="!loading && property">
+  <app-breadcrumb [items]="[{ label: 'Properties', link: '/properties' }, { label: property.title || 'Details' }]"></app-breadcrumb>
   <!-- Header Section -->
   <header class="page-header">
-    <button mat-button class="back-btn" (click)="goBack()">
-      <mat-icon>arrow_back</mat-icon>
+    <button mat-button class="back-btn" (click)="goBack()" aria-label="Back to properties">
+      <mat-icon aria-hidden="true">arrow_back</mat-icon>
       Back
     </button>
     <div class="header-actions">

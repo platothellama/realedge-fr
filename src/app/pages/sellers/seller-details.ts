@@ -14,6 +14,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ApiService } from '../../services/api';
 import { FormsModule } from '@angular/forms';
+import { BreadcrumbComponent } from '../../components/breadcrumb/breadcrumb';
 
 @Component({
   selector: 'app-seller-details',
@@ -31,7 +32,8 @@ import { FormsModule } from '@angular/forms';
     MatInputModule,
     MatSnackBarModule,
     MatProgressSpinnerModule,
-    FormsModule
+    FormsModule,
+    BreadcrumbComponent
   ],
   templateUrl: './seller-details.html',
   styleUrl: './seller-details.css'

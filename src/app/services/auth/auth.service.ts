@@ -2,6 +2,7 @@ import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable, tap } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 export interface User {
   id: string;
@@ -15,7 +16,7 @@ export interface User {
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'https://realedge-frontend.onrender.com/api/auth';
+  private apiUrl = `${environment.apiUrl}/auth`;
   
   // Real-time user state using Angular Signals
   currentUser = signal<User | null>(null);

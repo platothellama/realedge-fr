@@ -5,9 +5,10 @@
       <p>Loading lead details...</p>
     </div>
   } @else if (lead) {
+    <app-breadcrumb [items]="[{ label: 'CRM / Leads', link: '/crm' }, { label: lead.name || 'Details' }]"></app-breadcrumb>
     <div class="header-section">
-      <button mat-icon-button (click)="goBack()" class="back-btn">
-        <mat-icon>arrow_back</mat-icon>
+      <button mat-icon-button (click)="goBack()" class="back-btn" aria-label="Back to leads">
+        <mat-icon aria-hidden="true">arrow_back</mat-icon>
       </button>
       
       <div class="lead-info">
@@ -44,17 +45,21 @@
             <div class="info-card">
               <h3>Contact Information</h3>
               <div class="info-row">
-                <mat-icon>email</mat-icon>
+                <mat-icon aria-hidden="true">email</mat-icon>
                 <div class="info-content">
                   <label>Email</label>
-                  <span>{{ lead.email }}</span>
+                  <a [href]="'mailto:' + lead.email">{{ lead.email }}</a>
                 </div>
               </div>
               <div class="info-row">
-                <mat-icon>phone</mat-icon>
+                <mat-icon aria-hidden="true">phone</mat-icon>
                 <div class="info-content">
                   <label>Phone</label>
-                  <span>{{ lead.phone || 'Not provided' }}</span>
+                  @if (lead.phone) {
+                    <a [href]="'tel:' + lead.phone">{{ lead.phone }}</a>
+                  } @else {
+                    <span>Not provided</span>
+                  }
                 </div>
               </div>
               @if (lead.job) {

@@ -100,7 +100,7 @@
                 <td>
                   <div class="agent-cell">
                     @if (commission.user?.photo) {
-                      <img [src]="commission.user!.photo" class="agent-avatar" alt="">
+                      <img [src]="commission.user!.photo" class="agent-avatar" [alt]="getAgentName(commission) + ' photo'">
                     } @else {
                       <mat-icon class="default-avatar">person</mat-icon>
                     }
@@ -124,8 +124,8 @@
                   </span>
                 </td>
                 <td>
-                  <button mat-icon-button [matMenuTriggerFor]="menu" [disabled]="isProcessing(commission.id)">
-                    <mat-icon>more_vert</mat-icon>
+                  <button mat-icon-button [matMenuTriggerFor]="menu" [disabled]="isProcessing(commission.id)" [attr.aria-label]="'Actions for commission ' + commission.id">
+                    <mat-icon aria-hidden="true">more_vert</mat-icon>
                   </button>
                   <mat-menu #menu="matMenu">
                     @if (commission.status === 'pending') {

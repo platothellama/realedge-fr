@@ -22,9 +22,15 @@
   </div>
 
   @if (loading) {
-    <div class="loading-container">
+    <div class="loading-container" role="status">
       <mat-spinner diameter="40"></mat-spinner>
     </div>
+  } @else if (loadError) {
+    <app-error-state
+      title="Couldn't load announcements"
+      message="Check your connection and try again."
+      (retry)="fetchAnnouncements()">
+    </app-error-state>
   } @else {
     <div class="announcements-list">
       @for (announcement of filteredAnnouncements; track announcement.id) {
@@ -38,11 +44,11 @@
               </span>
             </div>
             <div class="announcement-actions">
-              <button mat-icon-button (click)="toggleActive(announcement)" [matTooltip]="announcement.isActive ? 'Deactivate' : 'Activate'">
-                <mat-icon>{{ announcement.isActive ? 'visibility' : 'visibility_off' }}</mat-icon>
+              <button mat-icon-button (click)="toggleActive(announcement)" [matTooltip]="announcement.isActive ? 'Deactivate' : 'Activate'" [attr.aria-label]="(announcement.isActive ? 'Deactivate ' : 'Activate ') + announcement.title">
+                <mat-icon aria-hidden="true">{{ announcement.isActive ? 'visibility' : 'visibility_off' }}</mat-icon>
               </button>
-              <button mat-icon-button (click)="deleteAnnouncement(announcement.id)" matTooltip="Delete">
-                <mat-icon>delete</mat-icon>
+              <button mat-icon-button (click)="deleteAnnouncement(announcement.id)" matTooltip="Delete" [attr.aria-label]="'Delete ' + announcement.title">
+                <mat-icon aria-hidden="true">delete</mat-icon>
               </button>
             </div>
           </div>
@@ -84,12 +90,16 @@
 </div>
 
 @if (showAddDialog) {
-  <div class="dialog-overlay" (click)="closeDialog()">
-    <div class="dialog-content" (click)="$event.stopPropagation()">
+  <div class="dialog-overlay" (click)="closeDialog()" (keydown.escape)="closeDialog()">
+    <div class="dialog-content"
+         (click)="$event.stopPropagation()"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="new-announcement-title">
       <div class="dialog-header">
-        <h2>Create Announcement</h2>
-        <button mat-icon-button (click)="closeDialog()">
-          <mat-icon>close</mat-icon>
+        <h2 id="new-announcement-title">Create Announcement</h2>
+        <button mat-icon-button (click)="closeDialog()" aria-label="Close dialog">
+          <mat-icon aria-hidden="true">close</mat-icon>
         </button>
       </div>
       <div class="dialog-body">

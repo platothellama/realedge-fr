@@ -13,7 +13,9 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatChipsModule } from '@angular/material/chips';
 import { FormsModule } from '@angular/forms';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ApiService } from '../../services/api';
+import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog';
 import { SectionEditorComponent } from './section-editor';
 
 interface Section {
@@ -55,7 +57,7 @@ interface Website {
     CommonModule, RouterModule, MatCardModule, MatIconModule, MatButtonModule,
     MatTabsModule, MatProgressSpinnerModule, MatSnackBarModule, MatMenuModule,
     MatFormFieldModule, MatInputModule, MatSelectModule, MatChipsModule, FormsModule,
-    SectionEditorComponent
+    MatDialogModule, SectionEditorComponent
   ],
   templateUrl: './website-editor.html',
   styleUrl: './website-editor.css'
@@ -64,6 +66,7 @@ export class WebsiteEditorComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private api = inject(ApiService);
   private snackBar = inject(MatSnackBar);
+  private dialog = inject(MatDialog);
 
   loading = true;
   website!: Website;
@@ -172,13 +175,26 @@ export class WebsiteEditorComponent implements OnInit {
   }
 
   deleteSection(section: Section) {
-    this.api.deleteSection(section.id).subscribe({
-      next: () => {
-        const page = this.website.pages[this.selectedPageIndex];
-        page.sections = page.sections.filter(s => s.id !== section.id);
-        this.snackBar.open('Section removed', 'Close', { duration: 2000 });
-      },
-      error: () => this.snackBar.open('Error removing section', 'Close', { duration: 3000 })
+    const ref = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      maxWidth: '95vw',
+      data: {
+        title: 'Delete section?',
+        message: `"${section.name || 'This section'}" will be removed from the page.`,
+        confirmLabel: 'Delete',
+        destructive: true
+      }
+    });
+    ref.afterClosed().subscribe(confirmed => {
+      if (!confirmed) return;
+      this.api.deleteSection(section.id).subscribe({
+        next: () => {
+          const page = this.website.pages[this.selectedPageIndex];
+          page.sections = page.sections.filter(s => s.id !== section.id);
+          this.snackBar.open('Section removed', 'Close', { duration: 2000 });
+        },
+        error: () => this.snackBar.open('Error removing section', 'Close', { duration: 3000 })
+      });
     });
   }
 

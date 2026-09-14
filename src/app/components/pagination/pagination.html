@@ -1,28 +1,28 @@
-<div class="pagination">
-  <span class="pagination-info">
+<nav class="pagination" aria-label="Pagination">
+  <span class="pagination-info" aria-live="polite">
     Showing {{ startItem }}-{{ endItem }} of {{ totalItems }} {{ label }}
   </span>
   <div class="pagination-controls">
-    <button mat-icon-button [disabled]="page === 1" (click)="goToPage(1)">
-      <mat-icon>first_page</mat-icon>
+    <button mat-icon-button [disabled]="page === 1" (click)="goToPage(1)" aria-label="First page">
+      <mat-icon aria-hidden="true">first_page</mat-icon>
     </button>
-    <button mat-icon-button [disabled]="page === 1" (click)="goToPage(page - 1)">
-      <mat-icon>chevron_left</mat-icon>
+    <button mat-icon-button [disabled]="page === 1" (click)="goToPage(page - 1)" aria-label="Previous page">
+      <mat-icon aria-hidden="true">chevron_left</mat-icon>
     </button>
     @for (p of getPageNumbers(); track p) {
       @if (p === -1) {
-        <span class="page-ellipsis">...</span>
+        <span class="page-ellipsis" aria-hidden="true">...</span>
       } @else {
-        <button mat-button [class.active]="p === page" (click)="goToPage(p)">
+        <button mat-button [class.active]="p === page" (click)="goToPage(p)" [attr.aria-label]="'Page ' + p" [attr.aria-current]="p === page ? 'page' : null">
           {{ p }}
         </button>
       }
     }
-    <button mat-icon-button [disabled]="page === totalPages" (click)="goToPage(page + 1)">
-      <mat-icon>chevron_right</mat-icon>
+    <button mat-icon-button [disabled]="page === totalPages" (click)="goToPage(page + 1)" aria-label="Next page">
+      <mat-icon aria-hidden="true">chevron_right</mat-icon>
     </button>
-    <button mat-icon-button [disabled]="page === totalPages" (click)="goToPage(totalPages)">
-      <mat-icon>last_page</mat-icon>
+    <button mat-icon-button [disabled]="page === totalPages" (click)="goToPage(totalPages)" aria-label="Last page">
+      <mat-icon aria-hidden="true">last_page</mat-icon>
     </button>
   </div>
-</div>
+</nav>

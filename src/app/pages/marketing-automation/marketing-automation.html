@@ -62,8 +62,8 @@
                 <td>{{ campaign.stats?.opened || 0 }}</td>
                 <td>{{ formatDate(campaign.createdAt) }}</td>
                 <td>
-                  <button mat-icon-button [matMenuTriggerFor]="menu">
-                    <mat-icon>more_vert</mat-icon>
+                  <button mat-icon-button [matMenuTriggerFor]="menu" [attr.aria-label]="'Actions for ' + campaign.name">
+                    <mat-icon aria-hidden="true">more_vert</mat-icon>
                   </button>
                   <mat-menu #menu="matMenu">
                     @if (campaign.status === 'draft') {
@@ -84,11 +84,11 @@
   }
 
   @if (showAddDialog) {
-    <div class="dialog-overlay" (click)="showAddDialog = false">
-      <div class="dialog-content" (click)="$event.stopPropagation()">
+    <div class="dialog-overlay" (click)="showAddDialog = false" (keydown.escape)="showAddDialog = false">
+      <div class="dialog-content" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="new-campaign-title">
         <div class="dialog-header">
-          <h2>New Campaign</h2>
-          <button mat-icon-button (click)="showAddDialog = false"><mat-icon>close</mat-icon></button>
+          <h2 id="new-campaign-title">New Campaign</h2>
+          <button mat-icon-button (click)="showAddDialog = false" aria-label="Close dialog"><mat-icon aria-hidden="true">close</mat-icon></button>
         </div>
         <div class="dialog-body">
           <mat-form-field appearance="outline">

@@ -258,8 +258,18 @@
   transition: opacity 0.2s ease;
 }
 
-.lead-card:hover .edit-btn {
+.lead-card:hover .edit-btn,
+.lead-card:focus-within .edit-btn {
   opacity: 1;
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .edit-btn {
+    opacity: 1;
+    width: 44px !important;
+    height: 44px !important;
+    line-height: 44px !important;
+  }
 }
 
 .lead-details {
@@ -1052,7 +1062,10 @@
   .col-visits,
   .col-scheduled,
   .col-completed {
-    display: none;
+    /* Keep visit counts visible on tablet — they collapse into the
+       wrapped row instead of being dropped (previously display:none). */
+    display: inline-flex;
+    flex: 0 0 auto;
   }
 
   .col-actions {

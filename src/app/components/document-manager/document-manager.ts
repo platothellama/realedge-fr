@@ -5,11 +5,14 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog';
+import { AuditTrailDialogComponent } from '../audit-trail-dialog/audit-trail-dialog';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { environment } from '../../../environments/environment';
 import { ApiService } from '../../services/api';
 import { DocumentUploadFormComponent } from '../document-upload-form/document-upload-form';
 import { PaginationComponent } from '../pagination/pagination';
@@ -189,7 +192,7 @@ export class DocumentManagerComponent implements OnInit {
 
   private resolveFileUrl(fileUrl: string): string {
     if (/^https?:\/\//i.test(fileUrl)) return fileUrl;
-    return `https://realedge-frontend.onrender.com/uploads/${fileUrl}`;
+    return `${environment.apiUrl.replace(/\/api$/, '')}/uploads/${fileUrl}`;
   }
 
   signDocument(doc: any) {
@@ -240,10 +243,16 @@ export class DocumentManagerComponent implements OnInit {
   viewAuditTrail(doc: any) {
     this.api.getDocumentAuditTrail(doc.id).subscribe({
       next: (res) => {
-        const auditInfo = res.auditLogs.map((log: any) =>
-          `${new Date(log.createdAt).toLocaleString()} - ${log.action} - ${log.ipAddress || 'N/A'}`
-        ).join('\n');
-        alert(`Audit Trail for: ${doc.title}\n\n${auditInfo || 'No audit events recorded'}`);
+        const events = (res.auditLogs || []).map((log: any) => ({
+          createdAt: log.createdAt,
+          action: log.action,
+          ipAddress: log.ipAddress,
+        }));
+        this.dialog.open(AuditTrailDialogComponent, {
+          width: '480px',
+          maxWidth: '95vw',
+          data: { title: doc.title, events },
+        });
       },
       error: () => {
         this.snackBar.open('Failed to load audit trail', 'Close', { duration: 3000 });
@@ -252,7 +261,18 @@ export class DocumentManagerComponent implements OnInit {
   }
 
   deleteDocument(doc: any) {
-    if (confirm('Are you sure you want to delete this document?')) {
+    const ref = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      maxWidth: '95vw',
+      data: {
+        title: 'Delete document?',
+        message: `"${doc.title || 'This document'}" will be permanently deleted. This cannot be undone.`,
+        confirmLabel: 'Delete',
+        destructive: true
+      }
+    });
+    ref.afterClosed().subscribe(confirmed => {
+      if (!confirmed) return;
       this.api.deleteDocument(doc.id).subscribe({
         next: () => {
           this.snackBar.open('Document deleted', 'Close', { duration: 3000 });
@@ -260,7 +280,7 @@ export class DocumentManagerComponent implements OnInit {
         },
         error: (err) => this.snackBar.open('Delete failed', 'Close', { duration: 3000 })
       });
-    }
+    });
   }
 
   getIconForType(type: string): string {
@@ -283,7 +303,7 @@ export class DocumentManagerComponent implements OnInit {
   getPreviewUrl(fileUrl: string): string {
     if (!fileUrl) return '';
     if (/^https?:\/\//i.test(fileUrl)) return fileUrl;
-    return `https://realedge-frontend.onrender.com/uploads/${fileUrl}`;
+    return `${environment.apiUrl.replace(/\/api$/, '')}/uploads/${fileUrl}`;
   }
 
   isImageFile(fileUrl: string): boolean {

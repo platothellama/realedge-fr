@@ -14,7 +14,9 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatTabsModule } from '@angular/material/tabs';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { PropertySearchComponent, SearchFilters, SearchFilterConfig } from '../../components/property-search/property-search';
+import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog';
 
 @Component({
   selector: 'app-deals',
@@ -33,6 +35,7 @@ import { PropertySearchComponent, SearchFilters, SearchFilterConfig } from '../.
     MatSelectModule,
     MatMenuModule,
     MatTabsModule,
+    MatProgressSpinnerModule,
     PropertySearchComponent
   ],
   templateUrl: './deals.html',
@@ -43,6 +46,7 @@ export class DealsComponent implements OnInit {
   searchQuery: string = '';
   selectedStage: string = 'All';
   deletingId: string | null = null;
+  loading = true;
 
   stageOptions = ['All', 'Offer Made', 'Negotiation', 'Contract Signed', 'Payment', 'Closed'];
 
@@ -91,15 +95,18 @@ export class DealsComponent implements OnInit {
   }
 
   fetchDeals() {
+    this.loading = true;
     this.apiService.getDeals().subscribe({
       next: (data: any) => {
         this.allDeals = Array.isArray(data) ? data : (data?.data || []);
         this.applyFilters();
+        this.loading = false;
       },
       error: (err) => {
         console.error('Failed to fetch deals', err);
         this.showError('Failed to load deals');
         this.allDeals = [];
+        this.loading = false;
       }
     });
   }
@@ -243,7 +250,18 @@ export class DealsComponent implements OnInit {
   }
 
   deleteDeal(id: string) {
-    if (confirm('Are you sure you want to delete this deal?')) {
+    const ref = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      maxWidth: '95vw',
+      data: {
+        title: 'Delete deal?',
+        message: 'This deal and its linked records will be permanently deleted. This cannot be undone.',
+        confirmLabel: 'Delete',
+        destructive: true
+      }
+    });
+    ref.afterClosed().subscribe(confirmed => {
+      if (!confirmed) return;
       this.deletingId = id;
       this.apiService.deleteDeal(id).subscribe({
         next: () => {
@@ -256,7 +274,7 @@ export class DealsComponent implements OnInit {
           this.deletingId = null;
         }
       });
-    }
+    });
   }
 
   isDeleting(id: string): boolean {

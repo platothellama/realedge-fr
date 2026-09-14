@@ -13,17 +13,26 @@
       <mat-card-content>
         <div class="property-list">
           @for (property of properties; track property.id) {
-            <div 
-              class="property-item" 
+            <div
+              class="property-item"
               [class.selected]="selectedProperty?.id === property.id"
-              (click)="selectProperty(property)">
-              <mat-icon>home</mat-icon>
+              (click)="selectProperty(property)"
+              (keydown.enter)="selectProperty(property)"
+              tabindex="0"
+              role="option"
+              [attr.aria-selected]="selectedProperty?.id === property.id">
+              <mat-icon aria-hidden="true">home</mat-icon>
               <div class="property-info">
                 <span class="property-title">{{ property.title }}</span>
                 <span class="property-details">{{ property.type }} • {{ property.listingType }} • {{ property.bedrooms }} bed • ${{ property.price | number }}</span>
               </div>
             </div>
-          }
+          } @empty {
+            <div class="empty-state">
+              <mat-icon aria-hidden="true">home</mat-icon>
+              <p>No properties available for marketing</p>
+            </div>
+}
         </div>
       </mat-card-content>
     </mat-card>

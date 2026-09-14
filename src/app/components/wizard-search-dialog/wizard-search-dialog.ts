@@ -171,7 +171,8 @@ interface WizardFilters {
   styles: [`
     .dialog-container {
       padding: 0;
-      min-width: 550px;
+      width: 100%;
+      max-width: 560px;
       max-height: 90vh;
       display: flex;
       flex-direction: column;

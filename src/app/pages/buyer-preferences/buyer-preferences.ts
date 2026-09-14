@@ -4,6 +4,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
+import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -72,7 +73,8 @@ export class BuyerPreferencesComponent implements OnInit {
   constructor(
     private apiService: ApiService,
     private snackBar: MatSnackBar,
-    private router: Router
+    private router: Router,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit() {
@@ -193,7 +195,18 @@ export class BuyerPreferencesComponent implements OnInit {
   }
 
   deletePreference(id: string) {
-    if (confirm('Are you sure you want to delete this buyer preference?')) {
+    const ref = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      maxWidth: '95vw',
+      data: {
+        title: 'Delete buyer preference?',
+        message: 'This preference profile will be permanently deleted. This cannot be undone.',
+        confirmLabel: 'Delete',
+        destructive: true
+      }
+    });
+    ref.afterClosed().subscribe(confirmed => {
+      if (!confirmed) return;
       this.apiService.deleteBuyerPreference(id).subscribe({
         next: () => {
           this.showSuccess('Preference deleted');
@@ -203,7 +216,7 @@ export class BuyerPreferencesComponent implements OnInit {
           this.showError('Failed to delete preference');
         }
       });
-    }
+    });
   }
 
   matchProperties(preferenceId: string) {

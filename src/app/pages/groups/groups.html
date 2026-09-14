@@ -36,8 +36,8 @@
                   <span class="item-title">{{ group.name }}</span>
                   <span class="item-subtitle">{{ group.memberCount || group.members?.length || 0 }} members</span>
                 </div>
-                <button mat-icon-button [matMenuTriggerFor]="groupMenu" (click)="$event.stopPropagation()">
-                  <mat-icon>more_vert</mat-icon>
+                <button mat-icon-button [matMenuTriggerFor]="groupMenu" (click)="$event.stopPropagation()" [attr.aria-label]="'Actions for ' + group.name">
+                  <mat-icon aria-hidden="true">more_vert</mat-icon>
                 </button>
                 <mat-menu #groupMenu="matMenu">
                   <button mat-menu-item (click)="selectGroup(group); openEditGroupDialog()">
@@ -71,7 +71,7 @@
                 <p>{{ selectedGroup.description || 'No description' }}</p>
                 <p class="company-commission">
                   <mat-icon>percent</mat-icon>
-                  Company Commission: {{ selectedGroup?.companyCommission ??0 || 10 }}%
+                  Company Commission: {{ (selectedGroup.companyCommission ?? 0) || 10 }}%
                 </p>
               </div>
               <button mat-raised-button color="accent" (click)="openAddMemberDialog()">
@@ -101,8 +101,8 @@
                       }
                     </div>
                     <div class="member-actions">
-                      <button mat-icon-button [matMenuTriggerFor]="memberMenu" [disabled]="isProcessing(member.id)">
-                        <mat-icon>more_vert</mat-icon>
+                      <button mat-icon-button [matMenuTriggerFor]="memberMenu" [disabled]="isProcessing(member.id)" [attr.aria-label]="'Actions for ' + (member.user?.name || 'member')">
+                        <mat-icon aria-hidden="true">more_vert</mat-icon>
                       </button>
                       <mat-menu #memberMenu="matMenu">
                         <button mat-menu-item (click)="openEditMemberDialog(member)">
@@ -142,12 +142,12 @@
 
   <!-- Group Dialog -->
   @if (showGroupDialog) {
-    <div class="dialog-overlay" (click)="closeDialog()">
-      <div class="dialog-content" (click)="$event.stopPropagation()">
+    <div class="dialog-overlay" (click)="closeDialog()" (keydown.escape)="closeDialog()">
+      <div class="dialog-content" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="group-dialog-title">
         <div class="dialog-header">
-          <h2>{{ isEditMode ? 'Edit Team' : 'New Team' }}</h2>
-          <button mat-icon-button (click)="closeDialog()">
-            <mat-icon>close</mat-icon>
+          <h2 id="group-dialog-title">{{ isEditMode ? 'Edit Team' : 'New Team' }}</h2>
+          <button mat-icon-button (click)="closeDialog()" aria-label="Close dialog">
+            <mat-icon aria-hidden="true">close</mat-icon>
           </button>
         </div>
         <div class="dialog-body">
@@ -179,12 +179,12 @@
 
   <!-- Add Member Dialog -->
   @if (showMemberDialog) {
-    <div class="dialog-overlay" (click)="closeDialog()">
-      <div class="dialog-content" (click)="$event.stopPropagation()">
+    <div class="dialog-overlay" (click)="closeDialog()" (keydown.escape)="closeDialog()">
+      <div class="dialog-content" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="add-member-title">
         <div class="dialog-header">
-          <h2>Add Member</h2>
-          <button mat-icon-button (click)="closeDialog()">
-            <mat-icon>close</mat-icon>
+          <h2 id="add-member-title">Add Member</h2>
+          <button mat-icon-button (click)="closeDialog()" aria-label="Close dialog">
+            <mat-icon aria-hidden="true">close</mat-icon>
           </button>
         </div>
         <div class="dialog-body">
@@ -228,12 +228,12 @@
 
   <!-- Edit Member Dialog -->
   @if (showEditMemberDialog && editingMember) {
-    <div class="dialog-overlay" (click)="closeDialog()">
-      <div class="dialog-content" (click)="$event.stopPropagation()">
+    <div class="dialog-overlay" (click)="closeDialog()" (keydown.escape)="closeDialog()">
+      <div class="dialog-content" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="edit-member-title">
         <div class="dialog-header">
-          <h2>Edit Member</h2>
-          <button mat-icon-button (click)="closeDialog()">
-            <mat-icon>close</mat-icon>
+          <h2 id="edit-member-title">Edit Member</h2>
+          <button mat-icon-button (click)="closeDialog()" aria-label="Close dialog">
+            <mat-icon aria-hidden="true">close</mat-icon>
           </button>
         </div>
         <div class="dialog-body">

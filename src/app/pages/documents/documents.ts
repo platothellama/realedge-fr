@@ -10,13 +10,16 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { environment } from '../../../environments/environment';
 import { FormsModule } from '@angular/forms';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog';
 import { ActivatedRoute } from '@angular/router';
 import { ApiService } from '../../services/api';
 import { DocumentUploadFormComponent } from '../../components/document-upload-form/document-upload-form';
 import { PaginationComponent } from '../../components/pagination/pagination';
 import { PropertySearchComponent, SearchFilters, SearchFilterConfig } from '../../components/property-search/property-search';
+import { ErrorStateComponent } from '../../components/error-state/error-state';
 
 @Component({
   selector: 'app-documents',
@@ -36,7 +39,8 @@ import { PropertySearchComponent, SearchFilters, SearchFilterConfig } from '../.
     FormsModule,
     MatDialogModule,
     PaginationComponent,
-    PropertySearchComponent
+    PropertySearchComponent,
+    ErrorStateComponent
   ],
   templateUrl: './documents.html',
   styleUrl: './documents.css'
@@ -51,6 +55,7 @@ export class DocumentsPageComponent implements OnInit, AfterViewChecked {
   highlightedDocId: string | null = null;
   private hasScrolled = false;
   loading = true;
+  loadError = false;
   searchQuery = '';
   filterType = 'All';
 
@@ -141,6 +146,7 @@ export class DocumentsPageComponent implements OnInit, AfterViewChecked {
 
   fetchDocuments() {
     this.loading = true;
+    this.loadError = false;
     
     const params: any = {
       page: this.pagination.page,
@@ -171,6 +177,7 @@ export class DocumentsPageComponent implements OnInit, AfterViewChecked {
       error: (err) => {
         console.error('Failed to fetch documents', err);
         this.loading = false;
+        this.loadError = true;
         this.documents = [];
       }
     });
@@ -229,7 +236,7 @@ export class DocumentsPageComponent implements OnInit, AfterViewChecked {
     if (version?.fileUrl) {
       const url = /^https?:\/\//i.test(version.fileUrl)
         ? version.fileUrl
-        : `https://realedge-frontend.onrender.com/uploads/${version.fileUrl}`;
+        : `${environment.apiUrl.replace(/\/api$/, '')}/uploads/${version.fileUrl}`;
       window.open(url, '_blank');
     }
   }
@@ -245,7 +252,18 @@ export class DocumentsPageComponent implements OnInit, AfterViewChecked {
   }
 
   deleteDocument(doc: any) {
-    if (confirm('Are you sure you want to delete this document?')) {
+    const ref = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      maxWidth: '95vw',
+      data: {
+        title: 'Delete document?',
+        message: `"${doc.title || 'This document'}" will be permanently deleted. This cannot be undone.`,
+        confirmLabel: 'Delete',
+        destructive: true
+      }
+    });
+    ref.afterClosed().subscribe(confirmed => {
+      if (!confirmed) return;
       this.api.deleteDocument(doc.id).subscribe({
         next: () => {
           this.snackBar.open('Document deleted', 'Close', { duration: 3000 });
@@ -253,7 +271,7 @@ export class DocumentsPageComponent implements OnInit, AfterViewChecked {
         },
         error: (err) => this.snackBar.open('Delete failed', 'Close', { duration: 3000 })
       });
-    }
+    });
   }
 
   onSearchChange() {

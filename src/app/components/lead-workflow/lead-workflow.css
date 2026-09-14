@@ -1,6 +1,12 @@
 .lead-workflow-container {
-  min-width: 600px;
+  width: 100%;
   max-width: 700px;
+}
+
+@media (max-width: 640px) {
+  .lead-workflow-container {
+    max-width: 100%;
+  }
 }
 
 .modal-header {

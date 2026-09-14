@@ -4,8 +4,8 @@
   } @else {
     <div class="editor-header">
       <div class="header-left">
-        <button mat-icon-button routerLink="/website-builder">
-          <mat-icon>arrow_back</mat-icon>
+        <button mat-icon-button routerLink="/website-builder" aria-label="Back to websites">
+          <mat-icon aria-hidden="true">arrow_back</mat-icon>
         </button>
         <h2>{{ website.name }}</h2>
         <span class="slug">/{{ website.slug }}</span>
@@ -44,14 +44,14 @@
                         <span class="variant-badge">{{ section.designVariant }}</span>
                       </div>
                       <div class="section-actions">
-                        <button mat-icon-button>
-                          <mat-icon>drag_handle</mat-icon>
+                        <button mat-icon-button aria-label="Reorder section">
+                          <mat-icon aria-hidden="true">drag_handle</mat-icon>
                         </button>
-                        <button mat-icon-button (click)="editSection(section)">
-                          <mat-icon>edit</mat-icon>
+                        <button mat-icon-button (click)="editSection(section)" [attr.aria-label]="'Edit ' + section.name">
+                          <mat-icon aria-hidden="true">edit</mat-icon>
                         </button>
-                        <button mat-icon-button (click)="deleteSection(section)">
-                          <mat-icon>delete</mat-icon>
+                        <button mat-icon-button (click)="deleteSection(section)" [attr.aria-label]="'Delete ' + section.name">
+                          <mat-icon aria-hidden="true">delete</mat-icon>
                         </button>
                       </div>
                     </div>
@@ -68,8 +68,8 @@
       <div class="component-panel">
         <div class="panel-header">
           <h3>Add Component</h3>
-          <button mat-icon-button (click)="showComponentPanel = false">
-            <mat-icon>close</mat-icon>
+          <button mat-icon-button (click)="showComponentPanel = false" aria-label="Close component panel">
+            <mat-icon aria-hidden="true">close</mat-icon>
           </button>
         </div>
         <div class="category-tabs">

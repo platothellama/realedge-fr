@@ -11,9 +11,15 @@
   </div>
 
   @if (loading) {
-    <div class="loading-container">
+    <div class="loading-container" role="status">
       <mat-spinner diameter="40"></mat-spinner>
     </div>
+  } @else if (loadError) {
+    <app-error-state
+      title="Couldn't load invoices"
+      message="Check your connection and try again."
+      (retry)="loadInvoices(); loadStats()">
+    </app-error-state>
   } @else {
     <div class="stats-grid">
       <div class="stat-card">
@@ -77,19 +83,19 @@
         </div>
       </div>
 
-      <div class="table-container">
+      <div class="table-container table-scroll">
         <table class="invoices-table">
           <thead>
             <tr>
-              <th>Invoice #</th>
-              <th>Client</th>
-              <th>Type</th>
-              <th>Currency</th>
-              <th>Issue Date</th>
-              <th>Due Date</th>
-              <th>Amount</th>
-              <th>Status</th>
-              <th>Actions</th>
+              <th class="sticky-col" scope="col">Invoice #</th>
+              <th scope="col">Client</th>
+              <th scope="col">Type</th>
+              <th scope="col">Currency</th>
+              <th scope="col">Issue Date</th>
+              <th scope="col">Due Date</th>
+              <th scope="col">Amount</th>
+              <th scope="col">Status</th>
+              <th scope="col">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -115,8 +121,8 @@
                   </span>
                 </td>
                 <td>
-                  <button mat-icon-button [matMenuTriggerFor]="menu" [disabled]="isProcessing(invoice.id)">
-                    <mat-icon>more_vert</mat-icon>
+                  <button mat-icon-button [matMenuTriggerFor]="menu" [disabled]="isProcessing(invoice.id)" [attr.aria-label]="'Actions for invoice ' + invoice.invoiceNumber">
+                    <mat-icon aria-hidden="true">more_vert</mat-icon>
                   </button>
                   <mat-menu #menu="matMenu">
                     @if (invoice.status !== 'Paid') {
@@ -146,12 +152,16 @@
   }
 
   @if (showAddDialog) {
-    <div class="dialog-overlay" (click)="closeDialog()">
-      <div class="dialog-content invoice-dialog" (click)="$event.stopPropagation()">
+    <div class="dialog-overlay" (click)="closeDialog()" (keydown.escape)="closeDialog()">
+      <div class="dialog-content invoice-dialog"
+           (click)="$event.stopPropagation()"
+           role="dialog"
+           aria-modal="true"
+           aria-labelledby="new-invoice-title">
         <div class="dialog-header">
-          <h2>New Invoice</h2>
-          <button mat-icon-button (click)="closeDialog()">
-            <mat-icon>close</mat-icon>
+          <h2 id="new-invoice-title">New Invoice</h2>
+          <button mat-icon-button (click)="closeDialog()" aria-label="Close dialog">
+            <mat-icon aria-hidden="true">close</mat-icon>
           </button>
         </div>
         <div class="dialog-body">
@@ -231,8 +241,8 @@
                 <input class="col-qty" type="number" matInput [(ngModel)]="item.quantity" min="1" (input)="updateLineItemTotal(item)">
                 <input class="col-price" type="number" matInput [(ngModel)]="item.unitPrice" min="0" (input)="updateLineItemTotal(item)">
                 <span class="col-total item-total">{{ formatCurrencyWithSymbol(item.total, newInvoice.currency) }}</span>
-                <button mat-icon-button class="col-action remove-item-btn" (click)="removeLineItem($index)">
-                  <mat-icon>delete</mat-icon>
+                <button mat-icon-button class="col-action remove-item-btn" (click)="removeLineItem($index)" [attr.aria-label]="'Remove line item ' + ($index + 1)">
+                  <mat-icon aria-hidden="true">delete</mat-icon>
                 </button>
               </div>
             }

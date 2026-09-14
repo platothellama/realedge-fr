@@ -14,6 +14,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api';
 import { AuthService } from '../../services/auth/auth.service';
+import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog';
+import { ErrorStateComponent } from '../../components/error-state/error-state';
 
 interface Announcement {
   id: string;
@@ -43,7 +45,8 @@ interface Announcement {
     MatDialogModule,
     MatChipsModule,
     MatTooltipModule,
-    FormsModule
+    FormsModule,
+    ErrorStateComponent
   ],
   templateUrl: './announcements.html',
   styleUrl: './announcements.css'
@@ -56,6 +59,7 @@ export class AnnouncementsComponent implements OnInit {
 
   announcements: Announcement[] = [];
   loading = true;
+  loadError = false;
   currentUserName = '';
   filterCategory = 'all';
 
@@ -97,6 +101,7 @@ export class AnnouncementsComponent implements OnInit {
 
   fetchAnnouncements() {
     this.loading = true;
+    this.loadError = false;
     this.api.getAnnouncements().subscribe({
       next: (res: any) => {
         this.announcements = Array.isArray(res) ? res : (res?.data || []);
@@ -106,6 +111,7 @@ export class AnnouncementsComponent implements OnInit {
         console.error('Failed to fetch announcements', err);
         this.loading = false;
         this.announcements = [];
+        this.loadError = true;
       }
     });
   }
@@ -145,8 +151,22 @@ export class AnnouncementsComponent implements OnInit {
   }
 
   deleteAnnouncement(id: string) {
-    this.announcements = this.announcements.filter(a => a.id !== id);
-    this.snackBar.open('Announcement deleted', 'Close', { duration: 2000 });
+    const target = this.announcements.find(a => a.id === id);
+    const ref = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      maxWidth: '95vw',
+      data: {
+        title: 'Delete announcement?',
+        message: `"${target?.title || 'This announcement'}" will be removed for everyone.`,
+        confirmLabel: 'Delete',
+        destructive: true
+      }
+    });
+    ref.afterClosed().subscribe(confirmed => {
+      if (!confirmed) return;
+      this.announcements = this.announcements.filter(a => a.id !== id);
+      this.snackBar.open('Announcement deleted', 'Close', { duration: 2000 });
+    });
   }
 
   toggleActive(announcement: Announcement) {

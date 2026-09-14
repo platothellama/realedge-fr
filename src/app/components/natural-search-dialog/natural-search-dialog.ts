@@ -78,7 +78,8 @@ import { ApiService } from '../../services/api';
   styles: [`
     .dialog-container {
       padding: 0;
-      min-width: 550px;
+      width: 100%;
+      max-width: 560px;
     }
 
     .dialog-header {

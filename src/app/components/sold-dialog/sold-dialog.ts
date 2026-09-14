@@ -122,7 +122,8 @@ import { ApiService } from '../../services/api';
   `,
   styles: [`
     .sold-dialog {
-      min-width: 400px;
+      width: 100%;
+      max-width: 440px;
     }
     .dialog-header {
       display: flex;

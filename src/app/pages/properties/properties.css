@@ -332,9 +332,23 @@
   transition: all 0.3s ease;
 }
 
-.property-card:hover .card-overlay {
+.property-card:hover .card-overlay,
+.property-card:focus-within .card-overlay {
   opacity: 1;
   transform: translateY(0);
+}
+
+/* Touch devices + keyboard: hover-only actions must stay reachable */
+@media (hover: none) and (pointer: coarse) {
+  .card-overlay {
+    opacity: 1;
+    transform: none;
+  }
+
+  .card-overlay button {
+    width: 44px;
+    height: 44px;
+  }
 }
 
 .card-overlay button {

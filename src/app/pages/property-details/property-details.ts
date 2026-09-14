@@ -19,6 +19,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { ApiService } from '../../services/api';
 import { AuthService } from '../../services/auth/auth.service';
+import { BreadcrumbComponent } from '../../components/breadcrumb/breadcrumb';
 import { PropertyFormComponent } from '../../components/property-form/property-form';
 import { NegotiationFormComponent } from '../../components/negotiation-form/negotiation-form';
 import { DealFormComponent } from '../../components/deal-form/deal-form';
@@ -26,6 +27,7 @@ import { VisitFormComponent } from '../../components/visit-form/visit-form';
 import { DocumentManagerComponent } from '../../components/document-manager/document-manager';
 import { LeadWorkflowComponent, LeadWorkflowResult } from '../../components/lead-workflow/lead-workflow';
 import { SoldDialogComponent } from '../../components/sold-dialog/sold-dialog';
+import { LostDialogComponent, LostDialogResult } from '../../components/lost-dialog/lost-dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 @Component({
@@ -52,6 +54,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
     MatDatepickerModule,
     MatNativeDateModule,
     DocumentManagerComponent,
+    BreadcrumbComponent,
   ],
   templateUrl: './property-details.html',
   styleUrl: './property-details.css'
@@ -337,11 +340,15 @@ export class PropertyDetailsComponent implements OnInit {
   }
 
   showLostDialog() {
-    const reason = prompt('Enter reason for losing (reason/competitor):', '');
-    if (reason !== null && reason.trim()) {
-      const date = prompt('Enter date (YYYY-MM-DD):', new Date().toISOString().split('T')[0]);
-      this.markAsLost(reason.trim(), date || '');
-    }
+    const ref = this.dialog.open(LostDialogComponent, {
+      width: '440px',
+      maxWidth: '95vw',
+      data: { propertyTitle: this.property?.title },
+    });
+    ref.afterClosed().subscribe((result: LostDialogResult | undefined) => {
+      if (!result) return;
+      this.markAsLost(result.reason, result.date);
+    });
   }
 
   getPrimaryPhotoIndex(): number {

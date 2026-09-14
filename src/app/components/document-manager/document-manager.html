@@ -76,8 +76,8 @@
             }
           </div>
           <div class="doc-card-actions" (click)="$event.stopPropagation()">
-            <button mat-icon-button [matMenuTriggerFor]="docMenu">
-              <mat-icon>more_vert</mat-icon>
+            <button mat-icon-button [matMenuTriggerFor]="docMenu" [attr.aria-label]="'Actions for ' + doc.title">
+              <mat-icon aria-hidden="true">more_vert</mat-icon>
             </button>
             <mat-menu #docMenu="matMenu">
               <button mat-menu-item (click)="openPreview(doc)">

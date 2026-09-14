@@ -13,6 +13,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
+import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api';
 
@@ -58,6 +59,7 @@ interface Property {
 export class WebsiteBuilderComponent implements OnInit {
   private api = inject(ApiService);
   private snackBar = inject(MatSnackBar);
+  private dialog = inject(MatDialog);
 
   loading = true;
   websites: Website[] = [];
@@ -175,7 +177,18 @@ export class WebsiteBuilderComponent implements OnInit {
   }
 
   deleteWebsite(website: Website) {
-    if (confirm(`Delete "${website.name}"? This cannot be undone.`)) {
+    const ref = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      maxWidth: '95vw',
+      data: {
+        title: 'Delete website?',
+        message: `"${website.name}" and its pages will be permanently deleted. This cannot be undone.`,
+        confirmLabel: 'Delete',
+        destructive: true
+      }
+    });
+    ref.afterClosed().subscribe(confirmed => {
+      if (!confirmed) return;
       this.api.deleteWebsite(website.id).subscribe({
         next: () => {
           this.websites = this.websites.filter(w => w.id !== website.id);
@@ -183,7 +196,7 @@ export class WebsiteBuilderComponent implements OnInit {
         },
         error: () => this.snackBar.open('Error deleting website', 'Close', { duration: 3000 })
       });
-    }
+    });
   }
 
   publishWebsite(website: Website) {

@@ -15,6 +15,8 @@ import { MatSelectModule } from '@angular/material/select';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api';
 import { ClientSelectorComponent, ClientSelection } from '../../components/client-selector/client-selector';
+import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog';
+import { ErrorStateComponent } from '../../components/error-state/error-state';
 
 interface LineItem {
   description: string;
@@ -75,7 +77,8 @@ interface Invoice {
     MatInputModule,
     MatSelectModule,
     FormsModule,
-    ClientSelectorComponent
+    ClientSelectorComponent,
+    ErrorStateComponent
   ],
   templateUrl: './invoices.html',
   styleUrl: './invoices.css'
@@ -86,6 +89,7 @@ export class InvoicesComponent implements OnInit {
   private dialog = inject(MatDialog);
 
   loading = true;
+  loadError = false;
   invoices: Invoice[] = [];
   stats: any = {};
   processingId: string | null = null;
@@ -124,6 +128,7 @@ export class InvoicesComponent implements OnInit {
 
   loadInvoices() {
     this.loading = true;
+    this.loadError = false;
     const filters: any = {};
     if (this.statusFilter) filters.status = this.statusFilter;
     if (this.typeFilter) filters.type = this.typeFilter;
@@ -137,6 +142,7 @@ export class InvoicesComponent implements OnInit {
         console.error('Failed to fetch invoices', err);
         this.invoices = [];
         this.loading = false;
+        this.loadError = true;
       }
     });
   }
@@ -237,18 +243,31 @@ export class InvoicesComponent implements OnInit {
   }
 
   deleteInvoice(invoice: Invoice) {
-    this.processingId = invoice.id;
-    this.api.deleteInvoice(invoice.id).subscribe({
-      next: () => {
-        this.invoices = this.invoices.filter(i => i.id !== invoice.id);
-        this.loadStats();
-        this.snackBar.open('Invoice deleted', 'Close', { duration: 2000 });
-        this.processingId = null;
-      },
-      error: (err) => {
-        this.snackBar.open('Failed to delete invoice', 'Close', { duration: 3000 });
-        this.processingId = null;
+    const ref = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      maxWidth: '95vw',
+      data: {
+        title: 'Delete invoice?',
+        message: `Invoice ${invoice.invoiceNumber} will be permanently deleted. This cannot be undone.`,
+        confirmLabel: 'Delete',
+        destructive: true
       }
+    });
+    ref.afterClosed().subscribe(confirmed => {
+      if (!confirmed) return;
+      this.processingId = invoice.id;
+      this.api.deleteInvoice(invoice.id).subscribe({
+        next: () => {
+          this.invoices = this.invoices.filter(i => i.id !== invoice.id);
+          this.loadStats();
+          this.snackBar.open('Invoice deleted', 'Close', { duration: 2000 });
+          this.processingId = null;
+        },
+        error: (err) => {
+          this.snackBar.open('Failed to delete invoice', 'Close', { duration: 3000 });
+          this.processingId = null;
+        }
+      });
     });
   }
 

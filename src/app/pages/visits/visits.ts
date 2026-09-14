@@ -6,6 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { FullCalendarModule } from '@fullcalendar/angular';
 import { CalendarOptions, EventClickArg } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -27,7 +28,8 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
     MatDatepickerModule,
     MatNativeDateModule,
     FullCalendarModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    MatProgressSpinnerModule
   ],
   templateUrl: './visits.html',
   styleUrl: './visits.css'
@@ -36,6 +38,8 @@ export class VisitsComponent implements OnInit {
   private api = inject(ApiService);
   private dialog = inject(MatDialog);
   private snackBar = inject(MatSnackBar);
+
+  isLoading = signal(false);
 
   calendarOptions = signal<CalendarOptions>({
     plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
@@ -63,6 +67,7 @@ export class VisitsComponent implements OnInit {
   }
 
   fetchVisits() {
+    this.isLoading.set(true);
     this.api.getVisits().subscribe({
       next: (res: any) => {
         const visits = Array.isArray(res) ? res : (res?.data || []);
@@ -80,8 +85,14 @@ export class VisitsComponent implements OnInit {
           ...options,
           events: events
         }));
+        this.isLoading.set(false);
       },
-      error: (err) => console.error('Failed to fetch visits', err)
+      error: (err) => {
+        this.isLoading.set(false);
+        console.error('Failed to fetch visits', err);
+        this.snackBar.open('Failed to load visits. Pull to refresh or try again.', 'Retry', { duration: 5000 })
+          .onAction().subscribe(() => this.fetchVisits());
+      }
     });
   }
 

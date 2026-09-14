@@ -15,6 +15,8 @@ import { ApiService } from '../../services/api';
 import { PropertyFormComponent } from '../../components/property-form/property-form';
 import { PaginationComponent } from '../../components/pagination/pagination';
 import { PropertySearchComponent, SearchFilters } from '../../components/property-search/property-search';
+import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog';
+import { ErrorStateComponent } from '../../components/error-state/error-state';
 
 @Component({
   selector: 'app-properties',
@@ -32,7 +34,8 @@ import { PropertySearchComponent, SearchFilters } from '../../components/propert
     MatMenuModule,
     FormsModule,
     PaginationComponent,
-    PropertySearchComponent
+    PropertySearchComponent,
+    ErrorStateComponent
   ],
   templateUrl: './properties.html',
   styleUrl: './properties.css',
@@ -40,8 +43,8 @@ import { PropertySearchComponent, SearchFilters } from '../../components/propert
 export class PropertiesComponent implements OnInit {
   properties: any[] = [];
   loading = false;
+  loadError = false;
   deletingId: string | null = null;
-  seeding = false;
 
   filters: SearchFilters = {
     searchQuery: '',
@@ -79,6 +82,7 @@ export class PropertiesComponent implements OnInit {
 
   fetchProperties() {
     this.loading = true;
+    this.loadError = false;
     
     const params: any = {
       page: this.pagination.page,
@@ -136,6 +140,7 @@ export class PropertiesComponent implements OnInit {
       error: (err) => {
         console.error('Failed to fetch properties', err);
         this.loading = false;
+        this.loadError = true;
       }
     });
   }
@@ -191,7 +196,18 @@ export class PropertiesComponent implements OnInit {
   }
 
   deleteProperty(id: string) {
-    if (confirm('Are you sure you want to delete this property?')) {
+    const ref = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      maxWidth: '95vw',
+      data: {
+        title: 'Delete property?',
+        message: 'This property will be permanently deleted. This cannot be undone.',
+        confirmLabel: 'Delete',
+        destructive: true
+      }
+    });
+    ref.afterClosed().subscribe(confirmed => {
+      if (!confirmed) return;
       this.deletingId = id;
       this.apiService.deleteProperty(id).subscribe({
         next: () => {
@@ -203,26 +219,11 @@ export class PropertiesComponent implements OnInit {
           this.deletingId = null;
         }
       });
-    }
+    });
   }
 
   isDeleting(id: string): boolean {
     return this.deletingId === id;
   }
 
-  seedProperties() {
-    if (confirm('This will delete all existing properties and seed 100 new Lebanese properties. Continue?')) {
-      this.seeding = true;
-      this.apiService.seedProperties().subscribe({
-        next: () => {
-          this.seeding = false;
-          this.fetchProperties();
-        },
-        error: (err) => {
-          console.error('Error seeding properties', err);
-          this.seeding = false;
-        }
-      });
-    }
-  }
 }

@@ -15,8 +15,8 @@
   /* Pure white for headings */
   --text-secondary: #94A3B8;
   /* Slate 400 for subtext */
-  --text-muted: #64748B;
-  /* Slate 500 for captions */
+  --text-muted: #9AA9BD;
+  /* Lightened for 4.5:1 contrast on dark surfaces */
 
   /* Brand */
   --primary: #6366f1;
@@ -29,6 +29,12 @@
   --success: #10b981;
   --error: #ef4444;
   --warning: #f59e0b;
+  --info: #38bdf8;
+  /* Sky 400 — was referenced but undefined */
+
+  /* Surface aliases (previously referenced but undefined) */
+  --bg-card: var(--bg-surface);
+  --bg-header: rgba(5, 5, 5, 0.85);
 
   /* Borders */
   --border: rgba(255, 255, 255, 0.05);
@@ -43,13 +49,35 @@
   --radius-md: 12px;
   --radius-lg: 20px;
   --radius-xl: 32px;
+  --radius: var(--radius-md);
+  /* Alias: was referenced bare as var(--radius) in several files */
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
 }
 
 * {
-  box-sizing: border-box;
   margin: 0;
   padding: 0;
-  transition: all 0.2s ease-in-out;
+}
+
+/* Scoped transitions: avoid global `transition: all` (layout thrash + perf).
+   Animate only interactive elements and cheap properties. */
+a, button, .mat-mdc-button, .mat-mdc-raised-button, .mat-mdc-icon-button,
+.mat-mdc-list-item, .dropdown-item, .filter-pill, .filter-chip,
+input, select, textarea, .card-overlay, .edit-btn {
+  transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out,
+    border-color 0.2s ease-in-out, opacity 0.2s ease-in-out,
+    transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition: none !important;
+    animation-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 html {
@@ -1222,7 +1250,7 @@ button.loading mat-spinner {
   p { font-size: 0.95rem !important; }
 
   .page-container {
-    padding: 12px !important;
+    padding: 16px !important;
   }
 
   .content-card {
@@ -2881,17 +2909,179 @@ button.loading mat-spinner {
 }
 
 /* ========================
-   LOW RESOLUTION SCREEN FIX
+   LOW RESOLUTION / TABLET FIX
+   (Previously html{zoom:75%}+body{scale} here — removed: it broke
+   position:fixed/sticky, blurred text, and broke a11y zoom.)
+   Fluid layout is handled per-component via breakpoints below.
    ======================== */
 @media (max-width: 1024px) {
-  html {
-    zoom: 75%;
+  .page-container {
+    padding: 16px;
   }
 
-  body {
-    transform: scale(0.75);
-    transform-origin: top left;
-    width: 133.33%;
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+/* ========================
+   UX AUDIT PATCH — shared states, a11y, responsive tables
+   ======================== */
+
+/* Skip link for keyboard users */
+.skip-link {
+  position: absolute;
+  left: 12px;
+  top: -48px;
+  z-index: 2000;
+  background: var(--primary);
+  color: #fff;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: top 0.2s ease;
+}
+.skip-link:focus {
+  top: 12px;
+}
+
+/* Screen-reader-only utility */
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* Error state (pairs with existing .empty-state / .loading-container) */
+.error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 48px 24px;
+  gap: 8px;
+  background: var(--bg-card);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: var(--radius-lg);
+}
+.error-state mat-icon {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  color: var(--error);
+  opacity: 0.9;
+}
+.error-state h3 {
+  color: var(--text-primary);
+  margin: 8px 0 0;
+}
+.error-state p {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  max-width: 420px;
+}
+
+/* Breadcrumb */
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.breadcrumb a {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-weight: 600;
+}
+.breadcrumb a:hover {
+  color: var(--primary-bright);
+}
+.breadcrumb mat-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+/* Responsive table helpers — desktop-first */
+.table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: var(--radius-md);
+}
+.table-scroll table {
+  min-width: 720px;
+}
+.sticky-col {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background: var(--bg-card);
+}
+thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+.cell-truncate {
+  max-width: 220px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Card fallback for tables on small screens */
+@media (max-width: 640px) {
+  .table-scroll table {
+    min-width: 0;
+  }
+}
+
+/* Touch targets */
+@media (hover: none) and (pointer: coarse) {
+  button, .mat-mdc-button, .mat-mdc-icon-button, a.mat-list-item {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Reveal hover-only actions on focus + touch (pairs with per-page rules) */
+.card-overlay:focus-within,
+.list-item:focus-within .edit-btn {
+  opacity: 1 !important;
+}
+
+/* Contact links */
+a[href^="tel:"], a[href^="mailto:"] {
+  color: var(--primary-bright);
+  font-weight: 600;
+  text-decoration: none;
+}
+a[href^="tel:"]:hover, a[href^="mailto:"]:hover {
+  text-decoration: underline;
+}
+
+/* Responsive dialogs: never exceed viewport */
+.mat-mdc-dialog-panel {
+  max-width: 95vw !important;
+}
+.mat-mdc-dialog-panel .mat-mdc-dialog-content {
+  max-height: 70vh !important;
+}
+@media (max-width: 640px) {
+  .mat-mdc-dialog-panel {
+    width: 100% !important;
+    margin: 12px !important;
   }
 }
 

@@ -20,7 +20,7 @@
   ></app-property-search>
 
   @if (isLoading) {
-    <div class="loading-spinner">
+    <div class="loading-spinner" role="status" aria-label="Loading sellers">
       <mat-spinner diameter="40"></mat-spinner>
     </div>
   } @else if (filteredSellers.length === 0) {
@@ -42,12 +42,24 @@
 
         <ng-container matColumnDef="email">
           <th mat-header-cell *matHeaderCellDef>Email</th>
-          <td mat-cell *matCellDef="let seller">{{ seller.email || '-' }}</td>
+          <td mat-cell *matCellDef="let seller">
+            @if (seller.email) {
+              <a [href]="'mailto:' + seller.email" (click)="$event.stopPropagation()">{{ seller.email }}</a>
+            } @else {
+              -
+            }
+          </td>
         </ng-container>
 
         <ng-container matColumnDef="phone">
           <th mat-header-cell *matHeaderCellDef>Phone</th>
-          <td mat-cell *matCellDef="let seller">{{ seller.phone || '-' }}</td>
+          <td mat-cell *matCellDef="let seller">
+            @if (seller.phone) {
+              <a [href]="'tel:' + seller.phone" (click)="$event.stopPropagation()">{{ seller.phone }}</a>
+            } @else {
+              -
+            }
+          </td>
         </ng-container>
 
         <ng-container matColumnDef="city">
@@ -65,8 +77,8 @@
         <ng-container matColumnDef="actions">
           <th mat-header-cell *matHeaderCellDef></th>
           <td mat-cell *matCellDef="let seller">
-            <button mat-icon-button [matMenuTriggerFor]="menu" (click)="$event.stopPropagation()">
-              <mat-icon>more_vert</mat-icon>
+            <button mat-icon-button [matMenuTriggerFor]="menu" (click)="$event.stopPropagation()" [attr.aria-label]="'Actions for ' + seller.name">
+              <mat-icon aria-hidden="true">more_vert</mat-icon>
             </button>
             <mat-menu #menu="matMenu">
               <button mat-menu-item (click)="openSellerDetails(seller)">

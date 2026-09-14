@@ -12,7 +12,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { FormsModule } from '@angular/forms';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ApiService } from '../../services/api';
+import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog';
 
 interface Campaign {
   id: string;
@@ -33,7 +35,7 @@ interface Campaign {
     CommonModule, MatCardModule, MatIconModule, MatButtonModule,
     MatProgressSpinnerModule, MatSnackBarModule, MatTableModule,
     MatMenuModule, MatChipsModule, MatFormFieldModule, MatInputModule,
-    MatSelectModule, FormsModule
+    MatSelectModule, FormsModule, MatDialogModule
   ],
   templateUrl: './marketing-automation.html',
   styleUrl: './marketing-automation.css'
@@ -41,6 +43,7 @@ interface Campaign {
 export class MarketingAutomationComponent implements OnInit {
   private api = inject(ApiService);
   private snackBar = inject(MatSnackBar);
+  private dialog = inject(MatDialog);
 
   loading = true;
   campaigns: Campaign[] = [];
@@ -105,13 +108,26 @@ export class MarketingAutomationComponent implements OnInit {
   }
 
   deleteCampaign(campaign: Campaign) {
-    this.api.deleteCampaign(campaign.id).subscribe({
-      next: () => {
-        this.campaigns = this.campaigns.filter(c => c.id !== campaign.id);
-        this.loadStats();
-        this.snackBar.open('Campaign deleted', 'Close', { duration: 2000 });
-      },
-      error: () => this.snackBar.open('Error deleting campaign', 'Close', { duration: 3000 })
+    const ref = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      maxWidth: '95vw',
+      data: {
+        title: 'Delete campaign?',
+        message: `"${campaign.name || 'This campaign'}" will be permanently deleted. This cannot be undone.`,
+        confirmLabel: 'Delete',
+        destructive: true
+      }
+    });
+    ref.afterClosed().subscribe(confirmed => {
+      if (!confirmed) return;
+      this.api.deleteCampaign(campaign.id).subscribe({
+        next: () => {
+          this.campaigns = this.campaigns.filter(c => c.id !== campaign.id);
+          this.loadStats();
+          this.snackBar.open('Campaign deleted', 'Close', { duration: 2000 });
+        },
+        error: () => this.snackBar.open('Error deleting campaign', 'Close', { duration: 3000 })
+      });
     });
   }
 

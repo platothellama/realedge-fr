@@ -25,7 +25,7 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withInterceptors([authInterceptor])),
     provideAnimations(),
     provideNativeDateAdapter(),
-    { provide: MAT_DIALOG_DEFAULT_OPTIONS, useValue: { hasBackdrop: true, disableClose: false } },
+    { provide: MAT_DIALOG_DEFAULT_OPTIONS, useValue: { hasBackdrop: true, disableClose: false, maxWidth: '95vw', closeOnNavigation: true } },
     { provide: MAT_SELECT_CONFIG, useValue: { hideSingleSelectionIndicator: false } as MatSelectConfig },
     { provide: MAT_MENU_DEFAULT_OPTIONS, useValue: { hasBackdrop: true, closeOnNavigation: true } },
     { provide: APP_INITIALIZER, useFactory: initializeApp, deps: [GoogleMapsService], multi: true }

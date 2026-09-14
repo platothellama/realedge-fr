@@ -1,12 +1,25 @@
 <div class="page" *ngIf="!loading && seller">
+  <app-breadcrumb [items]="[{ label: 'Sellers', link: '/sellers' }, { label: seller.name || 'Details' }]"></app-breadcrumb>
   <div class="page-header">
     <div class="header-left">
-      <button mat-icon-button class="back-btn" (click)="goBack()">
-        <mat-icon>arrow_back</mat-icon>
+      <button mat-icon-button class="back-btn" (click)="goBack()" aria-label="Back to sellers">
+        <mat-icon aria-hidden="true">arrow_back</mat-icon>
       </button>
       <div class="seller-info">
         <h1>{{ seller.name }}</h1>
-        <p>{{ seller.email || 'No email' }} • {{ seller.phone || 'No phone' }}</p>
+        <p>
+          @if (seller.email) {
+            <a [href]="'mailto:' + seller.email">{{ seller.email }}</a>
+          } @else {
+            <span>No email</span>
+          }
+          •
+          @if (seller.phone) {
+            <a [href]="'tel:' + seller.phone">{{ seller.phone }}</a>
+          } @else {
+            <span>No phone</span>
+          }
+        </p>
       </div>
     </div>
     <div class="header-actions">
@@ -79,7 +92,7 @@
         <div class="properties-grid" *ngIf="seller.properties?.length">
           <div class="property-card" *ngFor="let prop of seller.properties" (click)="openPropertyDetails(prop)">
             <div class="card-image">
-              <img [src]="prop.photos?.length ? prop.photos[0] : 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80'" alt="">
+              <img [src]="prop.photos?.length ? prop.photos[0] : 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80'" [alt]="prop.title || 'Property photo'">
               <span class="badge-status" [class]="getStatusClass(prop.status)">{{ prop.status }}</span>
             </div>
             <div class="card-body">

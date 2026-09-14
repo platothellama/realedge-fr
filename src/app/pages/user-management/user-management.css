@@ -306,3 +306,6 @@
   color: var(--text-muted);
   font-size: 0.9rem;
 }
+
+.no-data-cell { text-align: center; padding: 32px 16px !important; color: var(--text-muted); }
+.no-data-cell .loading-container { display: flex; justify-content: center; padding: 16px; }

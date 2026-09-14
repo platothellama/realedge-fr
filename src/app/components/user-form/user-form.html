@@ -25,8 +25,8 @@
       <mat-form-field appearance="outline" class="full-width">
         <mat-label>Initial Password</mat-label>
         <input matInput formControlName="password" [type]="hidePassword ? 'password' : 'text'">
-        <button type="button" mat-icon-button matSuffix (click)="hidePassword = !hidePassword">
-          <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+        <button type="button" mat-icon-button matSuffix (click)="hidePassword = !hidePassword" [attr.aria-label]="hidePassword ? 'Show password' : 'Hide password'">
+          <mat-icon aria-hidden="true">{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
         </button>
         <mat-hint>Minimum 6 characters</mat-hint>
         <mat-error *ngIf="userForm.get('password')?.hasError('required')">Password is required</mat-error>

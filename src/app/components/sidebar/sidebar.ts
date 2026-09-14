@@ -1,6 +1,7 @@
 import { Component, computed, inject } from '@angular/core';
 import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth/auth.service';
 import { FeatureService } from '../../services/feature/feature.service';
@@ -9,7 +10,7 @@ import { CommonModule } from '@angular/common';
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [MatListModule, MatIconModule, RouterModule, CommonModule],
+  imports: [MatListModule, MatIconModule, MatTooltipModule, RouterModule, CommonModule],
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.css',
 })
@@ -50,6 +51,8 @@ export class Sidebar {
     if (['superadmin', 'admin', 'accountant'].includes(role || '')) {
       items.push({ label: 'Invoices', icon: 'receipt_long', link: '/invoices', feature: 'invoices' });
       items.push({ label: 'Expenses', icon: 'account_balance_wallet', link: '/expenses', feature: 'expenses' });
+      items.push({ label: 'Payments', icon: 'credit_card', link: '/payments' });
+      items.push({ label: 'Commission Settings', icon: 'tune', link: '/commission-settings' });
     }
 
     if (['superadmin', 'admin', 'broker', 'officemanager'].includes(role || '')) {
@@ -64,7 +67,8 @@ export class Sidebar {
       items.push({ label: 'AI Insights', icon: 'psychology', link: '/ai-insights', feature: 'ai_assistant' });
     }
 
-    items.push({ label: 'Settings', icon: 'settings', link: '#' });
+    // NOTE: dead 'Settings → #' link removed (UX audit). Settings live
+    // under Organization / user-management for privileged roles.
 
     return items.filter(item => {
       if (!item.feature) return true;

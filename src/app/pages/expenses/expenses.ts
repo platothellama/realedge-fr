@@ -12,7 +12,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { FormsModule } from '@angular/forms';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ApiService } from '../../services/api';
+import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog';
 
 interface Expense {
   id: string;
@@ -41,6 +43,7 @@ interface Expense {
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
+    MatDialogModule,
     FormsModule
   ],
   templateUrl: './expenses.html',
@@ -49,6 +52,7 @@ interface Expense {
 export class ExpensesComponent implements OnInit {
   private api = inject(ApiService);
   private snackBar = inject(MatSnackBar);
+  private dialog = inject(MatDialog);
 
   loading = true;
   expenses: Expense[] = [];
@@ -89,6 +93,8 @@ export class ExpensesComponent implements OnInit {
         console.error('Failed to fetch expenses', err);
         this.expenses = [];
         this.loading = false;
+        this.snackBar.open('Failed to load expenses', 'Retry', { duration: 5000 })
+          .onAction().subscribe(() => this.loadExpenses());
       }
     });
   }
@@ -168,18 +174,31 @@ export class ExpensesComponent implements OnInit {
   }
 
   deleteExpense(expense: Expense) {
-    this.processingId = expense.id;
-    this.api.deleteExpense(expense.id).subscribe({
-      next: () => {
-        this.expenses = this.expenses.filter(e => e.id !== expense.id);
-        this.loadStats();
-        this.snackBar.open('Expense deleted', 'Close', { duration: 2000 });
-        this.processingId = null;
-      },
-      error: (err) => {
-        this.snackBar.open('Failed to delete expense', 'Close', { duration: 3000 });
-        this.processingId = null;
+    const ref = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      maxWidth: '95vw',
+      data: {
+        title: 'Delete expense?',
+        message: `"${expense.title || 'This expense'}" will be permanently deleted. This cannot be undone.`,
+        confirmLabel: 'Delete',
+        destructive: true
       }
+    });
+    ref.afterClosed().subscribe(confirmed => {
+      if (!confirmed) return;
+      this.processingId = expense.id;
+      this.api.deleteExpense(expense.id).subscribe({
+        next: () => {
+          this.expenses = this.expenses.filter(e => e.id !== expense.id);
+          this.loadStats();
+          this.snackBar.open('Expense deleted', 'Close', { duration: 2000 });
+          this.processingId = null;
+        },
+        error: (err) => {
+          this.snackBar.open('Failed to delete expense', 'Close', { duration: 3000 });
+          this.processingId = null;
+        }
+      });
     });
   }
 

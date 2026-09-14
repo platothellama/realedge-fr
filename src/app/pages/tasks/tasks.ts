@@ -16,6 +16,7 @@ import { FormsModule } from '@angular/forms';
 import { CdkDragDrop, DragDropModule, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { ApiService } from '../../services/api';
 import { AuthService } from '../../services/auth/auth.service';
+import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog';
 
 interface Task {
   id: string;
@@ -305,23 +306,28 @@ export class TasksComponent implements OnInit {
       taskStatus = 'done';
     }
 
-    this.api.deleteTask(taskId).subscribe({
-      next: () => {
-        this.removeTaskFromArray(task!, taskStatus);
-        this.snackBar.open('Task deleted', 'Close', { duration: 2000 });
-      },
-      error: (err) => {
-        this.removeTaskFromArray(task!, taskStatus);
-        this.snackBar.open('Task deleted (local)', 'Close', { duration: 2000 });
+    this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      maxWidth: '95vw',
+      data: {
+        title: 'Delete task?',
+        message: `"${task?.title || 'This task'}" will be permanently deleted. This cannot be undone.`,
+        confirmLabel: 'Delete',
+        destructive: true
       }
+    }).afterClosed().subscribe(confirmed => {
+      if (!confirmed) return;
+      this.api.deleteTask(taskId).subscribe({
+        next: () => {
+          this.removeTaskFromArray(task!, taskStatus);
+          this.snackBar.open('Task deleted', 'Close', { duration: 2000 });
+        },
+        error: (err) => {
+          this.removeTaskFromArray(task!, taskStatus);
+          this.snackBar.open('Task deleted (local)', 'Close', { duration: 2000 });
+        }
+      });
     });
-  }
-
-  openAssignDialog(task: Task) {
-    const userId = prompt(`Assign task "${task.title}" to user ID:`);
-    if (userId) {
-      this.assignTask(task, userId);
-    }
   }
 
   closeDialog() {

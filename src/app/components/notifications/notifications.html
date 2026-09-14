@@ -1,8 +1,8 @@
-<button mat-icon-button [matMenuTriggerFor]="notificationMenu" class="notification-btn">
+<button mat-icon-button [matMenuTriggerFor]="notificationMenu" class="notification-btn" aria-label="Notifications">
   @if (unreadCount() > 0) {
-    <mat-icon [matBadge]="unreadCount()" matBadgeColor="warn" matBadgeSize="small">notifications</mat-icon>
+    <mat-icon [matBadge]="unreadCount()" matBadgeColor="warn" matBadgeSize="small" aria-hidden="true">notifications</mat-icon>
   } @else {
-    <mat-icon>notifications_none</mat-icon>
+    <mat-icon aria-hidden="true">notifications_none</mat-icon>
   }
 </button>
 
@@ -36,8 +36,8 @@
           <span class="notification-message">{{ notification.message }}</span>
           <span class="notification-time">{{ getTimeAgo(notification.createdAt) }}</span>
         </div>
-        <button mat-icon-button class="delete-btn" (click)="deleteNotification(notification, $event)">
-          <mat-icon>close</mat-icon>
+        <button mat-icon-button class="delete-btn" (click)="deleteNotification(notification, $event)" aria-label="Delete notification">
+          <mat-icon aria-hidden="true">close</mat-icon>
         </button>
       </div>
     }

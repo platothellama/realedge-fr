@@ -2,17 +2,20 @@
   <div class="filter-main">
     @if (config.showSearch) {
       <div class="search-wrapper">
-        <mat-icon>search</mat-icon>
+        <mat-icon aria-hidden="true">search</mat-icon>
+        <label class="visually-hidden" for="property-search-input">Search properties</label>
         <input
-          type="text"
+          id="property-search-input"
+          type="search"
           placeholder="Search by title, address, city..."
+          aria-label="Search properties by title, address, or city"
           [(ngModel)]="filters.searchQuery"
           (keyup.enter)="search.emit()"
           (input)="onSearchInput()"
         >
         @if (filters.searchQuery) {
-          <button class="clear-search" (click)="clearSearch()">
-            <mat-icon>close</mat-icon>
+          <button class="clear-search" (click)="clearSearch()" aria-label="Clear search">
+            <mat-icon aria-hidden="true">close</mat-icon>
           </button>
         }
       </div>

@@ -30,6 +30,8 @@ import { SellerDetailsComponent } from './pages/sellers/seller-details';
 import { LeadDetailsComponent } from './pages/lead-details/lead-details';
 import { GroupsComponent } from './pages/groups/groups';
 import { CommissionsComponent } from './pages/commissions/commissions';
+import { CommissionSettingsComponent } from './pages/commission-settings/commission-settings';
+import { PaymentsComponent } from './pages/payments/payments';
 import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
@@ -48,6 +50,16 @@ export const routes: Routes = [
       { path: 'leads/:id', component: LeadDetailsComponent },
       { path: 'deals', component: DealsComponent },
       { path: 'commissions', component: CommissionsComponent },
+      {
+        path: 'commission-settings',
+        component: CommissionSettingsComponent,
+        data: { roles: ['Super Admin', 'Admin', 'Accountant'] }
+      },
+      {
+        path: 'payments',
+        component: PaymentsComponent,
+        data: { roles: ['Super Admin', 'Admin', 'Accountant'] }
+      },
       { path: 'sellers', component: SellersComponent },
       { path: 'sellers/:id', component: SellerDetailsComponent },
       { path: 'documents', component: DocumentsPageComponent },

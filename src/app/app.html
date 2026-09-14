@@ -1,3 +1,4 @@
+<a class="skip-link" href="#main-content">Skip to main content</a>
 <div class="app-container" [class.no-sidebar]="!auth.currentUser()">
   
   <!-- Sidebar -->
@@ -10,7 +11,7 @@
     <app-header *ngIf="auth.currentUser()"></app-header>
 
     <!-- Content -->
-    <main class="content-body">
+    <main class="content-body" id="main-content" tabindex="-1">
       <router-outlet></router-outlet>
     </main>
 

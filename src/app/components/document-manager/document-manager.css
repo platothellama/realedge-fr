@@ -164,8 +164,15 @@ app-property-search {
   position: relative;
 }
 
-.doc-card:hover .doc-card-actions {
+.doc-card:hover .doc-card-actions,
+.doc-card:focus-within .doc-card-actions {
   opacity: 1;
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .doc-card-actions {
+    opacity: 1;
+  }
 }
 
 .loading-state, .empty-state {

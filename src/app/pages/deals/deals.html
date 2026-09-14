@@ -32,6 +32,12 @@
     (search)="applyFilters()"
   ></app-property-search>
 
+  @if (loading) {
+    <div class="loading-container" role="status" aria-label="Loading deals">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p>Loading deals...</p>
+    </div>
+  } @else {
   <div class="pipeline-board">
     <mat-tab-group class="view-tabs" color="primary">
       <mat-tab>
@@ -63,8 +69,8 @@
                         <span class="deal-title">{{ deal.title }}</span>
                         <span class="property-tag">{{ deal.property?.title }}</span>
                       </div>
-                      <button mat-icon-button class="edit-btn" (click)="$event.stopPropagation(); openDealForm(deal)">
-                        <mat-icon>edit</mat-icon>
+                      <button mat-icon-button class="edit-btn" (click)="$event.stopPropagation(); openDealForm(deal)" [attr.aria-label]="'Edit ' + deal.title">
+                        <mat-icon aria-hidden="true">edit</mat-icon>
                       </button>
                     </div>
 
@@ -86,7 +92,7 @@
                           <span class="commission-value">{{ deal.commission | currency:'USD':'symbol':'1.0-0' }}</span>
                         </div>
                         <div class="stat-item broker-info">
-                          <img [src]="deal.broker?.photo || 'https://ui-avatars.com/api/?name=' + deal.broker?.name" alt="Broker">
+                          <img [src]="deal.broker?.photo || 'https://ui-avatars.com/api/?name=' + deal.broker?.name" [alt]="deal.broker?.name + ' photo'">
                           <span>{{ deal.broker?.name }}</span>
                         </div>
                       </div>
@@ -115,16 +121,17 @@
 
         <div class="list-view-wrapper">
           <mat-card class="table-card">
+            <div class="table-scroll">
             <table class="standard-table">
               <tr class="header-row">
-                <th>Deal Title</th>
-                <th>Buyer</th>
-                <th>Seller</th>
-                <th>Property</th>
-                <th>Broker</th>
-                <th>Stage</th>
-                <th>Commission</th>
-                <th align="right">Actions</th>
+                <th scope="col">Deal Title</th>
+                <th scope="col">Buyer</th>
+                <th scope="col">Seller</th>
+                <th scope="col">Property</th>
+                <th scope="col">Broker</th>
+                <th scope="col">Stage</th>
+                <th scope="col">Commission</th>
+                <th scope="col" align="right">Actions</th>
               </tr>
               @for (deal of allDeals; track deal.id) {
                 <tr class="data-row">
@@ -139,7 +146,7 @@
                   <td>{{ deal.property?.title }}</td>
                   <td>
                     <div class="broker-cell">
-                      <img [src]="deal.broker?.photo || 'https://ui-avatars.com/api/?name=' + deal.broker?.name">
+                      <img [src]="deal.broker?.photo || 'https://ui-avatars.com/api/?name=' + deal.broker?.name" [alt]="deal.broker?.name + ' photo'">
                       <span>{{ deal.broker?.name }}</span>
                     </div>
                   </td>
@@ -148,16 +155,17 @@
                   </td>
                   <td><span class="commission-text">{{ deal.commission | currency }}</span></td>
                   <td align="right">
-                    <button mat-icon-button (click)="openDealForm(deal)">
-                      <mat-icon>edit</mat-icon>
+                    <button mat-icon-button (click)="openDealForm(deal)" [attr.aria-label]="'Edit ' + deal.title">
+                      <mat-icon aria-hidden="true">edit</mat-icon>
                     </button>
-                    <button mat-icon-button color="warn" (click)="deleteDeal(deal.id)">
-                      <mat-icon>delete_outline</mat-icon>
+                    <button mat-icon-button color="warn" (click)="deleteDeal(deal.id)" [attr.aria-label]="'Delete ' + deal.title">
+                      <mat-icon aria-hidden="true">delete_outline</mat-icon>
                     </button>
                   </td>
                 </tr>
               }
             </table>
+            </div>
             @if (allDeals.length === 0) {
               <div class="empty-state">
                 <mat-icon>history_edu</mat-icon>
@@ -169,4 +177,5 @@
       </mat-tab>
     </mat-tab-group>
   </div>
+  }
 </div>

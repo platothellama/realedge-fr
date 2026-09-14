@@ -7,8 +7,9 @@
 
     <div class="filter-controls">
       <div class="search-box">
-        <mat-icon>search</mat-icon>
-        <input type="text" placeholder="Search leads..." [(ngModel)]="searchQuery" (ngModelChange)="applyFilters()">
+        <mat-icon aria-hidden="true">search</mat-icon>
+        <label class="visually-hidden" for="crm-search">Search leads</label>
+        <input id="crm-search" type="search" placeholder="Search leads..." [(ngModel)]="searchQuery" (ngModelChange)="applyFilters()" aria-label="Search leads">
       </div>
 
       <mat-form-field appearance="outline" class="source-filter no-subscript">
@@ -74,8 +75,12 @@
                     <div class="col-client">
                       <div class="client-info clickable" (click)="$event.stopPropagation(); openLeadDetails(lead.id)">
                         <span class="client-name">{{ lead.name }}</span>
-                        <span class="client-email">{{ lead.email }}</span>
-                        <span class="client-phone">{{ lead.phone || 'No phone' }}</span>
+                        <a class="client-email" [href]="'mailto:' + lead.email" (click)="$event.stopPropagation()">{{ lead.email }}</a>
+                        @if (lead.phone) {
+                          <a class="client-phone" [href]="'tel:' + lead.phone" (click)="$event.stopPropagation()">{{ lead.phone }}</a>
+                        } @else {
+                          <span class="client-phone">No phone</span>
+                        }
                       </div>
                     </div>
                     <div class="col-source">
@@ -97,16 +102,16 @@
                       <span class="visit-count completed">{{ getCompletedVisits(lead).length }}</span>
                     </div>
                     <div class="col-actions">
-                      <button mat-icon-button (click)="$event.stopPropagation(); convertToDeal(lead)" matTooltip="Convert to Deal">
-                        <mat-icon>trending_up</mat-icon>
+                      <button mat-icon-button (click)="$event.stopPropagation(); convertToDeal(lead)" matTooltip="Convert to Deal" [attr.aria-label]="'Convert ' + lead.name + ' to deal'">
+                        <mat-icon aria-hidden="true">trending_up</mat-icon>
                       </button>
-                      <button mat-icon-button (click)="$event.stopPropagation(); openLeadForm(lead)" matTooltip="Edit">
-                        <mat-icon>edit</mat-icon>
+                      <button mat-icon-button (click)="$event.stopPropagation(); openLeadForm(lead)" matTooltip="Edit" [attr.aria-label]="'Edit ' + lead.name">
+                        <mat-icon aria-hidden="true">edit</mat-icon>
                       </button>
-                      <button mat-icon-button (click)="$event.stopPropagation(); deleteLead(lead.id)" matTooltip="Delete" [class.deleting]="isDeleting(lead.id)">
-                        <mat-icon>delete</mat-icon>
+                      <button mat-icon-button (click)="$event.stopPropagation(); deleteLead(lead.id)" matTooltip="Delete" [class.deleting]="isDeleting(lead.id)" [attr.aria-label]="'Delete ' + lead.name">
+                        <mat-icon aria-hidden="true">delete</mat-icon>
                       </button>
-                      <mat-icon class="expand-icon">{{ expandedLeadId === lead.id ? 'expand_less' : 'expand_more' }}</mat-icon>
+                      <mat-icon class="expand-icon" aria-hidden="true">{{ expandedLeadId === lead.id ? 'expand_less' : 'expand_more' }}</mat-icon>
                     </div>
                   </div>
 
@@ -213,8 +218,8 @@
                         <span class="lead-name">{{ lead.name }}</span>
                         <span class="lead-source-badge" [attr.data-source]="lead.source">{{ lead.source }}</span>
                       </div>
-                      <button mat-icon-button class="edit-btn" (click)="$event.stopPropagation(); openLeadForm(lead)">
-                        <mat-icon>edit</mat-icon>
+                      <button mat-icon-button class="edit-btn" (click)="$event.stopPropagation(); openLeadForm(lead)" [attr.aria-label]="'Edit ' + lead.name">
+                        <mat-icon aria-hidden="true">edit</mat-icon>
                       </button>
                     </div>
 

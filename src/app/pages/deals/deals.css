@@ -247,7 +247,17 @@
   opacity: 0;
 }
 
-.deal-card:hover .edit-btn { opacity: 1; }
+.deal-card:hover .edit-btn,
+.deal-card:focus-within .edit-btn { opacity: 1; }
+
+@media (hover: none) and (pointer: coarse) {
+  .edit-btn {
+    opacity: 1;
+    width: 44px !important;
+    height: 44px !important;
+    line-height: 44px !important;
+  }
+}
 
 .deal-details {
   display: flex;

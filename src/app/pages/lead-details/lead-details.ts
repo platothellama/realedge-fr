@@ -16,6 +16,8 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatListModule } from '@angular/material/list';
 import { ApiService } from '../../services/api';
 import { FormsModule } from '@angular/forms';
+import { BreadcrumbComponent } from '../../components/breadcrumb/breadcrumb';
+import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog';
 
 @Component({
   selector: 'app-lead-details',
@@ -35,7 +37,8 @@ import { FormsModule } from '@angular/forms';
     MatTooltipModule,
     MatMenuModule,
     MatListModule,
-    FormsModule
+    FormsModule,
+    BreadcrumbComponent
   ],
   templateUrl: './lead-details.html',
   styleUrl: './lead-details.css'
@@ -285,7 +288,18 @@ export class LeadDetailsComponent implements OnInit {
   }
 
   deleteLead() {
-    if (confirm('Are you sure you want to delete this lead?')) {
+    const ref = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      maxWidth: '95vw',
+      data: {
+        title: 'Delete lead?',
+        message: `${this.lead?.name || 'This lead'} will be permanently deleted. This cannot be undone.`,
+        confirmLabel: 'Delete',
+        destructive: true
+      }
+    });
+    ref.afterClosed().subscribe(confirmed => {
+      if (!confirmed) return;
       this.apiService.deleteLead(this.lead.id).subscribe({
         next: () => {
           this.snackBar.open('Lead deleted', 'Close', { duration: 3000 });
@@ -295,6 +309,6 @@ export class LeadDetailsComponent implements OnInit {
           this.snackBar.open('Failed to delete lead', 'Close', { duration: 3000 });
         }
       });
-    }
+    });
   }
 }

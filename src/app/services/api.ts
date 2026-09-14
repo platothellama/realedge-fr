@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ApiService {
-  private apiUrl = 'https://realedge-frontend.onrender.com/api';
+  private apiUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) {}
 
@@ -112,7 +113,7 @@ export class ApiService {
 
   // Users
   getUsers(): Observable<any> {
-    return this.http.get<any>(`https://realedge-frontend-production.up.railway.app/api/users`);
+    return this.http.get<any>(`${this.apiUrl}/users`);
   }
 
   // Groups - Enhanced with roles
@@ -145,19 +146,19 @@ export class ApiService {
   }
 
   createUser(data: any): Observable<any> {
-    return this.http.post<any>(`https://realedge-frontend-production.up.railway.app/api/users`, data);
+    return this.http.post<any>(`${this.apiUrl}/users`, data);
   }
 
   updateUser(id: string, data: any): Observable<any> {
-    return this.http.put<any>(`https://realedge-frontend-production.up.railway.app/api/users/${id}`, data);
+    return this.http.put<any>(`${this.apiUrl}/users/${id}`, data);
   }
 
   deleteUser(id: string): Observable<any> {
-    return this.http.delete<any>(`https://realedge-frontend-production.up.railway.app/api/users/${id}`);
+    return this.http.delete<any>(`${this.apiUrl}/users/${id}`);
   }
 
   toggleUserStatus(id: string): Observable<any> {
-    return this.http.patch<any>(`https://realedge-frontend-production.up.railway.app/api/users/${id}/toggle-status`, {});
+    return this.http.patch<any>(`${this.apiUrl}/users/${id}/toggle-status`, {});
   }
 
   // AI
@@ -633,11 +634,6 @@ export class ApiService {
 
   clearEmbeddingCache(): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/buyer-preferences/clear-cache`, {});
-  }
-
-  // Admin - Seed Properties
-  seedProperties(): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/admin/seed-properties`, {});
   }
 
   // Payments

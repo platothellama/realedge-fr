@@ -387,9 +387,9 @@
                      (drop)="onPhotoDrop($event, i)"
                      (dragend)="onPhotoDragEnd()"
                      (click)="setPrimaryPhoto(i)">
-                  <img [src]="photo" alt="Property photo">
-                  <button mat-icon-button color="warn" class="remove-btn" (click)="removePhoto(i); $event.stopPropagation()">
-                    <mat-icon>close</mat-icon>
+                  <img [src]="photo" [alt]="'Property photo ' + (i + 1)">
+                  <button mat-icon-button color="warn" class="remove-btn" (click)="removePhoto(i); $event.stopPropagation()" [attr.aria-label]="'Remove photo ' + (i + 1)">
+                    <mat-icon aria-hidden="true">close</mat-icon>
                   </button>
                   <div class="drag-handle">
                     <mat-icon>drag_indicator</mat-icon>
