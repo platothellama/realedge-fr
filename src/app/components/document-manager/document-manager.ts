@@ -182,9 +182,14 @@ export class DocumentManagerComponent implements OnInit {
 
   downloadDocument(doc: any) {
     const version = doc.versions[0]; // Latest version
-    if (version) {
-      window.open(`https://realedge-frontend-production.up.railway.app/uploads/${version.fileUrl}`, '_blank');
+    if (version?.fileUrl) {
+      window.open(this.resolveFileUrl(version.fileUrl), '_blank');
     }
+  }
+
+  private resolveFileUrl(fileUrl: string): string {
+    if (/^https?:\/\//i.test(fileUrl)) return fileUrl;
+    return `https://realedge-frontend.onrender.com/uploads/${fileUrl}`;
   }
 
   signDocument(doc: any) {
@@ -276,19 +281,20 @@ export class DocumentManagerComponent implements OnInit {
   }
 
   getPreviewUrl(fileUrl: string): string {
-    const baseUrl = 'https://realedge-frontend-production.up.railway.app/uploads/';
-    return baseUrl + fileUrl;
+    if (!fileUrl) return '';
+    if (/^https?:\/\//i.test(fileUrl)) return fileUrl;
+    return `https://realedge-frontend.onrender.com/uploads/${fileUrl}`;
   }
 
   isImageFile(fileUrl: string): boolean {
     if (!fileUrl) return false;
-    const ext = fileUrl.split('.').pop()?.toLowerCase();
+    const ext = fileUrl.split('?')[0].split('.').pop()?.toLowerCase();
     return ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg'].includes(ext || '');
   }
 
   isPdfFile(fileUrl: string): boolean {
     if (!fileUrl) return false;
-    const ext = fileUrl.split('.').pop()?.toLowerCase();
+    const ext = fileUrl.split('?')[0].split('.').pop()?.toLowerCase();
     return ext === 'pdf';
   }
 

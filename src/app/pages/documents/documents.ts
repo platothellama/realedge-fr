@@ -227,7 +227,10 @@ export class DocumentsPageComponent implements OnInit, AfterViewChecked {
   downloadDocument(doc: any) {
     const version = doc.versions?.[0];
     if (version?.fileUrl) {
-      window.open(`https://realedge-frontend-production.up.railway.app/uploads/${version.fileUrl}`, '_blank');
+      const url = /^https?:\/\//i.test(version.fileUrl)
+        ? version.fileUrl
+        : `https://realedge-frontend.onrender.com/uploads/${version.fileUrl}`;
+      window.open(url, '_blank');
     }
   }
 

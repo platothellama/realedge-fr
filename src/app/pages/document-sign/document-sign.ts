@@ -136,8 +136,10 @@ export class DocumentSignPageComponent implements OnInit {
 
   downloadDocument() {
     if (this.version?.fileUrl) {
-      const baseUrl = this.api['apiUrl'];
-      const url = `${baseUrl}/uploads/${this.version.fileUrl}`;
+      const fileUrl: string = this.version.fileUrl;
+      const url = /^https?:\/\//i.test(fileUrl)
+        ? fileUrl
+        : `${(this.api['apiUrl'] as string).replace(/\/api$/, '')}/uploads/${fileUrl}`;
       window.open(url, '_blank');
     }
   }
