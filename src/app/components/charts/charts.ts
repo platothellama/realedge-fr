@@ -259,7 +259,7 @@ export class LineChartComponent implements OnChanges {
     .skeleton {
       background: linear-gradient(90deg, var(--bg-elevated) 25%, var(--bg-surface) 50%, var(--bg-elevated) 75%);
       background-size: 200% 100%;
-      animation: shimmer 1.5s infinite;
+      animation: shimmer 2.8s infinite;
       border-radius: 8px;
     }
     .skeleton.circle { border-radius: 50%; }

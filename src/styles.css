@@ -1056,9 +1056,17 @@ input[matDatepicker] {
   --mdc-linear-progress-track-color: var(--bg-elevated) !important;
 }
 
-/* Progress Spinner */
+/* Progress Spinner - slowed down */
 .mat-mdc-progress-spinner circle {
   stroke: var(--primary) !important;
+}
+
+/* Slow down mat-spinner rotation (MDC indeterminate animations) */
+.mat-mdc-progress-spinner .mdc-circular-progress__indeterminate-container,
+.mat-mdc-progress-spinner .mdc-circular-progress__spinner-layer,
+.mat-mdc-progress-spinner .mdc-circular-progress__circle-clipper,
+.mat-mdc-progress-spinner svg {
+  animation-duration: 3s !important;
 }
 
 /* Chips */
@@ -1163,7 +1171,7 @@ button.loading::after,
   border: 2px solid rgba(255, 255, 255, 0.3) !important;
   border-top-color: white !important;
   border-radius: 50% !important;
-  animation: button-spinner 0.8s linear infinite !important;
+  animation: button-spinner 2s linear infinite !important;
 }
 
 button.loading .mat-icon,
@@ -2446,6 +2454,14 @@ button.loading mat-spinner {
   justify-content: center;
   align-items: center;
   min-height: 300px;
+}
+
+/* Slow down all skeleton / shimmer loaders */
+.skeleton,
+.skeleton-image,
+.skeleton-line,
+.skeleton-card .skeleton-line {
+  animation-duration: 2.8s !important;
 }
 
 /* ========================

@@ -452,7 +452,7 @@
   height: 8px;
   background: var(--text-muted);
   border-radius: 50%;
-  animation: typing 1.4s infinite;
+  animation: typing 2.5s infinite;
 }
 
 .typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
