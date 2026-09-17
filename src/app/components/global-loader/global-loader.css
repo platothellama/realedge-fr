@@ -1,0 +1,50 @@
+/* Blocking overlay: covers viewport, swallows all pointer input
+   so users can't double-click buttons or navigate mid-request. */
+.global-loader-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(5, 5, 5, 0.55);
+  backdrop-filter: blur(2px);
+  cursor: wait;
+  pointer-events: all;
+  animation: global-loader-fade-in 0.18s ease-out;
+}
+
+.global-loader-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 28px 36px;
+  background: var(--bg-surface, #17171a);
+  border: 1px solid var(--border-strong, rgba(255, 255, 255, 0.1));
+  border-radius: var(--radius-lg, 20px);
+  box-shadow: var(--shadow-xl, 0 25px 50px -12px rgba(0, 0, 0, 0.8));
+}
+
+.global-loader-text {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-secondary, #94a3b8);
+  letter-spacing: 0.02em;
+}
+
+@keyframes global-loader-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .global-loader-overlay {
+    animation: none;
+  }
+}

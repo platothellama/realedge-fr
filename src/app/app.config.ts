@@ -7,6 +7,7 @@ import { MAT_DIALOG_DEFAULT_OPTIONS } from '@angular/material/dialog';
 import { MAT_SELECT_CONFIG, MatSelectConfig } from '@angular/material/select';
 import { MAT_MENU_DEFAULT_OPTIONS } from '@angular/material/menu';
 import { authInterceptor } from './interceptors/auth.interceptor';
+import { loadingInterceptor } from './interceptors/loading.interceptor';
 import { GoogleMapsService } from './services/google-maps.service';
 
 import { routes } from './app.routes';
@@ -22,7 +23,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
-    provideHttpClient(withInterceptors([authInterceptor])),
+    provideHttpClient(withInterceptors([authInterceptor, loadingInterceptor])),
     provideAnimations(),
     provideNativeDateAdapter(),
     { provide: MAT_DIALOG_DEFAULT_OPTIONS, useValue: { hasBackdrop: true, disableClose: false, maxWidth: '95vw', closeOnNavigation: true } },

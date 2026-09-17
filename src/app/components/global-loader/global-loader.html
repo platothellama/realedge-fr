@@ -1,0 +1,14 @@
+@if (visible()) {
+  <div
+    class="global-loader-overlay"
+    role="status"
+    aria-live="polite"
+    aria-label="Loading, please wait"
+    data-testid="global-loader"
+  >
+    <div class="global-loader-card">
+      <mat-spinner diameter="48" strokeWidth="4"></mat-spinner>
+      <p class="global-loader-text">Please wait…</p>
+    </div>
+  </div>
+}
