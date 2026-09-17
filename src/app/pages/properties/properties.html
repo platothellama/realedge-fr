@@ -32,6 +32,12 @@
         <mat-icon>add</mat-icon>
         Add Property
       </button>
+      @if (canImport) {
+        <button mat-stroked-button (click)="openImportDialog()">
+          <mat-icon>upload_file</mat-icon>
+          Import Excel
+        </button>
+      }
     </div>
   </div>
 

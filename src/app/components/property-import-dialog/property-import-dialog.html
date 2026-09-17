@@ -1,0 +1,189 @@
+<h2 mat-dialog-title class="import-title">
+  <mat-icon>upload_file</mat-icon>
+  Import properties from Excel
+</h2>
+
+<mat-dialog-content class="import-content">
+  <!-- Step 1: template + file picker -->
+  @if (stage === 'idle' || stage === 'parsing') {
+    <div class="step-box">
+      <p class="muted">
+        Download the predefined template, fill one property per row, then upload the file.
+        You will preview every row and fix missing fields before anything is saved.
+      </p>
+      <div class="row-actions">
+        <button mat-stroked-button (click)="downloadTemplate()">
+          <mat-icon>download</mat-icon>
+          Download Template
+        </button>
+        <button mat-raised-button color="primary" (click)="fileInput.click()" [disabled]="stage === 'parsing'">
+          <mat-icon>attach_file</mat-icon>
+          {{ stage === 'parsing' ? 'Reading file…' : 'Choose Excel File' }}
+        </button>
+      </div>
+      @if (stage === 'parsing') {
+        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+      }
+      @if (parseError) {
+        <p class="error-text" role="alert"><mat-icon>error</mat-icon> {{ parseError }}</p>
+      }
+    </div>
+  }
+
+  <!-- Step 2: preview + fix-up -->
+  @if (stage === 'preview' || stage === 'importing') {
+    <div class="summary-bar">
+      <span class="pill ok">{{ validRows.length }} valid</span>
+      <span class="pill bad">{{ invalidRows.length }} need attention</span>
+      <span class="muted small">{{ fileName }}</span>
+      @if (truncated) {
+        <span class="pill warn" matTooltip="Only the first 500 rows are imported">
+          First 500 of {{ totalDataRows }} rows
+        </span>
+      }
+    </div>
+
+    <div class="filter-row">
+      <button mat-button (click)="showValidOnly = false; showInvalidOnly = false"
+        [disabled]="!showValidOnly && !showInvalidOnly">All ({{ rows.length }})</button>
+      <button mat-button (click)="showValidOnly = true; showInvalidOnly = false"
+        [disabled]="showValidOnly">Valid only</button>
+      <button mat-button (click)="showValidOnly = false; showInvalidOnly = true"
+        [disabled]="showInvalidOnly">Needs attention ({{ invalidRows.length }})</button>
+      <span class="spacer"></span>
+      <button mat-button (click)="fileInput.click()">
+        <mat-icon>attach_file</mat-icon> Replace file
+      </button>
+      @if (invalidRows.length > 0) {
+        <button mat-button (click)="downloadErrorsCsv()">
+          <mat-icon>download</mat-icon> Errors CSV
+        </button>
+      }
+    </div>
+
+    @if (invalidRows.length > 0) {
+      <p class="hint">
+        <mat-icon>info</mat-icon>
+        Rows highlighted in red are missing required data. Edit the cells directly —
+        the row turns green as soon as it is valid.
+      </p>
+    }
+
+    <div class="table-wrap">
+      <table class="preview-table">
+        <thead>
+          <tr>
+            <th>Row</th>
+            <th>Title *</th>
+            <th>Price *</th>
+            <th>Type *</th>
+            <th>Address *</th>
+            <th>City *</th>
+            <th>Country *</th>
+            <th>Details</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (r of visibleRows; track r.excelRow) {
+            <tr [class.invalid]="!r.valid">
+              <td class="row-num">{{ r.excelRow }}</td>
+              <td>
+                <input [(ngModel)]="r.data.title" (ngModelChange)="onCellEdited(r)"
+                  [name]="'title-' + r.excelRow" placeholder="Required" />
+              </td>
+              <td>
+                <input type="number" min="0" [(ngModel)]="r.data.price"
+                  (ngModelChange)="onCellEdited(r)" [name]="'price-' + r.excelRow" />
+              </td>
+              <td>
+                <select [(ngModel)]="r.data.type" (ngModelChange)="onCellEdited(r)"
+                  [name]="'type-' + r.excelRow">
+                  @for (t of propertyTypes; track t) {
+                    <option [value]="t">{{ t }}</option>
+                  }
+                </select>
+              </td>
+              <td>
+                <input [(ngModel)]="r.data.address" (ngModelChange)="onCellEdited(r)"
+                  [name]="'address-' + r.excelRow" placeholder="Required" />
+              </td>
+              <td>
+                <input [(ngModel)]="r.data.city" (ngModelChange)="onCellEdited(r)"
+                  [name]="'city-' + r.excelRow" placeholder="Required" />
+              </td>
+              <td>
+                <input [(ngModel)]="r.data.country" (ngModelChange)="onCellEdited(r)"
+                  [name]="'country-' + r.excelRow" placeholder="Required" />
+              </td>
+              <td class="details">
+                {{ r.data.bedrooms }}bd · {{ r.data.bathrooms }}ba · {{ r.data.area }}m² · {{ r.data.listingType }}
+                @if (r.data.features.length) {
+                  <span class="muted">· {{ r.data.features.join(', ') }}</span>
+                }
+                @if (!r.valid) {
+                  <ul class="row-errors">
+                    @for (e of r.errors; track e) {
+                      <li>{{ e }}</li>
+                    }
+                  </ul>
+                } @else {
+                  <span class="ok-text"><mat-icon>check_circle</mat-icon> Ready</span>
+                }
+              </td>
+              <td>
+                <button mat-icon-button (click)="removeRow(r)" matTooltip="Remove this row"
+                  [attr.aria-label]="'Remove row ' + r.excelRow">
+                  <mat-icon>close</mat-icon>
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    @if (stage === 'importing') {
+      <mat-progress-bar mode="determinate" [value]="progressPct"></mat-progress-bar>
+      <p class="muted small">Saving… {{ importedCount + failed.length }} of {{ validRows.length }}</p>
+    }
+  }
+
+  <!-- Step 3: result -->
+  @if (stage === 'done') {
+    <div class="result-box">
+      <p class="result-line">
+        <mat-icon class="ok-icon">check_circle</mat-icon>
+        Created <strong>{{ importedCount }}</strong> propert{{ importedCount === 1 ? 'y' : 'ies' }}.
+      </p>
+      @if (failed.length > 0) {
+        <p class="error-text">{{ failed.length }} row(s) were rejected by the server:</p>
+        <ul class="row-errors">
+          @for (f of failed; track f.excelRow) {
+            <li>Row {{ f.excelRow }} ({{ f.title }}): {{ f.message }}</li>
+          }
+        </ul>
+      }
+      @if (importedCount === 0 && failed.length === 0) {
+        <p class="muted">Nothing was imported.</p>
+      }
+    </div>
+  }
+
+  <input #fileInput type="file" hidden accept=".xlsx,.xls,.csv" (change)="onFileSelected($event)" />
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  @if (stage === 'preview') {
+    <button mat-button (click)="close()">Cancel</button>
+    <button mat-raised-button color="primary" (click)="importValid()"
+      [disabled]="validRows.length === 0 || importing">
+      <mat-icon>cloud_upload</mat-icon>
+      Import {{ validRows.length }} valid {{ validRows.length === 1 ? 'property' : 'properties' }}
+    </button>
+  } @else if (stage === 'done') {
+    <button mat-raised-button color="primary" (click)="close()">Done</button>
+  } @else {
+    <button mat-button (click)="close()">Close</button>
+  }
+</mat-dialog-actions>

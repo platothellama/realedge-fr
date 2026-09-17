@@ -12,7 +12,9 @@ import { MatMenuModule } from '@angular/material/menu';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ApiService } from '../../services/api';
+import { AuthService } from '../../services/auth/auth.service';
 import { PropertyFormComponent } from '../../components/property-form/property-form';
+import { PropertyImportDialogComponent } from '../../components/property-import-dialog/property-import-dialog';
 import { PaginationComponent } from '../../components/pagination/pagination';
 import { PropertySearchComponent, SearchFilters } from '../../components/property-search/property-search';
 import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog';
@@ -72,9 +74,15 @@ export class PropertiesComponent implements OnInit {
 
   constructor(
     private apiService: ApiService,
+    private authService: AuthService,
     private dialog: MatDialog,
     private router: Router
   ) {}
+
+  /** Same roles allowed to create properties via POST /properties. */
+  get canImport(): boolean {
+    return this.authService.hasRole(['Super Admin', 'Admin', 'Office Manager', 'Broker']);
+  }
 
   ngOnInit() {
     this.fetchProperties();
@@ -179,6 +187,18 @@ export class PropertiesComponent implements OnInit {
 
   openPropertyDetails(property: any) {
     this.router.navigate(['/properties', property.id]);
+  }
+
+  openImportDialog() {
+    const dialogRef = this.dialog.open(PropertyImportDialogComponent, {
+      width: '1000px',
+      maxWidth: '95vw',
+      disableClose: true
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result?.created > 0) this.fetchProperties();
+    });
   }
 
   createProperty(data: any) {
