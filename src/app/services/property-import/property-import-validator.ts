@@ -149,8 +149,12 @@ export function validateImportRow(raw: RawImportRow, excelRow: number): Validate
     return n;
   };
   const bedrooms = intField('bedrooms', 'Bedrooms');
+  const masterBedrooms = intField('masterbedrooms', 'Master bedrooms');
   const bathrooms = intField('bathrooms', 'Bathrooms');
   const parkingSpaces = intField('parkingspaces', 'Parking spaces');
+  if (masterBedrooms > bedrooms) {
+    errors.push(`Master bedrooms (${masterBedrooms}) cannot exceed total bedrooms (${bedrooms}).`);
+  }
 
   let floor: number | null = null;
   const floorRaw = get('floor');
@@ -188,6 +192,17 @@ export function validateImportRow(raw: RawImportRow, excelRow: number): Validate
     }
   }
 
+  let cellarSize: number | null = null;
+  const cellarRaw = get('cellarsize');
+  if (!isBlank(cellarRaw)) {
+    const n = toNumber(cellarRaw);
+    if (n === null || n < 0) {
+      errors.push(`Cellar size must be a number >= 0 (got "${asText(cellarRaw)}").`);
+    } else {
+      cellarSize = n;
+    }
+  }
+
   // ---- Year built ----
   let yearBuilt: number | null = null;
   const yearRaw = get('yearbuilt');
@@ -208,6 +223,15 @@ export function validateImportRow(raw: RawImportRow, excelRow: number): Validate
     errors.push(`HasTerrace must be YES or NO (got "${asText(get('hasterrace'))}").`);
   } else if (terraceFlag !== null) {
     hasTerrace = terraceFlag;
+  }
+
+  // ---- Cellar flag ----
+  let hasCellar = false;
+  const cellarFlag = parseYesNo(get('hascellar'));
+  if (cellarFlag === 'invalid') {
+    errors.push(`HasCellar must be YES or NO (got "${asText(get('hascellar'))}").`);
+  } else if (cellarFlag !== null) {
+    hasCellar = cellarFlag;
   }
 
   // ---- Coordinates ----
@@ -234,6 +258,10 @@ export function validateImportRow(raw: RawImportRow, excelRow: number): Validate
 
   const features = splitFeatures(get('features'));
 
+  // Optional project grouping — free text, resolved/created on import.
+  const projectRaw = asText(get('project'));
+  const project = projectRaw ? projectRaw.slice(0, 255) : '';
+
   const data: PropertyImportPayload = {
     title,
     price: price ?? 0,
@@ -246,17 +274,21 @@ export function validateImportRow(raw: RawImportRow, excelRow: number): Validate
     condition,
     status,
     bedrooms,
+    masterBedrooms,
     bathrooms,
     parkingSpaces,
     floor,
     area,
     lotSize,
     terraceSize,
+    cellarSize,
     yearBuilt,
     hasTerrace,
+    hasCellar,
     lat,
     lng,
     features,
+    project,
   };
 
   return { excelRow, data, errors, valid: errors.length === 0 };

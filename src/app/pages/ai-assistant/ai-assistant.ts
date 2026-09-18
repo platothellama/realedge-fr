@@ -82,10 +82,14 @@ Try asking:
     });
   }
 
+  // QA hardening 2026-09-18: cap input (cost/abuse) and never disclose
+  // backend wiring (backend/key state) to the user.
+  readonly MAX_INPUT_LENGTH = 2000;
+
   onSendMessage() {
     if (!this.userInput.trim() || this.loading) return;
 
-    const userMessage = this.userInput.trim();
+    const userMessage = this.userInput.trim().slice(0, this.MAX_INPUT_LENGTH);
     this.messages.push({
       sender: 'user',
       text: userMessage,
@@ -108,7 +112,7 @@ Try asking:
         console.error('AI Assistant error:', err);
         this.messages.push({
           sender: 'ai',
-          text: 'I encountered an error. Please try again. Make sure the backend is running and the OpenAI API key is configured.',
+          text: 'I encountered an error. Please try again in a moment.',
           time: this.formatTime(new Date())
         });
         this.loading = false;

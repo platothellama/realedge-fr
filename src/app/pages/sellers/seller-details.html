@@ -104,7 +104,7 @@
               </p>
               <div class="card-meta">
                 <span><mat-icon>home</mat-icon> {{ prop.type }}</span>
-                <span><mat-icon>bed</mat-icon>{{ prop.bedrooms }}</span>
+                <span><mat-icon>bed</mat-icon>{{ prop.bedrooms }}@if (prop.masterBedrooms) { ({{ prop.masterBedrooms }}m) }</span>
                 <span><mat-icon>square</mat-icon>{{ prop.area }}m²</span>
               </div>
             </div>

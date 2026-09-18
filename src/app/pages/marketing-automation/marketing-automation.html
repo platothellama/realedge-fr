@@ -49,7 +49,7 @@
       <div class="table-container">
         <table class="campaigns-table">
           <thead>
-            <tr><th>Name</th><th>Type</th><th>Subject</th><th>Status</th><th>Sent</th><th>Opened</th><th>Created</th><th>Actions</th></tr>
+            <tr><th scope="col">Name</th><th scope="col">Type</th><th scope="col">Subject</th><th scope="col">Status</th><th scope="col">Sent</th><th scope="col">Opened</th><th scope="col">Created</th><th scope="col">Actions</th></tr>
           </thead>
           <tbody>
             @for (campaign of campaigns; track campaign.id) {
@@ -66,8 +66,10 @@
                     <mat-icon aria-hidden="true">more_vert</mat-icon>
                   </button>
                   <mat-menu #menu="matMenu">
-                    @if (campaign.status === 'draft') {
-                      <button mat-menu-item (click)="sendCampaign(campaign)"><mat-icon>send</mat-icon> Send</button>
+                    @if (campaign.status === 'draft' && canSend) {
+                      <button mat-menu-item (click)="sendCampaign(campaign)" [disabled]="sendingId === campaign.id">
+                        <mat-icon>send</mat-icon> {{ sendingId === campaign.id ? 'Sending…' : 'Send' }}
+                      </button>
                     }
                     <button mat-menu-item (click)="deleteCampaign(campaign)" class="delete-option"><mat-icon>delete</mat-icon> Delete</button>
                   </mat-menu>

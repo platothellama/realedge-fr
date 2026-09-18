@@ -16,6 +16,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FormsModule } from '@angular/forms';
+import { A11yModule } from '@angular/cdk/a11y';
 import { ApiService } from '../../services/api';
 
 interface Payment {
@@ -73,7 +74,8 @@ interface PaymentPlan {
     MatSelectModule,
     MatTabsModule,
     MatTooltipModule,
-    FormsModule
+    FormsModule,
+    A11yModule
   ],
   templateUrl: './payments.html',
   styleUrl: './payments.css'
@@ -91,6 +93,9 @@ export class PaymentsComponent implements OnInit {
   deals: any[] = [];
   selectedTab = 0;
   processingId: string | null = null;
+  // QA 2026-09-18: double-click guards — duplicate payments are money.
+  creatingPayment = false;
+  creatingPlan = false;
 
   showAddPaymentDialog = false;
   showAddPlanDialog = false;
@@ -187,6 +192,7 @@ export class PaymentsComponent implements OnInit {
   }
 
   createPayment() {
+    if (this.creatingPayment) return;
     if (!this.newPayment.dealId) {
       this.snackBar.open('Please select a deal', 'Close', { duration: 3000 });
       return;
@@ -195,8 +201,14 @@ export class PaymentsComponent implements OnInit {
       this.snackBar.open('Payer name is required', 'Close', { duration: 3000 });
       return;
     }
-    if (!this.newPayment.amount || this.newPayment.amount <= 0) {
+    if (!Number.isFinite(this.newPayment.amount) || (this.newPayment.amount ?? 0) <= 0) {
       this.snackBar.open('Valid amount is required', 'Close', { duration: 3000 });
+      return;
+    }
+    // QA 2026-09-18: LBP without a positive rate corrupts amountInUSD.
+    if (this.newPayment.currency === 'LBP' &&
+        (!Number.isFinite(this.newPayment.exchangeRate) || (this.newPayment.exchangeRate ?? 0) <= 0)) {
+      this.snackBar.open('A positive exchange rate is required for LBP payments', 'Close', { duration: 3000 });
       return;
     }
 
@@ -205,20 +217,25 @@ export class PaymentsComponent implements OnInit {
       paymentDate: new Date(this.newPayment.paymentDate!)
     };
 
+    this.creatingPayment = true;
     this.api.createPayment(paymentData).subscribe({
       next: (res) => {
-        this.payments.unshift(res);
+        // QA 2026-09-18: tolerate wrapped ({data}) or raw create responses.
+        this.payments.unshift((res as any)?.data ?? res);
         this.showAddPaymentDialog = false;
         this.resetPaymentForm();
         this.snackBar.open('Payment recorded successfully', 'Close', { duration: 3000 });
+        this.creatingPayment = false;
       },
       error: (err) => {
         this.snackBar.open('Failed to create payment: ' + (err.error?.message || 'Unknown error'), 'Close', { duration: 3000 });
+        this.creatingPayment = false;
       }
     });
   }
 
   createPaymentPlan() {
+    if (this.creatingPlan) return;
     if (!this.newPlan.dealId) {
       this.snackBar.open('Please select a deal', 'Close', { duration: 3000 });
       return;
@@ -238,15 +255,18 @@ export class PaymentsComponent implements OnInit {
       endDate: this.newPlan.endDate ? new Date(this.newPlan.endDate!) : null
     };
 
+    this.creatingPlan = true;
     this.api.createPaymentPlan(planData).subscribe({
       next: (res) => {
-        this.paymentPlans.unshift(res);
+        this.paymentPlans.unshift((res as any)?.data ?? res);
         this.showAddPlanDialog = false;
         this.resetPlanForm();
         this.snackBar.open('Payment plan created successfully', 'Close', { duration: 3000 });
+        this.creatingPlan = false;
       },
       error: (err) => {
         this.snackBar.open('Failed to create payment plan: ' + (err.error?.message || 'Unknown error'), 'Close', { duration: 3000 });
+        this.creatingPlan = false;
       }
     });
   }
@@ -311,11 +331,18 @@ export class PaymentsComponent implements OnInit {
     return this.processingId === id;
   }
 
+  /** QA 2026-09-18: NaN-safe total (one bad row poisoned the sum). */
+  get totalUsd(): number {
+    return this.payments.reduce((sum, p) => sum + (Number(p.amountInUSD) || 0), 0);
+  }
+
   formatCurrency(value: number, currency: string = 'USD'): string {
+    const v = Number(value);
+    if (!Number.isFinite(v)) return '—';
     if (currency === 'LBP') {
-      return new Intl.NumberFormat('en-LB', { style: 'decimal', maximumFractionDigits: 0 }).format(value) + ' LBP';
+      return new Intl.NumberFormat('en-LB', { style: 'decimal', maximumFractionDigits: 0 }).format(v) + ' LBP';
     }
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value);
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(v);
   }
 
   formatDate(date: string): string {

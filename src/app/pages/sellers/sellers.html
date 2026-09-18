@@ -16,7 +16,6 @@
     [filters]="searchFilters"
     [config]="searchConfig"
     (filtersChange)="onFiltersChange($event)"
-    (search)="fetchSellers()"
   ></app-property-search>
 
   @if (isLoading) {

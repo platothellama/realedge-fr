@@ -62,6 +62,13 @@ describe('property-import-validator', () => {
     expect(r.errors.some((e) => e.startsWith('Bedrooms'))).toBe(true);
   });
 
+  it('accepts master bedrooms within total and rejects overflow', () => {
+    expect(validateImportRow(row({ bedrooms: 3, masterbedrooms: 2 }), 2).valid).toBe(true);
+    const bad = validateImportRow(row({ bedrooms: 2, masterbedrooms: 3 }), 2);
+    expect(bad.valid).toBe(false);
+    expect(bad.errors.some((e) => e.includes('Master bedrooms'))).toBe(true);
+  });
+
   it('parses YES/NO variants and flags garbage', () => {
     expect(parseYesNo('YES')).toBe(true);
     expect(parseYesNo('no')).toBe(false);

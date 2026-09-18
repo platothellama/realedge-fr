@@ -80,7 +80,7 @@ export class AiInsightsComponent implements OnInit {
     this.loadAiInsights();
   }
 
-  loadAiInsights() {
+  loadAiInsights(notifyOnSuccess = false) {
     this.loading = true;
     
     this.api.getAiInsights().subscribe({
@@ -90,6 +90,11 @@ export class AiInsightsComponent implements OnInit {
         this.propertyValuations = res.propertyValuations || [];
         this.summary = res.summary || {};
         this.loading = false;
+        // QA fix 2026-09-18: toast only on actual success (was shown before
+        // the request completed, i.e. also on failure).
+        if (notifyOnSuccess) {
+          this.snackBar.open('AI insights refreshed', 'Close', { duration: 2000 });
+        }
       },
       error: (err) => {
         console.error('Failed to fetch AI insights', err);
@@ -124,8 +129,7 @@ export class AiInsightsComponent implements OnInit {
   }
 
   refreshInsights() {
-    this.loadAiInsights();
-    this.snackBar.open('AI insights refreshed', 'Close', { duration: 2000 });
+    this.loadAiInsights(true);
   }
 
   getTrendIcon(trend: string): string {

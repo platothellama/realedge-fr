@@ -1,6 +1,6 @@
 import { Component, Inject, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -11,6 +11,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { GoogleMapsModule } from '@angular/google-maps';
 import { ApiService } from '../../services/api';
 import { AuthService } from '../../services/auth/auth.service';
@@ -22,6 +23,7 @@ import { SellerSelectorComponent, SellerSelection } from '../seller-selector/sel
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    FormsModule,
     MatDialogModule,
     MatFormFieldModule,
     MatInputModule,
@@ -32,6 +34,7 @@ import { SellerSelectorComponent, SellerSelection } from '../seller-selector/sel
     MatProgressSpinnerModule,
     MatAutocompleteModule,
     MatChipsModule,
+    MatTooltipModule,
     GoogleMapsModule,
     SellerSelectorComponent
   ],
@@ -51,6 +54,11 @@ export class PropertyFormComponent implements OnInit, AfterViewInit {
   conditions = ['Used', 'New'];
   users: any[] = [];
   groups: any[] = [];
+  projects: any[] = [];
+  loadingProjects = false;
+  showNewProject = false;
+  newProjectName = '';
+  newProjectCity = '';
   availableFeatures: string[] = [];
   featureList: string[] = [];
 
@@ -61,6 +69,20 @@ export class PropertyFormComponent implements OnInit, AfterViewInit {
   uploadingCount = 0;
   totalUploading = 0;
   draggedIndex: number | null = null;
+
+  // Video uploads (property walkthroughs, mp4/webm/mov)
+  uploadedVideos: string[] = [];
+  isUploadingVideo = false;
+  uploadingVideoCount = 0;
+  totalUploadingVideo = 0;
+  videoUploadError = '';
+
+  // Document uploads (floor plans, brochures, deeds — pdf/doc/xls/...)
+  uploadedDocuments: string[] = [];
+  isUploadingDoc = false;
+  uploadingDocCount = 0;
+  totalUploadingDoc = 0;
+  docUploadError = '';
 
   // Map options
   mapCenter: any = { lat: 25.2048, lng: 55.2708 };
@@ -118,14 +140,50 @@ export class PropertyFormComponent implements OnInit, AfterViewInit {
           this.stepErrors[step] = 'Valid price is required';
           return false;
         }
-        if (!this.isEdit && !type) {
+        if (!type) {
           this.stepErrors[step] = 'Property type is required';
           return false;
         }
         return true;
 
-      case 1: // Details - no required fields, always valid
+      case 1: { // Details - numerics must be in range (previously always
+        // true, so e.g. -5 bedrooms advanced silently and Publish stayed
+        // disabled on Review with no visible error).
+        const numericLabels: Record<string, string> = {
+          bedrooms: 'Bedrooms',
+          masterBedrooms: 'Master bedrooms',
+          bathrooms: 'Bathrooms',
+          area: 'Area',
+          lotSize: 'Lot size',
+          yearBuilt: 'Year built',
+          parkingSpaces: 'Parking spaces',
+          terraceSize: 'Terrace size',
+          cellarSize: 'Cellar size'
+        };
+        for (const f of Object.keys(numericLabels)) {
+          const c = form.get(f);
+          if (c && c.invalid) {
+            c.markAsTouched();
+            if (c.hasError('min')) {
+              this.stepErrors[step] = `${numericLabels[f]} cannot be negative`;
+            } else if (c.hasError('max')) {
+              this.stepErrors[step] = `${numericLabels[f]} is unrealistically large`;
+            } else {
+              this.stepErrors[step] = `${numericLabels[f]} is invalid`;
+            }
+            return false;
+          }
+        }
+        // Master bedrooms are a subset of total bedrooms.
+        const totalBeds = Number(form.get('bedrooms')?.value ?? 0);
+        const masterBeds = Number(form.get('masterBedrooms')?.value ?? 0);
+        if (Number.isFinite(masterBeds) && Number.isFinite(totalBeds) && masterBeds > totalBeds) {
+          form.get('masterBedrooms')?.markAsTouched();
+          this.stepErrors[step] = 'Master bedrooms cannot exceed total bedrooms';
+          return false;
+        }
         return true;
+      }
 
       case 2: // Location
         const address = form.get('address')?.value;
@@ -191,7 +249,6 @@ export class PropertyFormComponent implements OnInit, AfterViewInit {
   ) {
     const user = this.auth.currentUser();
     this.currentUser = user;
-    console.log('User ', user);
     const userRole = user?.role || '';
     this.isAdmin = userRole === 'Super Admin';
 
@@ -200,7 +257,6 @@ export class PropertyFormComponent implements OnInit, AfterViewInit {
 
     // Default assignment to current user (already set - for Agent it auto-assigns to self)
     const defaultAssignedToUserId = user?.id || null;
-console.log('defaultAssignedToUserId ', defaultAssignedToUserId)
     this.propertyForm = this.fb.group({
       title: ['', Validators.required],
       description: [''],
@@ -210,29 +266,37 @@ console.log('defaultAssignedToUserId ', defaultAssignedToUserId)
       listingType: ['Sale', Validators.required],
       condition: ['Used', Validators.required],
 
-      // Details
-      bedrooms: [0],
-      bathrooms: [0],
-      area: [0],
-      lotSize: [0],
-      yearBuilt: [new Date().getFullYear()],
-      parkingSpaces: [0],
+      // Details (QA 2026-09-18: range guards; floor intentionally unclamped — basements are negative)
+      bedrooms: [0, Validators.min(0)],
+      masterBedrooms: [0, Validators.min(0)],
+      bathrooms: [0, Validators.min(0)],
+      area: [0, Validators.min(0)],
+      lotSize: [0, Validators.min(0)],
+      yearBuilt: [new Date().getFullYear(), Validators.max(new Date().getFullYear() + 1)],
+      parkingSpaces: [0, Validators.min(0)],
       floor: [null],
       hasTerrace: [false],
-      terraceSize: [0],
+      terraceSize: [0, Validators.min(0)],
+      hasCellar: [false],
+      cellarSize: [0, Validators.min(0)],
 
       // Location
       address: ['', Validators.required],
       city: ['', Validators.required],
       country: ['', Validators.required],
-      lat: [null],
-      lng: [null],
+      lat: [null, [Validators.min(-90), Validators.max(90)]],
+      lng: [null, [Validators.min(-180), Validators.max(180)]],
 
       // Assignments
       assignedToUserId: [defaultAssignedToUserId],
       assignedToGroupId: [null],
       sellerId: [null],
-      
+      // Optional project/building grouping (NULL = standalone listing)
+      projectId: [null],
+      photos: [''],
+      videos: [''],
+      tours360: [''],
+      documents: [''],
 
       // Sold/Lost Info
       soldTo: [''],
@@ -249,6 +313,7 @@ console.log('defaultAssignedToUserId ', defaultAssignedToUserId)
     this.initForm();
     this.loadUsers();
     this.loadGroups();
+    this.loadProjects();
     this.loadFeatures();
     this.handleEditMode();
     this.subscribeToLocationChanges();
@@ -306,7 +371,6 @@ console.log('defaultAssignedToUserId ', defaultAssignedToUserId)
   private initForm() {
     const user = this.auth.currentUser();
     const defaultAssignedToUserId = user?.id || null;
-    console.log('defaultAssignedToUserId ', defaultAssignedToUserId)
     this.propertyForm = this.fb.group({
       title: ['', Validators.required],
       description: [''],
@@ -315,24 +379,28 @@ console.log('defaultAssignedToUserId ', defaultAssignedToUserId)
       type: ['Apartment', Validators.required],
       listingType: ['Sale', Validators.required],
       condition: ['Used', Validators.required],
-      bedrooms: [0],
-      bathrooms: [0],
-      area: [0],
-      lotSize: [0],
-      yearBuilt: [new Date().getFullYear()],
-      parkingSpaces: [0],
+      bedrooms: [0, Validators.min(0)],
+      masterBedrooms: [0, Validators.min(0)],
+      bathrooms: [0, Validators.min(0)],
+      area: [0, Validators.min(0)],
+      lotSize: [0, Validators.min(0)],
+      yearBuilt: [new Date().getFullYear(), Validators.max(new Date().getFullYear() + 1)],
+      parkingSpaces: [0, Validators.min(0)],
       floor: [null],
       hasTerrace: [false],
-      terraceSize: [0],
+      terraceSize: [0, Validators.min(0)],
+      hasCellar: [false],
+      cellarSize: [0, Validators.min(0)],
       address: ['', Validators.required],
       city: ['', Validators.required],
       country: ['', Validators.required],
-      lat: [null],
-      lng: [null],
+      lat: [null, [Validators.min(-90), Validators.max(90)]],
+      lng: [null, [Validators.min(-180), Validators.max(180)]],
       assignedToUserId: [defaultAssignedToUserId],
       assignedToGroupId: [null],
       sellerId: [null],
-      
+      // Optional project/building grouping (NULL = standalone listing)
+      projectId: [null],
       photos: [''],
       videos: [''],
       tours360: [''],
@@ -365,6 +433,37 @@ console.log('defaultAssignedToUserId ', defaultAssignedToUserId)
     });
   }
 
+  private loadProjects() {
+    this.loadingProjects = true;
+    this.api.getProjects().subscribe({
+      next: (res: any) => {
+        this.projects = Array.isArray(res) ? res : (res?.data || []);
+        this.loadingProjects = false;
+      },
+      error: (err) => {
+        console.error('Error fetching projects', err);
+        this.projects = [];
+        this.loadingProjects = false;
+      }
+    });
+  }
+
+  toggleNewProject(): void {
+    this.showNewProject = !this.showNewProject;
+    if (this.showNewProject) {
+      this.propertyForm.get('projectId')?.setValue(null);
+    } else {
+      this.newProjectName = '';
+      this.newProjectCity = '';
+    }
+  }
+
+  get selectedProject(): any {
+    const id = this.propertyForm.get('projectId')?.value;
+    if (!id) return null;
+    return this.projects.find((p: any) => p.id === id) || null;
+  }
+
   private handleEditMode() {
     if (this.data && this.data.property) {
       this.isEdit = true;
@@ -378,14 +477,17 @@ console.log('defaultAssignedToUserId ', defaultAssignedToUserId)
 
       this.uploadedPhotos = prop.photos || [];
       this.primaryPhotoIndex = prop.primaryPhotoIndex || 0;
+      this.uploadedVideos = Array.isArray(prop.videos) ? [...prop.videos] : [];
+      this.uploadedDocuments = Array.isArray(prop.documents) ? [...prop.documents] : [];
       this.featureList = prop.features || [];
 
       this.propertyForm.patchValue({
         ...prop,
+        projectId: prop.projectId || prop.project?.id || null,
         photos: prop.photos?.join(', ') || '',
-        videos: prop.videos?.join(', ') || '',
+        videos: '',
         tours360: prop.tours360?.join(', ') || '',
-        documents: prop.documents?.join(', ') || '',
+        documents: '',
         features: prop.features?.join(', ') || ''
       });
 
@@ -476,6 +578,104 @@ console.log('defaultAssignedToUserId ', defaultAssignedToUserId)
     event.target.value = '';
   }
 
+  onVideoFilesSelected(event: any) {
+    const files: File[] = Array.from(event.target.files as FileList);
+    if (files.length > 0) {
+      this.uploadVideoFiles(files);
+    }
+    event.target.value = '';
+  }
+
+  onDocumentFilesSelected(event: any) {
+    const files: File[] = Array.from(event.target.files as FileList);
+    if (files.length > 0) {
+      this.uploadDocumentFiles(files);
+    }
+    event.target.value = '';
+  }
+
+  uploadVideoFiles(files: File[]) {
+    this.isUploadingVideo = true;
+    this.videoUploadError = '';
+    this.totalUploadingVideo = files.length;
+    this.uploadingVideoCount = 0;
+
+    let completed = 0;
+    files.forEach((file) => {
+      this.api.uploadVideo(file).subscribe({
+        next: (res) => {
+          if (res?.url) this.uploadedVideos.push(res.url);
+          completed++;
+          this.uploadingVideoCount = completed;
+          if (completed === files.length) {
+            this.isUploadingVideo = false;
+          }
+        },
+        error: (err) => {
+          console.error('Video upload failed', err);
+          this.videoUploadError = err?.error?.message || 'Video upload failed. Use mp4/webm/mov (max 100MB).';
+          completed++;
+          this.uploadingVideoCount = completed;
+          if (completed === files.length) {
+            this.isUploadingVideo = false;
+          }
+        }
+      });
+    });
+  }
+
+  uploadDocumentFiles(files: File[]) {
+    this.isUploadingDoc = true;
+    this.docUploadError = '';
+    this.totalUploadingDoc = files.length;
+    this.uploadingDocCount = 0;
+
+    let completed = 0;
+    files.forEach((file) => {
+      this.api.uploadPropertyDocument(file).subscribe({
+        next: (res) => {
+          if (res?.url) this.uploadedDocuments.push(res.url);
+          completed++;
+          this.uploadingDocCount = completed;
+          if (completed === files.length) {
+            this.isUploadingDoc = false;
+          }
+        },
+        error: (err) => {
+          console.error('Document upload failed', err);
+          this.docUploadError = err?.error?.message || 'Document upload failed. Use pdf/doc/xls/ppt/txt/csv (max 10MB).';
+          completed++;
+          this.uploadingDocCount = completed;
+          if (completed === files.length) {
+            this.isUploadingDoc = false;
+          }
+        }
+      });
+    });
+  }
+
+  removeVideo(index: number) {
+    this.uploadedVideos.splice(index, 1);
+  }
+
+  removeDocument(index: number) {
+    this.uploadedDocuments.splice(index, 1);
+  }
+
+  fileNameFromUrl(url: string): string {
+    try {
+      const clean = url.split('?')[0];
+      const parts = clean.split('/');
+      return decodeURIComponent(parts[parts.length - 1] || url);
+    } catch {
+      return url;
+    }
+  }
+
+  get hasPendingMediaUpload(): boolean {
+    return this.isUploading || this.isUploadingVideo || this.isUploadingDoc;
+  }
+
   uploadFiles(files: File[]) {
     this.isUploading = true;
     this.totalUploading = files.length;
@@ -550,24 +750,41 @@ console.log('defaultAssignedToUserId ', defaultAssignedToUserId)
   }
 
   onSubmit(): void {
+    // QA 2026-09-18: submitting mid-upload silently dropped in-flight photos.
+    if (this.hasPendingMediaUpload) return;
     if (this.propertyForm.valid && !this.isSubmitting) {
       this.isSubmitting = true;
       const val = this.propertyForm.getRawValue();
-console.log('val ', val)
       const manualPhotos = val.photos ? val.photos.split(',').map((s: string) => s.trim()).filter((s: string) => s !== '') : [];
       const allPhotos = [...new Set([...this.uploadedPhotos, ...manualPhotos])];
+      const manualVideos = val.videos ? val.videos.split(',').map((s: string) => s.trim()).filter((s: string) => s !== '') : [];
+      const allVideos = [...new Set([...this.uploadedVideos, ...manualVideos])];
+      const manualDocs = val.documents ? val.documents.split(',').map((s: string) => s.trim()).filter((s: string) => s !== '') : [];
+      const allDocs = [...new Set([...this.uploadedDocuments, ...manualDocs])];
 
       const payload: any = {
         ...val,
+        bedrooms: val.bedrooms === null || val.bedrooms === undefined || val.bedrooms === '' ? 0 : Number(val.bedrooms),
+        masterBedrooms: val.masterBedrooms === null || val.masterBedrooms === undefined || val.masterBedrooms === '' ? 0 : Number(val.masterBedrooms),
         lat: val.lat ? Number(val.lat) : null,
         lng: val.lng ? Number(val.lng) : null,
+        projectId: val.projectId || null,
         photos: allPhotos,
         primaryPhotoIndex: this.primaryPhotoIndex,
-        videos: val.videos ? val.videos.split(',').map((s: string) => s.trim()) : [],
-        tours360: val.tours360 ? val.tours360.split(',').map((s: string) => s.trim()) : [],
-        documents: val.documents ? val.documents.split(',').map((s: string) => s.trim()) : [],
+        videos: allVideos,
+        tours360: val.tours360 ? val.tours360.split(',').map((s: string) => s.trim()).filter((s: string) => s !== '') : [],
+        documents: allDocs,
         features: this.featureList
       };
+
+      // Optional on-the-fly project creation (same pattern as newSeller).
+      if (this.showNewProject && this.newProjectName.trim()) {
+        payload.newProject = {
+          name: this.newProjectName.trim(),
+          city: this.newProjectCity.trim() || val.city || null
+        };
+        payload.projectId = undefined;
+      }
 
       if (this.sellerSelection) {
         if (this.sellerSelection.createNew && this.sellerSelection.seller.name) {

@@ -161,3 +161,12 @@
   font-size: 0.75rem;
   margin-left: auto;
 }
+
+.submit-error {
+  margin: 0 24px 8px;
+  padding: 10px 12px;
+  background: rgba(244, 63, 94, 0.1);
+  color: var(--error, #e11d48);
+  border-radius: 8px;
+  font-size: 0.875rem;
+}

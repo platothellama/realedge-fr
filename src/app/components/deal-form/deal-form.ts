@@ -46,6 +46,9 @@ export class DealFormComponent implements OnInit {
   isAdmin = false;
   showAssignmentDropdown = false;
   isSubmitting = false;
+  // QA 2026-09-18: surfaced when submit is blocked by a missing
+  // client/seller/broker selection (previously a silent no-op).
+  submitError: string | null = null;
   preSelectedPropertyId: string | null = null;
   selectedClient: ClientSelection | null = null;
   sellerSelection: SellerSelection | null = null;
@@ -73,7 +76,7 @@ export class DealFormComponent implements OnInit {
       title: ['', Validators.required],
       sellerName: [''],
       
-      finalPrice: [null],
+      finalPrice: [null, Validators.min(0)],
       dealStage: ['Negotiation', Validators.required],
       notes: [''],
       propertyId: ['', Validators.required],
@@ -219,16 +222,20 @@ export class DealFormComponent implements OnInit {
   }
 
   private loadInitialData() {
-    this.api.getMe().subscribe(user => {
-      this.currentUser = user;
-      const userRole = user.role || '';
-      this.isAdmin = userRole === 'Super Admin';
-      this.showAssignmentDropdown = this.isAdmin;
+    this.api.getMe().subscribe({
+      next: (user) => {
+        if (!user) return;
+        this.currentUser = user;
+        const userRole = user.role || '';
+        this.isAdmin = userRole === 'Super Admin';
+        this.showAssignmentDropdown = this.isAdmin;
 
-      // Default broker to current user if not editing
-      if (!this.isEdit) {
-        this.dealForm.get('brokerId')?.setValue(user.id);
-      }
+        // Default broker to current user if not editing
+        if (!this.isEdit) {
+          this.dealForm.get('brokerId')?.setValue(user.id);
+        }
+      },
+      error: () => { /* broker stays at constructor default */ }
     });
 
     this.api.getProperties().subscribe((res: any) => {
@@ -366,13 +373,30 @@ export class DealFormComponent implements OnInit {
   
 
   onSubmit(): void {
-    if (this.dealForm.valid && !this.isSubmitting && this.selectedClient && this.sellerSelection) {
+    this.submitError = null;
+    if (this.isSubmitting) return;
+    if (!this.dealForm.valid) {
+      this.dealForm.markAllAsTouched();
+      this.submitError = 'Please complete all required fields.';
+      return;
+    }
+    if (!this.selectedClient) {
+      this.submitError = 'Please select a client to continue.';
+      return;
+    }
+    if (!this.sellerSelection) {
+      this.submitError = 'Please select a seller to continue.';
+      return;
+    }
+    {
       const val = this.dealForm.getRawValue();
-      
+
       if (!this.assignToTeam && !val.brokerId) {
+        this.submitError = 'Please assign a broker to continue.';
         return;
       }
       if (this.assignToTeam && !val.groupId) {
+        this.submitError = 'Please select a team to continue.';
         return;
       }
       
@@ -409,6 +433,7 @@ export class DealFormComponent implements OnInit {
 
   onSellerSelected(selection: SellerSelection): void {
     this.sellerSelection = selection;
+    this.submitError = null;
   }
 
   onAssignToTeamChange(): void {
@@ -421,6 +446,7 @@ export class DealFormComponent implements OnInit {
 
   onClientSelected(selection: ClientSelection): void {
     this.selectedClient = selection;
+    this.submitError = null;
     if (!selection.createNew && selection.leadId) {
       this.dealForm.get('buyerLeadId')?.setValue(selection.leadId);
     }

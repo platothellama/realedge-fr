@@ -47,6 +47,8 @@ export class LeadDetailsComponent implements OnInit {
   lead: any = null;
   leadId: string = '';
   loading: boolean = true;
+  // QA 2026-09-18: convert guard (duplicate deals on double-click).
+  converting: boolean = false;
   selectedPropertyId: string | null = null;
   propertyVisits: any[] = [];
   allActivities: any[] = [];
@@ -272,17 +274,21 @@ export class LeadDetailsComponent implements OnInit {
   }
 
   convertToDeal() {
+    if (this.converting) return;
     if (!this.lead.interestedIn) {
       this.snackBar.open('No property specified for this lead', 'Close', { duration: 3000 });
       return;
     }
+    this.converting = true;
     this.apiService.convertLeadToDeal(this.lead.id, { propertyId: this.lead.interestedIn }).subscribe({
       next: () => {
         this.snackBar.open('Lead converted to deal!', 'Close', { duration: 3000 });
+        this.converting = false;
         this.loadLead();
       },
       error: (err) => {
-        this.snackBar.open('Failed to convert lead', 'Close', { duration: 3000 });
+        this.snackBar.open(err?.error?.message || 'Failed to convert lead', 'Close', { duration: 3000 });
+        this.converting = false;
       }
     });
   }

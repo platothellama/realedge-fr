@@ -67,6 +67,16 @@
               }
             </mat-select>
           </mat-form-field>
+          <!-- QA 2026-09-18: roleFilter existed but was never wired to any control. -->
+          <mat-form-field appearance="outline">
+            <mat-label>Role</mat-label>
+            <mat-select [(ngModel)]="roleFilter">
+              <mat-option value="">All Roles</mat-option>
+              @for (role of roleOptions; track role) {
+                <mat-option [value]="role">{{ getRoleLabel(role) }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
           @if (statusFilter || roleFilter) {
             <button mat-button (click)="clearFilters()">Clear Filters</button>
           }
@@ -77,19 +87,19 @@
         <table class="commissions-table">
           <thead>
             <tr>
-              <th>Property / Deal</th>
-              <th>Agent</th>
-              <th>Role</th>
-              <th>Sale Price</th>
-              <th>Split %</th>
-              <th>Commission</th>
-              <th>Status</th>
-              <th>Created</th>
-              <th>Actions</th>
+              <th scope="col">Property / Deal</th>
+              <th scope="col">Agent</th>
+              <th scope="col">Role</th>
+              <th scope="col">Sale Price</th>
+              <th scope="col">Split %</th>
+              <th scope="col">Commission</th>
+              <th scope="col">Status</th>
+              <th scope="col">Created</th>
+              <th scope="col">Actions</th>
             </tr>
           </thead>
-          <tbody>
-            @for (commission of commissions; track commission.id) {
+            <tbody>
+              @for (commission of visibleCommissions; track commission.id) {
               <tr>
                 <td class="property-cell">
                   <div class="property-info">
@@ -146,7 +156,7 @@
             }
           </tbody>
         </table>
-        @if (commissions.length === 0) {
+        @if (visibleCommissions.length === 0) {
           <div class="empty-state">
             <mat-icon>account_balance</mat-icon>
             <p>No commissions found</p>

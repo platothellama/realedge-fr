@@ -68,6 +68,7 @@ export class PropertyDetailsComponent implements OnInit {
   propertyVisits: any[] = [];
   propertyDeals: any[] = [];
   propertyLeads: any[] = [];
+  projectUnits: any[] = [];
   allLeads: any[] = [];
   analytics: any = {};
   currentUser: any = null;
@@ -102,6 +103,7 @@ export class PropertyDetailsComponent implements OnInit {
         };
         this.calculateAnalytics();
         this.fetchPropertyRelatedData(id);
+        this.fetchProjectUnits();
 
         if (this.property.soldTo) {
           const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(this.property.soldTo);
@@ -129,6 +131,24 @@ export class PropertyDetailsComponent implements OnInit {
         }
       }
     });
+  }
+
+  fetchProjectUnits() {
+    this.projectUnits = [];
+    const pid = this.property?.projectId || this.property?.project?.id;
+    if (!pid) return;
+    this.api.getProperties({ projectId: pid, limit: 50 }).subscribe({
+      next: (res: any) => {
+        const all = Array.isArray(res) ? res : (res?.data || []);
+        this.projectUnits = all.filter((u: any) => u.id !== this.property?.id);
+      },
+      error: () => this.projectUnits = []
+    });
+  }
+
+  goToUnit(id: string) {
+    this.router.navigate(['/properties', id]);
+    this.fetchProperty(id);
   }
 
   fetchPropertyRelatedData(propertyId: string) {

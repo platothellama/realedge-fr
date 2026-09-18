@@ -14,6 +14,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { FormsModule } from '@angular/forms';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ApiService } from '../../services/api';
+import { AuthService } from '../../services/auth/auth.service';
 import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog';
 
 interface Campaign {
@@ -44,6 +45,14 @@ export class MarketingAutomationComponent implements OnInit {
   private api = inject(ApiService);
   private snackBar = inject(MatSnackBar);
   private dialog = inject(MatDialog);
+  private auth = inject(AuthService);
+
+  sendingId: string | null = null;
+
+  /** Same roles allowed to bulk-send via POST /campaigns/:id/send. */
+  get canSend(): boolean {
+    return this.auth.hasRole(['Super Admin', 'Admin', 'Office Manager', 'Marketing']);
+  }
 
   loading = true;
   campaigns: Campaign[] = [];
@@ -86,7 +95,7 @@ export class MarketingAutomationComponent implements OnInit {
     }
     this.api.createCampaign(this.newCampaign).subscribe({
       next: (res: any) => {
-        this.campaigns.unshift(res);
+        this.campaigns.unshift(res?.data ?? res);
         this.showAddDialog = false;
         this.newCampaign = { name: '', type: 'email', status: 'draft', subject: '', content: '', triggerType: 'manual' };
         this.loadStats();
@@ -97,13 +106,33 @@ export class MarketingAutomationComponent implements OnInit {
   }
 
   sendCampaign(campaign: Campaign) {
-    this.api.sendCampaign(campaign.id).subscribe({
-      next: () => {
-        this.loadCampaigns();
-        this.loadStats();
-        this.snackBar.open('Campaign sent', 'Close', { duration: 2000 });
-      },
-      error: () => this.snackBar.open('Error sending campaign', 'Close', { duration: 3000 })
+    // QA 2026-09-18: bulk email needs explicit confirmation + a send guard
+    // (repeat clicks previously blasted every lead with duplicates).
+    if (this.sendingId) return;
+    const ref = this.dialog.open(ConfirmDialogComponent, {
+      width: '440px',
+      maxWidth: '95vw',
+      data: {
+        title: 'Send campaign?',
+        message: `"${campaign.name || 'This campaign'}" will be emailed to all targeted leads. This cannot be undone.`,
+        confirmLabel: 'Send',
+      }
+    });
+    ref.afterClosed().subscribe(confirmed => {
+      if (!confirmed) return;
+      this.sendingId = campaign.id;
+      this.api.sendCampaign(campaign.id).subscribe({
+        next: () => {
+          this.loadCampaigns();
+          this.loadStats();
+          this.snackBar.open('Campaign sent', 'Close', { duration: 2000 });
+          this.sendingId = null;
+        },
+        error: (err) => {
+          this.snackBar.open(err?.status === 403 ? 'Only Admin, Office Manager or Marketing can send campaigns' : 'Error sending campaign', 'Close', { duration: 3000 });
+          this.sendingId = null;
+        }
+      });
     });
   }
 

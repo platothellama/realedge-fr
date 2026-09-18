@@ -27,11 +27,23 @@ export class AuthService {
   }
 
   private checkSession() {
-    const token = localStorage.getItem('token');
-    const user = localStorage.getItem('user');
-    if (token && user) {
-      this.currentUser.set(JSON.parse(user));
+    try {
+      const token = localStorage.getItem('token');
+      const user = localStorage.getItem('user');
+      if (!token || !user) return;
+      const parsed = JSON.parse(user);
+      // QA hardening 2026-09-18: corrupt/foreign localStorage entries must
+      // never crash app boot or fake an authenticated session.
+      if (!parsed || typeof parsed !== 'object' || !parsed.id || !parsed.email || !parsed.role) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        return;
+      }
+      this.currentUser.set(parsed as User);
       this.isAuthenticated.set(true);
+    } catch {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
     }
   }
 

@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { Crm } from './crm';
+import { CrmComponent } from './crm';
 
 describe('Crm', () => {
-  let component: Crm;
-  let fixture: ComponentFixture<Crm>;
+  let component: CrmComponent;
+  let fixture: ComponentFixture<CrmComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Crm],
+      imports: [CrmComponent],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(Crm);
+    fixture = TestBed.createComponent(CrmComponent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

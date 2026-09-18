@@ -209,6 +209,7 @@ interface Website {
                             @if (property.area) { <span>{{ property.area }} sqm</span> }
                             @if (property.floor) { <span>Floor {{ property.floor }}</span> }
                             @if (property.hasTerrace) { <span>Terrace</span> }
+                            @if (property.hasCellar) { <span>Cellar</span> }
                           </div>
                           <p class="property-price">\${{ property.price | number }}<span class="price-suffix">{{ property.listingType === 'Rent' ? '/mo' : '' }}</span></p>
                         </div>

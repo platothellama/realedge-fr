@@ -14,6 +14,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FormsModule } from '@angular/forms';
 import { CdkDragDrop, DragDropModule, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
+import { A11yModule } from '@angular/cdk/a11y';
 import { ApiService } from '../../services/api';
 import { AuthService } from '../../services/auth/auth.service';
 import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog';
@@ -56,7 +57,8 @@ interface User {
     MatMenuModule,
     MatTooltipModule,
     FormsModule,
-    DragDropModule
+    DragDropModule,
+    A11yModule
   ],
   templateUrl: './tasks.html',
   styleUrl: './tasks.css'
@@ -80,6 +82,7 @@ export class TasksComponent implements OnInit {
   };
 
   loading = true;
+  loadError = false;
   currentUserName = '';
   currentUser: any = null;
   isAdmin = false;
@@ -156,15 +159,18 @@ export class TasksComponent implements OnInit {
 
   fetchTasks() {
     this.loading = true;
+    this.loadError = false;
     this.api.getTasks().subscribe({
       next: (res) => {
         this.distributeTasks(res);
         this.loading = false;
       },
       error: (err) => {
+        // QA 2026-09-18: errors show an error state (was fake demo tasks).
         console.error('Failed to fetch tasks', err);
         this.loading = false;
-        this.distributeTasks(this.getMockTasks());
+        this.distributeTasks([]);
+        this.loadError = true;
       }
     });
   }
@@ -234,10 +240,9 @@ export class TasksComponent implements OnInit {
         this.snackBar.open('Task created successfully', 'Close', { duration: 3000 });
       },
       error: (err) => {
-        const newTask: Task = { ...taskData, id: Date.now().toString() } as Task;
-        this.taskArrays['todo'].push(newTask);
-        this.showAddDialog = false;
-        this.snackBar.open('Task created (local)', 'Close', { duration: 3000 });
+        // QA 2026-09-18: no fake local tasks (was phantom "created (local)").
+        console.error('Failed to create task', err);
+        this.snackBar.open('Failed to create task', 'Close', { duration: 3000 });
       }
     });
   }
@@ -323,8 +328,9 @@ export class TasksComponent implements OnInit {
           this.snackBar.open('Task deleted', 'Close', { duration: 2000 });
         },
         error: (err) => {
-          this.removeTaskFromArray(task!, taskStatus);
-          this.snackBar.open('Task deleted (local)', 'Close', { duration: 2000 });
+          // QA 2026-09-18: no fake local delete (row stays, honest error).
+          console.error('Failed to delete task', err);
+          this.snackBar.open('Failed to delete task', 'Close', { duration: 3000 });
         }
       });
     });
@@ -338,15 +344,5 @@ export class TasksComponent implements OnInit {
   isOverdue(dueDate?: string): boolean {
     if (!dueDate) return false;
     return new Date(dueDate) < new Date();
-  }
-
-  getMockTasks(): Task[] {
-    return [
-      { id: '1', title: 'Prepare monthly report', description: 'Generate sales report for January', status: 'todo', priority: 'high', assignee: 'John Doe', dueDate: '2026-03-20', createdAt: '2026-03-01' },
-      { id: '2', title: 'Client follow-up', description: 'Follow up with potential buyers', status: 'in_progress', priority: 'medium', assignee: 'Jane Smith', dueDate: '2026-03-15', createdAt: '2026-03-10' },
-      { id: '3', title: 'Property photoshoot', description: 'Schedule photos for new listings', status: 'review', priority: 'urgent', assignee: 'Mike Johnson', dueDate: '2026-03-14', createdAt: '2026-03-08' },
-      { id: '4', title: 'Update CRM data', description: 'Clean up old leads', status: 'done', priority: 'low', assignee: 'Sarah Wilson', createdAt: '2026-03-01' },
-      { id: '5', title: 'Team meeting preparation', description: 'Prepare agenda for weekly meeting', status: 'todo', priority: 'medium', assignee: 'John Doe', dueDate: '2026-03-16', createdAt: '2026-03-12' }
-    ];
   }
 }

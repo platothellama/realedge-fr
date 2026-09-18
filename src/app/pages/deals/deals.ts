@@ -136,6 +136,14 @@ export class DealsComponent implements OnInit {
     this.applyFilters();
   }
 
+  /** QA 2026-09-18: RFC4180 escaping + formula-injection guard (same class as CRM export). */
+  private escapeCsvCell(value: unknown): string {
+    let s = value === null || value === undefined ? '' : String(value);
+    if (/^[=+\-@]/.test(s.trim())) s = `'${s}`;
+    if (/[",\n\r]/.test(s)) s = `"${s.replace(/"/g, '""')}"`;
+    return s;
+  }
+
   exportDealsToCSV() {
     if (this.allDeals.length === 0) {
       this.snackBar.open('No deals to export', 'Close', { duration: 3000 });
@@ -144,17 +152,17 @@ export class DealsComponent implements OnInit {
 
     const headers = ['Title', 'Buyer', 'Seller', 'Property', 'Commission', 'Stage', 'Broker', 'Created At'];
     const csvData = this.allDeals.map(d => [
-      `"${d.title || ''}"`,
-      `"${d.buyerName || ''}"`,
-      `"${d.sellerName || ''}"`,
-      `"${d.property?.title || ''}"`,
+      d.title || '',
+      d.buyerName || '',
+      d.sellerName || '',
+      d.property?.title || '',
       d.commission,
       d.dealStage,
-      `"${d.broker?.name || ''}"`,
+      d.broker?.name || '',
       new Date(d.createdAt).toLocaleDateString()
-    ].join(','));
+    ].map(c => this.escapeCsvCell(c)).join(','));
 
-    const csvContent = [headers.join(','), ...csvData].join('\n');
+    const csvContent = [headers.map(h => this.escapeCsvCell(h)).join(','), ...csvData].join('\r\n');
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);

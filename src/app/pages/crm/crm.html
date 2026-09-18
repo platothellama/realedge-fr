@@ -102,7 +102,7 @@
                       <span class="visit-count completed">{{ getCompletedVisits(lead).length }}</span>
                     </div>
                     <div class="col-actions">
-                      <button mat-icon-button (click)="$event.stopPropagation(); convertToDeal(lead)" matTooltip="Convert to Deal" [attr.aria-label]="'Convert ' + lead.name + ' to deal'">
+                      <button mat-icon-button (click)="$event.stopPropagation(); convertToDeal(lead)" matTooltip="Convert to Deal" [disabled]="convertingId === lead.id" [attr.aria-label]="'Convert ' + lead.name + ' to deal'">
                         <mat-icon aria-hidden="true">trending_up</mat-icon>
                       </button>
                       <button mat-icon-button (click)="$event.stopPropagation(); openLeadForm(lead)" matTooltip="Edit" [attr.aria-label]="'Edit ' + lead.name">

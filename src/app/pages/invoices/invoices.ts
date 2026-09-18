@@ -13,6 +13,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { FormsModule } from '@angular/forms';
+import { A11yModule } from '@angular/cdk/a11y';
 import { ApiService } from '../../services/api';
 import { ClientSelectorComponent, ClientSelection } from '../../components/client-selector/client-selector';
 import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog';
@@ -77,6 +78,7 @@ interface Invoice {
     MatInputModule,
     MatSelectModule,
     FormsModule,
+    A11yModule,
     ClientSelectorComponent,
     ErrorStateComponent
   ],
@@ -89,6 +91,8 @@ export class InvoicesComponent implements OnInit {
   private dialog = inject(MatDialog);
 
   loading = true;
+  // QA 2026-09-18: double-click guard — duplicate invoices are money.
+  creatingInvoice = false;
   loadError = false;
   invoices: Invoice[] = [];
   stats: any = {};
@@ -173,6 +177,10 @@ export class InvoicesComponent implements OnInit {
   }
 
   updateLineItemTotal(item: LineItem) {
+    // QA 2026-09-18: clamp money inputs (negative/NaN qty×price previously
+    // POSTed straight through to negative invoice totals).
+    if (!Number.isFinite(item.quantity) || item.quantity < 1) item.quantity = 1;
+    if (!Number.isFinite(item.unitPrice) || item.unitPrice < 0) item.unitPrice = 0;
     item.total = item.quantity * item.unitPrice;
     this.calculateSubtotal();
   }
@@ -191,6 +199,7 @@ export class InvoicesComponent implements OnInit {
   }
 
   createInvoice() {
+    if (this.creatingInvoice) return;
     if (!this.newInvoice.clientName) {
       this.snackBar.open('Client name is required', 'Close', { duration: 3000 });
       return;
@@ -201,26 +210,54 @@ export class InvoicesComponent implements OnInit {
       return;
     }
 
+    // QA 2026-09-18: never POST negative/NaN money (devtools-bypassable HTML mins).
+    for (const item of this.lineItems) {
+      this.updateLineItemTotal(item);
+      if (!item.description?.trim()) {
+        this.snackBar.open('Each line item needs a description', 'Close', { duration: 3000 });
+        return;
+      }
+    }
+    if (!Number.isFinite(this.newInvoice.discount) || (this.newInvoice.discount ?? 0) < 0) {
+      this.snackBar.open('Discount cannot be negative', 'Close', { duration: 3000 });
+      return;
+    }
+
     const invoiceData: any = {
       ...this.newInvoice,
       leadId: this.selectedClient?.leadId || null,
       lineItems: this.lineItems,
       issueDate: new Date(),
-      dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+      // QA 2026-09-18: dueDate follows paymentTerms (was hardcoded +30d).
+      dueDate: this.dueDateForTerms(this.newInvoice.paymentTerms)
     };
 
+    this.creatingInvoice = true;
     this.api.createInvoice(invoiceData).subscribe({
       next: (res) => {
-        this.invoices.unshift(res);
+        this.invoices.unshift((res as any)?.data ?? res);
         this.showAddDialog = false;
         this.resetForm();
         this.loadStats();
         this.snackBar.open('Invoice created successfully', 'Close', { duration: 3000 });
+        this.creatingInvoice = false;
       },
       error: (err) => {
         this.snackBar.open('Failed to create invoice: ' + (err.error?.message || 'Unknown error'), 'Close', { duration: 3000 });
+        this.creatingInvoice = false;
       }
     });
+  }
+
+  private dueDateForTerms(terms?: string): Date {
+    const days: Record<string, number> = {
+      'Due on Receipt': 0,
+      'Net 15': 15,
+      'Net 30': 30,
+      'Net 60': 60
+    };
+    const d = days[terms || 'Net 30'] ?? 30;
+    return new Date(Date.now() + d * 24 * 60 * 60 * 1000);
   }
 
   markAsPaid(invoice: Invoice) {
@@ -280,10 +317,13 @@ export class InvoicesComponent implements OnInit {
   }
 
   formatCurrencyWithSymbol(value: number, currency: string = 'USD'): string {
+    // QA 2026-09-18: never render NaN/$NaN (one bad row poisoned totals).
+    const v = Number(value);
+    if (!Number.isFinite(v)) return '—';
     if (currency === 'LBP') {
-      return new Intl.NumberFormat('en-LB', { style: 'decimal', maximumFractionDigits: 0 }).format(value) + ' LBP';
+      return new Intl.NumberFormat('en-LB', { style: 'decimal', maximumFractionDigits: 0 }).format(v) + ' LBP';
     }
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value);
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(v);
   }
 
   formatDate(date: string): string {

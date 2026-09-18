@@ -69,6 +69,13 @@ export class CommissionsComponent implements OnInit {
   
   statusFilter = '';
   roleFilter = '';
+
+  /** QA 2026-09-18: roleFilter was dead state — now a client-side role filter
+   * (the summary endpoint only supports server-side status). */
+  get visibleCommissions(): DealCommission[] {
+    if (!this.roleFilter) return this.commissions;
+    return this.commissions.filter(c => c.roleInDeal === this.roleFilter);
+  }
   
   displayedColumns = ['deal', 'agent', 'role', 'salePrice', 'percentage', 'amount', 'status', 'createdAt', 'actions'];
 

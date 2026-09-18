@@ -12,6 +12,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { FormsModule } from '@angular/forms';
+import { A11yModule } from '@angular/cdk/a11y';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ApiService } from '../../services/api';
 import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog';
@@ -44,7 +45,8 @@ interface Expense {
     MatInputModule,
     MatSelectModule,
     MatDialogModule,
-    FormsModule
+    FormsModule,
+    A11yModule
   ],
   templateUrl: './expenses.html',
   styleUrl: './expenses.css'
@@ -55,6 +57,8 @@ export class ExpensesComponent implements OnInit {
   private dialog = inject(MatDialog);
 
   loading = true;
+  // QA 2026-09-18: double-click guard on creation.
+  creatingExpense = false;
   expenses: Expense[] = [];
   stats: any = {};
   processingId: string | null = null;
@@ -111,8 +115,15 @@ export class ExpensesComponent implements OnInit {
   }
 
   createExpense() {
-    if (!this.newExpense.title || !this.newExpense.amount) {
-      this.snackBar.open('Title and amount are required', 'Close', { duration: 3000 });
+    if (this.creatingExpense) return;
+    if (!this.newExpense.title?.trim()) {
+      this.snackBar.open('Title is required', 'Close', { duration: 3000 });
+      return;
+    }
+    // QA 2026-09-18: !amount passes negatives (backend had no guard either —
+    // now both sides require finite > 0).
+    if (!Number.isFinite(this.newExpense.amount) || (this.newExpense.amount ?? 0) <= 0) {
+      this.snackBar.open('Amount must be a positive number', 'Close', { duration: 3000 });
       return;
     }
 
@@ -121,16 +132,19 @@ export class ExpensesComponent implements OnInit {
       date: new Date()
     };
 
+    this.creatingExpense = true;
     this.api.createExpense(expenseData).subscribe({
       next: (res) => {
-        this.expenses.unshift(res);
+        this.expenses.unshift((res as any)?.data ?? res);
         this.showAddDialog = false;
         this.newExpense = { title: '', category: 'Other', amount: 0, status: 'Pending' };
         this.loadStats();
         this.snackBar.open('Expense created successfully', 'Close', { duration: 3000 });
+        this.creatingExpense = false;
       },
       error: (err) => {
         this.snackBar.open('Failed to create expense', 'Close', { duration: 3000 });
+        this.creatingExpense = false;
       }
     });
   }
@@ -207,7 +221,9 @@ export class ExpensesComponent implements OnInit {
   }
 
   formatCurrency(value: number): string {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value);
+    const v = Number(value);
+    if (!Number.isFinite(v)) return '—';
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(v);
   }
 
   formatDate(date: string): string {

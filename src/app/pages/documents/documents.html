@@ -17,7 +17,6 @@
     [config]="searchConfig"
     [typeOptions]="typeOptions"
     (filtersChange)="onFiltersChange($event)"
-    (search)="fetchDocuments()"
   ></app-property-search>
 
   @if (loading) {
@@ -47,10 +46,10 @@
 
   @if (!loading && !loadError && filteredDocuments.length > 0) {
     <div class="documents-grid custom-scrollbar">
-      @for (doc of filteredDocuments; track doc.id) {
+      @for (doc of pagedDocuments; track doc.id) {
         <mat-card class="document-card" [class.highlighted]="doc.id === highlightedDocId" [attr.data-doc-id]="doc.id">
           <div class="doc-icon">
-            <mat-icon>{{ getIconForType(doc.documentType) }}</mat-icon>
+            <mat-icon>{{ getIconForType(doc.documentType || doc.type) }}</mat-icon>
           </div>
           
           <div class="doc-info">
@@ -94,8 +93,8 @@
     <app-pagination
       [page]="pagination.page"
       [limit]="pagination.limit"
-      [totalItems]="pagination.totalItems"
-      [totalPages]="pagination.totalPages"
+      [totalItems]="filteredDocuments.length"
+      [totalPages]="totalPages"
       label="documents"
       (pageChange)="onPageChange($event)"
     ></app-pagination>

@@ -123,17 +123,15 @@
           </div>
 
           <div class="form-row three-col">
-            @if (!isEdit) {
-              <mat-form-field appearance="outline">
-                <mat-label>Property Type</mat-label>
-                <mat-select formControlName="type">
-                  @for (t of propertyTypes; track t) {
-                    <mat-option [value]="t">{{t}}</mat-option>
-                  }
-                </mat-select>
-                <mat-error *ngIf="propertyForm.get('type')?.hasError('required')">Property type is required</mat-error>
-              </mat-form-field>
-            }
+            <mat-form-field appearance="outline">
+              <mat-label>Property Type</mat-label>
+              <mat-select formControlName="type">
+                @for (t of propertyTypes; track t) {
+                  <mat-option [value]="t">{{t}}</mat-option>
+                }
+              </mat-select>
+              <mat-error *ngIf="propertyForm.get('type')?.hasError('required')">Property type is required</mat-error>
+            </mat-form-field>
 
             <mat-form-field appearance="outline">
               <mat-label>Listing Type</mat-label>
@@ -160,6 +158,56 @@
             </mat-form-field>
           </div>
         </div>
+
+        <div class="form-section">
+          <div class="section-header">
+            <mat-icon>domain</mat-icon>
+            <h3>Project / Building (optional)</h3>
+          </div>
+          <p class="upload-hint">
+            <mat-icon style="font-size: 14px; height: 14px; width: 14px; vertical-align: middle;">info</mat-icon>
+            Group apartments in the same building or development together.
+          </p>
+          @if (!showNewProject) {
+            <div class="form-row two-col">
+              <mat-form-field appearance="outline">
+                <mat-label>Project</mat-label>
+                <mat-select formControlName="projectId">
+                  <mat-option [value]="null">-- Standalone (no project) --</mat-option>
+                  @for (p of projects; track p.id) {
+                    <mat-option [value]="p.id">
+                      {{ p.name }}@if (p.city) { ({{ p.city }}) } — {{ p.unitsCount ?? p.properties?.length ?? 0 }} units
+                    </mat-option>
+                  }
+                </mat-select>
+                <mat-icon matPrefix>domain</mat-icon>
+              </mat-form-field>
+              <div>
+                <button mat-stroked-button type="button" (click)="toggleNewProject()">
+                  <mat-icon>add</mat-icon>
+                  New project
+                </button>
+              </div>
+            </div>
+          } @else {
+            <div class="form-row two-col">
+              <mat-form-field appearance="outline">
+                <mat-label>New project name</mat-label>
+                <input matInput [(ngModel)]="newProjectName" [ngModelOptions]="{standalone: true}" placeholder="Ex: Marina Gate Tower">
+                <mat-icon matPrefix>domain_add</mat-icon>
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Project city (optional)</mat-label>
+                <input matInput [(ngModel)]="newProjectCity" [ngModelOptions]="{standalone: true}" placeholder="Defaults to property city">
+                <mat-icon matPrefix>location_city</mat-icon>
+              </mat-form-field>
+            </div>
+            <button mat-button type="button" (click)="toggleNewProject()">
+              <mat-icon>arrow_back</mat-icon>
+              Choose existing project instead
+            </button>
+          }
+        </div>
       </div>
     }
 
@@ -185,16 +233,31 @@
               <mat-icon matPrefix>bed</mat-icon>
             </mat-form-field>
             <mat-form-field appearance="outline">
+              <mat-label>Master Bedrooms</mat-label>
+              <input matInput type="number" formControlName="masterBedrooms" min="0" [max]="propertyForm.get('bedrooms')?.value || 0">
+              <mat-icon matPrefix>king_bed</mat-icon>
+              <mat-hint>Of the {{ propertyForm.get('bedrooms')?.value || 0 }} bedrooms, how many are master?</mat-hint>
+              <mat-error *ngIf="propertyForm.get('masterBedrooms')?.hasError('min')">Cannot be negative</mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
               <mat-label>Bathrooms</mat-label>
               <input matInput type="number" formControlName="bathrooms" min="0">
               <mat-icon matPrefix>bathtub</mat-icon>
             </mat-form-field>
+          </div>
+          <div class="form-row two-col">
             <mat-form-field appearance="outline">
               <mat-label>Parking Spaces</mat-label>
               <input matInput type="number" formControlName="parkingSpaces" min="0">
               <mat-icon matPrefix>directions_car</mat-icon>
             </mat-form-field>
           </div>
+          @if ((propertyForm.get('masterBedrooms')?.value || 0) > (propertyForm.get('bedrooms')?.value || 0)) {
+            <p class="upload-hint" style="color: var(--mat-sys-error, #b3261e);">
+              <mat-icon style="font-size: 14px; height: 14px; width: 14px; vertical-align: middle;">error</mat-icon>
+              Master bedrooms cannot exceed total bedrooms.
+            </p>
+          }
         </div>
 
         <div class="form-section">
@@ -255,6 +318,30 @@
                 <input matInput type="number" formControlName="terraceSize" min="0">
                 <span matSuffix class="unit-suffix">sqm</span>
                 <mat-icon matPrefix>deck</mat-icon>
+              </mat-form-field>
+            </div>
+          }
+          <div class="form-row two-col">
+            <mat-form-field appearance="outline">
+              <mat-label>Has Cellar</mat-label>
+              <mat-select formControlName="hasCellar">
+                <mat-option [value]="true">
+                  <mat-icon>check_circle</mat-icon> Yes
+                </mat-option>
+                <mat-option [value]="false">
+                  <mat-icon>cancel</mat-icon> No
+                </mat-option>
+              </mat-select>
+              <mat-icon matPrefix>warehouse</mat-icon>
+            </mat-form-field>
+          </div>
+          @if (propertyForm.get('hasCellar')?.value) {
+            <div class="form-row one-col">
+              <mat-form-field appearance="outline">
+                <mat-label>Cellar Size</mat-label>
+                <input matInput type="number" formControlName="cellarSize" min="0">
+                <span matSuffix class="unit-suffix">sqm</span>
+                <mat-icon matPrefix>warehouse</mat-icon>
               </mat-form-field>
             </div>
           }
@@ -433,12 +520,47 @@
         <div class="form-section">
           <div class="section-header">
             <mat-icon>videocam</mat-icon>
-            <h3>Videos & Tours</h3>
+            <h3>Videos</h3>
+          </div>
+          <div class="upload-section">
+            @if (uploadedVideos.length > 0) {
+              <div class="file-list">
+                @for (video of uploadedVideos; track video; let i = $index) {
+                  <div class="file-item">
+                    <mat-icon class="file-icon">movie</mat-icon>
+                    <div class="file-info">
+                      <span class="file-name">{{ fileNameFromUrl(video) }}</span>
+                      <a [href]="video" target="_blank" rel="noopener" class="file-link" (click)="$event.stopPropagation()">Preview</a>
+                    </div>
+                    <button mat-icon-button color="warn" (click)="removeVideo(i)" [attr.aria-label]="'Remove video ' + (i + 1)">
+                      <mat-icon aria-hidden="true">close</mat-icon>
+                    </button>
+                  </div>
+                }
+              </div>
+            }
+            <div class="upload-row">
+              <input type="file" #videoInput (change)="onVideoFilesSelected($event)" accept="video/mp4,video/webm,video/quicktime,.mp4,.webm,.mov" multiple style="display: none">
+              <button mat-stroked-button color="primary" (click)="videoInput.click()" [disabled]="isUploadingVideo">
+                @if (isUploadingVideo) {
+                  <mat-spinner diameter="18"></mat-spinner>
+                  <span>Uploading {{ uploadingVideoCount }} of {{ totalUploadingVideo }}...</span>
+                } @else {
+                  <mat-icon>cloud_upload</mat-icon>
+                  <span>Upload video files</span>
+                }
+              </button>
+              <span class="upload-hint-inline">mp4 / webm / mov, max 100MB each</span>
+            </div>
+            @if (videoUploadError) {
+              <p class="upload-error"><mat-icon>error</mat-icon> {{ videoUploadError }}</p>
+            }
           </div>
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Video URLs</mat-label>
-            <input matInput formControlName="videos" placeholder="YouTube or Vimeo links">
+            <mat-label>Additional Video URLs (YouTube, Vimeo...)</mat-label>
+            <input matInput formControlName="videos" placeholder="https://youtube.com/..., https://vimeo.com/...">
             <mat-icon matSuffix>videocam</mat-icon>
+            <mat-hint>Comma-separated links, kept alongside uploaded videos</mat-hint>
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="full-width">
@@ -446,11 +568,53 @@
             <input matInput formControlName="tours360" placeholder="Virtual tour or 360° view links">
             <mat-icon matSuffix>360</mat-icon>
           </mat-form-field>
+        </div>
+
+        <div class="form-section">
+          <div class="section-header">
+            <mat-icon>description</mat-icon>
+            <h3>Documents</h3>
+          </div>
+          <div class="upload-section">
+            @if (uploadedDocuments.length > 0) {
+              <div class="file-list">
+                @for (doc of uploadedDocuments; track doc; let i = $index) {
+                  <div class="file-item">
+                    <mat-icon class="file-icon">description</mat-icon>
+                    <div class="file-info">
+                      <span class="file-name">{{ fileNameFromUrl(doc) }}</span>
+                      <a [href]="doc" target="_blank" rel="noopener" class="file-link" (click)="$event.stopPropagation()">Open</a>
+                    </div>
+                    <button mat-icon-button color="warn" (click)="removeDocument(i)" [attr.aria-label]="'Remove document ' + (i + 1)">
+                      <mat-icon aria-hidden="true">close</mat-icon>
+                    </button>
+                  </div>
+                }
+              </div>
+            }
+            <div class="upload-row">
+              <input type="file" #docInput (change)="onDocumentFilesSelected($event)" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv" multiple style="display: none">
+              <button mat-stroked-button color="primary" (click)="docInput.click()" [disabled]="isUploadingDoc">
+                @if (isUploadingDoc) {
+                  <mat-spinner diameter="18"></mat-spinner>
+                  <span>Uploading {{ uploadingDocCount }} of {{ totalUploadingDoc }}...</span>
+                } @else {
+                  <mat-icon>cloud_upload</mat-icon>
+                  <span>Upload documents</span>
+                }
+              </button>
+              <span class="upload-hint-inline">pdf / doc / xls / ppt / txt / csv, max 10MB each</span>
+            </div>
+            @if (docUploadError) {
+              <p class="upload-error"><mat-icon>error</mat-icon> {{ docUploadError }}</p>
+            }
+          </div>
 
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Document Links</mat-label>
-            <input matInput formControlName="documents" placeholder="Floor plans, brochures, deed...">
-            <mat-icon matSuffix>description</mat-icon>
+            <mat-label>Additional Document Links</mat-label>
+            <input matInput formControlName="documents" placeholder="Floor plans, brochures, deed links...">
+            <mat-icon matSuffix>link</mat-icon>
+            <mat-hint>Comma-separated URLs, kept alongside uploaded documents</mat-hint>
           </mat-form-field>
         </div>
       </div>
@@ -550,10 +714,23 @@
               </div>
             </div>
             <div class="summary-item">
+              <mat-icon>domain</mat-icon>
+              <div>
+                <span class="summary-label">Project</span>
+                <span class="summary-value">
+                  @if (showNewProject && newProjectName.trim()) {
+                    {{ newProjectName }} (new)
+                  } @else {
+                    {{ selectedProject?.name || 'Standalone' }}
+                  }
+                </span>
+              </div>
+            </div>
+            <div class="summary-item">
               <mat-icon>bed</mat-icon>
               <div>
                 <span class="summary-label">Bedrooms</span>
-                <span class="summary-value">{{ propertyForm.get('bedrooms')?.value }}</span>
+                <span class="summary-value">{{ propertyForm.get('bedrooms')?.value }}@if ((propertyForm.get('masterBedrooms')?.value || 0) > 0) { ({{ propertyForm.get('masterBedrooms')?.value }} master) }</span>
               </div>
             </div>
             <div class="summary-item">
@@ -575,6 +752,20 @@
               <div>
                 <span class="summary-label">Photos</span>
                 <span class="summary-value">{{ uploadedPhotos.length }} uploaded</span>
+              </div>
+            </div>
+            <div class="summary-item">
+              <mat-icon>videocam</mat-icon>
+              <div>
+                <span class="summary-label">Videos</span>
+                <span class="summary-value">{{ uploadedVideos.length }} uploaded</span>
+              </div>
+            </div>
+            <div class="summary-item">
+              <mat-icon>description</mat-icon>
+              <div>
+                <span class="summary-label">Documents</span>
+                <span class="summary-value">{{ uploadedDocuments.length }} uploaded</span>
               </div>
             </div>
           </div>
@@ -603,8 +794,10 @@
         <mat-icon>arrow_forward</mat-icon>
       </button>
     } @else {
-      <button mat-raised-button color="primary" class="publish-btn" (click)="onSubmit()" [disabled]="!propertyForm.valid || isSubmitting" [class.loading]="isSubmitting">
-        @if (isSubmitting) {
+      <button mat-raised-button color="primary" class="publish-btn" (click)="onSubmit()" [disabled]="!propertyForm.valid || isSubmitting || hasPendingMediaUpload" [class.loading]="isSubmitting" [matTooltip]="hasPendingMediaUpload ? 'Waiting for media uploads to finish…' : ''">
+        @if (hasPendingMediaUpload) {
+          <mat-spinner diameter="20"></mat-spinner>
+        } @else if (isSubmitting) {
           <mat-spinner diameter="20"></mat-spinner>
         } @else {
           <mat-icon>{{ isEdit ? 'save' : 'publish' }}</mat-icon>

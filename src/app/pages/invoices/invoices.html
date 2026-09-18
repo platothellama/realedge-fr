@@ -114,7 +114,7 @@
                 <td><span class="currency-badge">{{ invoice.currency }}</span></td>
                 <td>{{ formatDate(invoice.issueDate) }}</td>
                 <td>{{ formatDate(invoice.dueDate) }}</td>
-                <td class="amount">{{ formatCurrency(invoice.total) }}</td>
+                <td class="amount">{{ formatCurrencyWithSymbol(invoice.total, invoice.currency) }}</td>
                 <td>
                   <span class="status-badge" [class]="getStatusClass(invoice.status)">
                     {{ invoice.status }}
@@ -157,7 +157,8 @@
            (click)="$event.stopPropagation()"
            role="dialog"
            aria-modal="true"
-           aria-labelledby="new-invoice-title">
+           aria-labelledby="new-invoice-title"
+           cdkTrapFocus>
         <div class="dialog-header">
           <h2 id="new-invoice-title">New Invoice</h2>
           <button mat-icon-button (click)="closeDialog()" aria-label="Close dialog">
@@ -208,11 +209,8 @@
             <div class="form-row">
               <mat-form-field appearance="outline">
                 <mat-label>Status</mat-label>
-                <mat-select [(ngModel)]="newInvoice.status">
-                  @for (status of statusOptions; track status) {
-                    <mat-option [value]="status">{{ status }}</mat-option>
-                  }
-                </mat-select>
+                <!-- QA 2026-09-18: invoices are always created as Draft (server-enforced). -->
+                <input matInput value="Draft" disabled>
               </mat-form-field>
               <mat-form-field appearance="outline">
                 <mat-label>Payment Terms</mat-label>
@@ -297,7 +295,9 @@
         </div>
         <div class="dialog-footer">
           <button mat-button (click)="closeDialog()">Cancel</button>
-          <button mat-raised-button color="primary" (click)="createInvoice()">Create Invoice</button>
+          <button mat-raised-button color="primary" (click)="createInvoice()" [disabled]="creatingInvoice">
+            @if (creatingInvoice) { Creating… } @else { Create Invoice }
+          </button>
         </div>
       </div>
     </div>

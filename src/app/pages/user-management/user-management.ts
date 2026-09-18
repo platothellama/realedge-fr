@@ -52,8 +52,11 @@ export class UserManagementComponent implements OnInit {
   ) {}
 
   get canManageUsers(): boolean {
+    // QA 2026-09-18: matches the backend (userRoutes restrictTo +
+    // userController rank rules) — Office Managers may manage strictly-lower
+    // roles; the server still enforces the exact boundaries.
     const user = this.auth.currentUser();
-    return user?.role === 'Admin' || user?.role === 'Super Admin';
+    return user?.role === 'Admin' || user?.role === 'Super Admin' || user?.role === 'Office Manager';
   }
 
   ngOnInit(): void {
@@ -200,7 +203,7 @@ export class UserManagementComponent implements OnInit {
           this.fetchUsers();
           this.snackBar.open('User deleted successfully', 'Close', { duration: 3000 });
         },
-        error: (err) => this.showError('Error deleting user')
+        error: (err) => this.showError(err.error?.message || 'Error deleting user')
       });
     });
   }
@@ -212,7 +215,7 @@ export class UserManagementComponent implements OnInit {
         this.fetchUsers();
         this.snackBar.open(`User ${user.active ? 'blocked' : 'restored'} successfully`, 'Close', { duration: 3000 });
       },
-      error: (err) => this.showError('Error updating user status')
+        error: (err) => this.showError(err.error?.message || 'Error updating user status')
     });
   }
 

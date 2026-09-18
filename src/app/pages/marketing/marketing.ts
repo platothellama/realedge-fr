@@ -64,7 +64,8 @@ export class MarketingComponent implements OnInit {
     this.api.getProperties().subscribe({
       next: (data) => {
         const arr = Array.isArray(data) ? data : (data?.data || []);
-        this.properties = arr.length > 0 ? arr : this.getMockProperties();
+        // QA 2026-09-18: empty inventory shows empty (was fake Dubai listings).
+        this.properties = arr;
       },
       error: (err) => {
         console.error('Failed to fetch properties', err);
@@ -129,36 +130,5 @@ export class MarketingComponent implements OnInit {
         return;
     }
     if (url) window.open(url, '_blank');
-  }
-
-  private getMockProperties() {
-    return [
-      {
-        id: '1',
-        title: 'Penthouse with Panoramic City View',
-        price: 1250000,
-        address: 'Downtown Avenue',
-        city: 'Dubai',
-        country: 'UAE',
-        bedrooms: 4,
-        bathrooms: 3,
-        area: 320,
-        type: 'Apartment',
-        status: 'Available'
-      },
-      {
-        id: '2',
-        title: 'Ultra Luxury Beachfront Villa',
-        price: 4500000,
-        address: 'Palm Jumeirah',
-        city: 'Dubai',
-        country: 'UAE',
-        bedrooms: 6,
-        bathrooms: 7,
-        area: 850,
-        type: 'Villa',
-        status: 'Reserved'
-      }
-    ];
   }
 }

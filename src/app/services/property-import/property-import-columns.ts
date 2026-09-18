@@ -58,17 +58,21 @@ export const IMPORT_COLUMNS: ImportColumnDef[] = [
   { key: 'condition', required: false, description: 'Used or New (default Used)' },
   { key: 'status', required: false, description: 'Available or Reserved (default Available)' },
   { key: 'bedrooms', required: false, description: 'Integer >= 0 (default 0)' },
+  { key: 'masterBedrooms', required: false, description: 'Master bedrooms, whole number 0..bedrooms (default 0)' },
   { key: 'bathrooms', required: false, description: 'Integer >= 0 (default 0)' },
   { key: 'parkingSpaces', required: false, description: 'Integer >= 0 (default 0)' },
   { key: 'floor', required: false, description: 'Integer, empty = unknown' },
   { key: 'area', required: false, description: 'Built area in m², number >= 0' },
   { key: 'lotSize', required: false, description: 'Lot size in m², number >= 0' },
   { key: 'terraceSize', required: false, description: 'Terrace size in m², number >= 0' },
+  { key: 'cellarSize', required: false, description: 'Cellar size in m², number >= 0' },
   { key: 'yearBuilt', required: false, description: '1800–current year, empty = unknown' },
   { key: 'hasTerrace', required: false, description: 'YES / NO (default NO)' },
+  { key: 'hasCellar', required: false, description: 'YES / NO (default NO)' },
   { key: 'lat', required: false, description: 'Latitude, empty = unknown' },
   { key: 'lng', required: false, description: 'Longitude, empty = unknown' },
   { key: 'features', required: false, description: 'Semicolon-separated, e.g. Pool; Garage; Balcony' },
+  { key: 'project', required: false, description: 'Project/building name to group units (optional, created if new)' },
 ];
 
 export const IMPORT_TEMPLATE_HEADERS: string[] = IMPORT_COLUMNS.map((c) => c.key);
@@ -86,17 +90,22 @@ export interface PropertyImportPayload {
   condition: string;
   status: string;
   bedrooms: number;
+  masterBedrooms: number;
   bathrooms: number;
   parkingSpaces: number;
   floor: number | null;
   area: number;
   lotSize: number;
   terraceSize: number | null;
+  cellarSize: number | null;
   yearBuilt: number | null;
   hasTerrace: boolean;
+  hasCellar: boolean;
   lat: number | null;
   lng: number | null;
   features: string[];
+  /** Optional project/building name — resolved to projectId on import. */
+  project?: string;
 }
 
 export interface ValidatedImportRow {

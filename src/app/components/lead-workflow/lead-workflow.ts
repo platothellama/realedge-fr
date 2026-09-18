@@ -121,21 +121,27 @@ export class LeadWorkflowComponent implements OnInit {
   loadData() {
     this.api.getLeads().subscribe({
       next: (res: any) => {
-        console.log('Leads API response:', res);
         this.leads = Array.isArray(res) ? res : (res?.data || []);
-        console.log('Loaded leads:', this.leads);
-      }
+      },
+      error: () => { this.leads = []; }
     });
 
-    this.api.getUsers().subscribe(res => {
-      this.brokers = Array.isArray(res) ? res : (res.data || []);
+    this.api.getUsers().subscribe({
+      next: (res) => {
+        this.brokers = Array.isArray(res) ? res : (res.data || []);
+      },
+      error: () => { this.brokers = []; }
     });
 
-    this.api.getMe().subscribe(user => {
-      this.currentUser = user;
-      this.isAdmin = user.role === 'Super Admin';
-      this.visitForm.get('brokerId')?.setValue(user.id);
-      this.dealForm.get('brokerId')?.setValue(user.id);
+    this.api.getMe().subscribe({
+      next: (user) => {
+        if (!user) return;
+        this.currentUser = user;
+        this.isAdmin = user.role === 'Super Admin';
+        this.visitForm.get('brokerId')?.setValue(user.id);
+        this.dealForm.get('brokerId')?.setValue(user.id);
+      },
+      error: () => { /* broker stays at constructor default */ }
     });
   }
 

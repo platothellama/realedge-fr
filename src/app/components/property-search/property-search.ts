@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnInit, inject } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -60,7 +60,7 @@ export interface SearchFilters {
   templateUrl: './property-search.html',
   styleUrl: './property-search.css',
 })
-export class PropertySearchComponent implements OnInit {
+export class PropertySearchComponent implements OnInit, OnDestroy {
   private api = inject(ApiService);
 
   groups: any[] = [];
@@ -168,6 +168,11 @@ export class PropertySearchComponent implements OnInit {
     });
   }
 
+  ngOnDestroy() {
+    // QA fix 2026-09-18: a pending debounce must not emit after destroy.
+    clearTimeout(this.searchDebounce);
+  }
+
   onSearchInput() {
     clearTimeout(this.searchDebounce);
     this.searchDebounce = setTimeout(() => {
@@ -223,6 +228,7 @@ export class PropertySearchComponent implements OnInit {
       this.filters.searchQuery ||
       this.filters.selectedStatus !== 'All' ||
       this.filters.selectedType !== 'All' ||
+      this.filters.selectedListingType !== 'All' ||
       this.filters.selectedCity !== 'All' ||
       this.filters.minBedrooms ||
       this.filters.maxBedrooms ||

@@ -75,43 +75,6 @@
   background: var(--primary) !important;
 }
 
-.divider {
-  display: flex;
-  align-items: center;
-  text-align: center;
-  margin: 32px 0;
-  color: var(--text-secondary);
-  font-size: 0.875rem;
-}
-
-.divider::before, .divider::after {
-  content: '';
-  flex: 1;
-  border-bottom: 1px solid var(--border);
-}
-
-.divider:not(:empty)::before { margin-right: .5em; }
-.divider:not(:empty)::after { margin-left: .5em; }
-
-.google-btn {
-  width: 100%;
-  padding: 24px !important;
-  border-radius: 12px !important;
-  background: white !important;
-  color: #1e293b !important;
-  font-weight: 600 !important;
-  display: flex !important;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  border: none !important;
-}
-
-.google-icon {
-  width: 20px;
-  height: 20px;
-}
-
 .error-message {
   padding: 12px;
   background: rgba(244, 63, 94, 0.1);

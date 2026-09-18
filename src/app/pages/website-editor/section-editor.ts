@@ -33,7 +33,7 @@ interface Section {
     <div class="section-editor" *ngIf="section">
       <div class="editor-header">
         <h3>Edit: {{ section.name || section.componentType }}</h3>
-        <button mat-icon-button (click)="close.emit()">
+        <button mat-icon-button (click)="close.emit()" aria-label="Close section editor">
           <mat-icon>close</mat-icon>
         </button>
       </div>

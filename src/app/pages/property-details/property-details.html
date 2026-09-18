@@ -90,6 +90,12 @@
             <span class="property-type">{{ property.type }}</span>
             <span class="listing-type-badge" [class]="property.listingType?.toLowerCase()">{{ property.listingType }}</span>
             <span class="condition-badge" [class]="property.condition?.toLowerCase()">{{ property.condition }}</span>
+            @if (property.project?.name) {
+              <span class="condition-badge project-badge">
+                <mat-icon style="font-size:14px;height:14px;width:14px;vertical-align:middle;">domain</mat-icon>
+                {{ property.project.name }}
+              </span>
+            }
             <h1>{{ property.title }}</h1>
             <p class="location">
               <mat-icon>location_on</mat-icon>
@@ -108,7 +114,7 @@
             <mat-icon>bed</mat-icon>
             <div class="stat-content">
               <span class="stat-value">{{ property.bedrooms }}</span>
-              <span class="stat-label">Beds</span>
+              <span class="stat-label">Beds@if (property.masterBedrooms) { · {{ property.masterBedrooms }} master }</span>
             </div>
           </div>
           <div class="stat-item">
@@ -146,6 +152,13 @@
               <span class="stat-label">Terrace</span>
             </div>
           </div>
+          <div class="stat-item">
+            <mat-icon>warehouse</mat-icon>
+            <div class="stat-content">
+              <span class="stat-value">{{ property.hasCellar ? 'Yes' : 'No' }}</span>
+              <span class="stat-label">Cellar</span>
+            </div>
+          </div>
         </div>
       </mat-card>
 
@@ -173,6 +186,32 @@
           }
         </div>
       </mat-card>
+
+      <!-- Project / sibling units -->
+      @if (property.project?.name || projectUnits.length > 0) {
+        <mat-card class="info-card">
+          <h2 class="section-heading">
+            <mat-icon>domain</mat-icon>
+            @if (property.project?.name) { {{ property.project.name }} } @else { Project units }
+            <span class="unit-count">{{ projectUnits.length + 1 }} units</span>
+          </h2>
+          @if (property.project?.developer || property.project?.city) {
+            <p class="description">{{ property.project.developer }}@if (property.project?.developer && property.project?.city) { · }{{ property.project.city }}</p>
+          }
+          @if (projectUnits.length > 0) {
+            <div class="features-grid">
+              @for (u of projectUnits; track u.id) {
+                <div class="feature-item unit-item" (click)="goToUnit(u.id)" style="cursor:pointer">
+                  <mat-icon>apartment</mat-icon>
+                   <span><strong>{{ u.title }}</strong><br>${{ u.price | number }} · {{ u.bedrooms }} bd@if (u.masterBedrooms) { ({{ u.masterBedrooms }} master) } · {{ u.area }}m² · {{ u.status }}</span>
+                </div>
+              }
+            </div>
+          } @else {
+            <p class="description">Only unit in this project so far.</p>
+          }
+        </mat-card>
+      }
 
       <!-- Price History -->
       <mat-card class="info-card" *ngIf="property.priceHistoryEntries?.length">
@@ -265,6 +304,10 @@
             <span class="spec-value">{{ property.listingType }}</span>
           </div>
           <div class="spec-row">
+            <span class="spec-label">Bedrooms</span>
+            <span class="spec-value">{{ property.bedrooms }}@if (property.masterBedrooms) { ({{ property.masterBedrooms }} master) }</span>
+          </div>
+          <div class="spec-row">
             <span class="spec-label">Condition</span>
             <span class="spec-value">{{ property.condition }}</span>
           </div>
@@ -283,6 +326,10 @@
           <div class="spec-row" *ngIf="property.hasTerrace">
             <span class="spec-label">Terrace Size</span>
             <span class="spec-value">{{ property.terraceSize }} sqm</span>
+          </div>
+          <div class="spec-row" *ngIf="property.hasCellar">
+            <span class="spec-label">Cellar Size</span>
+            <span class="spec-value">{{ property.cellarSize }} sqm</span>
           </div>
           <div class="spec-row">
             <span class="spec-label">Property ID</span>

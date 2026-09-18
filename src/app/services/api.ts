@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 @Injectable({
@@ -18,10 +18,13 @@ export class ApiService {
     search?: string;
     status?: string;
     type?: string;
+    listingType?: string;
     minPrice?: number;
     maxPrice?: number;
     minBedrooms?: number;
+    maxBedrooms?: number;
     city?: string;
+    projectId?: string;
   }): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/properties`, { params: params as any });
   }
@@ -52,8 +55,42 @@ export class ApiService {
     return this.http.post<any>(`${this.apiUrl}/properties/upload`, formData);
   }
 
+  uploadVideo(file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('video', file);
+    return this.http.post<any>(`${this.apiUrl}/properties/upload`, formData);
+  }
+
+  uploadPropertyDocument(file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('document', file);
+    return this.http.post<any>(`${this.apiUrl}/properties/upload`, formData);
+  }
+
   getUniqueFeatures(): Observable<string[]> {
     return this.http.get<string[]>(`${this.apiUrl}/properties/features`);
+  }
+
+  // Projects (optional grouping: units in the same building/development)
+  getProjects(search?: string): Observable<any[]> {
+    const params: any = search ? { search } : {};
+    return this.http.get<any>(`${this.apiUrl}/projects`, { params }) as Observable<any[]>;
+  }
+
+  getProjectById(id: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/projects/${id}`);
+  }
+
+  createProject(data: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/projects`, data);
+  }
+
+  updateProject(id: string, data: any): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/projects/${id}`, data);
+  }
+
+  deleteProject(id: string): Observable<any> {
+    return this.http.delete<any>(`${this.apiUrl}/projects/${id}`);
   }
 
   // Leads
@@ -67,6 +104,11 @@ export class ApiService {
 
   createLead(data: any): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/leads`, data);
+  }
+
+  /** QA 2026-09-18: single-request bulk import (server-validated, capped). */
+  bulkCreateLeads(leads: any[]): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/leads/bulk`, { leads });
   }
 
   updateLead(id: string, data: any): Observable<any> {
@@ -91,7 +133,12 @@ export class ApiService {
   }
 
   getMe(): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/auth/me`);
+    // QA 2026-09-18: unwrap the {status, data:{user}} envelope — every
+    // consumer expects the user object (user.role/user.id), and passing the
+    // envelope through silently broke attribution (brokerId=undefined).
+    return this.http
+      .get<any>(`${this.apiUrl}/auth/me`)
+      .pipe(map((res) => res?.data?.user ?? res?.data ?? res));
   }
 
   // Groups
@@ -159,11 +206,6 @@ export class ApiService {
 
   toggleUserStatus(id: string): Observable<any> {
     return this.http.patch<any>(`${this.apiUrl}/users/${id}/toggle-status`, {});
-  }
-
-  // AI
-  onPriceEstimate(data: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/ai/estimate`, data);
   }
 
   // Deals
@@ -338,10 +380,6 @@ export class ApiService {
 
   updateCommissionStatus(id: string, data: any): Observable<any> {
     return this.http.patch(`${this.apiUrl}/commissions/${id}/status`, data);
-  }
-
-  deleteCommission(id: string): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/commissions/${id}`);
   }
 
   // Tasks

@@ -81,13 +81,13 @@
         <table class="expenses-table">
           <thead>
             <tr>
-              <th>Title</th>
-              <th>Category</th>
-              <th>Amount</th>
-              <th>Date</th>
-              <th>Vendor</th>
-              <th>Status</th>
-              <th>Actions</th>
+              <th scope="col">Title</th>
+              <th scope="col">Category</th>
+              <th scope="col">Amount</th>
+              <th scope="col">Date</th>
+              <th scope="col">Vendor</th>
+              <th scope="col">Status</th>
+              <th scope="col">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -147,7 +147,7 @@
 
   @if (showAddDialog) {
     <div class="dialog-overlay" (click)="closeDialog()" (keydown.escape)="closeDialog()">
-      <div class="dialog-content" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="new-expense-title">
+      <div class="dialog-content" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="new-expense-title" cdkTrapFocus>
         <div class="dialog-header">
           <h2 id="new-expense-title">New Expense</h2>
           <button mat-icon-button (click)="closeDialog()" aria-label="Close dialog">
@@ -170,11 +170,9 @@
             </mat-form-field>
             <mat-form-field appearance="outline">
               <mat-label>Status</mat-label>
-              <mat-select [(ngModel)]="newExpense.status">
-                @for (status of statusOptions; track status) {
-                  <mat-option [value]="status">{{ status }}</mat-option>
-                }
-              </mat-select>
+              <!-- QA 2026-09-18: new expenses always start as Pending (server-enforced);
+                   approval happens via the Approve action. -->
+              <input matInput value="Pending" disabled>
             </mat-form-field>
           </div>
           <mat-form-field appearance="outline">
@@ -192,7 +190,9 @@
         </div>
         <div class="dialog-footer">
           <button mat-button (click)="closeDialog()">Cancel</button>
-          <button mat-raised-button color="primary" (click)="createExpense()">Create Expense</button>
+          <button mat-raised-button color="primary" (click)="createExpense()" [disabled]="creatingExpense">
+            @if (creatingExpense) { Creating… } @else { Create Expense }
+          </button>
         </div>
       </div>
     </div>

@@ -89,10 +89,9 @@ export class WebsiteEditorComponent implements OnInit {
   loadWebsite(id: string) {
     this.loading = true;
     this.api.getWebsite(id).subscribe({
-      next: (res: any) => { 
-        console.log('Website loaded:', res);
-        this.website = res; 
-        this.loading = false; 
+      next: (res: any) => {
+        this.website = res;
+        this.loading = false;
       },
       error: (err) => { 
         console.error('Error loading website:', err);
@@ -106,7 +105,8 @@ export class WebsiteEditorComponent implements OnInit {
     this.api.getComponentTemplates(this.selectedCategory).subscribe({
       next: (res: any) => {
         this.componentTemplates = Array.isArray(res) ? res : (res?.data || []);
-      }
+      },
+      error: () => { this.componentTemplates = []; }
     });
   }
 
@@ -115,10 +115,6 @@ export class WebsiteEditorComponent implements OnInit {
   }
 
   addSection(template: any) {
-    console.log('Adding section. Website:', this.website);
-    console.log('Pages:', this.website?.pages);
-    console.log('Selected page index:', this.selectedPageIndex);
-    
     if (!this.website?.pages || this.website.pages.length === 0) {
       this.snackBar.open('No pages found. Creating default page...', 'Close', { duration: 3000 });
       // Create a default page first

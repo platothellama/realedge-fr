@@ -184,8 +184,7 @@ export class DocumentsPageComponent implements OnInit, AfterViewChecked {
   }
 
   onPageChange(page: number) {
-    this.pagination.page = page;
-    this.fetchDocuments();
+    this.pagination.page = Math.min(Math.max(page, 1), this.totalPages);
   }
 
   get filteredDocuments() {
@@ -197,13 +196,26 @@ export class DocumentsPageComponent implements OnInit, AfterViewChecked {
 
     if (this.searchFilters.searchQuery) {
       const q = this.searchFilters.searchQuery.toLowerCase();
-      result = result.filter(d => 
-        d.title?.toLowerCase().includes(q) || 
+      result = result.filter(d =>
+        d.title?.toLowerCase().includes(q) ||
         d.type?.toLowerCase().includes(q)
       );
     }
 
     return result;
+  }
+
+  /** QA 2026-09-18: the API returns the full list (no server paging), so the
+   * grid pages client-side — previously the grid showed ALL rows while the
+   * pager counted something else. */
+  get totalPages(): number {
+    return Math.max(1, Math.ceil(this.filteredDocuments.length / this.pagination.limit));
+  }
+
+  get pagedDocuments(): any[] {
+    const page = Math.min(Math.max(this.pagination.page, 1), this.totalPages);
+    const start = (page - 1) * this.pagination.limit;
+    return this.filteredDocuments.slice(start, start + this.pagination.limit);
   }
 
   onFiltersChange(filters: SearchFilters) {
@@ -301,28 +313,4 @@ export class DocumentsPageComponent implements OnInit, AfterViewChecked {
     }
   }
 
-  private getMockDocuments() {
-    return [
-      {
-        id: '1',
-        title: 'Sale Agreement - Villa A101',
-        documentType: 'Sales Agreement',
-        propertyId: '1',
-        property: { title: 'Penthouse with Panoramic City View' },
-        versions: [{ fileUrl: 'sample.pdf', version: 1, uploadedAt: new Date() }],
-        isSigned: false,
-        createdAt: new Date()
-      },
-      {
-        id: '2',
-        title: 'Property Title Deed',
-        documentType: 'Title Deed',
-        propertyId: '2',
-        property: { title: 'Ultra Luxury Beachfront Villa' },
-        versions: [{ fileUrl: 'deed.pdf', version: 2, uploadedAt: new Date() }],
-        isSigned: true,
-        createdAt: new Date()
-      }
-    ];
-  }
 }

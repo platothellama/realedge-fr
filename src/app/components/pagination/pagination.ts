@@ -55,6 +55,8 @@ export class PaginationComponent {
   }
 
   get startItem(): number {
+    // QA fix 2026-09-18: empty lists showed "Showing 1-0 of 0".
+    if (this.totalItems <= 0) return 0;
     return ((this.page - 1) * this.limit) + 1;
   }
 

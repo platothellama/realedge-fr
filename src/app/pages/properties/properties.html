@@ -44,8 +44,24 @@
   <app-property-search
     [filters]="filters"
     (filtersChange)="onFiltersChange($event)"
-    (search)="applyFilters()"
   ></app-property-search>
+
+  <div class="project-toolbar">
+    <mat-form-field appearance="outline" class="project-filter">
+      <mat-label>Project</mat-label>
+      <mat-select [(value)]="selectedProjectId" (selectionChange)="onProjectFilterChange($event.value)">
+        <mat-option value="All">All projects</mat-option>
+        <mat-option value="unassigned">Standalone (no project)</mat-option>
+        @for (proj of projects; track proj.id) {
+          <mat-option [value]="proj.id">{{ proj.name }} ({{ proj.unitsCount ?? proj.properties?.length ?? 0 }})</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+    <button mat-stroked-button (click)="toggleGroupByProject()" [class.active]="groupByProject">
+      <mat-icon>domain</mat-icon>
+      {{ groupByProject ? 'Ungroup' : 'Group by project' }}
+    </button>
+  </div>
 
   @if (loading) {
     <div class="loading-grid" role="status" aria-label="Loading properties">
@@ -73,6 +89,56 @@
       <p>Adjust your search or add a new property</p>
     </div>
   } @else {
+    @if (groupByProject) {
+      <div class="project-groups">
+        @for (group of groupedProperties; track group.key) {
+          <section class="project-group">
+            <div class="project-group-header" (click)="openProjectUnits(group)">
+              <mat-icon>domain</mat-icon>
+              <h2>{{ group.name }}</h2>
+              <span class="unit-count">{{ group.units.length }} unit{{ group.units.length === 1 ? '' : 's' }}</span>
+            </div>
+            <div class="properties-grid">
+              @for (prop of group.units; track prop.id) {
+                <div class="property-card" (click)="openPropertyDetails(prop)">
+                  <div class="card-image">
+                    <img [src]="prop.photos?.length ? prop.photos[0] : 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&q=80'" [alt]="prop.title || 'Property photo'">
+                    <div class="card-badges">
+                      <span class="badge-status" [class]="prop.status?.toLowerCase()">{{ prop.status }}</span>
+                      <span class="badge-type">{{ prop.type }}</span>
+                      @if (prop.project?.name) {
+                        <span class="badge-project">{{ prop.project.name }}</span>
+                      }
+                    </div>
+                    <div class="card-overlay">
+                      <button mat-icon-button (click)="openPropertyForm(prop); $event.stopPropagation()" [attr.aria-label]="'Edit ' + prop.title">
+                        <mat-icon aria-hidden="true">edit</mat-icon>
+                      </button>
+                      <button mat-icon-button (click)="deleteProperty(prop.id); $event.stopPropagation()" [attr.aria-label]="'Delete ' + prop.title">
+                        <mat-icon aria-hidden="true">delete</mat-icon>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="card-content">
+                    <div class="card-price">${{ prop.price | number }}</div>
+                    <h3 class="card-title">{{ prop.title }}</h3>
+                    <p class="card-location">
+                      <mat-icon>place</mat-icon>
+                      {{ prop.city }}
+                    </p>
+                    <div class="card-specs">
+                      <span><mat-icon>bed</mat-icon>{{ prop.bedrooms }}@if (prop.masterBedrooms) { ({{ prop.masterBedrooms }}m) }</span>
+                      <span><mat-icon>bathtub</mat-icon>{{ prop.bathrooms }}</span>
+                      <span><mat-icon>square</mat-icon>{{ prop.area }}m²</span>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          </section>
+        }
+      </div>
+    } @else {
     <div class="properties-grid">
       @for (prop of properties; track prop.id) {
         <div class="property-card" (click)="openPropertyDetails(prop)">
@@ -81,6 +147,9 @@
             <div class="card-badges">
               <span class="badge-status" [class]="prop.status?.toLowerCase()">{{ prop.status }}</span>
               <span class="badge-type">{{ prop.type }}</span>
+              @if (prop.project?.name) {
+                <span class="badge-project">{{ prop.project.name }}</span>
+              }
             </div>
             <div class="card-overlay">
               <button mat-icon-button (click)="openPropertyForm(prop); $event.stopPropagation()" [attr.aria-label]="'Edit ' + prop.title">
@@ -99,7 +168,7 @@
               {{ prop.city }}
             </p>
             <div class="card-specs">
-              <span><mat-icon>bed</mat-icon>{{ prop.bedrooms }}</span>
+              <span><mat-icon>bed</mat-icon>{{ prop.bedrooms }}@if (prop.masterBedrooms) { ({{ prop.masterBedrooms }}m) }</span>
               <span><mat-icon>bathtub</mat-icon>{{ prop.bathrooms }}</span>
               <span><mat-icon>square</mat-icon>{{ prop.area }}m²</span>
             </div>
@@ -107,6 +176,7 @@
         </div>
       }
     </div>
+    }
 
     <app-pagination
       [page]="pagination.page"

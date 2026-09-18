@@ -42,6 +42,9 @@ export class VisitFormComponent implements OnInit {
   statuses = ['Scheduled', 'Completed', 'Cancelled', 'No Show'];
   isSubmitting = false;
   selectedClient: ClientSelection | null = null;
+  // QA 2026-09-18: surfaced when submit is blocked by a missing client
+  // selection (previously a silent no-op).
+  submitError: string | null = null;
   currentUser: any = null;
   isAdmin = false;
   showAssignmentDropdown = false;
@@ -54,7 +57,6 @@ export class VisitFormComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
     const user = this.auth.currentUser();
-    console.log('user user ', user )
     this.currentUser = user;
     const userRole = user?.role || '';
     this.isAdmin = userRole === 'Super Admin';
@@ -105,27 +107,48 @@ export class VisitFormComponent implements OnInit {
   }
 
   private loadInitialData() {
-    this.api.getProperties().subscribe(res => {
-      this.properties = Array.isArray(res) ? res : (res.data || []);
+    this.api.getProperties().subscribe({
+      next: (res) => {
+        this.properties = Array.isArray(res) ? res : (res.data || []);
+      },
+      error: () => { this.properties = []; }
     });
-    this.api.getUsers().subscribe(res => {
-      this.brokers = Array.isArray(res) ? res : (res.data || []);
+    this.api.getUsers().subscribe({
+      next: (res) => {
+        this.brokers = Array.isArray(res) ? res : (res.data || []);
+      },
+      error: () => { this.brokers = []; }
     });
 
-    this.api.getMe().subscribe(user => {
-      this.currentUser = user;
-      const userRole = user.role || '';
-      this.isAdmin = userRole === 'Super Admin';
-      this.showAssignmentDropdown = this.isAdmin;
+    this.api.getMe().subscribe({
+      next: (user) => {
+        if (!user) return;
+        this.currentUser = user;
+        const userRole = user.role || '';
+        this.isAdmin = userRole === 'Super Admin';
+        this.showAssignmentDropdown = this.isAdmin;
 
-      if (!this.isEdit && !this.visitForm.get('brokerId')?.value) {
-        this.visitForm.get('brokerId')?.setValue(user.id);
-      }
+        if (!this.isEdit && !this.visitForm.get('brokerId')?.value) {
+          this.visitForm.get('brokerId')?.setValue(user.id);
+        }
+      },
+      error: () => { /* broker stays at constructor default */ }
     });
   }
 
   onSubmit(): void {
-    if (this.visitForm.valid && !this.isSubmitting && this.selectedClient) {
+    this.submitError = null;
+    if (this.isSubmitting) return;
+    if (!this.visitForm.valid) {
+      this.visitForm.markAllAsTouched();
+      this.submitError = 'Please complete all required fields.';
+      return;
+    }
+    if (!this.selectedClient) {
+      this.submitError = 'Please select a client to continue.';
+      return;
+    }
+    {
       this.isSubmitting = true;
       const val = this.visitForm.value;
       const date = new Date(val.visitDate);
@@ -151,6 +174,7 @@ export class VisitFormComponent implements OnInit {
 
   onClientSelected(selection: ClientSelection): void {
     this.selectedClient = selection;
+    this.submitError = null;
   }
 
   onCancel(): void {

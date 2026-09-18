@@ -44,9 +44,12 @@ import { ErrorStateComponent } from '../../components/error-state/error-state';
 })
 export class PropertiesComponent implements OnInit {
   properties: any[] = [];
+  projects: any[] = [];
   loading = false;
   loadError = false;
   deletingId: string | null = null;
+  selectedProjectId: string = 'All';
+  groupByProject = false;
 
   filters: SearchFilters = {
     searchQuery: '',
@@ -85,7 +88,54 @@ export class PropertiesComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.fetchProjects();
     this.fetchProperties();
+  }
+
+  fetchProjects() {
+    this.apiService.getProjects().subscribe({
+      next: (res: any) => {
+        this.projects = Array.isArray(res) ? res : (res?.data || []);
+      },
+      error: () => this.projects = []
+    });
+  }
+
+  /** Apartments sharing a project are grouped together; standalone listings fall under "Standalone". */
+  get groupedProperties(): { key: string; name: string; units: any[] }[] {
+    const map = new Map<string, { key: string; name: string; units: any[] }>();
+    for (const p of this.properties) {
+      const pid = p.projectId || p.project?.id || null;
+      const key = pid || 'standalone';
+      if (!map.has(key)) {
+        map.set(key, {
+          key,
+          name: p.project?.name || (pid ? 'Project' : 'Standalone'),
+          units: []
+        });
+      }
+      map.get(key)!.units.push(p);
+    }
+    return [...map.values()].sort((a, b) => {
+      if (a.key === 'standalone') return 1;
+      if (b.key === 'standalone') return -1;
+      return a.name.localeCompare(b.name);
+    });
+  }
+
+  onProjectFilterChange(projectId: string) {
+    this.selectedProjectId = projectId;
+    this.applyFilters();
+  }
+
+  toggleGroupByProject() {
+    this.groupByProject = !this.groupByProject;
+  }
+
+  openProjectUnits(project: any) {
+    this.selectedProjectId = project?.id || project?.key || 'All';
+    this.groupByProject = false;
+    this.applyFilters();
   }
 
   fetchProperties() {
@@ -130,6 +180,9 @@ export class PropertiesComponent implements OnInit {
     if (this.filters.selectedCity && this.filters.selectedCity !== 'All') {
       params.city = this.filters.selectedCity;
     }
+    if (this.selectedProjectId && this.selectedProjectId !== 'All') {
+      params.projectId = this.selectedProjectId;
+    }
 
     this.apiService.getProperties(params).subscribe({
       next: (response: any) => {
@@ -137,6 +190,14 @@ export class PropertiesComponent implements OnInit {
           this.properties = response.data;
           if (response.pagination) {
             this.pagination = { ...this.pagination, ...response.pagination };
+            // QA 2026-09-18: clamp stale out-of-range pages (e.g. deleting
+            // the last item on the last page left "Showing 49-48 of 48").
+            const totalPages = this.pagination.totalPages || 1;
+            if (this.pagination.page > totalPages && totalPages > 0) {
+              this.pagination.page = totalPages;
+              this.fetchProperties();
+              return;
+            }
           }
         } else if (Array.isArray(response)) {
           this.properties = response;

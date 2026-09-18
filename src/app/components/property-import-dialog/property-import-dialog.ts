@@ -142,10 +142,38 @@ export class PropertyImportDialogComponent {
     this.failed = [];
     this.importedCount = 0;
 
+    // Resolve optional project names to ids once (units sharing a name are
+    // grouped into one project; avoids creating duplicates per row).
+    const projectCache = new Map<string, string>();
+    try {
+      const existing = await firstValueFrom(this.api.getProjects());
+      for (const p of (Array.isArray(existing) ? existing : [])) {
+        projectCache.set(String(p.name || '').trim().toLowerCase(), p.id);
+      }
+    } catch { /* project grouping is best-effort; rows still import standalone */ }
+    const resolveProjectId = async (name: string, city: string): Promise<string | null> => {
+      const key = name.trim().toLowerCase();
+      if (!key) return null;
+      if (projectCache.has(key)) return projectCache.get(key)!;
+      try {
+        const created = await firstValueFrom(this.api.createProject({ name: name.trim(), city: city?.trim() || null }));
+        const id = (created as any)?.id;
+        if (id) projectCache.set(key, id);
+        return id || null;
+      } catch { return null; }
+    };
+
     // Sequential creates: reuses POST /properties (auth, PriceHistory, validation).
     for (const row of this.validRows) {
       try {
-        await firstValueFrom(this.api.createProperty(row.data));
+        const payload: any = { ...row.data };
+        const projectName = String((payload as any).project || '').trim();
+        delete (payload as any).project;
+        if (projectName) {
+          const pid = await resolveProjectId(projectName, payload.city);
+          if (pid) payload.projectId = pid;
+        }
+        await firstValueFrom(this.api.createProperty(payload));
         this.importedCount++;
       } catch (err: any) {
         const message =

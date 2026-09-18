@@ -50,7 +50,7 @@ export class FinanceComponent implements OnInit {
   incomeVsExpenseData: { label: string; value: number; color: string }[] = [];
   categoryData: { label: string; value: number; color: string }[] = [];
   monthlyData: { label: string; value: number; color: string }[] = [];
-  monthlyLabels: string[] = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+  private readonly monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
   categories = ['commission', 'rental', 'sale', 'consulting', 'marketing', 'salary', 'office', 'utilities', 'maintenance', 'other'];
 
@@ -89,9 +89,15 @@ export class FinanceComponent implements OnInit {
   }
 
   private generateChartData() {
+    // QA 2026-09-18: all chart values coerced — Sequelize DECIMAL/SUM arrive
+    // as STRINGS ("150000.00"), which used to string-concat into garbage.
+    const num = (v: unknown) => {
+      const n = Number(v);
+      return Number.isFinite(n) ? n : 0;
+    };
     this.incomeVsExpenseData = [
-      { label: 'Income', value: this.summary.totalIncome || 0, color: '#10b981' },
-      { label: 'Expenses', value: this.summary.totalExpenses || 0, color: '#ef4444' }
+      { label: 'Income', value: num(this.summary.totalIncome), color: '#10b981' },
+      { label: 'Expenses', value: num(this.summary.totalExpenses), color: '#ef4444' }
     ];
 
     const catColors: { [key: string]: string } = {
@@ -109,20 +115,32 @@ export class FinanceComponent implements OnInit {
     
     const catCount: { [key: string]: number } = {};
     this.transactions.forEach(t => {
-      catCount[t.category] = (catCount[t.category] || 0) + t.amount;
+      const key = t.category || 'other';
+      catCount[key] = (catCount[key] || 0) + num(t.amount);
     });
-    
+
     this.categoryData = Object.entries(catCount).map(([cat, amount]) => ({
       label: cat.charAt(0).toUpperCase() + cat.slice(1),
       value: amount,
       color: catColors[cat] || '#64748b'
     }));
 
-    this.monthlyData = this.monthlyLabels.map((_, i) => ({
-      label: this.monthlyLabels[i],
-      value: Math.floor(Math.random() * 50000) + 10000,
-      color: i % 2 === 0 ? '#10b981' : '#ef4444'
-    }));
+    // QA 2026-09-18: monthly NET from the real summary endpoint (was
+    // Math.random). Rows are {type, month (1-12), total}.
+    const netByMonth: { [month: number]: number } = {};
+    for (const row of this.summary.monthlyData || []) {
+      const m = Number(row.month);
+      if (!Number.isInteger(m) || m < 1 || m > 12) continue;
+      netByMonth[m] = (netByMonth[m] || 0) + (row.type === 'income' ? num(row.total) : -num(row.total));
+    }
+    this.monthlyData = Object.keys(netByMonth)
+      .map(Number)
+      .sort((a, b) => a - b)
+      .map((m) => ({
+        label: this.monthNames[m - 1],
+        value: netByMonth[m],
+        color: netByMonth[m] >= 0 ? '#10b981' : '#ef4444'
+      }));
   }
 
   get filteredTransactions() {
@@ -147,16 +165,8 @@ export class FinanceComponent implements OnInit {
   }
 
   formatCurrency(amount: number): string {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount || 0);
-  }
-
-  getMockTransactions() {
-    return [
-      { id: '1', type: 'income', category: 'commission', amount: 150000, date: new Date(), description: 'Commission - Villa Sale', status: 'completed' },
-      { id: '2', type: 'income', category: 'rental', amount: 25000, date: new Date(), description: 'Monthly Rent - Apt 402', status: 'completed' },
-      { id: '3', type: 'expense', category: 'salary', amount: 12000, date: new Date(), description: 'Agent Salary - January', status: 'completed' },
-      { id: '4', type: 'expense', category: 'marketing', amount: 3500, date: new Date(), description: 'Digital Marketing Campaign', status: 'completed' },
-      { id: '5', type: 'income', category: 'sale', amount: 45000, date: new Date(), description: 'Property Sale Commission', status: 'completed' }
-    ];
+    const v = Number(amount);
+    if (!Number.isFinite(v)) return '—';
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(v);
   }
 }

@@ -35,7 +35,7 @@
                 <mat-icon>account_balance_wallet</mat-icon>
               </div>
               <div class="stat-content">
-                <span class="stat-value">{{ formatCurrency(payments.reduce((sum, p) => sum + p.amountInUSD, 0)) }}</span>
+                <span class="stat-value">{{ formatCurrency(totalUsd) }}</span>
                 <span class="stat-label">Total Received (USD)</span>
               </div>
             </div>
@@ -70,14 +70,14 @@
               <table class="payments-table">
                 <thead>
                   <tr>
-                    <th>Date</th>
-                    <th>Payer</th>
-                    <th>Deal</th>
-                    <th>Amount</th>
-                    <th>Method</th>
-                    <th>Reference</th>
-                    <th>Status</th>
-                    <th></th>
+                    <th scope="col">Date</th>
+                    <th scope="col">Payer</th>
+                    <th scope="col">Deal</th>
+                    <th scope="col">Amount</th>
+                    <th scope="col">Method</th>
+                    <th scope="col">Reference</th>
+                    <th scope="col">Status</th>
+                    <th scope="col"></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -285,7 +285,7 @@
 
 @if (showAddPaymentDialog) {
   <div class="dialog-overlay" (click)="closePaymentDialog()" (keydown.escape)="closePaymentDialog()">
-    <div class="dialog-content" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="record-payment-title">
+    <div class="dialog-content" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="record-payment-title" cdkTrapFocus>
       <div class="dialog-header">
         <h2 id="record-payment-title">Record Payment</h2>
         <button mat-icon-button (click)="closePaymentDialog()" aria-label="Close dialog">
@@ -367,16 +367,16 @@
 
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Status</mat-label>
-          <mat-select [(ngModel)]="newPayment.status">
-            @for (s of paymentStatusOptions; track s) {
-              <mat-option [value]="s">{{ s }}</mat-option>
-            }
-          </mat-select>
+          <!-- QA 2026-09-18: payments are always recorded as Pending (server-enforced);
+               confirmation happens via the Confirm action. -->
+          <input matInput value="Pending" disabled>
         </mat-form-field>
       </div>
       <div class="dialog-footer">
         <button mat-button (click)="closePaymentDialog()">Cancel</button>
-        <button mat-raised-button color="primary" (click)="createPayment()">Record Payment</button>
+        <button mat-raised-button color="primary" (click)="createPayment()" [disabled]="creatingPayment">
+          @if (creatingPayment) { Recording… } @else { Record Payment }
+        </button>
       </div>
     </div>
   </div>
@@ -384,7 +384,7 @@
 
 @if (showAddPlanDialog) {
   <div class="dialog-overlay" (click)="closePlanDialog()" (keydown.escape)="closePlanDialog()">
-    <div class="dialog-content" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="create-plan-title">
+      <div class="dialog-content" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="create-plan-title" cdkTrapFocus>
       <div class="dialog-header">
         <h2 id="create-plan-title">Create Payment Plan</h2>
         <button mat-icon-button (click)="closePlanDialog()" aria-label="Close dialog">
@@ -454,7 +454,9 @@
       </div>
       <div class="dialog-footer">
         <button mat-button (click)="closePlanDialog()">Cancel</button>
-        <button mat-raised-button color="primary" (click)="createPaymentPlan()">Create Plan</button>
+        <button mat-raised-button color="primary" (click)="createPaymentPlan()" [disabled]="creatingPlan">
+          @if (creatingPlan) { Creating… } @else { Create Plan }
+        </button>
       </div>
     </div>
   </div>

@@ -24,12 +24,9 @@ export class FeatureService {
 
   async loadFeatures() {
     try {
-      console.log('Loading feature flags from:', `${this.apiUrl}/enabled`);
       const res = await firstValueFrom(this.http.get<any>(`${this.apiUrl}/enabled`));
-      console.log('Feature flags response:', res);
       if (res.status === 'success') {
         this.features.set(res.data);
-        console.log('Features loaded:', this.features());
       }
     } catch (err) {
       console.warn('Could not load feature flags:', err);
@@ -38,11 +35,12 @@ export class FeatureService {
 
   isEnabled(key: string, role?: string): boolean {
     const features = this.features();
-    console.log('Checking isEnabled:', key, role, features);
     const feature = features[key];
     if (!feature || !feature.enabled) return false;
     if (!feature.enabledForRoles || feature.enabledForRoles.length === 0) return true;
-    if (!role) return true;
+    // QA hardening 2026-09-18: a role-restricted flag must NOT pass when the
+    // caller has no role (previously returned true -> gate bypass).
+    if (!role) return false;
     return feature.enabledForRoles.includes(role);
   }
 }

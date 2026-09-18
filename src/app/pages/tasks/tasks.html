@@ -14,6 +14,12 @@
     <div class="loading-container">
       <mat-spinner diameter="40"></mat-spinner>
     </div>
+  } @else if (loadError) {
+    <div class="loading-container" role="alert">
+      <mat-icon>error_outline</mat-icon>
+      <p>Failed to load tasks</p>
+      <button mat-raised-button color="primary" (click)="fetchTasks()">Retry</button>
+    </div>
   } @else {
     <div class="kanban-board">
       @for (column of columns; track column.id) {
@@ -112,7 +118,7 @@
 
 @if (showAddDialog) {
   <div class="dialog-overlay" (click)="closeDialog()" (keydown.escape)="closeDialog()">
-    <div class="dialog-content" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="create-task-title">
+    <div class="dialog-content" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="create-task-title" cdkTrapFocus>
       <div class="dialog-header">
         <h2 id="create-task-title">Create New Task</h2>
         <button mat-icon-button (click)="closeDialog()" aria-label="Close dialog">

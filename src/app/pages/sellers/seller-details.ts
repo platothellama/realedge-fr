@@ -100,11 +100,13 @@ export class SellerDetailsComponent implements OnInit {
   }
 
   openDealDetails(deal: any) {
-    this.router.navigate(['/deals', deal.id]);
+    // QA 2026-09-18: no /deals/:id route exists (was a dead-end to dashboard).
+    this.router.navigate(['/deals']);
   }
 
   openInvoiceDetails(invoice: any) {
-    this.router.navigate(['/invoices', invoice.id]);
+    // QA 2026-09-18: no /invoices/:id route exists (was a dead-end to dashboard).
+    this.router.navigate(['/invoices']);
   }
 
   getStatusClass(status: string): string {

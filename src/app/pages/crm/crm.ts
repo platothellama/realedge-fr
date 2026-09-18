@@ -51,6 +51,8 @@ export class CrmComponent implements OnInit {
   selectedStatus: string = 'All';
   selectedSource: string = 'All';
   deletingId: string | null = null;
+  // QA 2026-09-18: convert guard (duplicate deals on double-click).
+  convertingId: string | null = null;
   expandedLeadId: string | null = null;
 
   statuses = ['All', 'New Lead', 'Contacted', 'Visit Scheduled', 'Negotiation', 'Closed Deal', 'Lost Lead'];
@@ -270,6 +272,15 @@ export class CrmComponent implements OnInit {
     });
   }
 
+  /** QA 2026-09-18: RFC4180 escaping + formula-injection guard. A cell starting
+   * with = + - @ (after optional quotes) can execute in spreadsheet apps. */
+  private escapeCsvCell(value: unknown): string {
+    let s = value === null || value === undefined ? '' : String(value);
+    if (/^[=+\-@]/.test(s.trim())) s = `'${s}`;
+    if (/[",\n\r]/.test(s)) s = `"${s.replace(/"/g, '""')}"`;
+    return s;
+  }
+
   exportToCSV() {
     if (this.allLeads.length === 0) {
       this.snackBar.open('No leads to export', 'Close', { duration: 3000 });
@@ -285,11 +296,11 @@ export class CrmComponent implements OnInit {
       l.status,
       l.budget,
       l.nationality,
-      `"${l.preferredAreas || ''}"`,
+      l.preferredAreas || '',
       new Date(l.createdAt).toLocaleDateString()
-    ].join(','));
+    ].map(c => this.escapeCsvCell(c)).join(','));
 
-    const csvContent = [headers.join(','), ...csvData].join('\n');
+    const csvContent = [headers.map(h => this.escapeCsvCell(h)).join(','), ...csvData].join('\r\n');
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
@@ -312,26 +323,54 @@ export class CrmComponent implements OnInit {
     fileInput.click();
   }
 
+  /** QA 2026-09-18: quote-aware row splitter (naive split(',') broke on
+   * quoted commas) + per-row validation + bounded import size + honest
+   * completion reporting (previously partial failures were silent). */
+  private splitCsvRow(line: string): string[] {
+    const cols: string[] = [];
+    let cur = '';
+    let inQuotes = false;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (inQuotes) {
+        if (ch === '"') {
+          if (line[i + 1] === '"') { cur += '"'; i++; }
+          else inQuotes = false;
+        } else cur += ch;
+      } else if (ch === '"') inQuotes = true;
+      else if (ch === ',') { cols.push(cur); cur = ''; }
+      else cur += ch;
+    }
+    cols.push(cur);
+    return cols;
+  }
+
   private importLeads(file: File) {
+    const MAX_IMPORT_ROWS = 500;
     const reader = new FileReader();
     reader.onload = (e: any) => {
       const text = e.target.result;
-      const lines = text.split('\n');
+      const lines = text.split(/\r?\n/);
       const leads = [];
+      let skipped = 0;
 
-      // Basic CSV parsing (skip header)
-      for (let i = 1; i < lines.length; i++) {
-        const cols = lines[i].split(',');
-        if (cols.length >= 3) {
-          leads.push({
-            name: cols[0]?.trim(),
-            email: cols[1]?.trim(),
-            phone: cols[2]?.trim(),
-            source: cols[3]?.trim() || 'Website',
-            status: cols[4]?.trim() || 'New Lead',
-            budget: parseFloat(cols[5]) || 0
-          });
-        }
+      // Skip header; ignore blank lines; bound the batch; parse quote-aware.
+      const dataLines = lines.slice(1).filter((l: string) => l.trim());
+      if (dataLines.length > MAX_IMPORT_ROWS) skipped = dataLines.length - MAX_IMPORT_ROWS;
+      for (const line of dataLines.slice(0, MAX_IMPORT_ROWS)) {
+        const cols = this.splitCsvRow(line);
+        if (cols.length < 3) { skipped++; continue; }
+        const email = cols[1]?.trim() || '';
+        // Reject rows without a plausible name+email instead of creating junk.
+        if (!cols[0]?.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { skipped++; continue; }
+        leads.push({
+          name: cols[0]?.trim(),
+          email,
+          phone: cols[2]?.trim(),
+          source: cols[3]?.trim() || 'Website',
+          status: cols[4]?.trim() || 'New Lead',
+          budget: parseFloat(cols[5]) || 0
+        });
       }
 
       if (leads.length === 0) {
@@ -339,20 +378,20 @@ export class CrmComponent implements OnInit {
         return;
       }
 
-      // We'll create leads one by one for simplicity in this demo,
-      // or implement a bulk create endpoint on the backend
-      let count = 0;
-      leads.forEach(lead => {
-        this.apiService.createLead(lead).subscribe({
-          next: () => {
-            count++;
-            if (count === leads.length) {
-              this.fetchLeads();
-              this.snackBar.open(`Successfully imported ${count} leads`, 'Close', { duration: 3000 });
-            }
-          },
-          error: (err) => console.error('Failed to import a lead', err)
-        });
+      // QA 2026-09-18: one validated server call (was N parallel creates).
+      this.apiService.bulkCreateLeads(leads).subscribe({
+        next: (res: any) => {
+          this.fetchLeads();
+          const created = res?.created ?? leads.length;
+          const skippedTotal = skipped + (res?.skipped ?? 0);
+          this.snackBar.open(
+            `Imported ${created} of ${leads.length} leads${skippedTotal ? ` (${skippedTotal} rows skipped)` : ''}`,
+            'Close', { duration: 4000 });
+        },
+        error: (err) => {
+          console.error('Failed to import leads', err);
+          this.showError(err?.error?.message || 'Failed to import leads');
+        }
       });
     };
     reader.readAsText(file);
@@ -472,6 +511,7 @@ export class CrmComponent implements OnInit {
   }
 
   convertToDeal(lead: any) {
+    if (this.convertingId) return;
     if (!lead.interestedIn) {
       this.snackBar.open('No property specified for this lead. Please add a property first.', 'Close', { duration: 5000 });
       return;
@@ -480,14 +520,17 @@ export class CrmComponent implements OnInit {
     const propertyId = lead.interestedIn;
     const sellerName = 'Seller'; 
 
+    this.convertingId = lead.id;
     this.apiService.convertLeadToDeal(lead.id, { propertyId, sellerName }).subscribe({
       next: (response) => {
         this.fetchLeads();
         this.snackBar.open('Lead converted to deal!', 'Close', { duration: 3000 });
+        this.convertingId = null;
       },
       error: (err) => {
         console.error('Error converting lead', err);
-        this.showError('Failed to convert lead to deal');
+        this.showError(err?.error?.message || 'Failed to convert lead to deal');
+        this.convertingId = null;
       }
     });
   }

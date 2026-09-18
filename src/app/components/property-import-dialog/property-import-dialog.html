@@ -117,7 +117,7 @@
                   [name]="'country-' + r.excelRow" placeholder="Required" />
               </td>
               <td class="details">
-                {{ r.data.bedrooms }}bd · {{ r.data.bathrooms }}ba · {{ r.data.area }}m² · {{ r.data.listingType }}
+                {{ r.data.bedrooms }}bd@if (r.data.masterBedrooms) { ({{ r.data.masterBedrooms }} master) } · {{ r.data.bathrooms }}ba · {{ r.data.area }}m² · {{ r.data.listingType }}
                 @if (r.data.features.length) {
                   <span class="muted">· {{ r.data.features.join(', ') }}</span>
                 }

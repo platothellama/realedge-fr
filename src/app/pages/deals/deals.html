@@ -29,7 +29,6 @@
     [config]="searchConfig"
     [statusOptions]="stageOptions"
     (filtersChange)="onFiltersChange($event)"
-    (search)="applyFilters()"
   ></app-property-search>
 
   @if (loading) {

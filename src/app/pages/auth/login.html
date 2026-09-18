@@ -16,6 +16,8 @@
           <mat-label>Email Address</mat-label>
           <input matInput formControlName="email" type="email" placeholder="name@company.com">
           <mat-icon matSuffix>email</mat-icon>
+          <mat-error *ngIf="loginForm.get('email')?.hasError('required')">Email is required</mat-error>
+          <mat-error *ngIf="loginForm.get('email')?.hasError('email')">Enter a valid email address</mat-error>
         </mat-form-field>
       </div>
 
@@ -23,9 +25,10 @@
         <mat-form-field appearance="outline">
           <mat-label>Password</mat-label>
           <input matInput formControlName="password" [type]="hidePassword ? 'password' : 'text'">
-          <button type="button" mat-icon-button matSuffix (click)="hidePassword = !hidePassword">
+          <button type="button" mat-icon-button matSuffix (click)="hidePassword = !hidePassword" [attr.aria-label]="hidePassword ? 'Show password' : 'Hide password'">
             <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
           </button>
+          <mat-error *ngIf="loginForm.get('password')?.hasError('required')">Password is required</mat-error>
         </mat-form-field>
       </div>
 
@@ -34,12 +37,5 @@
         <mat-spinner diameter="24" *ngIf="loading()"></mat-spinner>
       </button>
     </form>
-
-    <div class="divider">or continue with</div>
-
-    <button mat-button class="google-btn" (click)="loginWithGoogle()">
-      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="google-icon" alt="Google">
-      Sign in with Google
-    </button>
   </mat-card>
 </div>

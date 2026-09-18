@@ -61,10 +61,12 @@ export class LeadFormComponent implements OnInit {
     this.leadForm = this.fb.group({
       name: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
-      phone: ['', Validators.required],
+      // QA 2026-09-18: phone/budget are optional server-side (allowNull) —
+      // requiring them blocked legitimate email-only / unknown-budget leads.
+      phone: [''],
       source: ['Website', Validators.required],
       status: ['New Lead', Validators.required],
-      budget: [null, [Validators.required, Validators.min(0)]],
+      budget: [null, [Validators.min(0)]],
       nationality: [''],
       preferredAreas: [''],
       propertyPreferences: [''],

@@ -52,7 +52,12 @@ export class PropertyMatcherComponent implements OnInit {
   searchType: 'wizard' | 'natural' | null = null;
   lastSearchQuery = '';
 
-  private readonly STORAGE_KEY = 'property_matcher_search';
+  private readonly STORAGE_KEY_PREFIX = 'property_matcher_search:';
+  private readonly CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24h
+
+  private storageKey(): string {
+    return `${this.STORAGE_KEY_PREFIX}${this.preferenceId || 'none'}`;
+  }
 
   constructor(
     private route: ActivatedRoute,
@@ -88,12 +93,19 @@ export class PropertyMatcherComponent implements OnInit {
 
   private loadSavedSearch() {
     try {
-      const saved = localStorage.getItem(this.STORAGE_KEY);
+      // QA hardening 2026-09-18: per-preference key (was shared across all
+      // preferences), 24h TTL (timestamp was written but never read), and
+      // totalFound recomputed after filtering (was kept stale).
+      const saved = localStorage.getItem(this.storageKey());
       if (saved) {
         const data: SavedSearch = JSON.parse(saved);
+        if (Date.now() - (data.timestamp || 0) > this.CACHE_TTL_MS) {
+          localStorage.removeItem(this.storageKey());
+          return;
+        }
         if (data.preferenceId === this.preferenceId) {
           this.matches = (data.matches || []).filter((m: any) => m && m.property);
-          this.totalFound = data.totalFound || 0;
+          this.totalFound = this.matches.length;
           this.aiExplanation = data.aiExplanation || '';
           this.searchType = data.searchType;
           this.lastFilters = data.lastFilters || null;
@@ -110,14 +122,15 @@ export class PropertyMatcherComponent implements OnInit {
       const data: SavedSearch = {
         preferenceId: this.preferenceId,
         matches: this.matches,
-        totalFound: this.totalFound,
+        totalFound: this.matches.length,
         aiExplanation: this.aiExplanation,
         searchType: this.searchType as 'wizard' | 'natural',
         timestamp: Date.now(),
         lastFilters: this.lastFilters
       };
-      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(data));
+      localStorage.setItem(this.storageKey(), JSON.stringify(data));
     } catch (e) {
+      // QuotaExceededError etc: in-memory results still work for this session.
       console.error('Failed to save search', e);
     }
   }
@@ -137,7 +150,9 @@ export class PropertyMatcherComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result?.action === 'search' && result.results) {
         this.matches = (result.results.matches || []).filter((m: any) => m && m.property);
-        this.totalFound = result.results.totalFound || 0;
+        // QA fix: count what is actually displayed (server total includes
+        // rows dropped by the filter above).
+        this.totalFound = this.matches.length;
         this.aiExplanation = '';
         this.searchType = 'wizard';
         this.lastFilters = result.filters;
@@ -168,7 +183,7 @@ export class PropertyMatcherComponent implements OnInit {
     this.apiService.matchPropertiesToBuyer(this.preferenceId).subscribe({
       next: (data) => {
         this.matches = (data.matches || []).filter((m: any) => m && m.property);
-        this.totalFound = data.totalFound || 0;
+        this.totalFound = this.matches.length;
         this.aiExplanation = data.aiExplanation || '';
         this.hasSearched = true;
         this.saveSearch();
@@ -191,7 +206,7 @@ export class PropertyMatcherComponent implements OnInit {
     }).subscribe({
       next: (data) => {
         this.matches = (data.results || []).filter((m: any) => m && m.property);
-        this.totalFound = data.totalFound || 0;
+        this.totalFound = this.matches.length;
         this.hasSearched = true;
         this.saveSearch();
         
@@ -224,7 +239,7 @@ export class PropertyMatcherComponent implements OnInit {
     this.searchType = null;
     this.aiExplanation = '';
     this.lastSearchQuery = '';
-    localStorage.removeItem(this.STORAGE_KEY);
+    localStorage.removeItem(this.storageKey());
   }
 
   rerunSearch() {
@@ -233,7 +248,7 @@ export class PropertyMatcherComponent implements OnInit {
       this.apiService.wizardSearch(this.preferenceId, this.getFiltersFromLastSearch()).subscribe({
         next: (result) => {
           this.matches = (result.matches || []).filter((m: any) => m && m.property);
-          this.totalFound = result.totalFound || 0;
+          this.totalFound = this.matches.length;
           this.aiExplanation = '';
           this.hasSearched = true;
           this.saveSearch();

@@ -85,6 +85,10 @@
 
   </mat-dialog-content>
 
+  @if (submitError) {
+    <div class="submit-error" role="alert">{{ submitError }}</div>
+  }
+
   <mat-dialog-actions align="end">
     <button mat-button (click)="onCancel()" class="cancel-btn" [disabled]="isSubmitting">Discard</button>
     <button mat-raised-button color="primary" class="submit-btn" (click)="onSubmit()" [disabled]="!visitForm.valid || isSubmitting" [class.loading]="isSubmitting">
