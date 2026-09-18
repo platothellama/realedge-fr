@@ -78,6 +78,10 @@
                 <mat-icon>edit</mat-icon>
                 <span>Edit</span>
               </button>
+              <button mat-menu-item (click)="deleteSeller(seller)" [disabled]="isDeleting(seller.id)">
+                <mat-icon>delete</mat-icon>
+                <span>Delete</span>
+              </button>
             </mat-menu>
           </td>
         </ng-container>

@@ -18,6 +18,7 @@ import { Router } from '@angular/router';
 import { ApiService } from '../../services/api';
 import { FormsModule } from '@angular/forms';
 import { PropertySearchComponent, SearchFilters, SearchFilterConfig } from '../../shared/molecules/property-search/property-search';
+import { ConfirmDialogComponent } from '../../shared/molecules/confirm-dialog/confirm-dialog';
 import { PageHeaderComponent } from '../../shared/molecules/page-header/page-header';
 import { LoadingStateComponent } from '../../shared/atoms/loading-state/loading-state';
 import { EmptyStateComponent } from '../../shared/atoms/empty-state/empty-state';
@@ -56,6 +57,7 @@ export class SellersComponent implements OnInit {
   searchQuery = '';
 
   isLoading = false;
+  deletingId: string | null = null;
 
   searchFilters: SearchFilters = {
     searchQuery: '',
@@ -167,6 +169,38 @@ export class SellersComponent implements OnInit {
       },
       error: (err: any) => this.showError('Failed to update seller')
     });
+  }
+
+  deleteSeller(seller: any) {
+    const ref = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      maxWidth: '95vw',
+      data: {
+        title: 'Delete seller?',
+        message: `${seller?.name || 'This seller'} will be permanently deleted. This cannot be undone.`,
+        confirmLabel: 'Delete',
+        destructive: true
+      }
+    });
+    ref.afterClosed().subscribe(confirmed => {
+      if (!confirmed) return;
+      this.deletingId = seller.id;
+      this.api.deleteSeller(seller.id).subscribe({
+        next: () => {
+          this.showSuccess('Seller deleted successfully');
+          this.deletingId = null;
+          this.fetchSellers();
+        },
+        error: (err: any) => {
+          this.showError(err?.error?.message || 'Failed to delete seller');
+          this.deletingId = null;
+        }
+      });
+    });
+  }
+
+  isDeleting(id: string): boolean {
+    return this.deletingId === id;
   }
 
   showError(msg: string) {
