@@ -7,6 +7,16 @@ import { environment } from '../../environments/environment';
 export class GoogleMapsService {
   private loadPromise: Promise<void> | null = null;
 
+  /** True when an API key is configured (map *can* load). */
+  isConfigured(): boolean {
+    return !!environment.GOOGLE_MAPS_API_KEY;
+  }
+
+  /** True when the Maps JS API is actually usable in this browser session. */
+  isLoaded(): boolean {
+    return typeof google !== 'undefined' && !!(google as any).maps;
+  }
+
   load(): Promise<void> {
     if (this.loadPromise) {
       return this.loadPromise;

@@ -16,7 +16,14 @@ import { routes } from './app.routes';
 
 export function initializeApp(googleMapsService: GoogleMapsService) {
   return () => googleMapsService.load().catch(err => {
-    console.error('Failed to load Google Maps:', err);
+    // QA 2026-09-18 (real browser test): Maps is optional and nothing loads it
+    // at boot — an error here on EVERY page load drowns real console errors.
+    // Missing key (dev/test) => warn once; genuine script failure => error.
+    if (err && err.message && err.message.includes('not configured')) {
+      console.warn('Google Maps disabled: API key not configured (map UI shows a clear error if opened).');
+    } else {
+      console.error('Failed to load Google Maps:', err);
+    }
     return Promise.resolve();
   });
 }

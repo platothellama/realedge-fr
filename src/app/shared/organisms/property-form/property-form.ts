@@ -13,6 +13,7 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { GoogleMapsModule } from '@angular/google-maps';
+import { GoogleMapsService } from '../../../services/google-maps.service';
 import { ApiService } from '../../../services/api';
 import { AuthService } from '../../../services/auth/auth.service';
 import { SellerSelectorComponent, SellerSelection } from '../../molecules/seller-selector/seller-selector';
@@ -90,6 +91,10 @@ export class PropertyFormComponent implements OnInit, AfterViewInit {
   mapCenter: any = { lat: 25.2048, lng: 55.2708 };
   mapZoom = 12;
   markerPosition: any = null;
+  // QA 2026-09-18 (real browser test): without a Maps API key the
+  // <google-map> component throws and the global error dialog blocks the
+  // whole wizard. Hide the map and keep manual address entry working.
+  mapsAvailable = false;
   mapOptions: any = {
     mapTypeId: 'roadmap',
     zoomControl: true,
@@ -248,6 +253,7 @@ export class PropertyFormComponent implements OnInit, AfterViewInit {
     private dialogRef: MatDialogRef<PropertyFormComponent>,
     private api: ApiService,
     private auth: AuthService,
+    private maps: GoogleMapsService,
     @Inject(MAT_DIALOG_DATA) public data: any
   ) {
     const user = this.auth.currentUser();
@@ -321,6 +327,12 @@ export class PropertyFormComponent implements OnInit, AfterViewInit {
     this.loadFeatures();
     this.handleEditMode();
     this.subscribeToLocationChanges();
+    // Map preview only when the Maps API actually loaded; otherwise the
+    // <google-map> component throws and blocks the wizard (QA 2026-09-18).
+    this.mapsAvailable = this.maps.isLoaded();
+    if (!this.mapsAvailable && this.maps.isConfigured()) {
+      this.maps.load().then(() => { this.mapsAvailable = this.maps.isLoaded(); }).catch(() => { this.mapsAvailable = false; });
+    }
   }
 
   private loadFeatures() {

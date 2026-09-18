@@ -390,9 +390,14 @@
               <mat-icon>info</mat-icon>
               <div>
                 <strong>How to set location</strong>
-                <p>Click on the map to place a marker. Drag the marker to adjust the exact location. Scroll is disabled - use mouse to drag/pan the map.</p>
+                @if (mapsAvailable) {
+                  <p>Click on the map to place a marker. Drag the marker to adjust the exact location. Scroll is disabled - use mouse to drag/pan the map.</p>
+                } @else {
+                  <p>Map preview is unavailable (Google Maps API key not configured). Enter the address details manually below — the listing saves normally.</p>
+                }
               </div>
             </div>
+            @if (mapsAvailable) {
             <div class="map-container">
               <google-map
                 height="280px"
@@ -406,6 +411,7 @@
                 }
               </google-map>
             </div>
+            }
           </div>
 
           <mat-form-field appearance="outline" class="full-width">
