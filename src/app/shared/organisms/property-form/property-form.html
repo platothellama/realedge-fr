@@ -308,9 +308,11 @@
             <div class="form-row one-col">
               <mat-form-field appearance="outline">
                 <mat-label>Terrace Size</mat-label>
-                <input matInput type="number" formControlName="terraceSize" min="0">
+                <input matInput type="number" formControlName="terraceSize" min="0" placeholder="Ex: 25">
                 <span matSuffix class="unit-suffix">sqm</span>
                 <mat-icon matPrefix>deck</mat-icon>
+                <mat-hint>Enter the terrace area in sqm</mat-hint>
+                <mat-error *ngIf="propertyForm.get('terraceSize')?.hasError('min')">Terrace size cannot be negative</mat-error>
               </mat-form-field>
             </div>
           }
@@ -332,9 +334,11 @@
             <div class="form-row one-col">
               <mat-form-field appearance="outline">
                 <mat-label>Cellar Size</mat-label>
-                <input matInput type="number" formControlName="cellarSize" min="0">
+                <input matInput type="number" formControlName="cellarSize" min="0" placeholder="Ex: 10">
                 <span matSuffix class="unit-suffix">sqm</span>
                 <mat-icon matPrefix>warehouse</mat-icon>
+                <mat-hint>Enter the cellar area in sqm</mat-hint>
+                <mat-error *ngIf="propertyForm.get('cellarSize')?.hasError('min')">Cellar size cannot be negative</mat-error>
               </mat-form-field>
             </div>
           }

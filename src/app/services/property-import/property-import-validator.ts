@@ -235,6 +235,15 @@ export function validateImportRow(raw: RawImportRow, excelRow: number): Validate
     hasCellar = cellarFlag;
   }
 
+  // Sizes only make sense when the feature exists — flag mismatches are
+  // rejected so imports don't silently store sizes for missing features.
+  if (!hasTerrace && terraceSize !== null) {
+    errors.push('Terrace size is set but HasTerrace is NO — set HasTerrace to YES or clear Terrace size.');
+  }
+  if (!hasCellar && cellarSize !== null) {
+    errors.push('Cellar size is set but HasCellar is NO — set HasCellar to YES or clear Cellar size.');
+  }
+
   // ---- Coordinates ----
   let lat: number | null = null;
   let lng: number | null = null;

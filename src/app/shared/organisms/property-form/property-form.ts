@@ -286,9 +286,9 @@ export class PropertyFormComponent implements OnInit, AfterViewInit {
       parkingSpaces: [0, Validators.min(0)],
       floor: [null],
       hasTerrace: [false],
-      terraceSize: [0, Validators.min(0)],
+      terraceSize: [{ value: null, disabled: true }, Validators.min(0)],
       hasCellar: [false],
-      cellarSize: [0, Validators.min(0)],
+      cellarSize: [{ value: null, disabled: true }, Validators.min(0)],
 
       // Location
       address: ['', Validators.required],
@@ -326,7 +326,9 @@ export class PropertyFormComponent implements OnInit, AfterViewInit {
     this.loadProjects();
     this.loadFeatures();
     this.handleEditMode();
+    this.syncOutdoorSizes();
     this.subscribeToLocationChanges();
+    this.subscribeToOutdoorChanges();
     // Map preview only when the Maps API actually loaded; otherwise the
     // <google-map> component throws and blocks the wizard (QA 2026-09-18).
     this.mapsAvailable = this.maps.isLoaded();
@@ -405,9 +407,9 @@ export class PropertyFormComponent implements OnInit, AfterViewInit {
       parkingSpaces: [0, Validators.min(0)],
       floor: [null],
       hasTerrace: [false],
-      terraceSize: [0, Validators.min(0)],
+      terraceSize: [{ value: null, disabled: true }, Validators.min(0)],
       hasCellar: [false],
-      cellarSize: [0, Validators.min(0)],
+      cellarSize: [{ value: null, disabled: true }, Validators.min(0)],
       address: ['', Validators.required],
       city: ['', Validators.required],
       country: ['', Validators.required],
@@ -527,6 +529,38 @@ export class PropertyFormComponent implements OnInit, AfterViewInit {
         this.updateMarkerFromInputs(this.propertyForm.get('lat')?.value, lng);
       }
     });
+  }
+
+  // Terrace / cellar sizes are only meaningful when the flag is set.
+  // Keep the size control enabled only then, otherwise clear + disable it
+  // so no stale 0/size is submitted for a property without one.
+  private syncOutdoorSizes(): void {
+    // Sold listings lock the whole form — never re-enable sizes there.
+    if (this.statusLocked || this.propertyForm.disabled) return;
+    const hasTerrace = !!this.propertyForm.get('hasTerrace')?.value;
+    const terraceCtrl = this.propertyForm.get('terraceSize');
+    if (hasTerrace) {
+      terraceCtrl?.enable({ emitEvent: false });
+    } else {
+      terraceCtrl?.setValue(null, { emitEvent: false });
+      terraceCtrl?.disable({ emitEvent: false });
+      terraceCtrl?.markAsUntouched();
+    }
+
+    const hasCellar = !!this.propertyForm.get('hasCellar')?.value;
+    const cellarCtrl = this.propertyForm.get('cellarSize');
+    if (hasCellar) {
+      cellarCtrl?.enable({ emitEvent: false });
+    } else {
+      cellarCtrl?.setValue(null, { emitEvent: false });
+      cellarCtrl?.disable({ emitEvent: false });
+      cellarCtrl?.markAsUntouched();
+    }
+  }
+
+  private subscribeToOutdoorChanges(): void {
+    this.propertyForm.get('hasTerrace')?.valueChanges.subscribe(() => this.syncOutdoorSizes());
+    this.propertyForm.get('hasCellar')?.valueChanges.subscribe(() => this.syncOutdoorSizes());
   }
 
   ngAfterViewInit() {
@@ -779,12 +813,21 @@ export class PropertyFormComponent implements OnInit, AfterViewInit {
       const manualDocs = val.documents ? val.documents.split(',').map((s: string) => s.trim()).filter((s: string) => s !== '') : [];
       const allDocs = [...new Set([...this.uploadedDocuments, ...manualDocs])];
 
+      const toNullableNumber = (v: unknown): number | null => {
+        if (v === null || v === undefined || v === '') return null;
+        const n = Number(v);
+        return Number.isFinite(n) ? n : null;
+      };
       const payload: any = {
         ...val,
         bedrooms: val.bedrooms === null || val.bedrooms === undefined || val.bedrooms === '' ? 0 : Number(val.bedrooms),
         masterBedrooms: val.masterBedrooms === null || val.masterBedrooms === undefined || val.masterBedrooms === '' ? 0 : Number(val.masterBedrooms),
         bathrooms: val.bathrooms === null || val.bathrooms === undefined || val.bathrooms === '' ? 0 : Number(val.bathrooms),
         balconies: val.balconies === null || val.balconies === undefined || val.balconies === '' ? 0 : Number(val.balconies),
+        // Sizes only apply when the feature exists — otherwise store NULL
+        // (no stale 0 for a property without terrace/cellar).
+        terraceSize: val.hasTerrace ? toNullableNumber(val.terraceSize) : null,
+        cellarSize: val.hasCellar ? toNullableNumber(val.cellarSize) : null,
         lat: val.lat ? Number(val.lat) : null,
         lng: val.lng ? Number(val.lng) : null,
         projectId: val.projectId || null,

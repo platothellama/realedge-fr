@@ -240,10 +240,19 @@
         </div>
         <div class="dialog-footer">
           <button mat-button (click)="closeDialog()">Cancel</button>
-          <button mat-raised-button color="primary" (click)="createInvoice()" [disabled]="creatingInvoice">
+          <!-- Human-QA 2026-09-18: empty submit previously did nothing visible
+               (snackbar was hidden behind the dialog backdrop), so the dialog
+               looked dead. Disable until the minimum valid state and explain
+               what is missing; TS snackbar guards remain as fallback. -->
+          <button mat-raised-button color="primary" (click)="createInvoice()"
+            [disabled]="creatingInvoice || !(newInvoice.clientName?.trim()) || lineItems.length === 0"
+            [title]="!(newInvoice.clientName?.trim()) ? 'Enter or select a client first' : (lineItems.length === 0 ? 'Add at least one line item' : 'Create invoice')">
             @if (creatingInvoice) { Creating… } @else { Create Invoice }
           </button>
         </div>
+        @if (!creatingInvoice && (!(newInvoice.clientName?.trim()) || lineItems.length === 0)) {
+          <p class="dialog-hint" role="note">Add a client and at least one line item to create the invoice.</p>
+        }
     </app-dialog-shell>
   }
 </div>

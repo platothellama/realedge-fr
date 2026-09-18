@@ -884,6 +884,16 @@ mat-error {
   color: var(--text-primary) !important;
 }
 
+/* Human-QA 2026-09-18: custom .dialog-overlay sits at z-index 1000, which
+   buried Material snackbars/menus (same default level) behind the backdrop —
+   e.g. "Client name is required" was invisible while New Invoice was open.
+   Lift the CDK overlay container above app dialogs so transient feedback is
+   always visible. Internal overlay order (menu < dialog < datepicker) is
+   preserved because it is relative within the container. */
+.cdk-overlay-container {
+  z-index: 2000 !important;
+}
+
 .mat-mdc-snack-bar-label {
   color: var(--text-primary) !important;
   font-family: 'Urbanist', sans-serif !important;
@@ -1956,6 +1966,15 @@ button.loading mat-spinner {
   gap: 12px;
   padding: 16px 24px;
   border-top: 1px solid var(--border);
+}
+
+/* Human-QA 2026-09-18: inline readiness hint for dialogs whose primary
+   action stays disabled until minimum-valid input (e.g. New Invoice). */
+.dialog-hint {
+  margin: 0;
+  padding: 0 24px 16px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
 }
 
 /* ========================
