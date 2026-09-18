@@ -1304,6 +1304,20 @@ button.loading mat-spinner {
     max-height: 85vh !important;
   }
 
+  /* Compact dialog chrome on small screens (promoted from tasks page —
+     previously only tasks dialogs tightened here; now consistent). */
+  .dialog-header {
+    padding: 12px 16px !important;
+  }
+
+  .dialog-header h2 {
+    font-size: 1.1rem !important;
+  }
+
+  .dialog-body {
+    padding: 16px !important;
+  }
+
   .search-options {
     flex-direction: column !important;
   }
@@ -1603,6 +1617,53 @@ button.loading mat-spinner {
   color: var(--text-muted);
 }
 
+/* Canonical stat-icon tones. These palettes were previously duplicated in
+   commissions/expenses/invoices/payments/marketing-automation CSS; they are
+   centralized here because shared <app-stat-card> markup renders outside
+   those components' style encapsulation, so page-local tone rules no longer
+   match converted cards. Intentional normalizations (documented in the
+   refactor report): approved → info-blue on all pages (was green on
+   expenses), this-month → info-blue (was indigo on commissions), and the
+   payments light-theme pastels → dark-theme equivalents. Semantics
+   (green=money-in, amber=waiting, red=bad, blue=info) are unchanged. */
+.stat-icon.total,
+.stat-icon.campaigns {
+  background: rgba(99, 102, 241, 0.12);
+  color: var(--primary);
+}
+
+.stat-icon.pending,
+.stat-icon.outstanding,
+.stat-icon.rate,
+.stat-icon.cash {
+  background: rgba(245, 158, 11, 0.12);
+  color: var(--warning);
+}
+
+.stat-icon.paid,
+.stat-icon.active,
+.stat-icon.received {
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--success);
+}
+
+.stat-icon.approved,
+.stat-icon.this-month,
+.stat-icon.emails {
+  background: rgba(59, 130, 246, 0.12);
+  color: #3b82f6;
+}
+
+.stat-icon.overdue {
+  background: rgba(239, 68, 68, 0.12);
+  color: var(--error);
+}
+
+.stat-icon.transactions {
+  background: rgba(168, 85, 247, 0.12);
+  color: #a855f7;
+}
+
 /* ========================
    STANDARDIZED SEARCH BOX
    ======================== */
@@ -1780,6 +1841,39 @@ button.loading mat-spinner {
   color: var(--primary);
 }
 
+/* Canonical badge tones emitted by app-status-badge (STATUS_BADGE_MAP).
+   Previously these only existed in dashboard.css, which left the shared
+   atom unstyled everywhere else. Same palette as .status-* above. */
+.badge-success {
+  background: rgba(16, 185, 129, 0.12);
+  color: var(--success);
+}
+
+.badge-warning {
+  background: rgba(245, 158, 11, 0.12);
+  color: var(--warning);
+}
+
+.badge-danger {
+  background: rgba(239, 68, 68, 0.12);
+  color: var(--error);
+}
+
+.badge-primary {
+  background: rgba(99, 102, 241, 0.12);
+  color: var(--primary);
+}
+
+.badge-info {
+  background: rgba(56, 189, 248, 0.12);
+  color: var(--info);
+}
+
+.badge-muted {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-muted);
+}
+
 /* ========================
    STANDARDIZED DIALOG OVERLAY
    ======================== */
@@ -1807,6 +1901,31 @@ button.loading mat-spinner {
   max-height: 90vh;
   overflow-y: auto;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+/* Dialog size variants. Promoted from invoices/website-builder page CSS so
+   the modifier classes keep working when the content box is rendered inside
+   app-dialog-shell (page-scoped rules no longer match there). */
+.dialog-content.dialog-large {
+  max-width: 800px;
+}
+
+/* Gap between a projected title icon and the dialog title text
+   (replaces the inline whitespace of hand-rolled h2 > mat-icon copies). */
+.dialog-header h2 .dialog-title-icon {
+  margin-right: 8px;
+}
+
+.dialog-content.invoice-dialog {
+  max-width: 700px !important;
+  max-height: 85vh !important;
+}
+
+@media (max-width: 640px) {
+  .dialog-content.invoice-dialog {
+    max-width: 95vw !important;
+    max-height: 90vh !important;
+  }
 }
 
 .dialog-header {
@@ -2757,14 +2876,6 @@ button.loading mat-spinner {
 }
 
 /* ========================
-   UTILITY: HIDE SUBSCRIPT
-   ======================== */
-
-.no-subscript ::ng-deep .mat-mdc-form-field-subscript-wrapper {
-  display: none !important;
-}
-
-/* ========================
    RESPONSIVE UTILITIES
    ======================== */
 
@@ -2775,9 +2886,6 @@ button.loading mat-spinner {
 }
 
 @media (max-width: 768px) {
-  .page-container {
-    padding: 16px;
-  }
 
   .page-header {
     flex-direction: column;
@@ -2834,11 +2942,6 @@ button.loading mat-spinner {
     flex-direction: column;
     gap: 16px;
     padding: 16px;
-  }
-
-  .pagination-controls {
-    flex-wrap: wrap;
-    justify-content: center;
   }
 
   .stat-card {

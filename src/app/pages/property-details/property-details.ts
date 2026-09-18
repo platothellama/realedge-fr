@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -19,15 +20,16 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { ApiService } from '../../services/api';
 import { AuthService } from '../../services/auth/auth.service';
-import { BreadcrumbComponent } from '../../components/breadcrumb/breadcrumb';
-import { PropertyFormComponent } from '../../components/property-form/property-form';
-import { NegotiationFormComponent } from '../../components/negotiation-form/negotiation-form';
-import { DealFormComponent } from '../../components/deal-form/deal-form';
-import { VisitFormComponent } from '../../components/visit-form/visit-form';
-import { DocumentManagerComponent } from '../../components/document-manager/document-manager';
-import { LeadWorkflowComponent, LeadWorkflowResult } from '../../components/lead-workflow/lead-workflow';
-import { SoldDialogComponent } from '../../components/sold-dialog/sold-dialog';
-import { LostDialogComponent, LostDialogResult } from '../../components/lost-dialog/lost-dialog';
+import { BreadcrumbComponent } from '../../shared/atoms/breadcrumb/breadcrumb';
+import { PageHeaderComponent } from '../../shared/molecules/page-header/page-header';
+import { PropertyFormComponent } from '../../shared/organisms/property-form/property-form';
+import { NegotiationFormComponent } from '../../shared/molecules/negotiation-form/negotiation-form';
+import { DealFormComponent } from '../../shared/organisms/deal-form/deal-form';
+import { VisitFormComponent } from '../../shared/organisms/visit-form/visit-form';
+import { DocumentManagerComponent } from '../../shared/organisms/document-manager/document-manager';
+import { LeadWorkflowComponent, LeadWorkflowResult } from '../../shared/organisms/lead-workflow/lead-workflow';
+import { SoldDialogComponent } from '../../shared/molecules/sold-dialog/sold-dialog';
+import { LostDialogComponent, LostDialogResult } from '../../shared/molecules/lost-dialog/lost-dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 @Component({
@@ -55,6 +57,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
     MatNativeDateModule,
     DocumentManagerComponent,
     BreadcrumbComponent,
+    PageHeaderComponent,
   ],
   templateUrl: './property-details.html',
   styleUrl: './property-details.css'
@@ -79,7 +82,8 @@ export class PropertyDetailsComponent implements OnInit {
     private api: ApiService,
     private auth: AuthService,
     private dialog: MatDialog,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private sanitizer: DomSanitizer
   ) {
     this.currentUser = this.auth.currentUser();
   }
@@ -98,6 +102,9 @@ export class PropertyDetailsComponent implements OnInit {
         this.property = {
           ...res,
           photos: Array.isArray(res.photos) ? res.photos : [],
+          videos: Array.isArray(res.videos) ? res.videos : [],
+          tours360: Array.isArray(res.tours360) ? res.tours360 : [],
+          documents: Array.isArray(res.documents) ? res.documents : [],
           features: Array.isArray(res.features) ? res.features : [],
           priceHistoryEntries: Array.isArray(res.priceHistoryEntries) ? res.priceHistoryEntries : []
         };
@@ -409,6 +416,62 @@ export class PropertyDetailsComponent implements OnInit {
     event.stopPropagation();
     if (this.property?.photos?.length) {
       this.lightboxIndex = (this.lightboxIndex + 1) % this.property.photos.length;
+    }
+  }
+
+  // ---- Videos & tours (uploaded mp4/webm/mov + YouTube/Vimeo links) ----
+  get hasMedia(): boolean {
+    return (this.property?.videos?.length || 0) > 0
+      || (this.property?.tours360?.length || 0) > 0
+      || (this.property?.documents?.length || 0) > 0;
+  }
+
+  get videoItems(): { kind: 'file' | 'youtube' | 'vimeo' | 'link'; url: string; embedUrl?: string; label: string }[] {
+    const list: string[] = Array.isArray(this.property?.videos) ? this.property.videos : [];
+    return list.filter(Boolean).map((url) => this.describeVideoUrl(url));
+  }
+
+  get tourLinks(): string[] {
+    const list: string[] = Array.isArray(this.property?.tours360) ? this.property.tours360 : [];
+    return list.filter(Boolean);
+  }
+
+  get attachmentDocs(): string[] {
+    const list: string[] = Array.isArray(this.property?.documents) ? this.property.documents : [];
+    return list.filter(Boolean);
+  }
+
+  private describeVideoUrl(url: string): { kind: 'file' | 'youtube' | 'vimeo' | 'link'; url: string; embedUrl?: string; label: string } {
+    const label = this.fileNameFromUrl(url);
+    const ytId = this.youtubeId(url);
+    if (ytId) return { kind: 'youtube', url, embedUrl: `https://www.youtube.com/embed/${ytId}`, label };
+    const vimeoId = this.vimeoId(url);
+    if (vimeoId) return { kind: 'vimeo', url, embedUrl: `https://player.vimeo.com/video/${vimeoId}`, label };
+    if (/\.(mp4|webm|mov)(\?|#|$)/i.test(url)) return { kind: 'file', url, label };
+    return { kind: 'link', url, label };
+  }
+
+  private youtubeId(url: string): string | null {
+    const m = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/|shorts\/)|youtu\.be\/)([\w-]{6,})/i);
+    return m ? m[1] : null;
+  }
+
+  private vimeoId(url: string): string | null {
+    const m = url.match(/vimeo\.com\/(?:video\/)?(\d+)/i);
+    return m ? m[1] : null;
+  }
+
+  safeResource(url: string): SafeResourceUrl {
+    return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+  }
+
+  fileNameFromUrl(url: string): string {
+    try {
+      const clean = url.split('?')[0].split('#')[0];
+      const parts = clean.split('/');
+      return decodeURIComponent(parts[parts.length - 1] || url);
+    } catch {
+      return url;
     }
   }
 

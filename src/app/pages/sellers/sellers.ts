@@ -17,7 +17,10 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Router } from '@angular/router';
 import { ApiService } from '../../services/api';
 import { FormsModule } from '@angular/forms';
-import { PropertySearchComponent, SearchFilters, SearchFilterConfig } from '../../components/property-search/property-search';
+import { PropertySearchComponent, SearchFilters, SearchFilterConfig } from '../../shared/molecules/property-search/property-search';
+import { PageHeaderComponent } from '../../shared/molecules/page-header/page-header';
+import { LoadingStateComponent } from '../../shared/atoms/loading-state/loading-state';
+import { EmptyStateComponent } from '../../shared/atoms/empty-state/empty-state';
 
 @Component({
   selector: 'app-sellers',
@@ -39,7 +42,10 @@ import { PropertySearchComponent, SearchFilters, SearchFilterConfig } from '../.
     MatMenuModule,
     MatProgressSpinnerModule,
     FormsModule,
-    PropertySearchComponent
+    PropertySearchComponent,
+    PageHeaderComponent,
+    LoadingStateComponent,
+    EmptyStateComponent
   ],
   templateUrl: './sellers.html',
   styleUrl: './sellers.css'

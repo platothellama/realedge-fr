@@ -1,26 +1,8 @@
 <div class="page-container">
-  <div class="page-header">
-    <button mat-icon-button (click)="goBack()" class="back-button" aria-label="Go back">
-      <mat-icon aria-hidden="true">arrow_back</mat-icon>
-    </button>
-    <div class="header-content">
-      <h1>AI Property Matcher</h1>
-      @if (preference) {
-        <p class="subtitle">Finding matches for: <strong>{{ preference.clientName }}</strong></p>
-      }
-    </div>
-  </div>
+  <app-page-header title="AI Property Matcher" [subtitle]="preference ? 'Finding matches for: ' + preference.clientName : ''" [showBack]="true" (back)="goBack()"></app-page-header>
 
   @if (!preferenceId) {
-    <div class="empty-state full">
-      <mat-icon>search_off</mat-icon>
-      <h3>No buyer preference selected</h3>
-      <p>Go back and select a buyer preference to match properties.</p>
-      <button mat-raised-button color="primary" (click)="goBack()">
-        <mat-icon>arrow_back</mat-icon>
-        Go Back
-      </button>
-    </div>
+    <app-empty-state icon="search_off" title="No buyer preference selected" hint="Go back and select a buyer preference to match properties." actionLabel="Go Back" (action)="goBack()"></app-empty-state>
   } @else {
     <div class="search-options">
       <mat-card class="search-card wizard-card" (click)="openWizardSearch()">
@@ -55,10 +37,7 @@
     </div>
 
     @if (loading || searchLoading) {
-      <div class="loading-container">
-        <mat-spinner diameter="50"></mat-spinner>
-        <p>Finding matching properties...</p>
-      </div>
+      <app-loading-state message="Finding matching properties..." [diameter]="50"></app-loading-state>
     }
 
     @if (!loading && !searchLoading && hasSearched && matches.length > 0) {
@@ -205,11 +184,7 @@
     }
 
     @if (!loading && !searchLoading && hasSearched && matches.length === 0) {
-      <div class="empty-state">
-        <mat-icon>search_off</mat-icon>
-        <h3>No matching properties found</h3>
-        <p>Try adjusting the search criteria.</p>
-      </div>
+      <app-empty-state icon="search_off" title="No matching properties found" hint="Try adjusting the search criteria."></app-empty-state>
     }
   }
 </div>

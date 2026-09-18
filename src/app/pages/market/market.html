@@ -1,9 +1,5 @@
 <div class="market-container">
-  <div class="page-header">
-    <div class="header-content">
-      <h1 class="page-title">Market Intelligence</h1>
-      <p class="page-subtitle">Real-time market analytics, insights & methodology</p>
-    </div>
+  <app-page-header title="Market Intelligence" subtitle="Real-time market analytics, insights & methodology">
     <div class="header-actions">
       <mat-form-field appearance="outline" class="period-select">
         <mat-select [(ngModel)]="selectedPeriod" (selectionChange)="loadMarketData()">
@@ -17,12 +13,10 @@
         Refresh
       </button>
     </div>
-  </div>
+  </app-page-header>
 
   @if (loading) {
-    <div class="loading-container">
-      <mat-spinner diameter="40"></mat-spinner>
-    </div>
+    <app-loading-state></app-loading-state>
   } @else {
     <div class="metrics-grid">
       @for (metric of metrics; track metric.label) {
@@ -38,11 +32,7 @@
           </div>
         </div>
       } @empty {
-        <div class="empty-state">
-          <mat-icon aria-hidden="true">analytics</mat-icon>
-          <h3>No market data</h3>
-          <p>Try a different period or refresh the data.</p>
-        </div>
+        <app-empty-state icon="analytics" title="No market data" hint="Try a different period or refresh the data."></app-empty-state>
       }
     </div>
 
@@ -75,9 +65,7 @@
                     <td>{{ data.avgDaysOnMarket }}</td>
                     <td>{{ data.inventory }}</td>
                     <td>
-                      <span class="demand-badge" [class]="getDemandClass(data.demand)">
-                        {{ data.demand }}
-                      </span>
+                      <app-status-badge [status]="data.demand" [toneClass]="getDemandClass(data.demand)"></app-status-badge>
                     </td>
                   </tr>
                 }

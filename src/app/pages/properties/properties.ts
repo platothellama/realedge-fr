@@ -13,12 +13,14 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { ApiService } from '../../services/api';
 import { AuthService } from '../../services/auth/auth.service';
-import { PropertyFormComponent } from '../../components/property-form/property-form';
-import { PropertyImportDialogComponent } from '../../components/property-import-dialog/property-import-dialog';
-import { PaginationComponent } from '../../components/pagination/pagination';
-import { PropertySearchComponent, SearchFilters } from '../../components/property-search/property-search';
-import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog';
-import { ErrorStateComponent } from '../../components/error-state/error-state';
+import { PropertyFormComponent } from '../../shared/organisms/property-form/property-form';
+import { PropertyImportDialogComponent } from '../../shared/organisms/property-import-dialog/property-import-dialog';
+import { PaginationComponent } from '../../shared/atoms/pagination/pagination';
+import { PropertySearchComponent, SearchFilters } from '../../shared/molecules/property-search/property-search';
+import { ConfirmDialogComponent } from '../../shared/molecules/confirm-dialog/confirm-dialog';
+import { ErrorStateComponent } from '../../shared/atoms/error-state/error-state';
+import { PageHeaderComponent } from '../../shared/molecules/page-header/page-header';
+import { EmptyStateComponent } from '../../shared/atoms/empty-state/empty-state';
 
 @Component({
   selector: 'app-properties',
@@ -37,7 +39,9 @@ import { ErrorStateComponent } from '../../components/error-state/error-state';
     FormsModule,
     PaginationComponent,
     PropertySearchComponent,
-    ErrorStateComponent
+    ErrorStateComponent,
+    PageHeaderComponent,
+    EmptyStateComponent
   ],
   templateUrl: './properties.html',
   styleUrl: './properties.css',

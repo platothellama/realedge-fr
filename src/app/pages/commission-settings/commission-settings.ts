@@ -16,6 +16,11 @@ import { MatSliderModule } from '@angular/material/slider';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { ApiService } from '../../services/api';
+import { PageHeaderComponent } from '../../shared/molecules/page-header/page-header';
+import { LoadingStateComponent } from '../../shared/atoms/loading-state/loading-state';
+import { StatCardComponent } from '../../shared/molecules/stat-card/stat-card';
+import { EmptyStateComponent } from '../../shared/atoms/empty-state/empty-state';
+import { StatusBadgeComponent } from '../../shared/atoms/status-badge/status-badge';
 
 interface DealCommission {
   id: string;
@@ -51,7 +56,12 @@ interface DealCommission {
     MatSelectModule,
     MatSliderModule,
     MatTabsModule,
-    MatProgressBarModule
+    MatProgressBarModule,
+    PageHeaderComponent,
+    LoadingStateComponent,
+    StatCardComponent,
+    EmptyStateComponent,
+    StatusBadgeComponent
   ],
   templateUrl: './commission-settings.html',
   styleUrl: './commission-settings.css'

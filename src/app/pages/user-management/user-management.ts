@@ -7,14 +7,15 @@ import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog';
+import { ConfirmDialogComponent } from '../../shared/molecules/confirm-dialog/confirm-dialog';
 import { ApiService } from '../../services/api';
 import { AuthService } from '../../services/auth/auth.service';
-import { UserFormComponent } from '../../components/user-form/user-form.component';
-import { GroupFormComponent } from '../../components/group-form/group-form';
+import { UserFormComponent } from '../../shared/molecules/user-form/user-form.component';
+import { GroupFormComponent } from '../../shared/molecules/group-form/group-form';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { PageHeaderComponent } from '../../shared/molecules/page-header/page-header';
 
 @Component({
   selector: 'app-user-management',
@@ -30,7 +31,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     MatSnackBarModule,
     MatTooltipModule,
     MatTabsModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    PageHeaderComponent
   ],
   templateUrl: './user-management.html',
   styleUrl: './user-management.css'

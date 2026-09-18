@@ -285,12 +285,7 @@
   }
 }
 
-/* Dialog Styles */
-.invoice-dialog {
-  max-width: 700px !important;
-  max-height: 85vh !important;
-}
-
+/* Dialog Styles (size now comes from global .dialog-content.invoice-dialog) */
 .dialog-body {
   max-height: calc(85vh - 140px);
   overflow-y: auto;
@@ -434,11 +429,6 @@
 }
 
 @media (max-width: 640px) {
-  .invoice-dialog {
-    max-width: 95vw !important;
-    max-height: 90vh !important;
-  }
-
   .form-section {
     padding: 12px;
   }

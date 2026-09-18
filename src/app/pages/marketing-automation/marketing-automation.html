@@ -1,47 +1,19 @@
 <div class="automation-container">
-  <div class="page-header">
-    <div class="header-content">
-      <h1 class="page-title">Marketing Automation</h1>
-      <p class="page-subtitle">Email campaigns, drip sequences & automated follow-ups</p>
-    </div>
+  <app-page-header [title]="'Marketing Automation'" [subtitle]="'Email campaigns, drip sequences & automated follow-ups'">
     <button mat-raised-button color="primary" (click)="showAddDialog = true">
       <mat-icon>add</mat-icon>
       New Campaign
     </button>
-  </div>
+  </app-page-header>
 
   @if (loading) {
-    <div class="loading-container"><mat-spinner diameter="40"></mat-spinner></div>
+    <app-loading-state />
   } @else {
     <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-icon campaigns"><mat-icon>campaign</mat-icon></div>
-        <div class="stat-content">
-          <span class="stat-value">{{ stats.totalCampaigns || 0 }}</span>
-          <span class="stat-label">Total Campaigns</span>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon active"><mat-icon>play_circle</mat-icon></div>
-        <div class="stat-content">
-          <span class="stat-value">{{ stats.activeCampaigns || 0 }}</span>
-          <span class="stat-label">Active</span>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon emails"><mat-icon>email</mat-icon></div>
-        <div class="stat-content">
-          <span class="stat-value">{{ stats.totalEmails || 0 }}</span>
-          <span class="stat-label">Emails Sent</span>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon rate"><mat-icon>trending_up</mat-icon></div>
-        <div class="stat-content">
-          <span class="stat-value">{{ stats.openRate || 0 }}%</span>
-          <span class="stat-label">Open Rate</span>
-        </div>
-      </div>
+      <app-stat-card [icon]="'campaign'" [value]="stats.totalCampaigns || 0" [label]="'Total Campaigns'" [tone]="'campaigns'" />
+      <app-stat-card [icon]="'play_circle'" [value]="stats.activeCampaigns || 0" [label]="'Active'" [tone]="'active'" />
+      <app-stat-card [icon]="'email'" [value]="stats.totalEmails || 0" [label]="'Emails Sent'" [tone]="'emails'" />
+      <app-stat-card [icon]="'trending_up'" [value]="(stats.openRate || 0) + '%'" [label]="'Open Rate'" [tone]="'rate'" />
     </div>
 
     <mat-card class="table-card">
@@ -57,7 +29,7 @@
                 <td class="name-cell">{{ campaign.name }}</td>
                 <td><span class="type-badge">{{ campaign.type }}</span></td>
                 <td>{{ campaign.subject || '-' }}</td>
-                <td><span class="status-badge" [class]="getStatusClass(campaign.status)">{{ campaign.status }}</span></td>
+                <td><app-status-badge [status]="campaign.status" /></td>
                 <td>{{ campaign.stats?.sent || 0 }}</td>
                 <td>{{ campaign.stats?.opened || 0 }}</td>
                 <td>{{ formatDate(campaign.createdAt) }}</td>
@@ -79,19 +51,14 @@
           </tbody>
         </table>
         @if (campaigns.length === 0) {
-          <div class="empty-state"><mat-icon>campaign</mat-icon><p>No campaigns yet</p></div>
+          <app-empty-state [icon]="'campaign'" [title]="'No campaigns yet'" />
         }
       </div>
     </mat-card>
   }
 
   @if (showAddDialog) {
-    <div class="dialog-overlay" (click)="showAddDialog = false" (keydown.escape)="showAddDialog = false">
-      <div class="dialog-content" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="new-campaign-title">
-        <div class="dialog-header">
-          <h2 id="new-campaign-title">New Campaign</h2>
-          <button mat-icon-button (click)="showAddDialog = false" aria-label="Close dialog"><mat-icon aria-hidden="true">close</mat-icon></button>
-        </div>
+    <app-dialog-shell [title]="'New Campaign'" [titleId]="'new-campaign-title'" (closed)="showAddDialog = false">
         <div class="dialog-body">
           <mat-form-field appearance="outline">
             <mat-label>Campaign Name</mat-label>
@@ -128,7 +95,6 @@
           <button mat-button (click)="showAddDialog = false">Cancel</button>
           <button mat-raised-button color="primary" (click)="createCampaign()">Create Campaign</button>
         </div>
-      </div>
-    </div>
+    </app-dialog-shell>
   }
 </div>

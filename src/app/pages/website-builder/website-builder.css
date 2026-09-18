@@ -141,44 +141,6 @@ mat-card-actions {
   color: var(--error) !important;
 }
 
-.dialog-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.dialog-content {
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  width: 100%;
-  max-width: 520px;
-  max-height: 90vh;
-  overflow-y: auto;
-}
-
-.dialog-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px 24px;
-  border-bottom: 1px solid var(--border);
-}
-
-.dialog-header h2 {
-  font-size: 20px;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin: 0;
-}
-
 .dialog-body {
   padding: 24px;
   display: flex;
@@ -198,11 +160,7 @@ mat-card-actions {
   width: 100%;
 }
 
-/* Large Dialog */
-.dialog-large {
-  max-width: 800px;
-}
-
+/* Large Dialog body tweak (width now comes from global .dialog-large) */
 .dialog-large .dialog-body {
   max-height: 70vh;
   overflow-y: auto;

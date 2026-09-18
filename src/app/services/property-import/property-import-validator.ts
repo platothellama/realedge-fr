@@ -151,6 +151,7 @@ export function validateImportRow(raw: RawImportRow, excelRow: number): Validate
   const bedrooms = intField('bedrooms', 'Bedrooms');
   const masterBedrooms = intField('masterbedrooms', 'Master bedrooms');
   const bathrooms = intField('bathrooms', 'Bathrooms');
+  const balconies = intField('balconies', 'Balconies');
   const parkingSpaces = intField('parkingspaces', 'Parking spaces');
   if (masterBedrooms > bedrooms) {
     errors.push(`Master bedrooms (${masterBedrooms}) cannot exceed total bedrooms (${bedrooms}).`);
@@ -276,6 +277,7 @@ export function validateImportRow(raw: RawImportRow, excelRow: number): Validate
     bedrooms,
     masterBedrooms,
     bathrooms,
+    balconies,
     parkingSpaces,
     floor,
     area,

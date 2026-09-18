@@ -89,51 +89,8 @@
   color: var(--primary-bright);
 }
 
-/* Modal Styles */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.8);
-  backdrop-filter: blur(4px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.modal-content {
-  background: var(--bg-surface);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border-strong);
-  width: 90%;
-  max-width: 800px;
-  max-height: 90vh;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  box-shadow: var(--shadow-xl);
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px 24px;
-  border-bottom: 1px solid var(--border);
-  background: var(--bg-elevated);
-}
-
-.modal-header h2 {
-  margin: 0;
-  font-size: 20px;
-  font-weight: 600;
-  color: var(--text-primary);
-  font-family: 'Urbanist', sans-serif;
-}
-
+/* Modal Styles (body/footer only — overlay/content/header now rendered by
+   app-dialog-shell; dialog-large carries the former 800px modal width) */
 .modal-body {
   flex: 1;
   overflow-y: auto;
@@ -298,7 +255,6 @@ button[mat-icon-button][color="warn"] { color: var(--error) !important; }
 
 @media (max-width: 768px) {
   .form-row { grid-template-columns: 1fr; }
-  .modal-content { width: 95%; max-height: 95vh; }
   .lead-options mat-radio-group { flex-direction: column; gap: 12px; }
 }
 

@@ -1,85 +1,30 @@
 <div class="page">
-  <div class="page-header">
-    <div>
-      <h1>Welcome back, {{ user()?.name }}</h1>
-      <p class="subtitle">Here's your {{ getWelcomeMessage() }}</p>
-    </div>
-  </div>
+  <app-page-header [title]="'Welcome back, ' + (user()?.name ?? '')" [subtitle]="'Here\'s your ' + getWelcomeMessage()"></app-page-header>
 
   <div class="page-content">
     @if (loading) {
-      <div class="d-flex justify-content-center align-items-center" style="min-height: 300px;">
-        <mat-spinner diameter="40"></mat-spinner>
-      </div>
+      <app-loading-state />
     } @else {
       
       @if (isSuperAdmin()) {
         <div class="row g-4">
           <div class="col-md-6 col-xl-4">
-            <div class="stat-card">
-              <div class="stat-icon-wrap" style="background: rgba(99, 102, 241, 0.1);">
-                <mat-icon style="color: #6366f1;">home</mat-icon>
-              </div>
-              <div class="stat-content">
-                <span class="stat-label">Properties</span>
-                <span class="stat-value">{{ overview.totalProperties }}</span>
-              </div>
-            </div>
+            <app-stat-card [icon]="'home'" [value]="overview.totalProperties" [label]="'Properties'" [layout]="'label-first'" [iconBackground]="'rgba(99, 102, 241, 0.1)'" [iconColor]="'#6366f1'" />
           </div>
           <div class="col-md-6 col-xl-4">
-            <div class="stat-card">
-              <div class="stat-icon-wrap" style="background: rgba(16, 185, 129, 0.1);">
-                <mat-icon style="color: #10b981;">people</mat-icon>
-              </div>
-              <div class="stat-content">
-                <span class="stat-label">Leads</span>
-                <span class="stat-value">{{ overview.totalLeads }}</span>
-              </div>
-            </div>
+            <app-stat-card [icon]="'people'" [value]="overview.totalLeads" [label]="'Leads'" [layout]="'label-first'" [iconBackground]="'rgba(16, 185, 129, 0.1)'" [iconColor]="'#10b981'" />
           </div>
           <div class="col-md-6 col-xl-4">
-            <div class="stat-card">
-              <div class="stat-icon-wrap" style="background: rgba(139, 92, 246, 0.1);">
-                <mat-icon style="color: #8b5cf6;">handshake</mat-icon>
-              </div>
-              <div class="stat-content">
-                <span class="stat-label">Deals</span>
-                <span class="stat-value">{{ overview.totalDeals }}</span>
-              </div>
-            </div>
+            <app-stat-card [icon]="'handshake'" [value]="overview.totalDeals" [label]="'Deals'" [layout]="'label-first'" [iconBackground]="'rgba(139, 92, 246, 0.1)'" [iconColor]="'#8b5cf6'" />
           </div>
           <div class="col-md-6 col-xl-4">
-            <div class="stat-card">
-              <div class="stat-icon-wrap" style="background: rgba(16, 185, 129, 0.1);">
-                <mat-icon style="color: #10b981;">payments</mat-icon>
-              </div>
-              <div class="stat-content">
-                <span class="stat-label">Revenue</span>
-                <span class="stat-value">{{ formatCurrency(overview.totalRevenue) }}</span>
-              </div>
-            </div>
+            <app-stat-card [icon]="'payments'" [value]="formatCurrency(overview.totalRevenue)" [label]="'Revenue'" [layout]="'label-first'" [iconBackground]="'rgba(16, 185, 129, 0.1)'" [iconColor]="'#10b981'" />
           </div>
           <div class="col-md-6 col-xl-4">
-            <div class="stat-card">
-              <div class="stat-icon-wrap" style="background: rgba(245, 158, 11, 0.1);">
-                <mat-icon style="color: #f59e0b;">pending</mat-icon>
-              </div>
-              <div class="stat-content">
-                <span class="stat-label">Pending Commission</span>
-                <span class="stat-value">{{ formatCurrency(overview.pendingCommissions) }}</span>
-              </div>
-            </div>
+            <app-stat-card [icon]="'pending'" [value]="formatCurrency(overview.pendingCommissions)" [label]="'Pending Commission'" [layout]="'label-first'" [iconBackground]="'rgba(245, 158, 11, 0.1)'" [iconColor]="'#f59e0b'" />
           </div>
           <div class="col-md-6 col-xl-4">
-            <div class="stat-card">
-              <div class="stat-icon-wrap" style="background: rgba(239, 68, 68, 0.1);">
-                <mat-icon style="color: #ef4444;">trending_down</mat-icon>
-              </div>
-              <div class="stat-content">
-                <span class="stat-label">Expenses</span>
-                <span class="stat-value">{{ formatCurrency(overview.totalExpenses) }}</span>
-              </div>
-            </div>
+            <app-stat-card [icon]="'trending_down'" [value]="formatCurrency(overview.totalExpenses)" [label]="'Expenses'" [layout]="'label-first'" [iconBackground]="'rgba(239, 68, 68, 0.1)'" [iconColor]="'#ef4444'" />
           </div>
         </div>
 
@@ -170,10 +115,7 @@
                     }
                   </div>
                 } @else if (recentActivities.length === 0) {
-                  <div class="text-center text-muted p-4">
-                    <mat-icon style="font-size: 48px; width: 48px; height: 48px; opacity: 0.5;">inbox</mat-icon>
-                    <p class="mt-2 mb-0">No recent activity</p>
-                  </div>
+                  <app-empty-state [icon]="'inbox'" [title]="'No recent activity'" [small]="true" />
                 } @else {
                   <div class="activity-list">
                     @for (activity of recentActivities; track $index) {
@@ -211,10 +153,7 @@
                     }
                   </div>
                 } @else if (topAgents.length === 0) {
-                  <div class="text-center text-muted p-4">
-                    <mat-icon style="font-size: 48px; width: 48px; height: 48px; opacity: 0.5;">people_outline</mat-icon>
-                    <p class="mt-2 mb-0">No team members</p>
-                  </div>
+                  <app-empty-state [icon]="'people_outline'" [title]="'No team members'" [small]="true" />
                 } @else {
                   <div class="activity-list">
                     @for (agent of topAgents; track agent.id) {
@@ -237,92 +176,28 @@
       } @else {
         <div class="row g-4">
           <div class="col-md-6 col-xl-3">
-            <div class="stat-card">
-              <div class="stat-icon-wrap" style="background: rgba(16, 185, 129, 0.1);">
-                <mat-icon style="color: #10b981;">event_available</mat-icon>
-              </div>
-              <div class="stat-content">
-                <span class="stat-label">Today's Visits</span>
-                <span class="stat-value">{{ userDashboard.todayVisits.length }}</span>
-              </div>
-            </div>
+            <app-stat-card [icon]="'event_available'" [value]="userDashboard.todayVisits.length" [label]="'Today\'s Visits'" [layout]="'label-first'" [iconBackground]="'rgba(16, 185, 129, 0.1)'" [iconColor]="'#10b981'" />
           </div>
           <div class="col-md-6 col-xl-3">
-            <div class="stat-card">
-              <div class="stat-icon-wrap" style="background: rgba(239, 68, 68, 0.1);">
-                <mat-icon style="color: #ef4444;">event_busy</mat-icon>
-              </div>
-              <div class="stat-content">
-                <span class="stat-label">Missed Visits</span>
-                <span class="stat-value">{{ userDashboard.missedVisits }}</span>
-              </div>
-            </div>
+            <app-stat-card [icon]="'event_busy'" [value]="userDashboard.missedVisits" [label]="'Missed Visits'" [layout]="'label-first'" [iconBackground]="'rgba(239, 68, 68, 0.1)'" [iconColor]="'#ef4444'" />
           </div>
           <div class="col-md-6 col-xl-3">
-            <div class="stat-card">
-              <div class="stat-icon-wrap" style="background: rgba(99, 102, 241, 0.1);">
-                <mat-icon style="color: #6366f1;">people</mat-icon>
-              </div>
-              <div class="stat-content">
-                <span class="stat-label">Contacted Leads</span>
-                <span class="stat-value">{{ userDashboard.contactedLeads }}</span>
-              </div>
-            </div>
+            <app-stat-card [icon]="'people'" [value]="userDashboard.contactedLeads" [label]="'Contacted Leads'" [layout]="'label-first'" [iconBackground]="'rgba(99, 102, 241, 0.1)'" [iconColor]="'#6366f1'" />
           </div>
           <div class="col-md-6 col-xl-3">
-            <div class="stat-card">
-              <div class="stat-icon-wrap" style="background: rgba(245, 158, 11, 0.1);">
-                <mat-icon style="color: #f59e0b;">person_add</mat-icon>
-              </div>
-              <div class="stat-content">
-                <span class="stat-label">New Leads</span>
-                <span class="stat-value">{{ userDashboard.uncontactedLeads }}</span>
-              </div>
-            </div>
+            <app-stat-card [icon]="'person_add'" [value]="userDashboard.uncontactedLeads" [label]="'New Leads'" [layout]="'label-first'" [iconBackground]="'rgba(245, 158, 11, 0.1)'" [iconColor]="'#f59e0b'" />
           </div>
           <div class="col-md-6 col-xl-3">
-            <div class="stat-card">
-              <div class="stat-icon-wrap" style="background: rgba(139, 92, 246, 0.1);">
-                <mat-icon style="color: #8b5cf6;">handshake</mat-icon>
-              </div>
-              <div class="stat-content">
-                <span class="stat-label">Deals On Hold</span>
-                <span class="stat-value">{{ userDashboard.dealsOnHold }}</span>
-              </div>
-            </div>
+            <app-stat-card [icon]="'handshake'" [value]="userDashboard.dealsOnHold" [label]="'Deals On Hold'" [layout]="'label-first'" [iconBackground]="'rgba(139, 92, 246, 0.1)'" [iconColor]="'#8b5cf6'" />
           </div>
           <div class="col-md-6 col-xl-3">
-            <div class="stat-card">
-              <div class="stat-icon-wrap" style="background: rgba(59, 130, 246, 0.1);">
-                <mat-icon style="color: #3b82f6;">home</mat-icon>
-              </div>
-              <div class="stat-content">
-                <span class="stat-label">Properties On Hold</span>
-                <span class="stat-value">{{ userDashboard.propertiesOnHold }}</span>
-              </div>
-            </div>
+            <app-stat-card [icon]="'home'" [value]="userDashboard.propertiesOnHold" [label]="'Properties On Hold'" [layout]="'label-first'" [iconBackground]="'rgba(59, 130, 246, 0.1)'" [iconColor]="'#3b82f6'" />
           </div>
           <div class="col-md-6 col-xl-3">
-            <div class="stat-card">
-              <div class="stat-icon-wrap" style="background: rgba(239, 68, 68, 0.1);">
-                <mat-icon style="color: #ef4444;">home_work</mat-icon>
-              </div>
-              <div class="stat-content">
-                <span class="stat-label">Not Handled (30d+)</span>
-                <span class="stat-value">{{ userDashboard.propertiesNotHandled }}</span>
-              </div>
-            </div>
+            <app-stat-card [icon]="'home_work'" [value]="userDashboard.propertiesNotHandled" [label]="'Not Handled (30d+)'" [layout]="'label-first'" [iconBackground]="'rgba(239, 68, 68, 0.1)'" [iconColor]="'#ef4444'" />
           </div>
           <div class="col-md-6 col-xl-3">
-            <div class="stat-card">
-              <div class="stat-icon-wrap" style="background: rgba(16, 185, 129, 0.1);">
-                <mat-icon style="color: #10b981;">payments</mat-icon>
-              </div>
-              <div class="stat-content">
-                <span class="stat-label">Total Earned</span>
-                <span class="stat-value">{{ formatCurrency(userDashboard.totalCommissionEarned) }}</span>
-              </div>
-            </div>
+            <app-stat-card [icon]="'payments'" [value]="formatCurrency(userDashboard.totalCommissionEarned)" [label]="'Total Earned'" [layout]="'label-first'" [iconBackground]="'rgba(16, 185, 129, 0.1)'" [iconColor]="'#10b981'" />
           </div>
         </div>
 
@@ -346,10 +221,7 @@
                     }
                   </div>
                 } @else if (userDashboard.todayVisits.length === 0) {
-                  <div class="text-center text-muted p-4">
-                    <mat-icon style="font-size: 48px; width: 48px; height: 48px; opacity: 0.5;">event_available</mat-icon>
-                    <p class="mt-2 mb-0">No visits scheduled for today</p>
-                  </div>
+                  <app-empty-state [icon]="'event_available'" [title]="'No visits scheduled for today'" [small]="true" />
                 } @else {
                   <div class="activity-list">
                     @for (visit of userDashboard.todayVisits; track visit.id) {
@@ -366,7 +238,7 @@
                             }
                           </div>
                         </div>
-                        <span class="badge" [ngClass]="getStatusClass(visit.status)">{{ visit.status }}</span>
+                        <app-status-badge [status]="visit.status" />
                       </div>
                     }
                   </div>
@@ -449,10 +321,7 @@
               </div>
               <div class="card-body p-0">
                 @if (userDashboard.upcomingVisits.length === 0) {
-                  <div class="text-center text-muted p-4">
-                    <mat-icon style="font-size: 48px; width: 48px; height: 48px; opacity: 0.5;">event</mat-icon>
-                    <p class="mt-2 mb-0">No upcoming visits</p>
-                  </div>
+                  <app-empty-state [icon]="'event'" [title]="'No upcoming visits'" [small]="true" />
                 } @else {
                   <div class="activity-list">
                     @for (visit of userDashboard.upcomingVisits; track visit.id) {
@@ -480,10 +349,7 @@
               </div>
               <div class="card-body p-0">
                 @if (recentLeads.length === 0) {
-                  <div class="text-center text-muted p-4">
-                    <mat-icon style="font-size: 48px; width: 48px; height: 48px; opacity: 0.5;">people_outline</mat-icon>
-                    <p class="mt-2 mb-0">No recent leads</p>
-                  </div>
+                  <app-empty-state [icon]="'people_outline'" [title]="'No recent leads'" [small]="true" />
                 } @else {
                   <div class="activity-list">
                     @for (lead of recentLeads; track lead.id) {
@@ -512,10 +378,7 @@
               </div>
               <div class="card-body p-0">
                 @if (recentDeals.length === 0) {
-                  <div class="text-center text-muted p-4">
-                    <mat-icon style="font-size: 48px; width: 48px; height: 48px; opacity: 0.5;">handshake</mat-icon>
-                    <p class="mt-2 mb-0">No deals yet</p>
-                  </div>
+                  <app-empty-state [icon]="'handshake'" [title]="'No deals yet'" [small]="true" />
                 } @else {
                   <div class="activity-list">
                     @for (deal of recentDeals; track deal.id) {
@@ -527,7 +390,7 @@
                           <div class="fw-medium">{{ deal.title }}</div>
                           <div class="fs-sm text-muted">{{ formatCurrency(deal.commission) }}</div>
                         </div>
-                        <span class="badge" [ngClass]="getStatusClass(deal.dealStage)">{{ deal.dealStage }}</span>
+                        <app-status-badge [status]="deal.dealStage" />
                       </div>
                     }
                   </div>
@@ -542,10 +405,7 @@
               </div>
               <div class="card-body p-0">
                 @if (recentProperties.length === 0) {
-                  <div class="text-center text-muted p-4">
-                    <mat-icon style="font-size: 48px; width: 48px; height: 48px; opacity: 0.5;">home</mat-icon>
-                    <p class="mt-2 mb-0">No properties assigned</p>
-                  </div>
+                  <app-empty-state [icon]="'home'" [title]="'No properties assigned'" [small]="true" />
                 } @else {
                   <div class="activity-list">
                     @for (property of recentProperties; track property.id) {

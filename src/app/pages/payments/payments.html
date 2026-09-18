@@ -1,53 +1,21 @@
 <div class="page-container">
-  <div class="page-header">
-    <div class="header-content">
-      <h1 class="page-title">Payments</h1>
-      <p class="page-subtitle">Track payments, payment plans & cash flow</p>
-    </div>
-    <div class="header-actions">
-      <button mat-raised-button color="primary" (click)="showAddPaymentDialog = true">
-        <mat-icon>add</mat-icon>
-        Record Payment
-      </button>
-    </div>
-  </div>
+  <app-page-header [title]="'Payments'" [subtitle]="'Track payments, payment plans & cash flow'">
+    <button mat-raised-button color="primary" (click)="showAddPaymentDialog = true">
+      <mat-icon>add</mat-icon>
+      Record Payment
+    </button>
+  </app-page-header>
 
   <mat-tab-group [(selectedIndex)]="selectedTab" (selectedIndexChange)="onTabChange($event)" class="main-tabs">
     <mat-tab label="Payments">
       <div class="tab-content">
         @if (loading) {
-          <div class="loading-container">
-            <mat-spinner diameter="40"></mat-spinner>
-          </div>
+          <app-loading-state />
         } @else {
           <div class="stats-grid">
-            <div class="stat-card">
-              <div class="stat-icon total">
-                <mat-icon>payments</mat-icon>
-              </div>
-              <div class="stat-content">
-                <span class="stat-value">{{ payments.length }}</span>
-                <span class="stat-label">Total Payments</span>
-              </div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-icon received">
-                <mat-icon>account_balance_wallet</mat-icon>
-              </div>
-              <div class="stat-content">
-                <span class="stat-value">{{ formatCurrency(totalUsd) }}</span>
-                <span class="stat-label">Total Received (USD)</span>
-              </div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-icon cash">
-                <mat-icon>local_atm</mat-icon>
-              </div>
-              <div class="stat-content">
-                <span class="stat-value">{{ payments.filter(p => p.paymentMethod === 'Cash').length }}</span>
-                <span class="stat-label">Cash Payments</span>
-              </div>
-            </div>
+            <app-stat-card [icon]="'payments'" [value]="payments.length" [label]="'Total Payments'" [tone]="'total'" />
+            <app-stat-card [icon]="'account_balance_wallet'" [value]="formatCurrency(totalUsd)" [label]="'Total Received (USD)'" [tone]="'received'" />
+            <app-stat-card [icon]="'local_atm'" [value]="payments.filter(p => p.paymentMethod === 'Cash').length" [label]="'Cash Payments'" [tone]="'cash'" />
           </div>
 
           <mat-card class="table-card">
@@ -117,7 +85,7 @@
                         }
                       </td>
                       <td>
-                        <span class="status-badge" [class]="getStatusClass(p.status)">{{ p.status }}</span>
+                        <app-status-badge [status]="p.status" />
                       </td>
                       <td>
                         <button mat-icon-button [matMenuTriggerFor]="menu" [disabled]="isProcessing(p.id)" [attr.aria-label]="'Actions for payment ' + p.id">
@@ -136,10 +104,7 @@
               </table>
 
               @if (payments.length === 0) {
-                <div class="empty-state">
-                  <mat-icon>payments</mat-icon>
-                  <p>No payments recorded yet</p>
-                </div>
+                <app-empty-state [icon]="'payments'" [title]="'No payments recorded yet'" />
               }
             </div>
           </mat-card>
@@ -157,9 +122,7 @@
         </div>
 
         @if (loading) {
-          <div class="loading-container">
-            <mat-spinner diameter="40"></mat-spinner>
-          </div>
+          <app-loading-state />
         } @else {
           <div class="plans-grid">
             @for (plan of paymentPlans; track plan.id) {
@@ -190,7 +153,7 @@
                     }
                     <div class="detail-row">
                       <span class="label">Status:</span>
-                      <span class="status-badge" [class]="getStatusClass(plan.status)">{{ plan.status }}</span>
+                      <app-status-badge [status]="plan.status" />
                     </div>
                   </div>
                   @if (plan.notes) {
@@ -207,10 +170,7 @@
             }
 
             @if (paymentPlans.length === 0) {
-              <div class="empty-state grid-empty">
-                <mat-icon>calendar_month</mat-icon>
-                <p>No payment plans created yet</p>
-              </div>
+              <app-empty-state [icon]="'calendar_month'" [title]="'No payment plans created yet'" />
             }
           </div>
         }
@@ -220,15 +180,7 @@
     <mat-tab label="Cash Tracking">
       <div class="tab-content">
         <div class="stats-grid">
-          <div class="stat-card gradient-cash">
-            <div class="stat-icon">
-              <mat-icon>payments</mat-icon>
-            </div>
-            <div class="stat-content">
-              <span class="stat-value">{{ formatCurrency(cashTracking?.summary?.totalInUSD || 0) }}</span>
-              <span class="stat-label">Total Cash (USD)</span>
-            </div>
-          </div>
+          <app-stat-card [icon]="'payments'" [value]="formatCurrency(cashTracking?.summary?.totalInUSD || 0)" [label]="'Total Cash (USD)'" [tone]="''" />
 <!--          <div class="stat-card gradient-lbp">-->
 <!--            <div class="stat-icon">-->
 <!--              <mat-icon>local_atm</mat-icon>-->
@@ -238,15 +190,7 @@
 <!--              <span class="stat-label">Total Cash (LBP)</span>-->
 <!--            </div>-->
 <!--          </div>-->
-          <div class="stat-card gradient-lbp">
-            <div class="stat-icon transactions">
-              <mat-icon>receipt_long</mat-icon>
-            </div>
-            <div class="stat-content">
-              <span class="stat-value">{{ cashTracking?.summary?.totalPayments || 0 }}</span>
-              <span class="stat-label">Cash Transactions</span>
-            </div>
-          </div>
+          <app-stat-card [icon]="'receipt_long'" [value]="cashTracking?.summary?.totalPayments || 0" [label]="'Cash Transactions'" [tone]="'transactions'" />
         </div>
 
         <mat-card class="table-card">
@@ -271,10 +215,7 @@
             }
 
             @if (!cashTracking?.payments?.length) {
-              <div class="empty-state">
-                <mat-icon>account_balance_wallet</mat-icon>
-                <p>No cash payments recorded</p>
-              </div>
+              <app-empty-state [icon]="'account_balance_wallet'" [title]="'No cash payments recorded'" />
             }
           </div>
         </mat-card>
@@ -284,14 +225,7 @@
 </div>
 
 @if (showAddPaymentDialog) {
-  <div class="dialog-overlay" (click)="closePaymentDialog()" (keydown.escape)="closePaymentDialog()">
-    <div class="dialog-content" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="record-payment-title" cdkTrapFocus>
-      <div class="dialog-header">
-        <h2 id="record-payment-title">Record Payment</h2>
-        <button mat-icon-button (click)="closePaymentDialog()" aria-label="Close dialog">
-          <mat-icon aria-hidden="true">close</mat-icon>
-        </button>
-      </div>
+  <app-dialog-shell [title]="'Record Payment'" [titleId]="'record-payment-title'" (closed)="closePaymentDialog()" [trapFocus]="true">
       <div class="dialog-body">
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Deal</mat-label>
@@ -378,19 +312,11 @@
           @if (creatingPayment) { Recording… } @else { Record Payment }
         </button>
       </div>
-    </div>
-  </div>
+  </app-dialog-shell>
 }
 
 @if (showAddPlanDialog) {
-  <div class="dialog-overlay" (click)="closePlanDialog()" (keydown.escape)="closePlanDialog()">
-      <div class="dialog-content" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="create-plan-title" cdkTrapFocus>
-      <div class="dialog-header">
-        <h2 id="create-plan-title">Create Payment Plan</h2>
-        <button mat-icon-button (click)="closePlanDialog()" aria-label="Close dialog">
-          <mat-icon aria-hidden="true">close</mat-icon>
-        </button>
-      </div>
+  <app-dialog-shell [title]="'Create Payment Plan'" [titleId]="'create-plan-title'" (closed)="closePlanDialog()" [trapFocus]="true">
       <div class="dialog-body">
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Deal</mat-label>
@@ -458,6 +384,5 @@
           @if (creatingPlan) { Creating… } @else { Create Plan }
         </button>
       </div>
-    </div>
-  </div>
+  </app-dialog-shell>
 }

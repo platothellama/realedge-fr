@@ -17,7 +17,11 @@ import { CdkDragDrop, DragDropModule, moveItemInArray, transferArrayItem } from 
 import { A11yModule } from '@angular/cdk/a11y';
 import { ApiService } from '../../services/api';
 import { AuthService } from '../../services/auth/auth.service';
-import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog';
+import { ConfirmDialogComponent } from '../../shared/molecules/confirm-dialog/confirm-dialog';
+import { PageHeaderComponent } from '../../shared/molecules/page-header/page-header';
+import { LoadingStateComponent } from '../../shared/atoms/loading-state/loading-state';
+import { ErrorStateComponent } from '../../shared/atoms/error-state/error-state';
+import { DialogShellComponent } from '../../shared/molecules/dialog-shell/dialog-shell';
 
 interface Task {
   id: string;
@@ -58,7 +62,11 @@ interface User {
     MatTooltipModule,
     FormsModule,
     DragDropModule,
-    A11yModule
+    A11yModule,
+    PageHeaderComponent,
+    LoadingStateComponent,
+    ErrorStateComponent,
+    DialogShellComponent
   ],
   templateUrl: './tasks.html',
   styleUrl: './tasks.css'

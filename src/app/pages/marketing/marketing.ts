@@ -12,6 +12,8 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api';
+import { PageHeaderComponent } from '../../shared/molecules/page-header/page-header';
+import { EmptyStateComponent } from '../../shared/atoms/empty-state/empty-state';
 
 @Component({
   selector: 'app-marketing',
@@ -28,7 +30,9 @@ import { ApiService } from '../../services/api';
     MatSnackBarModule,
     MatTabsModule,
     MatTooltipModule,
-    FormsModule
+    FormsModule,
+    PageHeaderComponent,
+    EmptyStateComponent
   ],
   templateUrl: './marketing.html',
   styleUrl: './marketing.css'

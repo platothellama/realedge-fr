@@ -1,23 +1,13 @@
 <div class="lead-details-container">
   @if (loading) {
-    <div class="loading-container">
-      <mat-spinner diameter="50"></mat-spinner>
-      <p>Loading lead details...</p>
-    </div>
+    <app-loading-state message="Loading lead details..." [diameter]="50"></app-loading-state>
   } @else if (lead) {
     <app-breadcrumb [items]="[{ label: 'CRM / Leads', link: '/crm' }, { label: lead.name || 'Details' }]"></app-breadcrumb>
-    <div class="header-section">
-      <button mat-icon-button (click)="goBack()" class="back-btn" aria-label="Back to leads">
-        <mat-icon aria-hidden="true">arrow_back</mat-icon>
-      </button>
-      
-      <div class="lead-info">
-        <h1>{{ lead.name }}</h1>
-        <div class="lead-meta">
-          <span class="lead-source" [attr.data-source]="lead.source">{{ lead.source }}</span>
-          <span class="status-badge" [attr.data-status]="lead.status">{{ lead.status }}</span>
-          <span class="lead-date">Added {{ lead.createdAt | date:'MMM d, yyyy' }}</span>
-        </div>
+    <app-page-header [title]="lead.name" [showBack]="true" (back)="goBack()">
+      <div class="lead-meta">
+        <app-status-badge [status]="lead.source"></app-status-badge>
+        <app-status-badge [status]="lead.status"></app-status-badge>
+        <span class="lead-date">Added {{ lead.createdAt | date:'MMM d, yyyy' }}</span>
       </div>
 
       <div class="action-buttons">
@@ -31,7 +21,7 @@
           <mat-icon>delete</mat-icon> Delete
         </button>
       </div>
-    </div>
+    </app-page-header>
 
     <mat-tab-group class="details-tabs" animationDuration="200ms">
       <!-- Overview Tab -->
@@ -144,11 +134,7 @@
 
         <div class="tab-content properties-tab">
           @if (getUniqueProperties().length === 0) {
-            <div class="empty-state">
-              <mat-icon>home_work</mat-icon>
-              <h3>No Properties Yet</h3>
-              <p>This lead hasn't been shown any properties</p>
-            </div>
+            <app-empty-state icon="home_work" title="No Properties Yet" hint="This lead hasn't been shown any properties"></app-empty-state>
           } @else {
             <div class="properties-list">
               @for (property of getUniqueProperties(); track property.id) {
@@ -188,7 +174,7 @@
                                 <span class="time">{{ visit.visitDate | date:'h:mm a' }}</span>
                               </div>
                               <div class="visit-status">
-                                <span class="status-badge" [attr.data-status]="visit.status">{{ visit.status }}</span>
+                                <app-status-badge [status]="visit.status"></app-status-badge>
                               </div>
                               <div class="visit-notes">{{ visit.notes || 'No notes' }}</div>
                             </div>
@@ -238,7 +224,7 @@
                   
                   @if (event.visit) {
                     <div class="event-details">
-                      <span class="status-badge" [attr.data-status]="event.visit.status">{{ event.visit.status }}</span>
+                      <app-status-badge [status]="event.visit.status"></app-status-badge>
                     </div>
                   }
                   
@@ -251,11 +237,7 @@
                 </div>
               </div>
             } @empty {
-              <div class="empty-state">
-                <mat-icon>history</mat-icon>
-                <h3>No Activity Yet</h3>
-                <p>Activities will appear here as they happen</p>
-              </div>
+              <app-empty-state icon="history" title="No Activity Yet" hint="Activities will appear here as they happen"></app-empty-state>
             }
           </div>
         </div>
@@ -272,11 +254,7 @@
 
         <div class="tab-content visits-tab">
           @if (!lead.visits || lead.visits.length === 0) {
-            <div class="empty-state">
-              <mat-icon>event_busy</mat-icon>
-              <h3>No Visits Scheduled</h3>
-              <p>Schedule a visit to see it here</p>
-            </div>
+            <app-empty-state icon="event_busy" title="No Visits Scheduled" hint="Schedule a visit to see it here"></app-empty-state>
           } @else {
             <div class="visits-list">
               @for (visit of lead.visits; track visit.id) {
@@ -324,11 +302,7 @@
 
         <div class="tab-content deals-tab">
           @if (!lead.deals || lead.deals.length === 0) {
-            <div class="empty-state">
-              <mat-icon>handshake</mat-icon>
-              <h3>No Deals Yet</h3>
-              <p>Convert this lead to a deal to see it here</p>
-            </div>
+            <app-empty-state icon="handshake" title="No Deals Yet" hint="Convert this lead to a deal to see it here"></app-empty-state>
           } @else {
             <div class="deals-list">
               @for (deal of lead.deals; track deal.id) {

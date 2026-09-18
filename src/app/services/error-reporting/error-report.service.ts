@@ -232,7 +232,7 @@ export class ErrorReportService {
     // Lazy-load the dialog component so this service has no static
     // cycle with the component and keeps the initial bundle small.
     const { ErrorDialogComponent } = await import(
-      '../../components/error-dialog/error-dialog'
+      '../../shared/molecules/error-dialog/error-dialog'
     );
     this.dialogOpen = true;
     const ref = this.dialog.open(ErrorDialogComponent, {

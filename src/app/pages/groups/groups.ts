@@ -13,7 +13,11 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
-import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog';
+import { ConfirmDialogComponent } from '../../shared/molecules/confirm-dialog/confirm-dialog';
+import { PageHeaderComponent } from '../../shared/molecules/page-header/page-header';
+import { LoadingStateComponent } from '../../shared/atoms/loading-state/loading-state';
+import { EmptyStateComponent } from '../../shared/atoms/empty-state/empty-state';
+import { DialogShellComponent } from '../../shared/molecules/dialog-shell/dialog-shell';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatBadgeModule } from '@angular/material/badge';
 import { ApiService } from '../../services/api';
@@ -67,7 +71,11 @@ const ROLE_OPTIONS = [
     MatSelectModule,
     MatDialogModule,
     MatTabsModule,
-    MatBadgeModule
+    MatBadgeModule,
+    PageHeaderComponent,
+    LoadingStateComponent,
+    EmptyStateComponent,
+    DialogShellComponent
   ],
   templateUrl: './groups.html',
   styleUrl: './groups.css'

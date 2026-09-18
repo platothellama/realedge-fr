@@ -1,57 +1,19 @@
 <div class="commissions-container">
-  <div class="page-header">
-    <div class="header-content">
-      <h1 class="page-title">Commissions</h1>
-      <p class="page-subtitle">Track and manage agent commission history</p>
-    </div>
+  <app-page-header [title]="'Commissions'" [subtitle]="'Track and manage agent commission history'">
     <button mat-raised-button color="primary" (click)="loadCommissions()">
       <mat-icon>refresh</mat-icon>
       Refresh
     </button>
-  </div>
+  </app-page-header>
 
   @if (loading) {
-    <div class="loading-container">
-      <mat-spinner diameter="40"></mat-spinner>
-    </div>
+    <app-loading-state />
   } @else {
     <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-icon total">
-          <mat-icon>account_balance_wallet</mat-icon>
-        </div>
-        <div class="stat-content">
-          <span class="stat-value">{{ formatCurrency(summary.totalAmount || 0) }}</span>
-          <span class="stat-label">Total Commission</span>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon pending">
-          <mat-icon>pending</mat-icon>
-        </div>
-        <div class="stat-content">
-          <span class="stat-value">{{ formatCurrency(summary.pendingAmount || 0) }}</span>
-          <span class="stat-label">Pending</span>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon approved">
-          <mat-icon>check_circle</mat-icon>
-        </div>
-        <div class="stat-content">
-          <span class="stat-value">{{ formatCurrency(summary.approvedAmount || 0) }}</span>
-          <span class="stat-label">Approved</span>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon paid">
-          <mat-icon>payments</mat-icon>
-        </div>
-        <div class="stat-content">
-          <span class="stat-value">{{ formatCurrency(summary.paidAmount || 0) }}</span>
-          <span class="stat-label">Paid</span>
-        </div>
-      </div>
+      <app-stat-card [icon]="'account_balance_wallet'" [value]="formatCurrency(summary.totalAmount || 0)" [label]="'Total Commission'" [tone]="'total'" />
+      <app-stat-card [icon]="'pending'" [value]="formatCurrency(summary.pendingAmount || 0)" [label]="'Pending'" [tone]="'pending'" />
+      <app-stat-card [icon]="'check_circle'" [value]="formatCurrency(summary.approvedAmount || 0)" [label]="'Approved'" [tone]="'approved'" />
+      <app-stat-card [icon]="'payments'" [value]="formatCurrency(summary.paidAmount || 0)" [label]="'Paid'" [tone]="'paid'" />
     </div>
 
     <mat-card class="table-card">
@@ -124,9 +86,7 @@
                 <td>{{ commission.percentage }}%</td>
                 <td class="amount commission-amount">{{ formatCurrency(commission.amount) }}</td>
                 <td>
-                  <span class="status-badge" [class]="getStatusClass(commission.status)">
-                    {{ getStatusLabel(commission.status) }}
-                  </span>
+                  <app-status-badge [status]="commission.status" [label]="getStatusLabel(commission.status)" />
                 </td>
                 <td>
                   <span class="date-cell" [matTooltip]="formatDateTime(commission.createdAt || '')">
@@ -157,11 +117,7 @@
           </tbody>
         </table>
         @if (visibleCommissions.length === 0) {
-          <div class="empty-state">
-            <mat-icon>account_balance</mat-icon>
-            <p>No commissions found</p>
-            <span>Commissions will appear here when deals are closed</span>
-          </div>
+          <app-empty-state [icon]="'account_balance'" [title]="'No commissions found'" [hint]="'Commissions will appear here when deals are closed'" />
         }
       </div>
     </mat-card>

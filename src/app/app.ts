@@ -3,9 +3,9 @@ import { RouterOutlet } from '@angular/router';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatListModule } from '@angular/material/list';
-import { Sidebar as SidebarComponent } from './components/sidebar/sidebar';
-import { Header as HeaderComponent } from './components/header/header';
-import { GlobalLoader as GlobalLoaderComponent } from './components/global-loader/global-loader';
+import { Sidebar as SidebarComponent } from './shared/organisms/sidebar/sidebar';
+import { Header as HeaderComponent } from './shared/organisms/header/header';
+import { GlobalLoader as GlobalLoaderComponent } from './shared/atoms/global-loader/global-loader';
 import { AuthService } from './services/auth/auth.service';
 import { CommonModule } from '@angular/common';
 

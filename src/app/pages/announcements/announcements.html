@@ -1,9 +1,5 @@
 <div class="announcements-container">
-  <div class="page-header">
-    <div class="header-content">
-      <h1 class="page-title">Announcements</h1>
-      <p class="page-subtitle">Company-wide announcements and updates</p>
-    </div>
+  <app-page-header [title]="'Announcements'" [subtitle]="'Company-wide announcements and updates'">
     <div class="header-actions">
       <mat-form-field appearance="outline" class="filter-select">
         <mat-label>Filter by Category</mat-label>
@@ -19,12 +15,10 @@
         New Announcement
       </button>
     </div>
-  </div>
+  </app-page-header>
 
   @if (loading) {
-    <div class="loading-container" role="status">
-      <mat-spinner diameter="40"></mat-spinner>
-    </div>
+    <app-loading-state />
   } @else if (loadError) {
     <app-error-state
       title="Couldn't load announcements"
@@ -74,35 +68,20 @@
               }
             </div>
             @if (!announcement.isActive) {
-              <span class="status-badge inactive">Inactive</span>
+              <app-status-badge status="Inactive" />
             }
           </div>
         </div>
       } @empty {
-        <div class="empty-state">
-          <mat-icon>campaign_off</mat-icon>
-          <h3>No Announcements</h3>
-          <p>There are no announcements to display.</p>
-        </div>
+        <app-empty-state icon="campaign_off" title="No Announcements" hint="There are no announcements to display." />
       }
     </div>
   }
 </div>
 
 @if (showAddDialog) {
-  <div class="dialog-overlay" (click)="closeDialog()" (keydown.escape)="closeDialog()">
-    <div class="dialog-content"
-         (click)="$event.stopPropagation()"
-         role="dialog"
-         aria-modal="true"
-         aria-labelledby="new-announcement-title">
-      <div class="dialog-header">
-        <h2 id="new-announcement-title">Create Announcement</h2>
-        <button mat-icon-button (click)="closeDialog()" aria-label="Close dialog">
-          <mat-icon aria-hidden="true">close</mat-icon>
-        </button>
-      </div>
-      <div class="dialog-body">
+  <app-dialog-shell [title]="'Create Announcement'" [titleId]="'new-announcement-title'" (closed)="closeDialog()">
+    <div class="dialog-body">
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Title</mat-label>
           <input matInput [(ngModel)]="newAnnouncement.title" placeholder="Enter announcement title">
@@ -138,6 +117,5 @@
         <button mat-button (click)="closeDialog()">Cancel</button>
         <button mat-raised-button color="primary" (click)="createAnnouncement()">Publish</button>
       </div>
-    </div>
-  </div>
+  </app-dialog-shell>
 }

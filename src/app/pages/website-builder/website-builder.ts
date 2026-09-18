@@ -13,9 +13,15 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
-import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog';
+import { ConfirmDialogComponent } from '../../shared/molecules/confirm-dialog/confirm-dialog';
+import { DialogShellComponent } from '../../shared/molecules/dialog-shell/dialog-shell';
+import { PageHeaderComponent } from '../../shared/molecules/page-header/page-header';
+import { LoadingStateComponent } from '../../shared/atoms/loading-state/loading-state';
+import { EmptyStateComponent } from '../../shared/atoms/empty-state/empty-state';
+import { StatusBadgeComponent } from '../../shared/atoms/status-badge/status-badge';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api';
+import { formatDateMed, formatMoneyUSD } from '../../shared/utils/format';
 
 interface Website {
   id: string;
@@ -51,7 +57,12 @@ interface Property {
     CommonModule, RouterModule, MatCardModule, MatIconModule, MatButtonModule,
     MatProgressSpinnerModule, MatSnackBarModule, MatMenuModule, MatChipsModule,
     MatFormFieldModule, MatInputModule, MatSelectModule, MatCheckboxModule,
-    MatDialogModule, FormsModule
+    MatDialogModule, FormsModule,
+    DialogShellComponent,
+    PageHeaderComponent,
+    LoadingStateComponent,
+    EmptyStateComponent,
+    StatusBadgeComponent
   ],
   templateUrl: './website-builder.html',
   styleUrl: './website-builder.css'
@@ -222,10 +233,10 @@ export class WebsiteBuilderComponent implements OnInit {
   }
 
   formatDate(date: string): string {
-    return new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    return formatDateMed(date);
   }
 
   formatPrice(price: number): string {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(price);
+    return formatMoneyUSD(price);
   }
 }

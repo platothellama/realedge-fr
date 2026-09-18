@@ -1,0 +1,78 @@
+<div class="client-selector">
+  <div class="section-label">Client Information</div>
+
+  @if (!showNewForm) {
+    <div class="">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Select Existing Client</mat-label>
+        <mat-select [value]="selected?.id || ''" (selectionChange)="onSelect($event.value)">
+          <mat-option [value]="''" disabled>-- Select a client --</mat-option>
+          @for (lead of filteredItems; track lead.id) {
+            <mat-option [value]="lead.id">
+              <div class="lead-option">
+                <span class="lead-name">{{ lead.name }}</span>
+                <span class="lead-email">{{ lead.email }}</span>
+              </div>
+            </mat-option>
+          }
+        </mat-select>
+        <mat-icon matSuffix>person</mat-icon>
+      </mat-form-field>
+    </div>
+
+    <div class="divider-text">
+      <span>or</span>
+    </div>
+
+    <button mat-stroked-button type="button" class="new-client-btn" (click)="toggleNewForm()">
+      <mat-icon>add</mat-icon>
+      Create New Client
+    </button>
+  } @else {
+    <div class="new-client-form">
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Client Name</mat-label>
+          <input matInput [(ngModel)]="draft.name" placeholder="Full Name" (input)="onDraftChange()">
+          <mat-icon matSuffix>person</mat-icon>
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Email Address</mat-label>
+          <input matInput type="email" [(ngModel)]="draft.email" placeholder="email@example.com" (input)="onDraftChange()">
+          <mat-icon matSuffix>email</mat-icon>
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Phone Number</mat-label>
+          <input matInput [(ngModel)]="draft.phone" placeholder="+1 234 567 890" (input)="onDraftChange()">
+          <mat-icon matSuffix>phone</mat-icon>
+        </mat-form-field>
+      </div>
+
+      <button mat-stroked-button type="button" class="select-existing-btn" (click)="toggleNewForm()">
+        <mat-icon>search</mat-icon>
+        Select Existing Client Instead
+      </button>
+    </div>
+  }
+
+  @if (selected) {
+    <div class="selected-client-info">
+      <div class="info-card">
+        <mat-icon>check_circle</mat-icon>
+        <div class="info-details">
+          <span class="info-name">{{ selected.name }}</span>
+          <span class="info-contact">{{ selected.email }} | {{ selected.phone }}</span>
+          @if (selected.budget) {
+            <span class="info-budget">Budget: ${{ selected.budget | number }}</span>
+          }
+        </div>
+      </div>
+    </div>
+  }
+</div>

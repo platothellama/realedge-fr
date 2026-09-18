@@ -13,13 +13,16 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { environment } from '../../../environments/environment';
 import { FormsModule } from '@angular/forms';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog';
+import { ConfirmDialogComponent } from '../../shared/molecules/confirm-dialog/confirm-dialog';
 import { ActivatedRoute } from '@angular/router';
 import { ApiService } from '../../services/api';
-import { DocumentUploadFormComponent } from '../../components/document-upload-form/document-upload-form';
-import { PaginationComponent } from '../../components/pagination/pagination';
-import { PropertySearchComponent, SearchFilters, SearchFilterConfig } from '../../components/property-search/property-search';
-import { ErrorStateComponent } from '../../components/error-state/error-state';
+import { DocumentUploadFormComponent } from '../../shared/organisms/document-upload-form/document-upload-form';
+import { PaginationComponent } from '../../shared/atoms/pagination/pagination';
+import { PropertySearchComponent, SearchFilters, SearchFilterConfig } from '../../shared/molecules/property-search/property-search';
+import { ErrorStateComponent } from '../../shared/atoms/error-state/error-state';
+import { PageHeaderComponent } from '../../shared/molecules/page-header/page-header';
+import { LoadingStateComponent } from '../../shared/atoms/loading-state/loading-state';
+import { EmptyStateComponent } from '../../shared/atoms/empty-state/empty-state';
 
 @Component({
   selector: 'app-documents',
@@ -40,7 +43,10 @@ import { ErrorStateComponent } from '../../components/error-state/error-state';
     MatDialogModule,
     PaginationComponent,
     PropertySearchComponent,
-    ErrorStateComponent
+    ErrorStateComponent,
+    PageHeaderComponent,
+    LoadingStateComponent,
+    EmptyStateComponent
   ],
   templateUrl: './documents.html',
   styleUrl: './documents.css'

@@ -15,7 +15,14 @@ import { FormsModule } from '@angular/forms';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ApiService } from '../../services/api';
 import { AuthService } from '../../services/auth/auth.service';
-import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog';
+import { ConfirmDialogComponent } from '../../shared/molecules/confirm-dialog/confirm-dialog';
+import { DialogShellComponent } from '../../shared/molecules/dialog-shell/dialog-shell';
+import { formatDateMed } from '../../shared/utils/format';
+import { PageHeaderComponent } from '../../shared/molecules/page-header/page-header';
+import { LoadingStateComponent } from '../../shared/atoms/loading-state/loading-state';
+import { StatCardComponent } from '../../shared/molecules/stat-card/stat-card';
+import { EmptyStateComponent } from '../../shared/atoms/empty-state/empty-state';
+import { StatusBadgeComponent } from '../../shared/atoms/status-badge/status-badge';
 
 interface Campaign {
   id: string;
@@ -36,7 +43,13 @@ interface Campaign {
     CommonModule, MatCardModule, MatIconModule, MatButtonModule,
     MatProgressSpinnerModule, MatSnackBarModule, MatTableModule,
     MatMenuModule, MatChipsModule, MatFormFieldModule, MatInputModule,
-    MatSelectModule, FormsModule, MatDialogModule
+    MatSelectModule, FormsModule, MatDialogModule,
+    DialogShellComponent,
+    PageHeaderComponent,
+    LoadingStateComponent,
+    StatCardComponent,
+    EmptyStateComponent,
+    StatusBadgeComponent
   ],
   templateUrl: './marketing-automation.html',
   styleUrl: './marketing-automation.css'
@@ -161,7 +174,7 @@ export class MarketingAutomationComponent implements OnInit {
   }
 
   formatDate(date: string): string {
-    return new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    return formatDateMed(date);
   }
 
   getStatusClass(status: string): string {

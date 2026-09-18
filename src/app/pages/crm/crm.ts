@@ -7,7 +7,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { DragDropModule, CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { ApiService } from '../../services/api';
-import { LeadFormComponent } from '../../components/lead-form/lead-form';
+import { LeadFormComponent } from '../../shared/organisms/lead-form/lead-form';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -18,8 +18,12 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatStepperModule } from '@angular/material/stepper';
 import { MatTabsModule } from '@angular/material/tabs';
-import { SearchFilters, SearchFilterConfig } from '../../components/property-search/property-search';
-import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog';
+import { SearchFilters, SearchFilterConfig } from '../../shared/molecules/property-search/property-search';
+import { ConfirmDialogComponent } from '../../shared/molecules/confirm-dialog/confirm-dialog';
+import { escapeCsvCell as sharedEscapeCsvCell } from '../../shared/utils/format';
+import { PageHeaderComponent } from '../../shared/molecules/page-header/page-header';
+import { EmptyStateComponent } from '../../shared/atoms/empty-state/empty-state';
+import { StatusBadgeComponent } from '../../shared/atoms/status-badge/status-badge';
 
 @Component({
   selector: 'app-crm',
@@ -40,7 +44,10 @@ import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-
     MatTooltipModule,
     MatExpansionModule,
     MatStepperModule,
-    MatTabsModule
+    MatTabsModule,
+    PageHeaderComponent,
+    EmptyStateComponent,
+    StatusBadgeComponent
   ],
   templateUrl: './crm.html',
   styleUrl: './crm.css',
@@ -272,13 +279,9 @@ export class CrmComponent implements OnInit {
     });
   }
 
-  /** QA 2026-09-18: RFC4180 escaping + formula-injection guard. A cell starting
-   * with = + - @ (after optional quotes) can execute in spreadsheet apps. */
+  /** Delegates to shared utils: RFC4180 escaping + formula-injection guard (QA 2026-09-18). */
   private escapeCsvCell(value: unknown): string {
-    let s = value === null || value === undefined ? '' : String(value);
-    if (/^[=+\-@]/.test(s.trim())) s = `'${s}`;
-    if (/[",\n\r]/.test(s)) s = `"${s.replace(/"/g, '""')}"`;
-    return s;
+    return sharedEscapeCsvCell(value);
   }
 
   exportToCSV() {

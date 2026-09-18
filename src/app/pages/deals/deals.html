@@ -1,10 +1,5 @@
 <div class="deals-container">
-  <div class="header-section">
-    <div class="title-area">
-      <h1>Deals & Contracts</h1>
-      <p>Manage sales pipeline and track commission progress</p>
-    </div>
-
+  <app-page-header title="Deals & Contracts" subtitle="Manage sales pipeline and track commission progress">
     <div class="action-area">
       <button mat-stroked-button color="primary" [matMenuTriggerFor]="dataMenu" class="data-btn">
         <mat-icon>import_export</mat-icon>
@@ -22,7 +17,7 @@
         New Deal
       </button>
     </div>
-  </div>
+  </app-page-header>
 
   <app-property-search
     [filters]="searchFilters"
@@ -32,10 +27,7 @@
   ></app-property-search>
 
   @if (loading) {
-    <div class="loading-container" role="status" aria-label="Loading deals">
-      <mat-spinner diameter="40"></mat-spinner>
-      <p>Loading deals...</p>
-    </div>
+    <app-loading-state message="Loading deals..."></app-loading-state>
   } @else {
   <div class="pipeline-board">
     <mat-tab-group class="view-tabs" color="primary">
@@ -102,10 +94,7 @@
                 }
 
                 @if (stage.leads?.length === 0) {
-                  <div class="empty-stage">
-                    <mat-icon>assignment</mat-icon>
-                    <p>No active deals</p>
-                  </div>
+                  <app-empty-state icon="assignment" title="No active deals"></app-empty-state>
                 }
               </div>
             </div>
@@ -150,7 +139,7 @@
                     </div>
                   </td>
                   <td>
-                    <span class="stage-badge" [attr.data-stage]="deal.dealStage">{{ deal.dealStage }}</span>
+                    <app-status-badge [status]="deal.dealStage"></app-status-badge>
                   </td>
                   <td><span class="commission-text">{{ deal.commission | currency }}</span></td>
                   <td align="right">
@@ -166,10 +155,7 @@
             </table>
             </div>
             @if (allDeals.length === 0) {
-              <div class="empty-state">
-                <mat-icon>history_edu</mat-icon>
-                <p>No deals found in history</p>
-              </div>
+              <app-empty-state icon="history_edu" title="No deals found in history"></app-empty-state>
             }
           </mat-card>
         </div>

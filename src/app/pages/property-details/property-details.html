@@ -1,11 +1,7 @@
 <div class="details-container" *ngIf="!loading && property">
   <app-breadcrumb [items]="[{ label: 'Properties', link: '/properties' }, { label: property.title || 'Details' }]"></app-breadcrumb>
   <!-- Header Section -->
-  <header class="page-header">
-    <button mat-button class="back-btn" (click)="goBack()" aria-label="Back to properties">
-      <mat-icon aria-hidden="true">arrow_back</mat-icon>
-      Back
-    </button>
+  <app-page-header [title]="property.title || 'Property Details'" [showBack]="true" (back)="goBack()" backLabel="Back to properties">
     <div class="header-actions">
       @if (canMarkSoldOrLost) {
         <button mat-stroked-button color="warn" [matMenuTriggerFor]="statusMenu">
@@ -36,7 +32,7 @@
       </button>
       }
     </div>
-  </header>
+  </app-page-header>
 
   @if (isSold && property.soldTo) {
     <div class="sale-info-banner">
@@ -125,6 +121,13 @@
             </div>
           </div>
           <div class="stat-item">
+            <mat-icon>balcony</mat-icon>
+            <div class="stat-content">
+              <span class="stat-value">{{ property.balconies ?? 0 }}</span>
+              <span class="stat-label">Balconies</span>
+            </div>
+          </div>
+          <div class="stat-item">
             <mat-icon>square_foot</mat-icon>
             <div class="stat-content">
               <span class="stat-value">{{ property.area }}</span>
@@ -170,6 +173,62 @@
         </h2>
         <p class="description">{{ property.description || 'No description provided for this property.' }}</p>
       </mat-card>
+
+      <!-- Videos & Virtual Tours -->
+      @if (hasMedia) {
+        <mat-card class="info-card media-card">
+          <h2 class="section-heading">
+            <mat-icon>videocam</mat-icon>
+            Videos & Virtual Tours
+          </h2>
+          @if (videoItems.length > 0) {
+            <div class="video-grid">
+              @for (video of videoItems; track video.url) {
+                <div class="video-item">
+                  @if (video.kind === 'file') {
+                    <video [src]="video.url" controls preload="metadata" playsinline></video>
+                  } @else if (video.embedUrl) {
+                    <iframe [src]="safeResource(video.embedUrl)" frameborder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowfullscreen loading="lazy"></iframe>
+                  } @else {
+                    <a class="video-link" [href]="video.url" target="_blank" rel="noopener">
+                      <mat-icon>play_circle</mat-icon>
+                      <span>{{ video.label }}</span>
+                    </a>
+                  }
+                  <div class="video-caption">
+                    <mat-icon>{{ video.kind === 'file' ? 'movie' : video.kind === 'link' ? 'link' : 'smart_display' }}</mat-icon>
+                    <span>{{ video.label }}</span>
+                    <a [href]="video.url" target="_blank" rel="noopener" class="open-original">Open original</a>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+          @if (tourLinks.length > 0) {
+            <div class="tour-list">
+              @for (tour of tourLinks; track tour) {
+                <a mat-stroked-button [href]="tour" target="_blank" rel="noopener">
+                  <mat-icon>360</mat-icon>
+                  {{ fileNameFromUrl(tour) }}
+                </a>
+              }
+            </div>
+          }
+          @if (attachmentDocs.length > 0) {
+            <div class="attachment-list">
+              <h3 class="attachment-heading"><mat-icon>folder</mat-icon> Attached files</h3>
+              @for (doc of attachmentDocs; track doc) {
+                <a class="attachment-item" [href]="doc" target="_blank" rel="noopener">
+                  <mat-icon>description</mat-icon>
+                  <span>{{ fileNameFromUrl(doc) }}</span>
+                </a>
+              }
+            </div>
+          }
+        </mat-card>
+      }
 
       <!-- Features -->
       <mat-card class="info-card" *ngIf="property.features?.length">
@@ -306,6 +365,10 @@
           <div class="spec-row">
             <span class="spec-label">Bedrooms</span>
             <span class="spec-value">{{ property.bedrooms }}@if (property.masterBedrooms) { ({{ property.masterBedrooms }} master) }</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-label">Balconies</span>
+            <span class="spec-value">{{ property.balconies ?? 0 }}</span>
           </div>
           <div class="spec-row">
             <span class="spec-label">Condition</span>

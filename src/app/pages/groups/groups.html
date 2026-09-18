@@ -1,19 +1,13 @@
 <div class="groups-container">
-  <div class="page-header">
-    <div class="header-content">
-      <h1 class="page-title">Team Management</h1>
-      <p class="page-subtitle">Manage teams, assign roles, and configure commission splits</p>
-    </div>
+  <app-page-header [title]="'Team Management'" [subtitle]="'Manage teams, assign roles, and configure commission splits'">
     <button mat-raised-button color="primary" (click)="openNewGroupDialog()">
       <mat-icon>add</mat-icon>
       New Team
     </button>
-  </div>
+  </app-page-header>
 
   @if (loading) {
-    <div class="loading-container">
-      <mat-spinner diameter="40"></mat-spinner>
-    </div>
+    <app-loading-state />
   } @else {
     <div class="groups-layout">
       <!-- Groups List -->
@@ -52,10 +46,7 @@
               </div>
             }
             @if (groups.length === 0) {
-              <div class="empty-state">
-                <mat-icon>group_off</mat-icon>
-                <p>No teams yet</p>
-              </div>
+              <app-empty-state icon="group_off" title="No teams yet" />
             }
           </div>
         </mat-card>
@@ -118,13 +109,7 @@
                   </div>
                 }
                 @if (groupMembers.length === 0) {
-                  <div class="empty-members">
-                    <mat-icon>group_add</mat-icon>
-                    <p>No members in this team</p>
-                    <button mat-stroked-button color="primary" (click)="openAddMemberDialog()">
-                      Add First Member
-                    </button>
-                  </div>
+                  <app-empty-state icon="group_add" title="No members in this team" actionLabel="Add First Member" (action)="openAddMemberDialog()" />
                 }
               </div>
             </div>
@@ -142,15 +127,8 @@
 
   <!-- Group Dialog -->
   @if (showGroupDialog) {
-    <div class="dialog-overlay" (click)="closeDialog()" (keydown.escape)="closeDialog()">
-      <div class="dialog-content" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="group-dialog-title">
-        <div class="dialog-header">
-          <h2 id="group-dialog-title">{{ isEditMode ? 'Edit Team' : 'New Team' }}</h2>
-          <button mat-icon-button (click)="closeDialog()" aria-label="Close dialog">
-            <mat-icon aria-hidden="true">close</mat-icon>
-          </button>
-        </div>
-        <div class="dialog-body">
+    <app-dialog-shell [title]="isEditMode ? 'Edit Team' : 'New Team'" [titleId]="'group-dialog-title'" (closed)="closeDialog()">
+      <div class="dialog-body">
           <form [formGroup]="groupForm" (ngSubmit)="saveGroup()">
             <mat-form-field appearance="outline" class="full-width">
               <mat-label>Team Name</mat-label>
@@ -173,21 +151,13 @@
             {{ isEditMode ? 'Update' : 'Create' }}
           </button>
         </div>
-      </div>
-    </div>
+    </app-dialog-shell>
   }
 
   <!-- Add Member Dialog -->
   @if (showMemberDialog) {
-    <div class="dialog-overlay" (click)="closeDialog()" (keydown.escape)="closeDialog()">
-      <div class="dialog-content" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="add-member-title">
-        <div class="dialog-header">
-          <h2 id="add-member-title">Add Member</h2>
-          <button mat-icon-button (click)="closeDialog()" aria-label="Close dialog">
-            <mat-icon aria-hidden="true">close</mat-icon>
-          </button>
-        </div>
-        <div class="dialog-body">
+    <app-dialog-shell [title]="'Add Member'" [titleId]="'add-member-title'" (closed)="closeDialog()">
+      <div class="dialog-body">
           <form [formGroup]="memberForm">
             <mat-form-field appearance="outline" class="full-width">
               <mat-label>Select User</mat-label>
@@ -222,21 +192,13 @@
             Add Member
           </button>
         </div>
-      </div>
-    </div>
+    </app-dialog-shell>
   }
 
   <!-- Edit Member Dialog -->
   @if (showEditMemberDialog && editingMember) {
-    <div class="dialog-overlay" (click)="closeDialog()" (keydown.escape)="closeDialog()">
-      <div class="dialog-content" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="edit-member-title">
-        <div class="dialog-header">
-          <h2 id="edit-member-title">Edit Member</h2>
-          <button mat-icon-button (click)="closeDialog()" aria-label="Close dialog">
-            <mat-icon aria-hidden="true">close</mat-icon>
-          </button>
-        </div>
-        <div class="dialog-body">
+    <app-dialog-shell [title]="'Edit Member'" [titleId]="'edit-member-title'" (closed)="closeDialog()">
+      <div class="dialog-body">
           <div class="edit-member-header">
             <div class="member-avatar-large">
               <mat-icon>person</mat-icon>
@@ -270,7 +232,6 @@
             Save Changes
           </button>
         </div>
-      </div>
-    </div>
+    </app-dialog-shell>
   }
 </div>

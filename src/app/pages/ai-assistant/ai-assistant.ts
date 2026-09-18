@@ -12,6 +12,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Router } from '@angular/router';
 import { ApiService } from '../../services/api';
+import { PageHeaderComponent } from '../../shared/molecules/page-header/page-header';
 
 interface Message {
   sender: 'user' | 'ai';
@@ -34,7 +35,8 @@ interface Message {
     MatSnackBarModule,
     MatProgressSpinnerModule,
     MatChipsModule,
-    MatTooltipModule
+    MatTooltipModule,
+    PageHeaderComponent
   ],
   templateUrl: './ai-assistant.html',
   styleUrl: './ai-assistant.css'

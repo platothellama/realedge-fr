@@ -11,6 +11,11 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api';
+import { formatMoneyUSD } from '../../shared/utils/format';
+import { PageHeaderComponent } from '../../shared/molecules/page-header/page-header';
+import { LoadingStateComponent } from '../../shared/atoms/loading-state/loading-state';
+import { EmptyStateComponent } from '../../shared/atoms/empty-state/empty-state';
+import { StatusBadgeComponent } from '../../shared/atoms/status-badge/status-badge';
 
 interface MarketMetric {
   label: string;
@@ -50,7 +55,11 @@ interface Methodology {
     MatSelectModule,
     MatFormFieldModule,
     MatExpansionModule,
-    FormsModule
+    FormsModule,
+    PageHeaderComponent,
+    LoadingStateComponent,
+    EmptyStateComponent,
+    StatusBadgeComponent
   ],
   templateUrl: './market.html',
   styleUrl: './market.css'
@@ -107,11 +116,7 @@ export class MarketComponent implements OnInit {
   }
 
   formatCurrency(value: number): string {
-    return new Intl.NumberFormat('en-US', { 
-      style: 'currency', 
-      currency: 'USD',
-      maximumFractionDigits: 0 
-    }).format(value);
+    return formatMoneyUSD(value);
   }
 
   getTrendIcon(trend: string): string {

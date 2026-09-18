@@ -1,6 +1,6 @@
 <div class="editor-container">
   @if (loading) {
-    <div class="loading-container"><mat-spinner diameter="40"></mat-spinner></div>
+    <app-loading-state></app-loading-state>
   } @else {
     <div class="editor-header">
       <div class="header-left">
@@ -26,14 +26,7 @@
           <mat-tab [label]="page.name">
             <div class="page-content">
               @if ((page.sections || []).length === 0) {
-                <div class="empty-sections">
-                  <mat-icon>dashboard</mat-icon>
-                  <h3>No sections yet</h3>
-                  <p>Add sections to build your page</p>
-                  <button mat-raised-button color="primary" (click)="showComponentPanel = true">
-                    <mat-icon>add</mat-icon> Add Section
-                  </button>
-                </div>
+                <app-empty-state icon="dashboard" title="No sections yet" hint="Add sections to build your page" actionLabel="Add Section" (action)="showComponentPanel = true"></app-empty-state>
               } @else {
                 <div class="sections-list">
                   @for (section of page.sections || []; track section.id; let j = $index) {

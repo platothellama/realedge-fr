@@ -10,6 +10,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatChipsModule } from '@angular/material/chips';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api';
+import { formatMoneyUSD } from '../../shared/utils/format';
+import { PageHeaderComponent } from '../../shared/molecules/page-header/page-header';
+import { LoadingStateComponent } from '../../shared/atoms/loading-state/loading-state';
 
 interface Prediction {
   type: string;
@@ -51,7 +54,9 @@ interface PropertyValuation {
     MatSelectModule,
     MatFormFieldModule,
     MatChipsModule,
-    FormsModule
+    FormsModule,
+    PageHeaderComponent,
+    LoadingStateComponent
   ],
   templateUrl: './ai-insights.html',
   styleUrl: './ai-insights.css'
@@ -121,11 +126,7 @@ export class AiInsightsComponent implements OnInit {
   }
 
   formatCurrency(value: number): string {
-    return new Intl.NumberFormat('en-US', { 
-      style: 'currency', 
-      currency: 'USD',
-      maximumFractionDigits: 0 
-    }).format(value);
+    return formatMoneyUSD(value);
   }
 
   refreshInsights() {

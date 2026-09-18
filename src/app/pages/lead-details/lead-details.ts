@@ -16,8 +16,12 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatListModule } from '@angular/material/list';
 import { ApiService } from '../../services/api';
 import { FormsModule } from '@angular/forms';
-import { BreadcrumbComponent } from '../../components/breadcrumb/breadcrumb';
-import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog';
+import { BreadcrumbComponent } from '../../shared/atoms/breadcrumb/breadcrumb';
+import { ConfirmDialogComponent } from '../../shared/molecules/confirm-dialog/confirm-dialog';
+import { PageHeaderComponent } from '../../shared/molecules/page-header/page-header';
+import { LoadingStateComponent } from '../../shared/atoms/loading-state/loading-state';
+import { EmptyStateComponent } from '../../shared/atoms/empty-state/empty-state';
+import { StatusBadgeComponent } from '../../shared/atoms/status-badge/status-badge';
 
 @Component({
   selector: 'app-lead-details',
@@ -38,7 +42,11 @@ import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-
     MatMenuModule,
     MatListModule,
     FormsModule,
-    BreadcrumbComponent
+    BreadcrumbComponent,
+    PageHeaderComponent,
+    LoadingStateComponent,
+    EmptyStateComponent,
+    StatusBadgeComponent
   ],
   templateUrl: './lead-details.html',
   styleUrl: './lead-details.css'

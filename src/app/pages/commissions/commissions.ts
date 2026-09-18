@@ -16,6 +16,11 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api';
 import { RouterModule } from '@angular/router';
+import { PageHeaderComponent } from '../../shared/molecules/page-header/page-header';
+import { LoadingStateComponent } from '../../shared/atoms/loading-state/loading-state';
+import { StatCardComponent } from '../../shared/molecules/stat-card/stat-card';
+import { EmptyStateComponent } from '../../shared/atoms/empty-state/empty-state';
+import { StatusBadgeComponent } from '../../shared/atoms/status-badge/status-badge';
 
 interface DealCommission {
   id: string;
@@ -53,7 +58,12 @@ interface DealCommission {
     MatDialogModule,
     MatTooltipModule,
     FormsModule,
-    RouterModule
+    RouterModule,
+    PageHeaderComponent,
+    LoadingStateComponent,
+    StatCardComponent,
+    EmptyStateComponent,
+    StatusBadgeComponent
   ],
   templateUrl: './commissions.html',
   styleUrl: './commissions.css'

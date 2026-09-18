@@ -13,8 +13,10 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import { ApiService } from '../../services/api';
-import { VisitFormComponent } from '../../components/visit-form/visit-form';
+import { VisitFormComponent } from '../../shared/organisms/visit-form/visit-form';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { PageHeaderComponent } from '../../shared/molecules/page-header/page-header';
+import { LoadingStateComponent } from '../../shared/atoms/loading-state/loading-state';
 
 @Component({
   selector: 'app-visits',
@@ -29,7 +31,9 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
     MatNativeDateModule,
     FullCalendarModule,
     MatSnackBarModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    PageHeaderComponent,
+    LoadingStateComponent
   ],
   templateUrl: './visits.html',
   styleUrl: './visits.css'

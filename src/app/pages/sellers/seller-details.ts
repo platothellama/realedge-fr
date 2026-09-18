@@ -14,7 +14,14 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ApiService } from '../../services/api';
 import { FormsModule } from '@angular/forms';
-import { BreadcrumbComponent } from '../../components/breadcrumb/breadcrumb';
+import { BreadcrumbComponent } from '../../shared/atoms/breadcrumb/breadcrumb';
+import { PageHeaderComponent } from '../../shared/molecules/page-header/page-header';
+import { StatCardComponent } from '../../shared/molecules/stat-card/stat-card';
+import { EmptyStateComponent } from '../../shared/atoms/empty-state/empty-state';
+import { ErrorStateComponent } from '../../shared/atoms/error-state/error-state';
+import { LoadingStateComponent } from '../../shared/atoms/loading-state/loading-state';
+import { StatusBadgeComponent } from '../../shared/atoms/status-badge/status-badge';
+import { formatMoneyUSD } from '../../shared/utils/format';
 
 @Component({
   selector: 'app-seller-details',
@@ -33,7 +40,13 @@ import { BreadcrumbComponent } from '../../components/breadcrumb/breadcrumb';
     MatSnackBarModule,
     MatProgressSpinnerModule,
     FormsModule,
-    BreadcrumbComponent
+    BreadcrumbComponent,
+    PageHeaderComponent,
+    StatCardComponent,
+    EmptyStateComponent,
+    ErrorStateComponent,
+    LoadingStateComponent,
+    StatusBadgeComponent
   ],
   templateUrl: './seller-details.html',
   styleUrl: './seller-details.css'
@@ -129,12 +142,7 @@ export class SellerDetailsComponent implements OnInit {
   }
 
   formatCurrency(amount: number): string {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    }).format(amount);
+    return formatMoneyUSD(amount);
   }
 
   showError(msg: string) {

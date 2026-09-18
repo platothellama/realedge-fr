@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
-import { DocumentManagerComponent } from '../../components/document-manager/document-manager';
+import { DocumentManagerComponent } from '../../shared/organisms/document-manager/document-manager';
 
 @Component({
   selector: 'app-document-manager-page',

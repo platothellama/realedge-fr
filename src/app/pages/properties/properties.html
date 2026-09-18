@@ -1,9 +1,5 @@
 <div class="page">
-  <div class="page-header">
-    <div>
-      <h1>Properties</h1>
-      <p>{{ pagination.totalItems }} listings</p>
-    </div>
+  <app-page-header title="Properties" [subtitle]="pagination.totalItems + ' listings'">
     <div class="header-actions">
       <div class="status-filter-group">
         <button mat-stroked-button 
@@ -39,7 +35,7 @@
         </button>
       }
     </div>
-  </div>
+  </app-page-header>
 
   <app-property-search
     [filters]="filters"
@@ -83,11 +79,7 @@
       (retry)="fetchProperties()">
     </app-error-state>
   } @else if (properties.length === 0) {
-    <div class="empty-state">
-      <mat-icon>apartment</mat-icon>
-      <h3>No properties found</h3>
-      <p>Adjust your search or add a new property</p>
-    </div>
+    <app-empty-state icon="apartment" title="No properties found" hint="Adjust your search or add a new property"></app-empty-state>
   } @else {
     @if (groupByProject) {
       <div class="project-groups">

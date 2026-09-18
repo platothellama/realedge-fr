@@ -15,9 +15,16 @@ import { MatSelectModule } from '@angular/material/select';
 import { FormsModule } from '@angular/forms';
 import { A11yModule } from '@angular/cdk/a11y';
 import { ApiService } from '../../services/api';
-import { ClientSelectorComponent, ClientSelection } from '../../components/client-selector/client-selector';
-import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog';
-import { ErrorStateComponent } from '../../components/error-state/error-state';
+import { ClientSelectorComponent, ClientSelection } from '../../shared/molecules/client-selector/client-selector';
+import { ConfirmDialogComponent } from '../../shared/molecules/confirm-dialog/confirm-dialog';
+import { DialogShellComponent } from '../../shared/molecules/dialog-shell/dialog-shell';
+import { ErrorStateComponent } from '../../shared/atoms/error-state/error-state';
+import { formatDateMed, formatMoney, formatMoneyUSD } from '../../shared/utils/format';
+import { PageHeaderComponent } from '../../shared/molecules/page-header/page-header';
+import { LoadingStateComponent } from '../../shared/atoms/loading-state/loading-state';
+import { StatCardComponent } from '../../shared/molecules/stat-card/stat-card';
+import { EmptyStateComponent } from '../../shared/atoms/empty-state/empty-state';
+import { StatusBadgeComponent } from '../../shared/atoms/status-badge/status-badge';
 
 interface LineItem {
   description: string;
@@ -79,8 +86,14 @@ interface Invoice {
     MatSelectModule,
     FormsModule,
     A11yModule,
+    DialogShellComponent,
     ClientSelectorComponent,
-    ErrorStateComponent
+    ErrorStateComponent,
+    PageHeaderComponent,
+    LoadingStateComponent,
+    StatCardComponent,
+    EmptyStateComponent,
+    StatusBadgeComponent
   ],
   templateUrl: './invoices.html',
   styleUrl: './invoices.css'
@@ -313,21 +326,16 @@ export class InvoicesComponent implements OnInit {
   }
 
   formatCurrency(value: number): string {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(value);
+    return formatMoneyUSD(value);
   }
 
   formatCurrencyWithSymbol(value: number, currency: string = 'USD'): string {
     // QA 2026-09-18: never render NaN/$NaN (one bad row poisoned totals).
-    const v = Number(value);
-    if (!Number.isFinite(v)) return '—';
-    if (currency === 'LBP') {
-      return new Intl.NumberFormat('en-LB', { style: 'decimal', maximumFractionDigits: 0 }).format(v) + ' LBP';
-    }
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(v);
+    return formatMoney(value, currency);
   }
 
   formatDate(date: string): string {
-    return new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    return formatDateMed(date);
   }
 
   getStatusClass(status: string): string {

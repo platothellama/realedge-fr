@@ -1,16 +1,12 @@
 <div class="page">
-  <div class="page-header">
-    <div>
-      <h1>Sellers</h1>
-      <p>{{ filteredSellers.length }} sellers</p>
-    </div>
+  <app-page-header [title]="'Sellers'" [subtitle]="filteredSellers.length + ' sellers'">
     <div class="header-actions">
       <button mat-raised-button color="primary" (click)="openSellerForm()">
         <mat-icon>person_add</mat-icon>
         Add Seller
       </button>
     </div>
-  </div>
+  </app-page-header>
 
   <app-property-search
     [filters]="searchFilters"
@@ -19,15 +15,9 @@
   ></app-property-search>
 
   @if (isLoading) {
-    <div class="loading-spinner" role="status" aria-label="Loading sellers">
-      <mat-spinner diameter="40"></mat-spinner>
-    </div>
+    <app-loading-state />
   } @else if (filteredSellers.length === 0) {
-    <div class="empty-state">
-      <mat-icon>people</mat-icon>
-      <h3>No sellers found</h3>
-      <p>Add a new seller to get started</p>
-    </div>
+    <app-empty-state icon="people" title="No sellers found" hint="Add a new seller to get started" />
   } @else {
     <div class="table-container">
       <table mat-table [dataSource]="filteredSellers" class="sellers-table">

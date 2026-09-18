@@ -10,8 +10,11 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { ApiService } from '../../services/api';
-import { WizardSearchDialogComponent } from '../../components/wizard-search-dialog/wizard-search-dialog';
-import { NaturalSearchDialogComponent } from '../../components/natural-search-dialog/natural-search-dialog';
+import { WizardSearchDialogComponent } from '../../shared/molecules/wizard-search-dialog/wizard-search-dialog';
+import { NaturalSearchDialogComponent } from '../../shared/molecules/natural-search-dialog/natural-search-dialog';
+import { PageHeaderComponent } from '../../shared/molecules/page-header/page-header';
+import { LoadingStateComponent } from '../../shared/atoms/loading-state/loading-state';
+import { EmptyStateComponent } from '../../shared/atoms/empty-state/empty-state';
 
 interface SavedSearch {
   preferenceId: string;
@@ -35,7 +38,10 @@ interface SavedSearch {
     MatChipsModule,
     MatTooltipModule,
     MatDialogModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    PageHeaderComponent,
+    LoadingStateComponent,
+    EmptyStateComponent
   ],
   templateUrl: './property-matcher.html',
   styleUrl: './property-matcher.css',

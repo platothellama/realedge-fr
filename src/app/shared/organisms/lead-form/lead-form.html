@@ -1,0 +1,165 @@
+<div class="lead-form-container">
+  <app-modal-header [title]="isEdit ? 'Edit Lead Profile' : 'Capture New Lead'" [subtitle]="'Fill in the prospect details for your CRM pipeline'" />
+
+  <mat-dialog-content [formGroup]="leadForm" class="custom-scrollbar">
+    <div class="section-label">Contact Information</div>
+    <div class="form-row">
+      <mat-form-field appearance="outline">
+        <mat-label>Lead Name</mat-label>
+        <input matInput formControlName="name" placeholder="Full Name">
+        <mat-icon matSuffix>person</mat-icon>
+        <mat-error *ngIf="leadForm.get('name')?.hasError('required')">Name is required</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Email Address</mat-label>
+        <input matInput type="email" formControlName="email" placeholder="email@example.com">
+        <mat-icon matSuffix>email</mat-icon>
+        <mat-error *ngIf="leadForm.get('email')?.hasError('required')">Email is required</mat-error>
+        <mat-error *ngIf="leadForm.get('email')?.hasError('email')">Please enter a valid email</mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline">
+        <mat-label>Phone Number</mat-label>
+        <input matInput formControlName="phone" placeholder="+1 234 567 890">
+        <mat-icon matSuffix>phone</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Job Title</mat-label>
+        <input matInput formControlName="job" placeholder="e.g. CEO, Engineer">
+        <mat-icon matSuffix>work</mat-icon>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline">
+        <mat-label>Nationality</mat-label>
+        <input matInput formControlName="nationality" placeholder="e.g. British, Emirati">
+        <mat-icon matSuffix>public</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" *ngIf="leadForm.get('referenceType')?.value === 'lead'">
+        <mat-label>Reference Lead</mat-label>
+        <mat-select formControlName="referenceId">
+          <mat-option [value]="null">-- None --</mat-option>
+          @for (lead of leads; track lead.id) {
+            <mat-option [value]="lead.id">{{ lead.name }} - {{ lead.email }}</mat-option>
+          }
+        </mat-select>
+        <mat-icon matSuffix>person</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" *ngIf="leadForm.get('referenceType')?.value === 'user'">
+        <mat-label>Reference User</mat-label>
+        <mat-select formControlName="referenceId">
+          <mat-option [value]="null">-- None --</mat-option>
+          @for (user of users; track user.id) {
+            <mat-option [value]="user.id">{{ user.name }}</mat-option>
+          }
+        </mat-select>
+        <mat-icon matSuffix>person</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" *ngIf="leadForm.get('referenceType')?.value === 'text'">
+        <mat-label>Reference Text</mat-label>
+        <input matInput formControlName="referenceText" placeholder="e.g. Referred by John Doe">
+        <mat-icon matSuffix>description</mat-icon>
+      </mat-form-field>
+    </div>
+
+    <div class="section-label">Pipeline & Preferences</div>
+    <div class="form-row">
+      <mat-form-field appearance="outline">
+        <mat-label>Lead Source</mat-label>
+        <mat-select formControlName="source">
+          <mat-option value="Website">Website</mat-option>
+          <mat-option value="Facebook">Facebook</mat-option>
+          <mat-option value="Google Ads">Google Ads</mat-option>
+          <mat-option value="Referral">Referral</mat-option>
+          <mat-option value="Walk-in">Walk-in</mat-option>
+        </mat-select>
+        <mat-icon matSuffix>campaign</mat-icon>
+        <mat-error *ngIf="leadForm.get('source')?.hasError('required')">Source is required</mat-error>
+      </mat-form-field>
+
+      <!-- QA 2026-09-18: the server always creates leads as 'New Lead';
+           showing the picker on create misled users (their choice was
+           silently discarded). Stage can be changed when editing. -->
+      @if (isEdit) {
+      <mat-form-field appearance="outline">
+        <mat-label>Pipeline Stage</mat-label>
+        <mat-select formControlName="status">
+          <mat-option value="New Lead">New Lead</mat-option>
+          <mat-option value="Contacted">Contacted</mat-option>
+          <mat-option value="Visit Scheduled">Visit Scheduled</mat-option>
+          <mat-option value="Negotiation">Negotiation</mat-option>
+          <mat-option value="Closed Deal">Closed Deal</mat-option>
+          <mat-option value="Lost Lead">Lost Lead</mat-option>
+        </mat-select>
+        <mat-icon matSuffix>account_tree</mat-icon>
+        <mat-error *ngIf="leadForm.get('status')?.hasError('required')">Status is required</mat-error>
+      </mat-form-field>
+      }
+    </div>
+
+    <div class="form-row">
+      <mat-form-field appearance="outline" class="budget-field">
+        <mat-label>Maximum Budget</mat-label>
+        <input matInput type="number" formControlName="budget" placeholder="0.00">
+        <span matPrefix class="currency-prefix">$</span>
+        <mat-hint style="margin-bottom: 8px;">Enter the maximum amount the client is willing to spend</mat-hint>
+        <mat-error *ngIf="leadForm.get('budget')?.hasError('min')">Budget cannot be negative</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Preferred Areas</mat-label>
+        <input matInput formControlName="preferredAreas" placeholder="e.g. Downtown, Marina">
+        <mat-icon matSuffix>map</mat-icon>
+      </mat-form-field>
+    </div>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Property Preferences</mat-label>
+      <input matInput formControlName="propertyPreferences" placeholder="e.g. 3 Bed Villa, Sea View">
+      <mat-icon matSuffix>home</mat-icon>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Internal Notes</mat-label>
+      <textarea matInput formControlName="notes" rows="3" placeholder="Additional details about the lead..."></textarea>
+    </mat-form-field>
+
+    @if (showAssignmentDropdown) {
+    <div class="section-label">Assignment</div>
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Assign to Agent</mat-label>
+      <mat-select formControlName="assignedToUserId">
+        @for (user of users; track user.id) {
+          <mat-option [value]="user.id">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <img [src]="user.photo || 'https://ui-avatars.com/api/?name=' + user.name" style="width: 24px; height: 24px; border-radius: 50%;">
+              <span>{{ user.name }}</span>
+              <span style="font-size: 0.75rem; color: var(--text-muted);">({{ user.role }})</span>
+            </div>
+          </mat-option>
+        }
+      </mat-select>
+      <mat-icon matSuffix>assignment_ind</mat-icon>
+    </mat-form-field>
+    }
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="onCancel()" class="cancel-btn" [disabled]="isSubmitting">Discard</button>
+    <button mat-raised-button color="primary" class="submit-btn" (click)="onSubmit()" [disabled]="!leadForm.valid || isSubmitting" [class.loading]="isSubmitting">
+      @if (isSubmitting) {
+        <mat-spinner diameter="20"></mat-spinner>
+      } @else {
+        {{ isEdit ? 'Update Profile' : 'Capture Lead' }}
+      }
+    </button>
+  </mat-dialog-actions>
+</div>

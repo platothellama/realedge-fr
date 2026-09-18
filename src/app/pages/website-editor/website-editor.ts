@@ -15,8 +15,10 @@ import { MatChipsModule } from '@angular/material/chips';
 import { FormsModule } from '@angular/forms';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ApiService } from '../../services/api';
-import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog';
+import { ConfirmDialogComponent } from '../../shared/molecules/confirm-dialog/confirm-dialog';
 import { SectionEditorComponent } from './section-editor';
+import { LoadingStateComponent } from '../../shared/atoms/loading-state/loading-state';
+import { EmptyStateComponent } from '../../shared/atoms/empty-state/empty-state';
 
 interface Section {
   id: string;
@@ -57,7 +59,8 @@ interface Website {
     CommonModule, RouterModule, MatCardModule, MatIconModule, MatButtonModule,
     MatTabsModule, MatProgressSpinnerModule, MatSnackBarModule, MatMenuModule,
     MatFormFieldModule, MatInputModule, MatSelectModule, MatChipsModule, FormsModule,
-    MatDialogModule, SectionEditorComponent
+    MatDialogModule, SectionEditorComponent,
+    LoadingStateComponent, EmptyStateComponent
   ],
   templateUrl: './website-editor.html',
   styleUrl: './website-editor.css'

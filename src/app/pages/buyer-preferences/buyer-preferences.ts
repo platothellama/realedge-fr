@@ -4,7 +4,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
-import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog';
+import { ConfirmDialogComponent } from '../../shared/molecules/confirm-dialog/confirm-dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -18,8 +18,13 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatRadioModule } from '@angular/material/radio';
 import { ApiService } from '../../services/api';
+import { DialogShellComponent } from '../../shared/molecules/dialog-shell/dialog-shell';
 import { Router } from '@angular/router';
-import { ClientSelectorComponent, ClientSelection } from '../../components/client-selector/client-selector';
+import { ClientSelectorComponent, ClientSelection } from '../../shared/molecules/client-selector/client-selector';
+import { PageHeaderComponent } from '../../shared/molecules/page-header/page-header';
+import { LoadingStateComponent } from '../../shared/atoms/loading-state/loading-state';
+import { EmptyStateComponent } from '../../shared/atoms/empty-state/empty-state';
+import { StatusBadgeComponent } from '../../shared/atoms/status-badge/status-badge';
 
 @Component({
   selector: 'app-buyer-preferences',
@@ -42,7 +47,12 @@ import { ClientSelectorComponent, ClientSelection } from '../../components/clien
     MatProgressSpinnerModule,
     MatTooltipModule,
     MatRadioModule,
-    ClientSelectorComponent
+    DialogShellComponent,
+    ClientSelectorComponent,
+    PageHeaderComponent,
+    LoadingStateComponent,
+    EmptyStateComponent,
+    StatusBadgeComponent
   ],
   templateUrl: './buyer-preferences.html',
   styleUrl: './buyer-preferences.css',

@@ -1,57 +1,19 @@
 <div class="expenses-container">
-  <div class="page-header">
-    <div class="header-content">
-      <h1 class="page-title">Expenses</h1>
-      <p class="page-subtitle">Track and manage business expenses</p>
-    </div>
+  <app-page-header [title]="'Expenses'" [subtitle]="'Track and manage business expenses'">
     <button mat-raised-button color="primary" (click)="showAddDialog = true">
       <mat-icon>add</mat-icon>
       New Expense
     </button>
-  </div>
+  </app-page-header>
 
   @if (loading) {
-    <div class="loading-container">
-      <mat-spinner diameter="40"></mat-spinner>
-    </div>
+    <app-loading-state />
   } @else {
     <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-icon total">
-          <mat-icon>payments</mat-icon>
-        </div>
-        <div class="stat-content">
-          <span class="stat-value">{{ formatCurrency(stats.totalExpenses || 0) }}</span>
-          <span class="stat-label">Total Paid</span>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon pending">
-          <mat-icon>pending</mat-icon>
-        </div>
-        <div class="stat-content">
-          <span class="stat-value">{{ formatCurrency(stats.pendingExpenses || 0) }}</span>
-          <span class="stat-label">Pending</span>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon this-month">
-          <mat-icon>calendar_today</mat-icon>
-        </div>
-        <div class="stat-content">
-          <span class="stat-value">{{ formatCurrency(stats.thisMonthExpenses || 0) }}</span>
-          <span class="stat-label">This Month</span>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon approved">
-          <mat-icon>check_circle</mat-icon>
-        </div>
-        <div class="stat-content">
-          <span class="stat-value">{{ stats.approvedCount || 0 }}</span>
-          <span class="stat-label">Approved</span>
-        </div>
-      </div>
+      <app-stat-card [icon]="'payments'" [value]="formatCurrency(stats.totalExpenses || 0)" [label]="'Total Paid'" [tone]="'total'" />
+      <app-stat-card [icon]="'pending'" [value]="formatCurrency(stats.pendingExpenses || 0)" [label]="'Pending'" [tone]="'pending'" />
+      <app-stat-card [icon]="'calendar_today'" [value]="formatCurrency(stats.thisMonthExpenses || 0)" [label]="'This Month'" [tone]="'this-month'" />
+      <app-stat-card [icon]="'check_circle'" [value]="stats.approvedCount || 0" [label]="'Approved'" [tone]="'approved'" />
     </div>
 
     <mat-card class="table-card">
@@ -104,9 +66,7 @@
                 <td>{{ formatDate(expense.date) }}</td>
                 <td>{{ expense.vendor || '-' }}</td>
                 <td>
-                  <span class="status-badge" [class]="getStatusClass(expense.status)">
-                    {{ expense.status }}
-                  </span>
+                  <app-status-badge [status]="expense.status" />
                 </td>
                 <td>
                   <button mat-icon-button [matMenuTriggerFor]="menu" [disabled]="isProcessing(expense.id)" [attr.aria-label]="'Actions for ' + expense.title">
@@ -136,25 +96,15 @@
           </tbody>
         </table>
         @if (expenses.length === 0) {
-          <div class="empty-state">
-            <mat-icon>receipt_long</mat-icon>
-            <p>No expenses found</p>
-          </div>
+          <app-empty-state [icon]="'receipt_long'" [title]="'No expenses found'" />
         }
       </div>
     </mat-card>
   }
 
   @if (showAddDialog) {
-    <div class="dialog-overlay" (click)="closeDialog()" (keydown.escape)="closeDialog()">
-      <div class="dialog-content" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="new-expense-title" cdkTrapFocus>
-        <div class="dialog-header">
-          <h2 id="new-expense-title">New Expense</h2>
-          <button mat-icon-button (click)="closeDialog()" aria-label="Close dialog">
-            <mat-icon aria-hidden="true">close</mat-icon>
-          </button>
-        </div>
-        <div class="dialog-body">
+    <app-dialog-shell [title]="'New Expense'" [titleId]="'new-expense-title'" (closed)="closeDialog()" [trapFocus]="true">
+      <div class="dialog-body">
           <mat-form-field appearance="outline">
             <mat-label>Title</mat-label>
             <input matInput [(ngModel)]="newExpense.title" placeholder="Enter expense title">
@@ -194,7 +144,6 @@
             @if (creatingExpense) { Creating… } @else { Create Expense }
           </button>
         </div>
-      </div>
-    </div>
+    </app-dialog-shell>
   }
 </div>

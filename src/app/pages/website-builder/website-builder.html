@@ -1,17 +1,13 @@
 <div class="builder-container">
-  <div class="page-header">
-    <div class="header-content">
-      <h1 class="page-title">Website Builder</h1>
-      <p class="page-subtitle">Create AI-powered property websites with automatic page generation</p>
-    </div>
+  <app-page-header [title]="'Website Builder'" [subtitle]="'Create AI-powered property websites with automatic page generation'">
     <button mat-raised-button color="primary" (click)="showAddDialog = true">
       <mat-icon>add</mat-icon>
       New Website
     </button>
-  </div>
+  </app-page-header>
 
   @if (loading) {
-    <div class="loading-container"><mat-spinner diameter="40"></mat-spinner></div>
+    <app-loading-state />
   } @else {
     <div class="websites-grid">
       @for (website of websites; track website.id) {
@@ -26,7 +22,7 @@
               <p class="website-desc">{{ website.description || 'No description' }}</p>
             </div>
             <div class="website-meta">
-              <span class="status-badge" [class]="getStatusClass(website.status)">{{ website.status }}</span>
+              <app-status-badge [status]="website.status" [toneClass]="getStatusClass(website.status)" />
               <span class="page-count">{{ website.pages?.length || 0 }} pages</span>
             </div>
           </mat-card-content>
@@ -57,24 +53,14 @@
         </mat-card>
       }
       @if (websites.length === 0) {
-        <div class="empty-state">
-          <mat-icon>web</mat-icon>
-          <h3>No websites yet</h3>
-          <p>Create your first website to get started</p>
-          <button mat-raised-button color="primary" (click)="showAddDialog = true">Create Website</button>
-        </div>
+        <app-empty-state icon="web" title="No websites yet" hint="Create your first website to get started" actionLabel="Create Website" (action)="showAddDialog = true" />
       }
     </div>
   }
 
   <!-- Create Website Dialog -->
   @if (showAddDialog) {
-    <div class="dialog-overlay" (click)="showAddDialog = false" (keydown.escape)="showAddDialog = false">
-      <div class="dialog-content" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="create-website-title">
-        <div class="dialog-header">
-          <h2 id="create-website-title">Create New Website</h2>
-          <button mat-icon-button (click)="showAddDialog = false" aria-label="Close dialog"><mat-icon aria-hidden="true">close</mat-icon></button>
-        </div>
+    <app-dialog-shell [title]="'Create New Website'" [titleId]="'create-website-title'" (closed)="showAddDialog = false">
         <div class="dialog-body">
           <mat-form-field appearance="outline">
             <mat-label>Website Name</mat-label>
@@ -106,18 +92,13 @@
           <button mat-button (click)="showAddDialog = false">Cancel</button>
           <button mat-raised-button color="primary" (click)="createWebsite()">Create Website</button>
         </div>
-      </div>
-    </div>
+    </app-dialog-shell>
   }
 
   <!-- AI Generate Dialog -->
   @if (showGenerateDialog) {
-    <div class="dialog-overlay" (click)="showGenerateDialog = false" (keydown.escape)="showGenerateDialog = false">
-      <div class="dialog-content dialog-large" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="ai-generator-title">
-        <div class="dialog-header">
-          <h2 id="ai-generator-title"><mat-icon aria-hidden="true">auto_awesome</mat-icon> AI Website Generator</h2>
-          <button mat-icon-button (click)="showGenerateDialog = false" aria-label="Close dialog"><mat-icon aria-hidden="true">close</mat-icon></button>
-        </div>
+    <app-dialog-shell [title]="'AI Website Generator'" [titleId]="'ai-generator-title'" (closed)="showGenerateDialog = false" [contentClass]="'dialog-large'">
+      <mat-icon dialog-title-icon>auto_awesome</mat-icon>
         <div class="dialog-body">
           <div class="generate-options">
             <div class="option-section">
@@ -185,7 +166,6 @@
             }
           </button>
         </div>
-      </div>
-    </div>
+    </app-dialog-shell>
   }
 </div>

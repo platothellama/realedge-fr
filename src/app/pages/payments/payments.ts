@@ -9,7 +9,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
-import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog';
+import { ConfirmDialogComponent } from '../../shared/molecules/confirm-dialog/confirm-dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
@@ -18,6 +18,13 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { FormsModule } from '@angular/forms';
 import { A11yModule } from '@angular/cdk/a11y';
 import { ApiService } from '../../services/api';
+import { DialogShellComponent } from '../../shared/molecules/dialog-shell/dialog-shell';
+import { formatDateMed, formatMoney } from '../../shared/utils/format';
+import { PageHeaderComponent } from '../../shared/molecules/page-header/page-header';
+import { LoadingStateComponent } from '../../shared/atoms/loading-state/loading-state';
+import { StatCardComponent } from '../../shared/molecules/stat-card/stat-card';
+import { EmptyStateComponent } from '../../shared/atoms/empty-state/empty-state';
+import { StatusBadgeComponent } from '../../shared/atoms/status-badge/status-badge';
 
 interface Payment {
   id: string;
@@ -75,7 +82,13 @@ interface PaymentPlan {
     MatTabsModule,
     MatTooltipModule,
     FormsModule,
-    A11yModule
+    A11yModule,
+    DialogShellComponent,
+    PageHeaderComponent,
+    LoadingStateComponent,
+    StatCardComponent,
+    EmptyStateComponent,
+    StatusBadgeComponent
   ],
   templateUrl: './payments.html',
   styleUrl: './payments.css'
@@ -337,16 +350,11 @@ export class PaymentsComponent implements OnInit {
   }
 
   formatCurrency(value: number, currency: string = 'USD'): string {
-    const v = Number(value);
-    if (!Number.isFinite(v)) return '—';
-    if (currency === 'LBP') {
-      return new Intl.NumberFormat('en-LB', { style: 'decimal', maximumFractionDigits: 0 }).format(v) + ' LBP';
-    }
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(v);
+    return formatMoney(value, currency);
   }
 
   formatDate(date: string): string {
-    return new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    return formatDateMed(date);
   }
 
   getStatusClass(status: string): string {

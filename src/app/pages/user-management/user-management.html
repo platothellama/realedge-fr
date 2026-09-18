@@ -1,22 +1,16 @@
 <div class="user-mgmt-container">
-  <div class="header-section">
-    <div class="title-area">
-      <h1>Organization</h1>
-      <p>Manage your team, roles and groups</p>
-    </div>
-    <div class="header-actions">
-      @if (canManageUsers) {
-        <button mat-stroked-button color="primary" class="create-btn" (click)="openGroupForm()">
-          <mat-icon class="btn-icon">group_add</mat-icon>
-          Create Group
-        </button>
-        <button mat-raised-button color="primary" class="create-btn" (click)="openUserForm()">
-          <mat-icon class="btn-icon">person_add</mat-icon>
-          Add New Member
-        </button>
-      }
-    </div>
-  </div>
+  <app-page-header title="Organization" subtitle="Manage your team, roles and groups">
+    @if (canManageUsers) {
+      <button mat-stroked-button color="primary" class="create-btn" (click)="openGroupForm()">
+        <mat-icon class="btn-icon">group_add</mat-icon>
+        Create Group
+      </button>
+      <button mat-raised-button color="primary" class="create-btn" (click)="openUserForm()">
+        <mat-icon class="btn-icon">person_add</mat-icon>
+        Add New Member
+      </button>
+    }
+  </app-page-header>
 
   <mat-tab-group class="mgmt-tabs">
     <mat-tab>

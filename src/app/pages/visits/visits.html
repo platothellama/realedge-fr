@@ -1,23 +1,16 @@
 <div class="visits-container">
-  <div class="header-section">
-    <div class="title-area">
-      <h1>Visit Calendar</h1>
-      <p>Manage property viewings and client meetings</p>
-    </div>
+  <app-page-header title="Visit Calendar" subtitle="Manage property viewings and client meetings">
     <div class="action-area">
       <button mat-raised-button color="primary" class="schedule-btn" (click)="openVisitForm()">
         <mat-icon>add_task</mat-icon>
         Schedule Visit
       </button>
     </div>
-  </div>
+  </app-page-header>
 
   <mat-card class="calendar-card">
     @if (isLoading()) {
-      <div class="loading-container" role="status" aria-label="Loading visits">
-        <mat-spinner diameter="40"></mat-spinner>
-        <p>Loading visits...</p>
-      </div>
+      <app-loading-state message="Loading visits..."></app-loading-state>
     } @else {
       <full-calendar [options]="calendarOptions()"></full-calendar>
     }

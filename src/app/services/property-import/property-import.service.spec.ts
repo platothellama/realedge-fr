@@ -18,9 +18,9 @@ describe('PropertyImportService', () => {
 
   it('parses a template-shaped workbook into valid + invalid rows', async () => {
     const file = toFile([
-      // valid row (headers: ... bedrooms, masterBedrooms, bathrooms, parkingSpaces, ...)
+      // valid row (headers: ... bedrooms, masterBedrooms, bathrooms, balconies, parkingSpaces, ...)
       ['Cottage', 100000, 'House', '1 Lane', 'Cairo', 'Egypt', '', 'Sale', 'Used', 'Available',
-        3, 1, 2, 1, '', 150, 200, '', '', 2000, 'YES', 'NO', '', '', 'Garden; Garage'],
+        3, 1, 2, 1, 1, '', 150, 200, '', '', 2000, 'YES', 'NO', '', '', 'Garden; Garage', ''],
       // invalid row: missing title + bad type
       ['', 50000, 'Castle', '2 Lane', 'Cairo', 'Egypt'],
     ]);
@@ -34,6 +34,7 @@ describe('PropertyImportService', () => {
     expect(ok.data.features).toEqual(['Garden', 'Garage']);
     expect(ok.data.hasTerrace).toBe(true);
     expect(ok.data.masterBedrooms).toBe(1);
+    expect(ok.data.balconies).toBe(1);
     expect(bad.valid).toBe(false);
     expect(bad.errors.some((e) => e.includes('Title is required.'))).toBe(true);
     expect(bad.errors.some((e) => e.includes('Type must be one of'))).toBe(true);

@@ -14,8 +14,14 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api';
 import { AuthService } from '../../services/auth/auth.service';
-import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog';
-import { ErrorStateComponent } from '../../components/error-state/error-state';
+import { ConfirmDialogComponent } from '../../shared/molecules/confirm-dialog/confirm-dialog';
+import { ErrorStateComponent } from '../../shared/atoms/error-state/error-state';
+import { PageHeaderComponent } from '../../shared/molecules/page-header/page-header';
+import { LoadingStateComponent } from '../../shared/atoms/loading-state/loading-state';
+import { EmptyStateComponent } from '../../shared/atoms/empty-state/empty-state';
+import { StatusBadgeComponent } from '../../shared/atoms/status-badge/status-badge';
+import { DialogShellComponent } from '../../shared/molecules/dialog-shell/dialog-shell';
+import { formatDateMed } from '../../shared/utils/format';
 
 interface Announcement {
   id: string;
@@ -46,7 +52,12 @@ interface Announcement {
     MatChipsModule,
     MatTooltipModule,
     FormsModule,
-    ErrorStateComponent
+    ErrorStateComponent,
+    PageHeaderComponent,
+    LoadingStateComponent,
+    EmptyStateComponent,
+    StatusBadgeComponent,
+    DialogShellComponent
   ],
   templateUrl: './announcements.html',
   styleUrl: './announcements.css'
@@ -189,11 +200,7 @@ export class AnnouncementsComponent implements OnInit {
   }
 
   formatDate(date: string): string {
-    return new Date(date).toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric',
-      year: 'numeric'
-    });
+    return formatDateMed(date);
   }
 
   isExpired(expiresAt?: string): boolean {

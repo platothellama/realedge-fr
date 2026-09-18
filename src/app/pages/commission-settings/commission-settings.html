@@ -1,15 +1,8 @@
 <div class="commission-settings-container">
-  <div class="page-header">
-    <div class="header-content">
-      <h1 class="page-title">Commission Settings</h1>
-      <p class="page-subtitle">Configure commission splits and manage payouts</p>
-    </div>
-  </div>
+  <app-page-header [title]="'Commission Settings'" [subtitle]="'Configure commission splits and manage payouts'"></app-page-header>
 
   @if (loading) {
-    <div class="loading-container">
-      <mat-spinner diameter="40"></mat-spinner>
-    </div>
+    <app-loading-state />
   } @else {
     <mat-tab-group>
       <!-- Commission Split Settings -->
@@ -91,42 +84,10 @@
 
           <!-- Summary Cards -->
           <div class="summary-grid">
-            <div class="summary-card">
-              <div class="summary-icon pending">
-                <mat-icon>pending_actions</mat-icon>
-              </div>
-              <div class="summary-content">
-                <span class="summary-value">{{ formatCurrency(summary.pendingAmount) }}</span>
-                <span class="summary-label">Pending Approval</span>
-              </div>
-            </div>
-            <div class="summary-card">
-              <div class="summary-icon approved">
-                <mat-icon>check_circle</mat-icon>
-              </div>
-              <div class="summary-content">
-                <span class="summary-value">{{ formatCurrency(summary.approvedAmount) }}</span>
-                <span class="summary-label">Approved</span>
-              </div>
-            </div>
-            <div class="summary-card">
-              <div class="summary-icon paid">
-                <mat-icon>payments</mat-icon>
-              </div>
-              <div class="summary-content">
-                <span class="summary-value">{{ formatCurrency(summary.paidAmount) }}</span>
-                <span class="summary-label">Paid Out</span>
-              </div>
-            </div>
-            <div class="summary-card">
-              <div class="summary-icon total">
-                <mat-icon>account_balance</mat-icon>
-              </div>
-              <div class="summary-content">
-                <span class="summary-value">{{ formatCurrency(summary.totalAmount) }}</span>
-                <span class="summary-label">Total Commission</span>
-              </div>
-            </div>
+            <app-stat-card [icon]="'pending_actions'" [value]="formatCurrency(summary.pendingAmount)" [label]="'Pending Approval'" [tone]="'pending'" />
+            <app-stat-card [icon]="'check_circle'" [value]="formatCurrency(summary.approvedAmount)" [label]="'Approved'" [tone]="'approved'" />
+            <app-stat-card [icon]="'payments'" [value]="formatCurrency(summary.paidAmount)" [label]="'Paid Out'" [tone]="'paid'" />
+            <app-stat-card [icon]="'account_balance'" [value]="formatCurrency(summary.totalAmount)" [label]="'Total Commission'" [tone]="'total'" />
           </div>
         </div>
       </mat-tab>
@@ -183,9 +144,7 @@
                       <td>{{ commission.percentage }}%</td>
                       <td class="amount">{{ formatCurrency(commission.amount) }}</td>
                       <td>
-                        <span class="status-badge" [class]="getStatusClass(commission.status)">
-                          {{ commission.status }}
-                        </span>
+                        <app-status-badge [status]="commission.status" />
                       </td>
                       <td>
                         @if (commission.status === 'pending') {
@@ -205,10 +164,7 @@
               </table>
 
               @if (commissions.length === 0) {
-                <div class="empty-state">
-                  <mat-icon>receipt_long</mat-icon>
-                  <p>No commission payouts found</p>
-                </div>
+                <app-empty-state [icon]="'receipt_long'" [title]="'No commission payouts found'" />
               }
             </div>
           </mat-card>

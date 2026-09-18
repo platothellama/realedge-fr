@@ -60,6 +60,7 @@ export const IMPORT_COLUMNS: ImportColumnDef[] = [
   { key: 'bedrooms', required: false, description: 'Integer >= 0 (default 0)' },
   { key: 'masterBedrooms', required: false, description: 'Master bedrooms, whole number 0..bedrooms (default 0)' },
   { key: 'bathrooms', required: false, description: 'Integer >= 0 (default 0)' },
+  { key: 'balconies', required: false, description: 'Number of balconies, integer >= 0 (default 0)' },
   { key: 'parkingSpaces', required: false, description: 'Integer >= 0 (default 0)' },
   { key: 'floor', required: false, description: 'Integer, empty = unknown' },
   { key: 'area', required: false, description: 'Built area in m², number >= 0' },
@@ -92,6 +93,7 @@ export interface PropertyImportPayload {
   bedrooms: number;
   masterBedrooms: number;
   bathrooms: number;
+  balconies: number;
   parkingSpaces: number;
   floor: number | null;
   area: number;

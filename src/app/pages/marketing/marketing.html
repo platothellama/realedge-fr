@@ -1,8 +1,5 @@
 <div class="marketing-container">
-  <div class="page-header">
-    <h1><mat-icon>trending_up</mat-icon> Marketing Tools</h1>
-    <p>Generate professional marketing content for your listings using AI</p>
-  </div>
+  <app-page-header title="Marketing Tools" subtitle="Generate professional marketing content for your listings using AI"></app-page-header>
 
   <div class="content-wrapper">
     <!-- Property Selection -->
@@ -28,10 +25,7 @@
               </div>
             </div>
           } @empty {
-            <div class="empty-state">
-              <mat-icon aria-hidden="true">home</mat-icon>
-              <p>No properties available for marketing</p>
-            </div>
+            <app-empty-state icon="home" title="No properties available for marketing"></app-empty-state>
 }
         </div>
       </mat-card-content>
@@ -40,10 +34,7 @@
     <!-- Marketing Tools -->
     <div class="marketing-tools" [class.disabled]="!selectedProperty">
       @if (!selectedProperty) {
-        <div class="placeholder-message">
-          <mat-icon>touch_app</mat-icon>
-          <p>Select a property to generate marketing content</p>
-        </div>
+        <app-empty-state icon="touch_app" title="Select a property to generate marketing content"></app-empty-state>
       }
 
       @if (selectedProperty) {

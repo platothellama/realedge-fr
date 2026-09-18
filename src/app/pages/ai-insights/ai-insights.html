@@ -1,20 +1,13 @@
 <div class="ai-insights-container">
-  <div class="page-header">
-    <div class="header-content">
-      <h1 class="page-title">AI Insights</h1>
-      <p class="page-subtitle">AI-powered analytics and predictive intelligence</p>
-    </div>
+  <app-page-header title="AI Insights" subtitle="AI-powered analytics and predictive intelligence">
     <button mat-raised-button color="primary" (click)="refreshInsights()">
       <mat-icon>refresh</mat-icon>
       Refresh Insights
     </button>
-  </div>
+  </app-page-header>
 
   @if (loading) {
-    <div class="loading-container">
-      <mat-spinner diameter="40"></mat-spinner>
-      <p>Analyzing data with AI...</p>
-    </div>
+    <app-loading-state message="Analyzing data with AI..."></app-loading-state>
   } @else {
     <div class="summary-bar">
       <div class="summary-item">

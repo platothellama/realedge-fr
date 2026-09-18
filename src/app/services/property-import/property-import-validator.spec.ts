@@ -69,6 +69,15 @@ describe('property-import-validator', () => {
     expect(bad.errors.some((e) => e.includes('Master bedrooms'))).toBe(true);
   });
 
+  it('accepts balcony counts and rejects negatives / fractions', () => {
+    expect(validateImportRow(row({ balconies: 2 }), 2).valid).toBe(true);
+    expect(validateImportRow(row(), 2).data.balconies).toBe(0);
+    const bad = validateImportRow(row({ balconies: -1 }), 2);
+    expect(bad.valid).toBe(false);
+    expect(bad.errors.some((e) => e.startsWith('Balconies'))).toBe(true);
+    expect(validateImportRow(row({ balconies: 1.5 }), 2).valid).toBe(false);
+  });
+
   it('parses YES/NO variants and flags garbage', () => {
     expect(parseYesNo('YES')).toBe(true);
     expect(parseYesNo('no')).toBe(false);

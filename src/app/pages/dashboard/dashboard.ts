@@ -6,7 +6,14 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { forkJoin } from 'rxjs';
 import { AuthService } from '../../services/auth/auth.service';
 import { ApiService } from '../../services/api';
-import { DonutChartComponent, LineChartComponent } from '../../components/charts/charts';
+import { DonutChartComponent, LineChartComponent } from '../../shared/atoms/charts/charts';
+import { PageHeaderComponent } from '../../shared/molecules/page-header/page-header';
+import { LoadingStateComponent } from '../../shared/atoms/loading-state/loading-state';
+import { StatCardComponent } from '../../shared/molecules/stat-card/stat-card';
+import { EmptyStateComponent } from '../../shared/atoms/empty-state/empty-state';
+import { StatusBadgeComponent } from '../../shared/atoms/status-badge/status-badge';
+import { formatCompactCurrency } from '../../shared/utils/format';
+import { getStatusBadgeClass } from '../../shared/utils/status';
 import { NgClass } from '@angular/common';
 
 @Component({
@@ -19,7 +26,12 @@ import { NgClass } from '@angular/common';
     MatIconModule,
     MatProgressSpinnerModule,
     DonutChartComponent,
-    LineChartComponent
+    LineChartComponent,
+    PageHeaderComponent,
+    LoadingStateComponent,
+    StatCardComponent,
+    EmptyStateComponent,
+    StatusBadgeComponent
   ],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
@@ -203,32 +215,11 @@ export class DashboardComponent implements OnInit {
   }
 
   formatCurrency(value: number | undefined): string {
-    if (!value) return '$0';
-    if (value >= 1000000) return `$${(value / 1000000).toFixed(1)}M`;
-    if (value >= 1000) return `$${(value / 1000).toFixed(0)}K`;
-    return `$${value}`;
+    return formatCompactCurrency(value);
   }
 
   getStatusClass(status: string): string {
-    const classes: { [key: string]: string } = {
-      'Available': 'badge-success',
-      'Reserved': 'badge-warning',
-      'Sold': 'badge-danger',
-      'Rented': 'badge-info',
-      'New Lead': 'badge-primary',
-      'Contacted': 'badge-primary',
-      'Qualified': 'badge-success',
-      'Hot': 'badge-danger',
-      'Negotiation': 'badge-warning',
-      'Closed': 'badge-success',
-      'Scheduled': 'badge-primary',
-      'Completed': 'badge-success',
-      'Cancelled': 'badge-muted',
-      'No Show': 'badge-danger',
-      'Visit Scheduled': 'badge-info',
-      'Contract Signed': 'badge-warning'
-    };
-    return classes[status] || 'badge-primary';
+    return getStatusBadgeClass(status);
   }
 
   formatVisitTime(dateString: string): string {

@@ -15,7 +15,14 @@ import { FormsModule } from '@angular/forms';
 import { A11yModule } from '@angular/cdk/a11y';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { ApiService } from '../../services/api';
-import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog';
+import { ConfirmDialogComponent } from '../../shared/molecules/confirm-dialog/confirm-dialog';
+import { formatDateMed, formatMoney } from '../../shared/utils/format';
+import { PageHeaderComponent } from '../../shared/molecules/page-header/page-header';
+import { LoadingStateComponent } from '../../shared/atoms/loading-state/loading-state';
+import { StatCardComponent } from '../../shared/molecules/stat-card/stat-card';
+import { EmptyStateComponent } from '../../shared/atoms/empty-state/empty-state';
+import { StatusBadgeComponent } from '../../shared/atoms/status-badge/status-badge';
+import { DialogShellComponent } from '../../shared/molecules/dialog-shell/dialog-shell';
 
 interface Expense {
   id: string;
@@ -46,7 +53,13 @@ interface Expense {
     MatSelectModule,
     MatDialogModule,
     FormsModule,
-    A11yModule
+    A11yModule,
+    PageHeaderComponent,
+    LoadingStateComponent,
+    StatCardComponent,
+    EmptyStateComponent,
+    StatusBadgeComponent,
+    DialogShellComponent
   ],
   templateUrl: './expenses.html',
   styleUrl: './expenses.css'
@@ -221,13 +234,11 @@ export class ExpensesComponent implements OnInit {
   }
 
   formatCurrency(value: number): string {
-    const v = Number(value);
-    if (!Number.isFinite(v)) return '—';
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(v);
+    return formatMoney(value);
   }
 
   formatDate(date: string): string {
-    return new Date(date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    return formatDateMed(date);
   }
 
   getStatusClass(status: string): string {

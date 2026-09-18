@@ -12,7 +12,10 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../services/api';
-import { DonutChartComponent, BarChartComponent } from '../../components/charts/charts';
+import { DonutChartComponent, BarChartComponent } from '../../shared/atoms/charts/charts';
+import { PageHeaderComponent } from '../../shared/molecules/page-header/page-header';
+import { LoadingStateComponent } from '../../shared/atoms/loading-state/loading-state';
+import { EmptyStateComponent } from '../../shared/atoms/empty-state/empty-state';
 
 @Component({
   selector: 'app-finance',
@@ -31,7 +34,10 @@ import { DonutChartComponent, BarChartComponent } from '../../components/charts/
     MatDialogModule,
     FormsModule,
     DonutChartComponent,
-    BarChartComponent
+    BarChartComponent,
+    PageHeaderComponent,
+    LoadingStateComponent,
+    EmptyStateComponent
   ],
   templateUrl: './finance.html',
   styleUrl: './finance.css'

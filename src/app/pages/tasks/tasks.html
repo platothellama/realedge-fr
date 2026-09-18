@@ -1,25 +1,15 @@
 <div class="tasks-container">
-  <div class="page-header">
-    <div class="header-content">
-      <h1 class="page-title">Office Tasks</h1>
-      <p class="page-subtitle">Manage team tasks and track progress</p>
-    </div>
+  <app-page-header [title]="'Office Tasks'" [subtitle]="'Manage team tasks and track progress'">
     <button mat-raised-button color="primary" (click)="showAddDialog = true">
       <mat-icon>add</mat-icon>
       Add Task
     </button>
-  </div>
+  </app-page-header>
 
   @if (loading) {
-    <div class="loading-container">
-      <mat-spinner diameter="40"></mat-spinner>
-    </div>
+    <app-loading-state />
   } @else if (loadError) {
-    <div class="loading-container" role="alert">
-      <mat-icon>error_outline</mat-icon>
-      <p>Failed to load tasks</p>
-      <button mat-raised-button color="primary" (click)="fetchTasks()">Retry</button>
-    </div>
+    <app-error-state title="Failed to load tasks" (retry)="fetchTasks()" />
   } @else {
     <div class="kanban-board">
       @for (column of columns; track column.id) {
@@ -117,15 +107,8 @@
 </div>
 
 @if (showAddDialog) {
-  <div class="dialog-overlay" (click)="closeDialog()" (keydown.escape)="closeDialog()">
-    <div class="dialog-content" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="create-task-title" cdkTrapFocus>
-      <div class="dialog-header">
-        <h2 id="create-task-title">Create New Task</h2>
-        <button mat-icon-button (click)="closeDialog()" aria-label="Close dialog">
-          <mat-icon aria-hidden="true">close</mat-icon>
-        </button>
-      </div>
-      <div class="dialog-body">
+  <app-dialog-shell [title]="'Create New Task'" [titleId]="'create-task-title'" (closed)="closeDialog()" [trapFocus]="true">
+    <div class="dialog-body">
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Task Title</mat-label>
           <input matInput [(ngModel)]="newTask.title" placeholder="Enter task title">
@@ -162,6 +145,5 @@
         <button mat-button (click)="closeDialog()">Cancel</button>
         <button mat-raised-button color="primary" (click)="createTask()">Create Task</button>
       </div>
-    </div>
-  </div>
+  </app-dialog-shell>
 }

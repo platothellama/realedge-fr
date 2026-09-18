@@ -1,10 +1,5 @@
 <div class="crm-container">
-  <div class="header-section">
-    <div class="title-area">
-      <h1>Lead Pipeline</h1>
-      <p>Manage your client journey and track deal progress</p>
-    </div>
-
+  <app-page-header title="Lead Pipeline" subtitle="Manage your client journey and track deal progress">
     <div class="filter-controls">
       <div class="search-box">
         <mat-icon aria-hidden="true">search</mat-icon>
@@ -46,7 +41,7 @@
         Capture New Lead
       </button>
     </div>
-  </div>
+  </app-page-header>
 
   <div class="pipeline-board">
     <mat-tab-group class="view-tabs" color="primary">
@@ -84,10 +79,10 @@
                       </div>
                     </div>
                     <div class="col-source">
-                      <span class="lead-source-badge" [attr.data-source]="lead.source">{{ lead.source }}</span>
+                      <app-status-badge [status]="lead.source"></app-status-badge>
                     </div>
                     <div class="col-status">
-                      <span class="status-badge" [attr.data-status]="lead.status">{{ lead.status }}</span>
+                      <app-status-badge [status]="lead.status"></app-status-badge>
                     </div>
                     <div class="col-budget">
                       {{ lead.budget ? (lead.budget | currency:'USD':'symbol':'1.0-0') : '-' }}
@@ -176,13 +171,7 @@
               }
 
               @if (filteredLeads.length === 0) {
-                <div class="empty-list">
-                  <mat-icon>people_outline</mat-icon>
-                  <p>No leads found</p>
-                  <button mat-raised-button color="primary" (click)="openLeadForm()">
-                    <mat-icon>add</mat-icon> Add First Lead
-                  </button>
-                </div>
+                <app-empty-state icon="people_outline" title="No leads found" actionLabel="Add First Lead" (action)="openLeadForm()"></app-empty-state>
               }
             </div>
           </mat-card>
@@ -216,7 +205,7 @@
                     <div class="lead-card-header">
                       <div class="lead-main-info">
                         <span class="lead-name">{{ lead.name }}</span>
-                        <span class="lead-source-badge" [attr.data-source]="lead.source">{{ lead.source }}</span>
+                        <app-status-badge [status]="lead.source"></app-status-badge>
                       </div>
                       <button mat-icon-button class="edit-btn" (click)="$event.stopPropagation(); openLeadForm(lead)" [attr.aria-label]="'Edit ' + lead.name">
                         <mat-icon aria-hidden="true">edit</mat-icon>
@@ -251,10 +240,7 @@
                 }
 
                 @if (stage.leads.length === 0) {
-                  <div class="empty-stage">
-                    <mat-icon>inbox</mat-icon>
-                    <p>No leads here</p>
-                  </div>
+                  <app-empty-state icon="inbox" title="No leads here"></app-empty-state>
                 }
               </div>
 

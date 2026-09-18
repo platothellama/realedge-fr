@@ -1,19 +1,13 @@
 <div class="invoices-container">
-  <div class="page-header">
-    <div class="header-content">
-      <h1 class="page-title">Invoices</h1>
-      <p class="page-subtitle">Manage and track all invoices (Lebanese Law Compliant)</p>
-    </div>
+  <app-page-header [title]="'Invoices'" [subtitle]="'Manage and track all invoices (Lebanese Law Compliant)'">
     <button mat-raised-button color="primary" (click)="showAddDialog = true">
       <mat-icon>add</mat-icon>
       New Invoice
     </button>
-  </div>
+  </app-page-header>
 
   @if (loading) {
-    <div class="loading-container" role="status">
-      <mat-spinner diameter="40"></mat-spinner>
-    </div>
+    <app-loading-state />
   } @else if (loadError) {
     <app-error-state
       title="Couldn't load invoices"
@@ -22,42 +16,10 @@
     </app-error-state>
   } @else {
     <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-icon paid">
-          <mat-icon>check_circle</mat-icon>
-        </div>
-        <div class="stat-content">
-          <span class="stat-value">{{ formatCurrency(stats.totalPaid || 0) }}</span>
-          <span class="stat-label">Total Paid</span>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon outstanding">
-          <mat-icon>pending</mat-icon>
-        </div>
-        <div class="stat-content">
-          <span class="stat-value">{{ formatCurrency(stats.totalOutstanding || 0) }}</span>
-          <span class="stat-label">Outstanding</span>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon overdue">
-          <mat-icon>warning</mat-icon>
-        </div>
-        <div class="stat-content">
-          <span class="stat-value">{{ stats.overdueInvoiceCount || 0 }}</span>
-          <span class="stat-label">Overdue</span>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon total">
-          <mat-icon>receipt_long</mat-icon>
-        </div>
-        <div class="stat-content">
-          <span class="stat-value">{{ formatCurrency(stats.totalInvoiced || 0) }}</span>
-          <span class="stat-label">Total Invoiced</span>
-        </div>
-      </div>
+      <app-stat-card [icon]="'check_circle'" [value]="formatCurrency(stats.totalPaid || 0)" [label]="'Total Paid'" [tone]="'paid'" />
+      <app-stat-card [icon]="'pending'" [value]="formatCurrency(stats.totalOutstanding || 0)" [label]="'Outstanding'" [tone]="'outstanding'" />
+      <app-stat-card [icon]="'warning'" [value]="stats.overdueInvoiceCount || 0" [label]="'Overdue'" [tone]="'overdue'" />
+      <app-stat-card [icon]="'receipt_long'" [value]="formatCurrency(stats.totalInvoiced || 0)" [label]="'Total Invoiced'" [tone]="'total'" />
     </div>
 
     <mat-card class="table-card">
@@ -116,9 +78,7 @@
                 <td>{{ formatDate(invoice.dueDate) }}</td>
                 <td class="amount">{{ formatCurrencyWithSymbol(invoice.total, invoice.currency) }}</td>
                 <td>
-                  <span class="status-badge" [class]="getStatusClass(invoice.status)">
-                    {{ invoice.status }}
-                  </span>
+                  <app-status-badge [status]="invoice.status" />
                 </td>
                 <td>
                   <button mat-icon-button [matMenuTriggerFor]="menu" [disabled]="isProcessing(invoice.id)" [attr.aria-label]="'Actions for invoice ' + invoice.invoiceNumber">
@@ -142,29 +102,14 @@
           </tbody>
         </table>
         @if (invoices.length === 0) {
-          <div class="empty-state">
-            <mat-icon>receipt_long</mat-icon>
-            <p>No invoices found</p>
-          </div>
+          <app-empty-state [icon]="'receipt_long'" [title]="'No invoices found'" />
         }
       </div>
     </mat-card>
   }
 
   @if (showAddDialog) {
-    <div class="dialog-overlay" (click)="closeDialog()" (keydown.escape)="closeDialog()">
-      <div class="dialog-content invoice-dialog"
-           (click)="$event.stopPropagation()"
-           role="dialog"
-           aria-modal="true"
-           aria-labelledby="new-invoice-title"
-           cdkTrapFocus>
-        <div class="dialog-header">
-          <h2 id="new-invoice-title">New Invoice</h2>
-          <button mat-icon-button (click)="closeDialog()" aria-label="Close dialog">
-            <mat-icon aria-hidden="true">close</mat-icon>
-          </button>
-        </div>
+    <app-dialog-shell [title]="'New Invoice'" [titleId]="'new-invoice-title'" (closed)="closeDialog()" [trapFocus]="true" [contentClass]="'invoice-dialog'">
         <div class="dialog-body">
           <div class="form-section">
             <h4>Client Information</h4>
@@ -299,7 +244,6 @@
             @if (creatingInvoice) { Creating… } @else { Create Invoice }
           </button>
         </div>
-      </div>
-    </div>
+    </app-dialog-shell>
   }
 </div>

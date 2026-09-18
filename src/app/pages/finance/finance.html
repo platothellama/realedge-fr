@@ -1,8 +1,5 @@
 <div class="finance-container">
-  <div class="page-header">
-    <h1><mat-icon>account_balance</mat-icon> Finance</h1>
-    <p>Track income, expenses, and financial performance</p>
-  </div>
+  <app-page-header title="Finance" subtitle="Track income, expenses, and financial performance"></app-page-header>
 
   <!-- Summary Cards -->
   <div class="summary-grid">
@@ -85,9 +82,7 @@
     </div>
 
     @if (loading) {
-      <div class="loading">
-        <mat-spinner diameter="40"></mat-spinner>
-      </div>
+      <app-loading-state></app-loading-state>
     }
 
     @if (!loading) {
@@ -107,10 +102,7 @@
           </div>
         }
         @if (filteredTransactions.length === 0) {
-          <div class="empty-state">
-            <mat-icon>receipt_long</mat-icon>
-            <span>No transactions found</span>
-          </div>
+          <app-empty-state icon="receipt_long" title="No transactions found"></app-empty-state>
         }
       </div>
     }
