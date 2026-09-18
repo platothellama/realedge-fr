@@ -16,7 +16,7 @@ import { AuthService } from '../../services/auth/auth.service';
 import { PropertyFormComponent } from '../../shared/organisms/property-form/property-form';
 import { PropertyImportDialogComponent } from '../../shared/organisms/property-import-dialog/property-import-dialog';
 import { PaginationComponent } from '../../shared/atoms/pagination/pagination';
-import { PropertySearchComponent, SearchFilters } from '../../shared/molecules/property-search/property-search';
+import { PropertySearchComponent, SearchFilters, SearchFilterConfig, EMPTY_SEARCH_FILTERS } from '../../shared/molecules/property-search/property-search';
 import { ConfirmDialogComponent } from '../../shared/molecules/confirm-dialog/confirm-dialog';
 import { ErrorStateComponent } from '../../shared/atoms/error-state/error-state';
 import { PageHeaderComponent } from '../../shared/molecules/page-header/page-header';
@@ -56,21 +56,38 @@ export class PropertiesComponent implements OnInit {
   groupByProject = false;
 
   filters: SearchFilters = {
-    searchQuery: '',
+    ...EMPTY_SEARCH_FILTERS,
     selectedStatus: 'Available',
-    selectedType: 'All',
-    selectedListingType: 'All',
-    selectedCity: 'All',
-    minBedrooms: null,
-    maxBedrooms: null,
-    minBathrooms: null,
-    minPrice: null,
-    maxPrice: null,
-    minArea: null,
-    maxArea: null
   };
 
-  statusOptions = ['Available', 'All', 'Sold', 'Rented', 'Reserved'];
+  /** Every filter the search bar supports on this page. */
+  searchConfig: SearchFilterConfig = {
+    showSearch: true,
+    showStatus: true,
+    showType: true,
+    showListingType: true,
+    showCondition: true,
+    showCity: true,
+    showCountry: true,
+    showBedrooms: true,
+    showBathrooms: true,
+    showBalconies: true,
+    showParking: true,
+    showFloor: true,
+    showYearBuilt: true,
+    showLotSize: true,
+    showMasterBedrooms: true,
+    showTerraceCellar: true,
+    showFeatures: true,
+    showPrice: true,
+    showArea: true,
+    showProject: true,
+    showSellerSelect: true,
+    showAgent: true,
+    showSort: true,
+  };
+
+  statusOptions = ['All', 'Available', 'Sold', 'Rented', 'Reserved', 'Lost'];
 
   pagination = {
     page: 1,
@@ -129,6 +146,7 @@ export class PropertiesComponent implements OnInit {
 
   onProjectFilterChange(projectId: string) {
     this.selectedProjectId = projectId;
+    this.filters.projectId = projectId;
     this.applyFilters();
   }
 
@@ -138,6 +156,7 @@ export class PropertiesComponent implements OnInit {
 
   openProjectUnits(project: any) {
     this.selectedProjectId = project?.id || project?.key || 'All';
+    this.filters.projectId = this.selectedProjectId;
     this.groupByProject = false;
     this.applyFilters();
   }
@@ -151,41 +170,110 @@ export class PropertiesComponent implements OnInit {
       limit: this.pagination.limit,
     };
 
-    if (this.filters.searchQuery) {
-      params.search = this.filters.searchQuery;
+    const f = this.filters;
+    if (f.searchQuery) {
+      params.search = f.searchQuery;
     }
-    if (this.filters.selectedStatus && this.filters.selectedStatus !== 'All') {
-      params.status = this.filters.selectedStatus;
+    if (f.selectedStatus && f.selectedStatus !== 'All') {
+      params.status = f.selectedStatus;
     }
-    if (this.filters.minBedrooms) {
-      params.minBedrooms = this.filters.minBedrooms;
+    if (f.minBedrooms != null) {
+      params.minBedrooms = f.minBedrooms;
     }
-    if (this.filters.maxBedrooms) {
-      params.maxBedrooms = this.filters.maxBedrooms;
+    if (f.maxBedrooms != null) {
+      params.maxBedrooms = f.maxBedrooms;
     }
-    if (this.filters.minBathrooms) {
-      params.minBathrooms = this.filters.minBathrooms;
+    if (f.minBathrooms != null) {
+      params.minBathrooms = f.minBathrooms;
     }
-    if (this.filters.minPrice) {
-      params.minPrice = this.filters.minPrice;
+    if (f.maxBathrooms != null) {
+      params.maxBathrooms = f.maxBathrooms;
     }
-    if (this.filters.maxPrice) {
-      params.maxPrice = this.filters.maxPrice;
+    if (f.minBalconies != null) {
+      params.minBalconies = f.minBalconies;
     }
-    if (this.filters.minArea) {
-      params.minArea = this.filters.minArea;
+    if (f.maxBalconies != null) {
+      params.maxBalconies = f.maxBalconies;
     }
-    if (this.filters.maxArea) {
-      params.maxArea = this.filters.maxArea;
+    if (f.minParking != null) {
+      params.minParking = f.minParking;
     }
-    if (this.filters.selectedType && this.filters.selectedType !== 'All') {
-      params.type = this.filters.selectedType;
+    if (f.maxParking != null) {
+      params.maxParking = f.maxParking;
     }
-    if (this.filters.selectedCity && this.filters.selectedCity !== 'All') {
-      params.city = this.filters.selectedCity;
+    if (f.minFloor != null) {
+      params.minFloor = f.minFloor;
     }
-    if (this.selectedProjectId && this.selectedProjectId !== 'All') {
-      params.projectId = this.selectedProjectId;
+    if (f.maxFloor != null) {
+      params.maxFloor = f.maxFloor;
+    }
+    if (f.minYearBuilt != null) {
+      params.minYearBuilt = f.minYearBuilt;
+    }
+    if (f.maxYearBuilt != null) {
+      params.maxYearBuilt = f.maxYearBuilt;
+    }
+    if (f.minLotSize != null) {
+      params.minLotSize = f.minLotSize;
+    }
+    if (f.maxLotSize != null) {
+      params.maxLotSize = f.maxLotSize;
+    }
+    if (f.minMasterBedrooms != null) {
+      params.minMasterBedrooms = f.minMasterBedrooms;
+    }
+    if (f.minPrice != null) {
+      params.minPrice = f.minPrice;
+    }
+    if (f.maxPrice != null) {
+      params.maxPrice = f.maxPrice;
+    }
+    if (f.minArea != null) {
+      params.minArea = f.minArea;
+    }
+    if (f.maxArea != null) {
+      params.maxArea = f.maxArea;
+    }
+    if (f.selectedType && f.selectedType !== 'All') {
+      params.type = f.selectedType;
+    }
+    if (f.selectedListingType && f.selectedListingType !== 'All') {
+      params.listingType = f.selectedListingType;
+    }
+    if (f.selectedCondition && f.selectedCondition !== 'All') {
+      params.condition = f.selectedCondition;
+    }
+    if (f.selectedCity && f.selectedCity !== 'All') {
+      params.city = f.selectedCity;
+    }
+    if (f.selectedCountry && f.selectedCountry !== 'All') {
+      params.country = f.selectedCountry;
+    }
+    if (f.hasTerrace != null) {
+      params.hasTerrace = f.hasTerrace;
+    }
+    if (f.hasCellar != null) {
+      params.hasCellar = f.hasCellar;
+    }
+    if (f.feature) {
+      params.feature = f.feature;
+    }
+    if (f.assignedToUserId && f.assignedToUserId !== 'All') {
+      params.assignedToUserId = f.assignedToUserId;
+    }
+    if (f.sellerId && f.sellerId !== 'All') {
+      params.sellerId = f.sellerId;
+    }
+    if (f.sortBy) {
+      params.sortBy = f.sortBy;
+    }
+    if (f.sortDir) {
+      params.sortDir = f.sortDir;
+    }
+    // The search bar's own project pill and the page toolbar share one param.
+    const projectId = (f.projectId && f.projectId !== 'All') ? f.projectId : this.selectedProjectId;
+    if (projectId && projectId !== 'All') {
+      params.projectId = projectId;
     }
 
     this.apiService.getProperties(params).subscribe({
@@ -230,6 +318,10 @@ export class PropertiesComponent implements OnInit {
 
   onFiltersChange(filters: SearchFilters) {
     this.filters = filters;
+    // Keep the toolbar dropdown in sync with the search bar's project pill.
+    if (filters.projectId !== undefined) {
+      this.selectedProjectId = filters.projectId;
+    }
     this.applyFilters();
   }
 

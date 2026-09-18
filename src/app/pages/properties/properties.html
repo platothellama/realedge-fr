@@ -39,6 +39,8 @@
 
   <app-property-search
     [filters]="filters"
+    [config]="searchConfig"
+    [statusOptions]="statusOptions"
     (filtersChange)="onFiltersChange($event)"
   ></app-property-search>
 

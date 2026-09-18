@@ -28,7 +28,7 @@
           [class.active]="filters.selectedStatus !== 'All'"
           [matMenuTriggerFor]="statusMenu"
         >
-          <span>Status</span>
+          <span>{{ filters.selectedStatus !== 'All' ? filters.selectedStatus : 'Status' }}</span>
           <mat-icon>expand_more</mat-icon>
         </button>
         <mat-menu #statusMenu="matMenu" class="filter-menu">
@@ -46,7 +46,7 @@
           [class.active]="filters.selectedType !== 'All'"
           [matMenuTriggerFor]="typeMenu"
         >
-          <span>Type</span>
+          <span>{{ filters.selectedType !== 'All' ? filters.selectedType : 'Type' }}</span>
           <mat-icon>expand_more</mat-icon>
         </button>
         <mat-menu #typeMenu="matMenu" class="filter-menu">
@@ -64,7 +64,7 @@
           [class.active]="filters.selectedListingType !== 'All'"
           [matMenuTriggerFor]="listingTypeMenu"
         >
-          <span>Listing Type</span>
+          <span>{{ filters.selectedListingType !== 'All' ? filters.selectedListingType : 'Sale / Rent' }}</span>
           <mat-icon>expand_more</mat-icon>
         </button>
         <mat-menu #listingTypeMenu="matMenu" class="filter-menu">
@@ -76,13 +76,31 @@
         </mat-menu>
       }
 
+      @if (config.showCondition) {
+        <button
+          class="filter-pill"
+          [class.active]="filters.selectedCondition && filters.selectedCondition !== 'All'"
+          [matMenuTriggerFor]="conditionMenu"
+        >
+          <span>{{ filters.selectedCondition && filters.selectedCondition !== 'All' ? filters.selectedCondition : 'Condition' }}</span>
+          <mat-icon>expand_more</mat-icon>
+        </button>
+        <mat-menu #conditionMenu="matMenu" class="filter-menu">
+          @for (c of conditionOptions; track c) {
+            <button mat-menu-item (click)="filters.selectedCondition = c; onFilterChange()">
+              <mat-icon>new_releases</mat-icon> {{ c }}
+            </button>
+          }
+        </mat-menu>
+      }
+
       @if (config.showCity) {
         <button
           class="filter-pill"
           [class.active]="filters.selectedCity !== 'All'"
           [matMenuTriggerFor]="cityMenu"
         >
-          <span>City</span>
+          <span>{{ filters.selectedCity !== 'All' ? filters.selectedCity : 'City' }}</span>
           <mat-icon>expand_more</mat-icon>
         </button>
         <mat-menu #cityMenu="matMenu" class="filter-menu">
@@ -94,14 +112,154 @@
         </mat-menu>
       }
 
-      @if (config.showBedrooms || config.showBathrooms || config.showPrice || config.showArea) {
+      @if (config.showCountry) {
+        <button
+          class="filter-pill"
+          [class.active]="filters.selectedCountry && filters.selectedCountry !== 'All'"
+          [matMenuTriggerFor]="countryMenu"
+        >
+          <span>{{ filters.selectedCountry && filters.selectedCountry !== 'All' ? filters.selectedCountry : 'Country' }}</span>
+          <mat-icon>expand_more</mat-icon>
+        </button>
+        <mat-menu #countryMenu="matMenu" class="filter-menu">
+          @for (country of countryOptions; track country) {
+            <button mat-menu-item (click)="filters.selectedCountry = country; onFilterChange()">
+              <mat-icon>flag</mat-icon> {{ country }}
+            </button>
+          }
+        </mat-menu>
+      }
+
+      @if (config.showProject) {
+        <button
+          class="filter-pill"
+          [class.active]="filters.projectId !== 'All'"
+          [matMenuTriggerFor]="projectMenu"
+        >
+          <mat-icon>domain</mat-icon>
+          <span>{{ filters.projectId !== 'All' ? projectName() : 'Project' }}</span>
+          <mat-icon>expand_more</mat-icon>
+        </button>
+        <mat-menu #projectMenu="matMenu" class="filter-menu">
+          <div class="menu-search" (click)="$event.stopPropagation()">
+            <input placeholder="Search project..." [(ngModel)]="projectSearch" (input)="loadProjects()">
+          </div>
+          <button mat-menu-item (click)="filters.projectId = 'All'; onFilterChange()">
+            <mat-icon>clear</mat-icon> All projects
+          </button>
+          <button mat-menu-item (click)="filters.projectId = 'unassigned'; onFilterChange()">
+            <mat-icon>home</mat-icon> Standalone (no project)
+          </button>
+          @if (loadingProjects) {
+            <div class="menu-loading">
+              <mat-spinner diameter="24"></mat-spinner>
+            </div>
+          } @else {
+            @for (proj of projects; track proj.id) {
+              @if (!projectSearch || proj.name?.toLowerCase().includes(projectSearch.toLowerCase())) {
+                <button mat-menu-item (click)="filters.projectId = proj.id; onFilterChange()">
+                  <mat-icon>domain</mat-icon> {{ proj.name }}
+                </button>
+              }
+            }
+          }
+        </mat-menu>
+      }
+
+      @if (config.showSellerSelect) {
+        <button
+          class="filter-pill"
+          [class.active]="filters.sellerId !== 'All'"
+          [matMenuTriggerFor]="sellerSelectMenu"
+        >
+          <mat-icon>storefront</mat-icon>
+          <span>{{ filters.sellerId !== 'All' ? sellerName() : 'Seller' }}</span>
+          <mat-icon>expand_more</mat-icon>
+        </button>
+        <mat-menu #sellerSelectMenu="matMenu" class="filter-menu">
+          <div class="menu-search" (click)="$event.stopPropagation()">
+            <input placeholder="Search seller..." [(ngModel)]="sellerSearch">
+          </div>
+          <button mat-menu-item (click)="filters.sellerId = 'All'; onFilterChange()">
+            <mat-icon>clear</mat-icon> All sellers
+          </button>
+          @if (loadingSellers) {
+            <div class="menu-loading">
+              <mat-spinner diameter="24"></mat-spinner>
+            </div>
+          } @else {
+            @for (seller of sellers; track seller.id) {
+              @if (!sellerSearch || seller.name?.toLowerCase().includes(sellerSearch.toLowerCase())) {
+                <button mat-menu-item (click)="filters.sellerId = seller.id; onFilterChange()">
+                  <mat-icon>storefront</mat-icon> {{ seller.name }}
+                </button>
+              }
+            }
+          }
+        </mat-menu>
+      }
+
+      @if (config.showAgent) {
+        <button
+          class="filter-pill"
+          [class.active]="filters.assignedToUserId !== 'All'"
+          [matMenuTriggerFor]="agentMenu"
+        >
+          <mat-icon>person</mat-icon>
+          <span>{{ filters.assignedToUserId !== 'All' ? agentName() : 'Agent' }}</span>
+          <mat-icon>expand_more</mat-icon>
+        </button>
+        <mat-menu #agentMenu="matMenu" class="filter-menu">
+          <div class="menu-search" (click)="$event.stopPropagation()">
+            <input placeholder="Search agent..." [(ngModel)]="agentSearch">
+          </div>
+          <button mat-menu-item (click)="filters.assignedToUserId = 'All'; onFilterChange()">
+            <mat-icon>clear</mat-icon> All agents
+          </button>
+          @if (loadingUsers) {
+            <div class="menu-loading">
+              <mat-spinner diameter="24"></mat-spinner>
+            </div>
+          } @else {
+            @for (user of users; track user.id) {
+              @if (!agentSearch || userDisplayName(user).toLowerCase().includes(agentSearch.toLowerCase())) {
+                <button mat-menu-item (click)="filters.assignedToUserId = user.id; onFilterChange()">
+                  <mat-icon>person</mat-icon> {{ userDisplayName(user) }}
+                </button>
+              }
+            }
+          }
+        </mat-menu>
+      }
+
+      @if (config.showSort) {
+        <button
+          class="filter-pill"
+          [class.active]="filters.sortBy !== 'createdAt'"
+          [matMenuTriggerFor]="sortMenu"
+        >
+          <mat-icon>sort</mat-icon>
+          <span>{{ sortLabel() }}</span>
+          <mat-icon>expand_more</mat-icon>
+        </button>
+        <mat-menu #sortMenu="matMenu" class="filter-menu">
+          @for (opt of sortOptions; track opt.value) {
+            <button mat-menu-item (click)="setSort(opt.value)">
+              <mat-icon>{{ filters.sortBy === opt.value ? (filters.sortDir === 'ASC' ? 'arrow_upward' : 'arrow_downward') : 'sort' }}</mat-icon>
+              {{ opt.label }}{{ filters.sortBy === opt.value ? (filters.sortDir === 'ASC' ? ' ↑' : ' ↓') : '' }}
+            </button>
+          }
+        </mat-menu>
+      }
+
+      @if (hasAdvancedFilters()) {
         <button
           class="filter-pill filter-pill-icon"
           [class.active]="showAdvancedFilters"
           (click)="showAdvancedFilters = !showAdvancedFilters"
         >
           <mat-icon>tune</mat-icon>
-          <span>Filters</span>
+          <span>Filters{{ activeFilterCount() ? ' (' + activeFilterCount() + ')' : '' }}</span>
         </button>
       }
 
@@ -269,6 +427,24 @@
           </button>
         </span>
       }
+      @if (config.showListingType && filters.selectedListingType !== 'All') {
+        <span class="filter-chip">
+          <mat-icon>swap_horiz</mat-icon>
+          For {{ filters.selectedListingType }}
+          <button (click)="filters.selectedListingType = 'All'; onFilterChange()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </span>
+      }
+      @if (config.showCondition && filters.selectedCondition && filters.selectedCondition !== 'All') {
+        <span class="filter-chip">
+          <mat-icon>new_releases</mat-icon>
+          {{ filters.selectedCondition }}
+          <button (click)="filters.selectedCondition = 'All'; onFilterChange()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </span>
+      }
       @if (config.showCity && filters.selectedCity !== 'All') {
         <span class="filter-chip">
           <mat-icon>place</mat-icon>
@@ -278,20 +454,137 @@
           </button>
         </span>
       }
-      @if (config.showBedrooms && (filters.minBedrooms || filters.maxBedrooms)) {
+      @if (config.showCountry && filters.selectedCountry && filters.selectedCountry !== 'All') {
+        <span class="filter-chip">
+          <mat-icon>flag</mat-icon>
+          {{ filters.selectedCountry }}
+          <button (click)="filters.selectedCountry = 'All'; onFilterChange()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </span>
+      }
+      @if (config.showProject && filters.projectId !== 'All') {
+        <span class="filter-chip">
+          <mat-icon>domain</mat-icon>
+          {{ projectName() }}
+          <button (click)="filters.projectId = 'All'; onFilterChange()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </span>
+      }
+      @if (config.showSellerSelect && filters.sellerId !== 'All') {
+        <span class="filter-chip">
+          <mat-icon>storefront</mat-icon>
+          {{ sellerName() }}
+          <button (click)="filters.sellerId = 'All'; onFilterChange()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </span>
+      }
+      @if (config.showAgent && filters.assignedToUserId !== 'All') {
+        <span class="filter-chip">
+          <mat-icon>person</mat-icon>
+          {{ agentName() }}
+          <button (click)="filters.assignedToUserId = 'All'; onFilterChange()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </span>
+      }
+      @if (config.showBedrooms && (filters.minBedrooms != null || filters.maxBedrooms != null)) {
         <span class="filter-chip">
           <mat-icon>bed</mat-icon>
-          {{ filters.minBedrooms || 0 }}-{{ filters.maxBedrooms || '∞' }} bed
+          {{ filters.minBedrooms ?? 0 }}-{{ filters.maxBedrooms ?? '∞' }} bed
           <button (click)="filters.minBedrooms = null; filters.maxBedrooms = null; onFilterChange()">
             <mat-icon>close</mat-icon>
           </button>
         </span>
       }
-      @if (config.showBathrooms && filters.minBathrooms) {
+      @if (config.showBathrooms && (filters.minBathrooms != null || filters.maxBathrooms != null)) {
         <span class="filter-chip">
           <mat-icon>bathtub</mat-icon>
-          {{ filters.minBathrooms }}+ bath
-          <button (click)="filters.minBathrooms = null; onFilterChange()">
+          {{ filters.minBathrooms ?? 0 }}-{{ filters.maxBathrooms ?? '∞' }} bath
+          <button (click)="filters.minBathrooms = null; filters.maxBathrooms = null; onFilterChange()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </span>
+      }
+      @if (config.showBalconies && (filters.minBalconies != null || filters.maxBalconies != null)) {
+        <span class="filter-chip">
+          <mat-icon>balcony</mat-icon>
+          {{ filters.minBalconies ?? 0 }}-{{ filters.maxBalconies ?? '∞' }} balcony
+          <button (click)="filters.minBalconies = null; filters.maxBalconies = null; onFilterChange()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </span>
+      }
+      @if (config.showParking && (filters.minParking != null || filters.maxParking != null)) {
+        <span class="filter-chip">
+          <mat-icon>local_parking</mat-icon>
+          {{ filters.minParking ?? 0 }}-{{ filters.maxParking ?? '∞' }} parking
+          <button (click)="filters.minParking = null; filters.maxParking = null; onFilterChange()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </span>
+      }
+      @if (config.showFloor && (filters.minFloor != null || filters.maxFloor != null)) {
+        <span class="filter-chip">
+          <mat-icon>layers</mat-icon>
+          Floor {{ filters.minFloor ?? '…' }}-{{ filters.maxFloor ?? '…' }}
+          <button (click)="filters.minFloor = null; filters.maxFloor = null; onFilterChange()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </span>
+      }
+      @if (config.showYearBuilt && (filters.minYearBuilt != null || filters.maxYearBuilt != null)) {
+        <span class="filter-chip">
+          <mat-icon>calendar_month</mat-icon>
+          {{ filters.minYearBuilt ?? '…' }}-{{ filters.maxYearBuilt ?? '…' }}
+          <button (click)="filters.minYearBuilt = null; filters.maxYearBuilt = null; onFilterChange()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </span>
+      }
+      @if (config.showLotSize && (filters.minLotSize != null || filters.maxLotSize != null)) {
+        <span class="filter-chip">
+          <mat-icon>landscape</mat-icon>
+          Lot {{ filters.minLotSize ?? 0 }}-{{ filters.maxLotSize ?? '∞' }}m²
+          <button (click)="filters.minLotSize = null; filters.maxLotSize = null; onFilterChange()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </span>
+      }
+      @if (config.showMasterBedrooms && filters.minMasterBedrooms != null) {
+        <span class="filter-chip">
+          <mat-icon>bed</mat-icon>
+          {{ filters.minMasterBedrooms }}+ master
+          <button (click)="filters.minMasterBedrooms = null; onFilterChange()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </span>
+      }
+      @if (config.showTerraceCellar && filters.hasTerrace != null) {
+        <span class="filter-chip">
+          <mat-icon>deck</mat-icon>
+          Terrace: {{ filters.hasTerrace ? 'Yes' : 'No' }}
+          <button (click)="filters.hasTerrace = null; onFilterChange()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </span>
+      }
+      @if (config.showTerraceCellar && filters.hasCellar != null) {
+        <span class="filter-chip">
+          <mat-icon>warehouse</mat-icon>
+          Cellar: {{ filters.hasCellar ? 'Yes' : 'No' }}
+          <button (click)="filters.hasCellar = null; onFilterChange()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </span>
+      }
+      @if (config.showFeatures && filters.feature) {
+        <span class="filter-chip">
+          <mat-icon>star</mat-icon>
+          {{ filters.feature }}
+          <button (click)="filters.feature = ''; onFilterChange()">
             <mat-icon>close</mat-icon>
           </button>
         </span>
@@ -395,20 +688,286 @@
       @if (config.showBathrooms) {
         <div class="filter-group">
           <label><mat-icon>bathtub</mat-icon> Bathrooms</label>
+          <div class="range-slider">
+            <div class="range-inputs">
+              <mat-form-field appearance="outline">
+                <mat-label>Min</mat-label>
+                <input matInput type="number" [(ngModel)]="filters.minBathrooms" (change)="onFilterChange()">
+              </mat-form-field>
+              <span>to</span>
+              <mat-form-field appearance="outline">
+                <mat-label>Max</mat-label>
+                <input matInput type="number" [(ngModel)]="filters.maxBathrooms" (change)="onFilterChange()">
+              </mat-form-field>
+            </div>
+            <div class="quick-btn-group">
+              <button
+                class="quick-btn"
+                [class.active]="filters.minBathrooms == null && filters.maxBathrooms == null"
+                (click)="filters.minBathrooms = null; filters.maxBathrooms = null; onFilterChange()"
+              >Any</button>
+              @for (num of [1,2,3,4]; track num) {
+                <button
+                  class="quick-btn"
+                  [class.active]="filters.minBathrooms === num && filters.maxBathrooms == null"
+                  (click)="filters.minBathrooms = num; filters.maxBathrooms = null; onFilterChange()"
+                >{{ num }}+</button>
+              }
+            </div>
+          </div>
+        </div>
+      }
+
+      @if (config.showBalconies) {
+        <div class="filter-group">
+          <label><mat-icon>balcony</mat-icon> Balconies</label>
+          <div class="range-slider">
+            <div class="range-inputs">
+              <mat-form-field appearance="outline">
+                <mat-label>Min</mat-label>
+                <input matInput type="number" [(ngModel)]="filters.minBalconies" (change)="onFilterChange()">
+              </mat-form-field>
+              <span>to</span>
+              <mat-form-field appearance="outline">
+                <mat-label>Max</mat-label>
+                <input matInput type="number" [(ngModel)]="filters.maxBalconies" (change)="onFilterChange()">
+              </mat-form-field>
+            </div>
+            <div class="quick-btn-group">
+              <button
+                class="quick-btn"
+                [class.active]="filters.minBalconies == null && filters.maxBalconies == null"
+                (click)="filters.minBalconies = null; filters.maxBalconies = null; onFilterChange()"
+              >Any</button>
+              @for (num of [1,2,3]; track num) {
+                <button
+                  class="quick-btn"
+                  [class.active]="filters.minBalconies === num && filters.maxBalconies == null"
+                  (click)="filters.minBalconies = num; filters.maxBalconies = null; onFilterChange()"
+                >{{ num }}+</button>
+              }
+            </div>
+          </div>
+        </div>
+      }
+
+      @if (config.showParking) {
+        <div class="filter-group">
+          <label><mat-icon>local_parking</mat-icon> Parking spaces</label>
+          <div class="range-slider">
+            <div class="range-inputs">
+              <mat-form-field appearance="outline">
+                <mat-label>Min</mat-label>
+                <input matInput type="number" [(ngModel)]="filters.minParking" (change)="onFilterChange()">
+              </mat-form-field>
+              <span>to</span>
+              <mat-form-field appearance="outline">
+                <mat-label>Max</mat-label>
+                <input matInput type="number" [(ngModel)]="filters.maxParking" (change)="onFilterChange()">
+              </mat-form-field>
+            </div>
+            <div class="quick-btn-group">
+              <button
+                class="quick-btn"
+                [class.active]="filters.minParking == null && filters.maxParking == null"
+                (click)="filters.minParking = null; filters.maxParking = null; onFilterChange()"
+              >Any</button>
+              @for (num of [1,2,3]; track num) {
+                <button
+                  class="quick-btn"
+                  [class.active]="filters.minParking === num && filters.maxParking == null"
+                  (click)="filters.minParking = num; filters.maxParking = null; onFilterChange()"
+                >{{ num }}+</button>
+              }
+            </div>
+          </div>
+        </div>
+      }
+
+      @if (config.showFloor) {
+        <div class="filter-group">
+          <label><mat-icon>layers</mat-icon> Floor</label>
+          <div class="range-slider">
+            <div class="range-inputs">
+              <mat-form-field appearance="outline">
+                <mat-label>Min</mat-label>
+                <input matInput type="number" [(ngModel)]="filters.minFloor" (change)="onFilterChange()">
+              </mat-form-field>
+              <span>to</span>
+              <mat-form-field appearance="outline">
+                <mat-label>Max</mat-label>
+                <input matInput type="number" [(ngModel)]="filters.maxFloor" (change)="onFilterChange()">
+              </mat-form-field>
+            </div>
+            <div class="quick-btn-group">
+              <button
+                class="quick-btn"
+                [class.active]="filters.minFloor == null && filters.maxFloor == null"
+                (click)="filters.minFloor = null; filters.maxFloor = null; onFilterChange()"
+              >Any</button>
+              <button
+                class="quick-btn"
+                [class.active]="filters.minFloor === 0 && filters.maxFloor === 0"
+                (click)="filters.minFloor = 0; filters.maxFloor = 0; onFilterChange()"
+              >Ground</button>
+              <button
+                class="quick-btn"
+                [class.active]="filters.minFloor === 1 && filters.maxFloor == null"
+                (click)="filters.minFloor = 1; filters.maxFloor = null; onFilterChange()"
+              >1st+</button>
+              <button
+                class="quick-btn"
+                [class.active]="filters.minFloor === 5 && filters.maxFloor == null"
+                (click)="filters.minFloor = 5; filters.maxFloor = null; onFilterChange()"
+              >5th+</button>
+            </div>
+          </div>
+        </div>
+      }
+
+      @if (config.showYearBuilt) {
+        <div class="filter-group">
+          <label><mat-icon>calendar_month</mat-icon> Year built</label>
+          <div class="range-slider">
+            <div class="range-inputs">
+              <mat-form-field appearance="outline">
+                <mat-label>From</mat-label>
+                <input matInput type="number" [(ngModel)]="filters.minYearBuilt" (change)="onFilterChange()">
+              </mat-form-field>
+              <span>to</span>
+              <mat-form-field appearance="outline">
+                <mat-label>To</mat-label>
+                <input matInput type="number" [(ngModel)]="filters.maxYearBuilt" (change)="onFilterChange()">
+              </mat-form-field>
+            </div>
+            <div class="quick-btn-group">
+              <button
+                class="quick-btn"
+                [class.active]="filters.minYearBuilt == null && filters.maxYearBuilt == null"
+                (click)="filters.minYearBuilt = null; filters.maxYearBuilt = null; onFilterChange()"
+              >Any</button>
+              <button
+                class="quick-btn"
+                [class.active]="filters.minYearBuilt === 2020 && filters.maxYearBuilt == null"
+                (click)="filters.minYearBuilt = 2020; filters.maxYearBuilt = null; onFilterChange()"
+              >2020+</button>
+              <button
+                class="quick-btn"
+                [class.active]="filters.minYearBuilt === 2010 && filters.maxYearBuilt == null"
+                (click)="filters.minYearBuilt = 2010; filters.maxYearBuilt = null; onFilterChange()"
+              >2010+</button>
+              <button
+                class="quick-btn"
+                [class.active]="filters.minYearBuilt == null && filters.maxYearBuilt === 2000"
+                (click)="filters.minYearBuilt = null; filters.maxYearBuilt = 2000; onFilterChange()"
+              >≤2000</button>
+            </div>
+          </div>
+        </div>
+      }
+
+      @if (config.showLotSize) {
+        <div class="filter-group">
+          <label><mat-icon>landscape</mat-icon> Lot size (m²)</label>
+          <div class="range-slider">
+            <div class="range-inputs">
+              <mat-form-field appearance="outline">
+                <mat-label>Min</mat-label>
+                <input matInput type="number" [(ngModel)]="filters.minLotSize" (change)="onFilterChange()">
+              </mat-form-field>
+              <span>to</span>
+              <mat-form-field appearance="outline">
+                <mat-label>Max</mat-label>
+                <input matInput type="number" [(ngModel)]="filters.maxLotSize" (change)="onFilterChange()">
+              </mat-form-field>
+            </div>
+          </div>
+        </div>
+      }
+
+      @if (config.showMasterBedrooms) {
+        <div class="filter-group">
+          <label><mat-icon>bed</mat-icon> Master bedrooms (min)</label>
           <div class="quick-btn-group">
             <button
               class="quick-btn"
-              [class.active]="!filters.minBathrooms"
-              (click)="filters.minBathrooms = null; onFilterChange()"
+              [class.active]="filters.minMasterBedrooms == null"
+              (click)="filters.minMasterBedrooms = null; onFilterChange()"
             >Any</button>
-            @for (num of [1,2,3,4]; track num) {
+            @for (num of [1,2,3]; track num) {
               <button
                 class="quick-btn"
-                [class.active]="filters.minBathrooms === num"
-                (click)="filters.minBathrooms = num; onFilterChange()"
+                [class.active]="filters.minMasterBedrooms === num"
+                (click)="filters.minMasterBedrooms = num; onFilterChange()"
               >{{ num }}+</button>
             }
           </div>
+        </div>
+      }
+
+      @if (config.showTerraceCellar) {
+        <div class="filter-group">
+          <label><mat-icon>deck</mat-icon> Terrace</label>
+          <div class="quick-btn-group">
+            <button
+              class="quick-btn"
+              [class.active]="filters.hasTerrace == null"
+              (click)="filters.hasTerrace = null; onFilterChange()"
+            >Any</button>
+            <button
+              class="quick-btn"
+              [class.active]="filters.hasTerrace === true"
+              (click)="filters.hasTerrace = true; onFilterChange()"
+            >Yes</button>
+            <button
+              class="quick-btn"
+              [class.active]="filters.hasTerrace === false"
+              (click)="filters.hasTerrace = false; onFilterChange()"
+            >No</button>
+          </div>
+        </div>
+      }
+
+      @if (config.showTerraceCellar) {
+        <div class="filter-group">
+          <label><mat-icon>warehouse</mat-icon> Cellar</label>
+          <div class="quick-btn-group">
+            <button
+              class="quick-btn"
+              [class.active]="filters.hasCellar == null"
+              (click)="filters.hasCellar = null; onFilterChange()"
+            >Any</button>
+            <button
+              class="quick-btn"
+              [class.active]="filters.hasCellar === true"
+              (click)="filters.hasCellar = true; onFilterChange()"
+            >Yes</button>
+            <button
+              class="quick-btn"
+              [class.active]="filters.hasCellar === false"
+              (click)="filters.hasCellar = false; onFilterChange()"
+            >No</button>
+          </div>
+        </div>
+      }
+
+      @if (config.showFeatures) {
+        <div class="filter-group">
+          <label><mat-icon>star</mat-icon> Feature</label>
+          <mat-form-field appearance="outline" class="feature-field">
+            <mat-label>e.g. Pool, Garden…</mat-label>
+            <input matInput [(ngModel)]="filters.feature" (change)="onFilterChange()" list="feature-options">
+            <datalist id="feature-options">
+              @for (feat of availableFeatures; track feat) {
+                <option [value]="feat"></option>
+              }
+            </datalist>
+          </mat-form-field>
+          @if (filters.feature) {
+            <div class="quick-btn-group">
+              <button class="quick-btn" (click)="filters.feature = ''; onFilterChange()">Clear</button>
+            </div>
+          }
         </div>
       }
 
@@ -464,3 +1023,4 @@
     </div>
   }
 </div>
+

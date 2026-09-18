@@ -19,12 +19,37 @@ export class ApiService {
     status?: string;
     type?: string;
     listingType?: string;
+    condition?: string;
     minPrice?: number;
     maxPrice?: number;
     minBedrooms?: number;
     maxBedrooms?: number;
+    minBathrooms?: number;
+    maxBathrooms?: number;
+    minBalconies?: number;
+    maxBalconies?: number;
+    minParking?: number;
+    maxParking?: number;
+    minFloor?: number;
+    maxFloor?: number;
+    minYearBuilt?: number;
+    maxYearBuilt?: number;
+    minLotSize?: number;
+    maxLotSize?: number;
+    minMasterBedrooms?: number;
+    minArea?: number;
+    maxArea?: number;
     city?: string;
+    country?: string;
+    hasTerrace?: boolean;
+    hasCellar?: boolean;
+    feature?: string;
+    assignedToUserId?: string;
+    assignedToGroupId?: string;
+    sellerId?: string;
     projectId?: string;
+    sortBy?: string;
+    sortDir?: string;
   }): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/properties`, { params: params as any });
   }
