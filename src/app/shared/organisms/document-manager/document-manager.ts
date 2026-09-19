@@ -14,6 +14,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { environment } from '../../../../environments/environment';
 import { ApiService } from '../../../services/api';
+import { ShareService } from '../../../services/share/share.service';
 import { DocumentUploadFormComponent } from '../document-upload-form/document-upload-form';
 import { PaginationComponent } from '../../atoms/pagination/pagination';
 import { PropertySearchComponent, SearchFilters, SearchFilterConfig } from '../../molecules/property-search/property-search';
@@ -52,6 +53,7 @@ export class DocumentManagerComponent implements OnInit {
   private api = inject(ApiService);
   private dialog = inject(MatDialog);
   private snackBar = inject(MatSnackBar);
+  private share = inject(ShareService);
 
   documents: any[] = [];
   filteredDocuments: any[] = [];
@@ -190,6 +192,25 @@ export class DocumentManagerComponent implements OnInit {
     if (version?.fileUrl) {
       window.open(this.resolveFileUrl(version.fileUrl), '_blank');
     }
+  }
+
+  shareDocumentViaWhatsApp(doc: any) {
+    const version = doc.versions?.[0];
+    const fileUrl = version?.fileUrl ? this.resolveFileUrl(version.fileUrl) : '';
+    if (!fileUrl) {
+      this.snackBar.open('No file available to share', 'Close', { duration: 3000 });
+      return;
+    }
+    const property = doc.property || {};
+    this.share.sharePropertyViaWhatsApp(
+      {
+        title: doc.title || property.title || 'Property document',
+        address: property.address,
+        city: property.city,
+        country: property.country,
+      },
+      [{ kind: 'document', url: fileUrl, label: doc.title || 'Document' }]
+    );
   }
 
   private resolveFileUrl(fileUrl: string): string {

@@ -21,6 +21,117 @@
   gap: 12px;
 }
 
+/* WhatsApp share */
+.whatsapp-btn {
+  border-color: #25d366 !important;
+  color: #25d366 !important;
+}
+
+.whatsapp-btn mat-icon {
+  color: #25d366;
+}
+
+.gallery-top-actions {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: flex;
+  gap: 8px;
+}
+
+.wa-share-fab {
+  background: #25d366 !important;
+  color: #062b1a !important;
+}
+
+.wa-share-fab mat-icon {
+  color: #062b1a;
+}
+
+.thumb-share {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  background: rgba(0, 0, 0, 0.65) !important;
+  color: #25d366 !important;
+  opacity: 0;
+  transition: opacity 0.2s;
+  z-index: 2;
+}
+
+.gallery-thumb:hover .thumb-share,
+.gallery-thumb:focus-within .thumb-share {
+  opacity: 1;
+}
+
+@media (hover: none) and (pointer: coarse) {
+  .thumb-share {
+    opacity: 1;
+  }
+}
+
+.thumb-share mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  color: #25d366;
+}
+
+.wa-icon-btn {
+  flex-shrink: 0;
+  color: #25d366 !important;
+}
+
+.wa-icon-btn mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  color: #25d366;
+}
+
+.tour-row,
+.attachment-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 100%;
+}
+
+.attachment-row {
+  display: flex;
+}
+
+.attachment-row .attachment-item {
+  flex: 1;
+}
+
+.lightbox-share {
+  position: absolute;
+  top: 20px;
+  right: 84px;
+  background: #25d366;
+  border: none;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.lightbox-share:hover {
+  transform: scale(1.08);
+}
+
+.lightbox-share mat-icon {
+  color: #062b1a;
+  font-size: 26px;
+  width: 26px;
+  height: 26px;
+}
+
 /* Sale/Lost Info Banners */
 .sale-info-banner {
   display: flex;

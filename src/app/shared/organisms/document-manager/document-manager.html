@@ -82,6 +82,10 @@
                 <mat-icon>download</mat-icon>
                 <span>Download</span>
               </button>
+              <button mat-menu-item (click)="shareDocumentViaWhatsApp(doc)">
+                <mat-icon>chat</mat-icon>
+                <span>Share via WhatsApp</span>
+              </button>
               <button mat-menu-item (click)="openUploadForm(true, doc.id)">
                 <mat-icon>history</mat-icon>
                 <span>New Version</span>
@@ -166,6 +170,10 @@
               <button mat-stroked-button (click)="downloadDocument(previewDoc)">
                 <mat-icon>download</mat-icon>
                 Download
+              </button>
+              <button mat-stroked-button (click)="shareDocumentViaWhatsApp(previewDoc)">
+                <mat-icon>chat</mat-icon>
+                WhatsApp
               </button>
               <button mat-stroked-button (click)="openUploadForm(true, previewDoc.id)">
                 <mat-icon>history</mat-icon>

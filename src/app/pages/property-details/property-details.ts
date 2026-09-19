@@ -20,6 +20,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { ApiService } from '../../services/api';
 import { AuthService } from '../../services/auth/auth.service';
+import { ShareService } from '../../services/share/share.service';
 import { BreadcrumbComponent } from '../../shared/atoms/breadcrumb/breadcrumb';
 import { PageHeaderComponent } from '../../shared/molecules/page-header/page-header';
 import { PropertyFormComponent } from '../../shared/organisms/property-form/property-form';
@@ -30,6 +31,7 @@ import { DocumentManagerComponent } from '../../shared/organisms/document-manage
 import { LeadWorkflowComponent, LeadWorkflowResult } from '../../shared/organisms/lead-workflow/lead-workflow';
 import { SoldDialogComponent } from '../../shared/molecules/sold-dialog/sold-dialog';
 import { LostDialogComponent, LostDialogResult } from '../../shared/molecules/lost-dialog/lost-dialog';
+import { WhatsappShareDialogComponent } from '../../shared/molecules/whatsapp-share-dialog/whatsapp-share-dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 @Component({
@@ -83,7 +85,8 @@ export class PropertyDetailsComponent implements OnInit {
     private auth: AuthService,
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
-    private sanitizer: DomSanitizer
+    private sanitizer: DomSanitizer,
+    private share: ShareService
   ) {
     this.currentUser = this.auth.currentUser();
   }
@@ -490,6 +493,53 @@ export class PropertyDetailsComponent implements OnInit {
 
   goBack() {
     this.router.navigate(['/properties']);
+  }
+
+  // ---- Share via WhatsApp (images, videos, documents) ----
+  private propertyShareData(): { title?: string; price?: number | string; listingType?: string; address?: string; city?: string; country?: string; bedrooms?: number; bathrooms?: number; area?: number; id?: string } {
+    const p = this.property || {};
+    return {
+      id: p.id,
+      title: p.title,
+      price: p.price,
+      listingType: p.listingType,
+      address: p.address,
+      city: p.city,
+      country: p.country,
+      bedrooms: p.bedrooms,
+      bathrooms: p.bathrooms,
+      area: p.area,
+    };
+  }
+
+  openWhatsAppShare(preselectedUrls?: string[]) {
+    if (!this.property) return;
+    this.dialog.open(WhatsappShareDialogComponent, {
+      width: '680px',
+      maxWidth: '95vw',
+      maxHeight: '90vh',
+      data: {
+        property: this.propertyShareData(),
+        photos: Array.isArray(this.property.photos) ? this.property.photos : [],
+        videos: this.videoItems.map((v) => ({ url: v.url, label: v.label })),
+        tours: this.tourLinks,
+        documents: this.attachmentDocs,
+        preselectedUrls,
+      }
+    });
+  }
+
+  /** One-click share of a single media item (used by per-item WhatsApp buttons). */
+  shareSingleViaWhatsApp(kind: 'image' | 'video' | 'document' | 'tour' | 'link', url: string, event?: Event) {
+    event?.stopPropagation();
+    event?.preventDefault();
+    if (!url) return;
+    const label = kind === 'image' ? 'Photo' : kind === 'video' ? 'Video' : kind === 'tour' ? 'Virtual tour' : 'Document';
+    this.share.sharePropertyViaWhatsApp(this.propertyShareData(), [{
+      kind,
+      url,
+      label: `${label} — ${this.property?.title || ''}`.trim(),
+    }]);
   }
 
   openLeadWorkflow() {

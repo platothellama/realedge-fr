@@ -1,0 +1,81 @@
+<div class="wa-dialog">
+  <div class="dialog-header">
+    <div class="header-icon">
+      <mat-icon>chat</mat-icon>
+    </div>
+    <div>
+      <h2>Share via WhatsApp</h2>
+      <p class="subtitle">{{ data.property.title || 'Property media' }} — pick images, videos & documents to include</p>
+    </div>
+    <button mat-icon-button class="close-btn" (click)="close()" aria-label="Close">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content class="dialog-body">
+    @if (!items.length) {
+      <div class="empty">
+        <mat-icon>sentiment_dissatisfied</mat-icon>
+        <p>No photos, videos or documents on this property yet.</p>
+      </div>
+    } @else {
+      @for (group of grouped; track group.kind) {
+        <div class="media-group">
+          <div class="group-header">
+            <span class="group-title"><mat-icon>{{ group.icon }}</mat-icon> {{ group.title }} ({{ group.items.length }})</span>
+            <button mat-button color="primary" (click)="toggleAll(group, !isAllSelected(group))">
+              {{ isAllSelected(group) ? 'Deselect all' : 'Select all' }}
+            </button>
+          </div>
+          <div class="item-grid" [class.docs]="(group.kind === 'document' || group.kind === 'tour')">
+            @for (item of group.items; track item.url) {
+              <label class="pick-item" [class.selected]="item.selected" [matTooltip]="absoluteUrl(item.url)">
+                <input type="checkbox" [(ngModel)]="item.selected" />
+                @if (thumbFor(item); as thumb) {
+                  <img [src]="thumb" [alt]="item.label" loading="lazy" />
+                } @else {
+                  <span class="file-icon"><mat-icon>{{ group.icon }}</mat-icon></span>
+                }
+                <span class="pick-label">{{ item.label }}</span>
+                <span class="check-badge"><mat-icon>check_circle</mat-icon></span>
+              </label>
+            }
+          </div>
+        </div>
+        <mat-divider></mat-divider>
+      }
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>WhatsApp number (optional — leave empty for contact picker)</mat-label>
+        <input matInput [(ngModel)]="phone" placeholder="+971 50 123 4567" inputmode="tel" />
+        <mat-hint>Include country code, e.g. 971501234567</mat-hint>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Add a personal note (optional)</mat-label>
+        <textarea matInput rows="2" [(ngModel)]="customMessage" placeholder="Hi! Here is a property you might like…"></textarea>
+      </mat-form-field>
+
+      <mat-checkbox [(ngModel)]="includeDetailsLink">Include link to property details page</mat-checkbox>
+
+      <div class="preview">
+        <div class="preview-label">WhatsApp message preview ({{ selectedCount }} item{{ selectedCount === 1 ? '' : 's' }})</div>
+        <pre>{{ messagePreview }}</pre>
+      </div>
+    }
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end" class="dialog-actions">
+    <button mat-button (click)="copyMessage()" [disabled]="!selectedCount">
+      <mat-icon>content_copy</mat-icon> Copy
+    </button>
+    @if (canNativeShare) {
+      <button mat-stroked-button color="primary" (click)="nativeShare()" [disabled]="!selectedCount || sharing">
+        <mat-icon>ios_share</mat-icon> {{ sharing ? 'Sharing…' : 'Share files…' }}
+      </button>
+    }
+    <button mat-raised-button class="wa-btn" (click)="openWhatsApp()" [disabled]="!selectedCount">
+      <mat-icon>chat</mat-icon> Open WhatsApp
+    </button>
+  </mat-dialog-actions>
+</div>
