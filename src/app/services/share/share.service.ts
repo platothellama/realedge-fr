@@ -17,7 +17,6 @@ export interface PropertyShareData {
   bedrooms?: number;
   bathrooms?: number;
   area?: number;
-  propertyUrl?: string;
 }
 
 /**
@@ -93,10 +92,6 @@ export class ShareService {
       items.forEach((item, i) => {
         lines.push(`${i + 1}. ${this.toAbsoluteUrl(item.url)}`);
       });
-    }
-    if (property.propertyUrl) {
-      lines.push('');
-      lines.push(`Details: ${property.propertyUrl}`);
     }
     return lines.join('\n');
   }

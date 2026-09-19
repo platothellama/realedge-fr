@@ -6,7 +6,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
@@ -36,7 +35,6 @@ interface PickableItem extends ShareMediaItem {
     MatIconModule,
     MatInputModule,
     MatFormFieldModule,
-    MatCheckboxModule,
     MatDividerModule,
     MatTooltipModule,
     MatSnackBarModule,
@@ -53,7 +51,6 @@ export class WhatsappShareDialogComponent implements OnInit {
   items: PickableItem[] = [];
   phone = '';
   customMessage = '';
-  includeDetailsLink = true;
   sharing = false;
 
   get canNativeShare(): boolean {
@@ -98,9 +95,8 @@ export class WhatsappShareDialogComponent implements OnInit {
   }
 
   get messagePreview(): string {
-    const propertyUrl = this.includeDetailsLink ? this.propertyUrl() : undefined;
     return this.share.buildPropertyMessage(
-      { ...this.data.property, propertyUrl },
+      { ...this.data.property },
       this.selectedItems,
       this.customMessage
     );
@@ -108,16 +104,6 @@ export class WhatsappShareDialogComponent implements OnInit {
 
   get selectedCount(): number {
     return this.selectedItems.length;
-  }
-
-  propertyUrl(): string | undefined {
-    const id = (this.data.property as any)?.id;
-    if (!id) return undefined;
-    try {
-      return `${window.location.origin}/properties/${id}`;
-    } catch {
-      return undefined;
-    }
   }
 
   toggleAll(group: { items: PickableItem[] }, checked: boolean): void {
@@ -143,7 +129,7 @@ export class WhatsappShareDialogComponent implements OnInit {
       return;
     }
     this.share.sharePropertyViaWhatsApp(
-      { ...this.data.property, propertyUrl: this.includeDetailsLink ? this.propertyUrl() : undefined },
+      { ...this.data.property },
       this.selectedItems,
       { phone: this.phone, message: this.customMessage }
     );

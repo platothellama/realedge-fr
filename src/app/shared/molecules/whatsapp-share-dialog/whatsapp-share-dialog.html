@@ -56,8 +56,6 @@
         <textarea matInput rows="2" [(ngModel)]="customMessage" placeholder="Hi! Here is a property you might like…"></textarea>
       </mat-form-field>
 
-      <mat-checkbox [(ngModel)]="includeDetailsLink">Include link to property details page</mat-checkbox>
-
       <div class="preview">
         <div class="preview-label">WhatsApp message preview ({{ selectedCount }} item{{ selectedCount === 1 ? '' : 's' }})</div>
         <pre>{{ messagePreview }}</pre>
